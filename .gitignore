@@ -1,0 +1,12 @@
+*.pyc
+__pycache__/
+*.egg-info/
+.venv/
+dist/
+build/
+.env
+*.sqlite3
+node_modules/
+frontend/dist/
+backend/media/
+backend/staticfiles/
