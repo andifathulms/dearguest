@@ -1,0 +1,89 @@
+import './JavaneseDark.css'
+import { motion } from 'framer-motion'
+import HeroSection from '../../components/sections/HeroSection.jsx'
+import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
+import CountdownTimer from '../../components/sections/CountdownTimer.jsx'
+import EventsSection from '../../components/sections/EventsSection.jsx'
+import StorySection from '../../components/sections/StorySection.jsx'
+import ProfileSection from '../../components/sections/ProfileSection.jsx'
+import GallerySection from '../../components/sections/GallerySection.jsx'
+import AmplodDigital from '../../components/sections/AmplodDigital.jsx'
+import RSVPForm from '../../components/sections/RSVPForm.jsx'
+import WishesWall from '../../components/sections/WishesWall.jsx'
+import MapsSection from '../../components/sections/MapsSection.jsx'
+import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
+import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
+}
+
+function Section({ children }) {
+  return (
+    <motion.div
+      variants={sectionVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+export default function JavaneseDark({ invitation, guestName }) {
+  const couple = invitation.couple || {}
+  const akad = (invitation.events || []).find(e => e.event_type === 'akad')
+
+  return (
+    <div className="javanese-dark">
+      <div className="kawung-border-top" />
+
+      <HeroSection
+        brideName={couple.bride_name}
+        groomName={couple.groom_name}
+        weddingDate={invitation.wedding_date}
+        theme="javanese-dark"
+      />
+
+      <Section><GuestGreeting guestName={guestName} openingText={invitation.opening_text} /></Section>
+      <Section><CountdownTimer targetDate={akad?.datetime} /></Section>
+      <Section><EventsSection events={invitation.events} /></Section>
+      <Section><StorySection stories={invitation.stories} /></Section>
+      <Section><ProfileSection couple={couple} /></Section>
+      <Section><GallerySection photos={invitation.photos} /></Section>
+      <Section><AmplodDigital bankAccounts={invitation.bank_accounts} /></Section>
+      <Section><RSVPForm slug={invitation.slug} /></Section>
+      <Section><WishesWall slug={invitation.slug} /></Section>
+      <Section><MapsSection events={invitation.events} /></Section>
+
+      <WhatsAppShare
+        slug={invitation.slug}
+        brideName={couple.bride_name}
+        groomName={couple.groom_name}
+      />
+
+      {invitation.closing_text && (
+        <motion.section
+          className="closing-section"
+          style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: 'var(--font-serif)' }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          <p>{invitation.closing_text}</p>
+        </motion.section>
+      )}
+
+      {invitation.watermark && (
+        <div className="watermark-footer">
+          Dibuat dengan <a href="/">Undangan Digital</a>
+        </div>
+      )}
+
+      <div className="kawung-border-bottom" />
+      <MusicPlayer musicUrl={invitation.music_file} />
+    </div>
+  )
+}
