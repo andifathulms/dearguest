@@ -55,47 +55,47 @@ function SettingsSection({ inv, reload, notify }) {
       <h2>Pengaturan Undangan</h2>
       <p className="ed-card-sub">Tema, tanggal, sambutan, musik, dan live streaming.</p>
       <div className="ed-field">
-        <label>Tema</label>
-        <select className="ed-select" value={f.theme} onChange={e => set('theme', e.target.value)}>
+        <label htmlFor="set-theme">Tema</label>
+        <select id="set-theme" className="ed-select" value={f.theme} onChange={e => set('theme', e.target.value)}>
           {THEMES.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
         </select>
       </div>
       <div className="ed-field">
-        <label>Tanggal pernikahan</label>
-        <input className="ed-input" type="date" value={f.wedding_date} onChange={e => set('wedding_date', e.target.value)} />
+        <label htmlFor="set-date">Tanggal pernikahan</label>
+        <input id="set-date" className="ed-input" type="date" value={f.wedding_date} onChange={e => set('wedding_date', e.target.value)} />
       </div>
       <div className="ed-field">
-        <label>Teks pembuka</label>
-        <textarea className="ed-textarea" value={f.opening_text} onChange={e => set('opening_text', e.target.value)} placeholder="Kata sambutan untuk tamu…" />
+        <label htmlFor="set-opening">Teks pembuka</label>
+        <textarea id="set-opening" className="ed-textarea" value={f.opening_text} onChange={e => set('opening_text', e.target.value)} placeholder="Kata sambutan untuk tamu…" />
       </div>
       <div className="ed-field">
-        <label>Teks penutup</label>
-        <textarea className="ed-textarea" value={f.closing_text} onChange={e => set('closing_text', e.target.value)} placeholder="Ucapan terima kasih…" />
+        <label htmlFor="set-closing">Teks penutup</label>
+        <textarea id="set-closing" className="ed-textarea" value={f.closing_text} onChange={e => set('closing_text', e.target.value)} placeholder="Ucapan terima kasih…" />
       </div>
       <div className="ed-field">
-        <label>Dress code (opsional)</label>
-        <input className="ed-input" value={f.dress_code} onChange={e => set('dress_code', e.target.value)} placeholder="mis. Batik / Earth tone / Formal" />
+        <label htmlFor="set-dress">Dress code (opsional)</label>
+        <input id="set-dress" className="ed-input" value={f.dress_code} onChange={e => set('dress_code', e.target.value)} placeholder="mis. Batik / Earth tone / Formal" />
       </div>
       <div className="ed-field">
-        <label>Link live streaming (opsional — YouTube, dll.)</label>
-        <input className="ed-input" value={f.livestream_url} onChange={e => set('livestream_url', e.target.value)} placeholder="https://youtube.com/watch?v=…" />
+        <label htmlFor="set-live">Link live streaming (opsional — YouTube, dll.)</label>
+        <input id="set-live" className="ed-input" value={f.livestream_url} onChange={e => set('livestream_url', e.target.value)} placeholder="https://youtube.com/watch?v=…" />
       </div>
       <div className="ed-field">
-        <label>Link wishlist / gift registry (opsional)</label>
-        <input className="ed-input" value={f.wishlist_url} onChange={e => set('wishlist_url', e.target.value)} placeholder="https://tokopedia.link/… atau registry kalian" />
+        <label htmlFor="set-wishlist">Link wishlist / gift registry (opsional)</label>
+        <input id="set-wishlist" className="ed-input" value={f.wishlist_url} onChange={e => set('wishlist_url', e.target.value)} placeholder="https://tokopedia.link/… atau registry kalian" />
       </div>
       {presets.length > 0 && (
         <div className="ed-field">
-          <label>Pilih dari pustaka musik</label>
-          <select className="ed-select" value={presetId} onChange={e => pickPreset(e.target.value)}>
+          <label htmlFor="set-preset">Pilih dari pustaka musik</label>
+          <select id="set-preset" className="ed-select" value={presetId} onChange={e => pickPreset(e.target.value)}>
             <option value="">— Tidak ada / pakai file unggahan —</option>
             {presets.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
           </select>
         </div>
       )}
       <div className="ed-field">
-        <label>Atau unggah musik sendiri {inv.music_file && <a href={inv.music_file} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(file saat ini)</a>}</label>
-        <input className="ed-file" type="file" accept="audio/*" onChange={e => setMusic(e.target.files[0] || null)} />
+        <label htmlFor="set-music">Atau unggah musik sendiri {inv.music_file && <a href={inv.music_file} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(file saat ini)</a>}</label>
+        <input id="set-music" className="ed-file" type="file" accept="audio/*" onChange={e => setMusic(e.target.files[0] || null)} />
       </div>
       <div className="ed-save-row">
         <button className="ed-btn" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan Pengaturan'}</button>
@@ -136,24 +136,24 @@ function CoupleSection({ inv, reload, notify }) {
       <p className="ed-card-sub">Nama, orang tua, bio, dan foto kedua mempelai.</p>
       <div className="ed-row2">
         <div>
-          <div className="ed-field"><label>Nama mempelai wanita</label><input className="ed-input" value={f.bride_name} onChange={e => set('bride_name', e.target.value)} /></div>
-          <div className="ed-field"><label>Orang tua</label><input className="ed-input" value={f.bride_parents} onChange={e => set('bride_parents', e.target.value)} placeholder="Putri dari Bapak … & Ibu …" /></div>
-          <div className="ed-field"><label>Bio (opsional)</label><textarea className="ed-textarea" value={f.bride_bio} onChange={e => set('bride_bio', e.target.value)} /></div>
-          <div className="ed-field"><label>Foto</label>
+          <div className="ed-field"><label htmlFor="cpl-bride-name">Nama mempelai wanita</label><input id="cpl-bride-name" className="ed-input" value={f.bride_name} onChange={e => set('bride_name', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor="cpl-bride-parents">Orang tua</label><input id="cpl-bride-parents" className="ed-input" value={f.bride_parents} onChange={e => set('bride_parents', e.target.value)} placeholder="Putri dari Bapak … & Ibu …" /></div>
+          <div className="ed-field"><label htmlFor="cpl-bride-bio">Bio (opsional)</label><textarea id="cpl-bride-bio" className="ed-textarea" value={f.bride_bio} onChange={e => set('bride_bio', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor="cpl-bride-photo">Foto</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               {(previews.bride_photo || c.bride_photo) && <img className="ed-thumb" src={previews.bride_photo || c.bride_photo} alt="Foto mempelai wanita" />}
-              <input className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'bride_photo', file: e.target.files[0] })} />
+              <input id="cpl-bride-photo" className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'bride_photo', file: e.target.files[0] })} />
             </div>
           </div>
         </div>
         <div>
-          <div className="ed-field"><label>Nama mempelai pria</label><input className="ed-input" value={f.groom_name} onChange={e => set('groom_name', e.target.value)} /></div>
-          <div className="ed-field"><label>Orang tua</label><input className="ed-input" value={f.groom_parents} onChange={e => set('groom_parents', e.target.value)} placeholder="Putra dari Bapak … & Ibu …" /></div>
-          <div className="ed-field"><label>Bio (opsional)</label><textarea className="ed-textarea" value={f.groom_bio} onChange={e => set('groom_bio', e.target.value)} /></div>
-          <div className="ed-field"><label>Foto</label>
+          <div className="ed-field"><label htmlFor="cpl-groom-name">Nama mempelai pria</label><input id="cpl-groom-name" className="ed-input" value={f.groom_name} onChange={e => set('groom_name', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor="cpl-groom-parents">Orang tua</label><input id="cpl-groom-parents" className="ed-input" value={f.groom_parents} onChange={e => set('groom_parents', e.target.value)} placeholder="Putra dari Bapak … & Ibu …" /></div>
+          <div className="ed-field"><label htmlFor="cpl-groom-bio">Bio (opsional)</label><textarea id="cpl-groom-bio" className="ed-textarea" value={f.groom_bio} onChange={e => set('groom_bio', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor="cpl-groom-photo">Foto</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               {(previews.groom_photo || c.groom_photo) && <img className="ed-thumb" src={previews.groom_photo || c.groom_photo} alt="Foto mempelai pria" />}
-              <input className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'groom_photo', file: e.target.files[0] })} />
+              <input id="cpl-groom-photo" className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'groom_photo', file: e.target.files[0] })} />
             </div>
           </div>
         </div>
@@ -230,18 +230,18 @@ function EventsSection({ inv, reload, notify }) {
             </div>
           </div>
           <div className="ed-row2">
-            <div className="ed-field"><label>Jenis</label>
-              <select className="ed-select" value={it.event_type} onChange={e => update(i, 'event_type', e.target.value)}>
+            <div className="ed-field"><label htmlFor={`evt-${i}-type`}>Jenis</label>
+              <select id={`evt-${i}-type`} className="ed-select" value={it.event_type} onChange={e => update(i, 'event_type', e.target.value)}>
                 <option value="akad">Akad Nikah</option><option value="resepsi">Resepsi</option>
               </select>
             </div>
-            <div className="ed-field"><label>Tanggal & waktu</label><input className="ed-input" type="datetime-local" value={it.datetime} onChange={e => update(i, 'datetime', e.target.value)} /></div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-dt`}>Tanggal & waktu</label><input id={`evt-${i}-dt`} className="ed-input" type="datetime-local" value={it.datetime} onChange={e => update(i, 'datetime', e.target.value)} /></div>
           </div>
-          <div className="ed-field"><label>Nama tempat</label><input className="ed-input" value={it.venue_name} onChange={e => update(i, 'venue_name', e.target.value)} /></div>
-          <div className="ed-field"><label>Alamat</label><textarea className="ed-textarea" value={it.address} onChange={e => update(i, 'address', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor={`evt-${i}-venue`}>Nama tempat</label><input id={`evt-${i}-venue`} className="ed-input" value={it.venue_name} onChange={e => update(i, 'venue_name', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor={`evt-${i}-addr`}>Alamat</label><textarea id={`evt-${i}-addr`} className="ed-textarea" value={it.address} onChange={e => update(i, 'address', e.target.value)} /></div>
           <div className="ed-row2">
-            <div className="ed-field"><label>Link Google Maps</label><input className="ed-input" value={it.gmaps_url} onChange={e => update(i, 'gmaps_url', e.target.value)} placeholder="https://maps.app.goo.gl/…" /></div>
-            <div className="ed-field"><label>Link embed peta</label><input className="ed-input" value={it.gmaps_embed_url} onChange={e => update(i, 'gmaps_embed_url', e.target.value)} placeholder="https://www.google.com/maps?…&output=embed" /></div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-gmaps`}>Link Google Maps</label><input id={`evt-${i}-gmaps`} className="ed-input" value={it.gmaps_url} onChange={e => update(i, 'gmaps_url', e.target.value)} placeholder="https://maps.app.goo.gl/…" /></div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-embed`}>Link embed peta</label><input id={`evt-${i}-embed`} className="ed-input" value={it.gmaps_embed_url} onChange={e => update(i, 'gmaps_embed_url', e.target.value)} placeholder="https://www.google.com/maps?…&output=embed" /></div>
           </div>
           <button className="ed-btn ed-btn-sm" onClick={() => saveOne(it)}>Simpan Acara</button>
         </div>
@@ -304,10 +304,10 @@ function StoriesSection({ inv, reload, notify }) {
             </div>
           </div>
           <div className="ed-row2">
-            <div className="ed-field"><label>Judul</label><input className="ed-input" value={it.title} onChange={e => update(i, 'title', e.target.value)} /></div>
-            <div className="ed-field"><label>Tanggal (opsional)</label><input className="ed-input" type="date" value={it.date || ''} onChange={e => update(i, 'date', e.target.value)} /></div>
+            <div className="ed-field"><label htmlFor={`sty-${i}-title`}>Judul</label><input id={`sty-${i}-title`} className="ed-input" value={it.title} onChange={e => update(i, 'title', e.target.value)} /></div>
+            <div className="ed-field"><label htmlFor={`sty-${i}-date`}>Tanggal (opsional)</label><input id={`sty-${i}-date`} className="ed-input" type="date" value={it.date || ''} onChange={e => update(i, 'date', e.target.value)} /></div>
           </div>
-          <div className="ed-field"><label>Cerita</label><textarea className="ed-textarea" value={it.description} onChange={e => update(i, 'description', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor={`sty-${i}-desc`}>Cerita</label><textarea id={`sty-${i}-desc`} className="ed-textarea" value={it.description} onChange={e => update(i, 'description', e.target.value)} /></div>
           <button className="ed-btn ed-btn-sm" onClick={() => saveOne(it)}>Simpan Kisah</button>
         </div>
       ))}
@@ -368,8 +368,8 @@ function GallerySection({ inv, reload, notify }) {
           ))}
         </div>
       )}
-      <div className="ed-field"><label>Tambah foto</label><input className="ed-file" type="file" accept="image/*" onChange={e => setFile(e.target.files[0] || null)} /></div>
-      <div className="ed-field"><label>Keterangan (opsional)</label><input className="ed-input" value={caption} onChange={e => setCaption(e.target.value)} /></div>
+      <div className="ed-field"><label htmlFor="gal-file">Tambah foto</label><input id="gal-file" className="ed-file" type="file" accept="image/*" onChange={e => setFile(e.target.files[0] || null)} /></div>
+      <div className="ed-field"><label htmlFor="gal-caption">Keterangan (opsional)</label><input id="gal-caption" className="ed-input" value={caption} onChange={e => setCaption(e.target.value)} /></div>
       <button className="ed-btn ed-btn-sm" onClick={upload} disabled={busy || !file}>{busy ? 'Mengunggah…' : 'Unggah Foto'}</button>
     </div>
   )
@@ -411,19 +411,19 @@ function GiftsSection({ inv, reload, notify }) {
             <button className="ed-mini ed-btn-danger" onClick={() => delOne(it, i)}>Hapus</button>
           </div>
           <div className="ed-row2">
-            <div className="ed-field"><label>Jenis</label>
-              <select className="ed-select" value={it.account_type} onChange={e => update(i, 'account_type', e.target.value)}>
+            <div className="ed-field"><label htmlFor={`gift-${i}-type`}>Jenis</label>
+              <select id={`gift-${i}-type`} className="ed-select" value={it.account_type} onChange={e => update(i, 'account_type', e.target.value)}>
                 <option value="bank">Bank</option><option value="ewallet">E-Wallet</option><option value="qris">QRIS</option>
               </select>
             </div>
-            <div className="ed-field"><label>Nama (bank / e-wallet)</label><input className="ed-input" value={it.bank_name} onChange={e => update(i, 'bank_name', e.target.value)} placeholder="BCA / GoPay / QRIS" /></div>
+            <div className="ed-field"><label htmlFor={`gift-${i}-name`}>Nama (bank / e-wallet)</label><input id={`gift-${i}-name`} className="ed-input" value={it.bank_name} onChange={e => update(i, 'bank_name', e.target.value)} placeholder="BCA / GoPay / QRIS" /></div>
           </div>
           {it.account_type !== 'qris' && (
-            <div className="ed-field"><label>Nomor</label><input className="ed-input" value={it.account_number} onChange={e => update(i, 'account_number', e.target.value)} /></div>
+            <div className="ed-field"><label htmlFor={`gift-${i}-num`}>Nomor</label><input id={`gift-${i}-num`} className="ed-input" value={it.account_number} onChange={e => update(i, 'account_number', e.target.value)} /></div>
           )}
-          <div className="ed-field"><label>Atas nama</label><input className="ed-input" value={it.account_name} onChange={e => update(i, 'account_name', e.target.value)} /></div>
+          <div className="ed-field"><label htmlFor={`gift-${i}-holder`}>Atas nama</label><input id={`gift-${i}-holder`} className="ed-input" value={it.account_name} onChange={e => update(i, 'account_name', e.target.value)} /></div>
           {it.account_type === 'qris' && (
-            <div className="ed-field"><label>Gambar QRIS {it.qris_image && <a href={it.qris_image} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(lihat)</a>}</label><input className="ed-file" type="file" accept="image/*" onChange={e => setQris(q => ({ ...q, [i]: e.target.files[0] || null }))} /></div>
+            <div className="ed-field"><label htmlFor={`gift-${i}-qris`}>Gambar QRIS {it.qris_image && <a href={it.qris_image} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(lihat)</a>}</label><input id={`gift-${i}-qris`} className="ed-file" type="file" accept="image/*" onChange={e => setQris(q => ({ ...q, [i]: e.target.files[0] || null }))} /></div>
           )}
           <button className="ed-btn ed-btn-sm" onClick={() => saveOne(it, i)}>Simpan</button>
         </div>
@@ -541,7 +541,7 @@ function PublishCard({ inv, reload, notify }) {
           <strong>Masukkan kode aktivasi dari admin.</strong>
           {inv.has_activation_code && <p className="ed-pub-ready">✓ Admin sudah menerbitkan kode — cek WhatsApp lalu masukkan di bawah.</p>}
           <div className="ed-pub-row">
-            <input className="ed-input" style={{ maxWidth: '200px', textTransform: 'uppercase', letterSpacing: '0.1em' }} value={code} onChange={e => setCode(e.target.value)} placeholder="mis. A7K2QX" />
+            <input className="ed-input" aria-label="Kode aktivasi" style={{ maxWidth: '200px', textTransform: 'uppercase', letterSpacing: '0.1em' }} value={code} onChange={e => setCode(e.target.value)} placeholder="mis. A7K2QX" />
             <button className="ed-btn ed-btn-sm" onClick={activate} disabled={activating}>{activating ? '…' : 'Aktifkan'}</button>
           </div>
           {err && <p className="ed-pub-err">{err}</p>}
