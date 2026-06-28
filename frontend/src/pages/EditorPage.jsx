@@ -107,13 +107,23 @@ function CoupleSection({ inv, reload, notify }) {
           <div className="ed-field"><label>Nama mempelai wanita</label><input className="ed-input" value={f.bride_name} onChange={e => set('bride_name', e.target.value)} /></div>
           <div className="ed-field"><label>Orang tua</label><input className="ed-input" value={f.bride_parents} onChange={e => set('bride_parents', e.target.value)} placeholder="Putri dari Bapak … & Ibu …" /></div>
           <div className="ed-field"><label>Bio (opsional)</label><textarea className="ed-textarea" value={f.bride_bio} onChange={e => set('bride_bio', e.target.value)} /></div>
-          <div className="ed-field"><label>Foto {c.bride_photo && <a href={c.bride_photo} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(lihat)</a>}</label><input className="ed-file" type="file" accept="image/*" onChange={e => setPhotos(p => ({ ...p, bride_photo: e.target.files[0] || null }))} /></div>
+          <div className="ed-field"><label>Foto</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              {c.bride_photo && <img className="ed-thumb" src={c.bride_photo} alt="Foto mempelai wanita" />}
+              <input className="ed-file" type="file" accept="image/*" onChange={e => setPhotos(p => ({ ...p, bride_photo: e.target.files[0] || null }))} />
+            </div>
+          </div>
         </div>
         <div>
           <div className="ed-field"><label>Nama mempelai pria</label><input className="ed-input" value={f.groom_name} onChange={e => set('groom_name', e.target.value)} /></div>
           <div className="ed-field"><label>Orang tua</label><input className="ed-input" value={f.groom_parents} onChange={e => set('groom_parents', e.target.value)} placeholder="Putra dari Bapak … & Ibu …" /></div>
           <div className="ed-field"><label>Bio (opsional)</label><textarea className="ed-textarea" value={f.groom_bio} onChange={e => set('groom_bio', e.target.value)} /></div>
-          <div className="ed-field"><label>Foto {c.groom_photo && <a href={c.groom_photo} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(lihat)</a>}</label><input className="ed-file" type="file" accept="image/*" onChange={e => setPhotos(p => ({ ...p, groom_photo: e.target.files[0] || null }))} /></div>
+          <div className="ed-field"><label>Foto</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              {c.groom_photo && <img className="ed-thumb" src={c.groom_photo} alt="Foto mempelai pria" />}
+              <input className="ed-file" type="file" accept="image/*" onChange={e => setPhotos(p => ({ ...p, groom_photo: e.target.files[0] || null }))} />
+            </div>
+          </div>
         </div>
       </div>
       <div className="ed-save-row"><button className="ed-btn" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan Mempelai'}</button></div>
@@ -138,8 +148,10 @@ function EventsSection({ inv, reload, notify }) {
     } catch { notify('Gagal menyimpan acara') }
   }
   async function delOne(it, i) {
-    if (it.id) { try { await api.delete(`/my/invitations/${inv.slug}/events/${it.id}/`); notify('Acara dihapus'); reload() } catch { notify('Gagal menghapus') } }
-    else setItems(arr => arr.filter((_, j) => j !== i))
+    if (it.id) {
+      if (!window.confirm('Hapus acara ini?')) return
+      try { await api.delete(`/my/invitations/${inv.slug}/events/${it.id}/`); notify('Acara dihapus'); reload() } catch { notify('Gagal menghapus') }
+    } else setItems(arr => arr.filter((_, j) => j !== i))
   }
 
   return (
@@ -191,8 +203,10 @@ function StoriesSection({ inv, reload, notify }) {
     } catch { notify('Gagal menyimpan') }
   }
   async function delOne(it, i) {
-    if (it.id) { try { await api.delete(`/my/invitations/${inv.slug}/stories/${it.id}/`); notify('Kisah dihapus'); reload() } catch { notify('Gagal menghapus') } }
-    else setItems(arr => arr.filter((_, j) => j !== i))
+    if (it.id) {
+      if (!window.confirm('Hapus kisah ini?')) return
+      try { await api.delete(`/my/invitations/${inv.slug}/stories/${it.id}/`); notify('Kisah dihapus'); reload() } catch { notify('Gagal menghapus') }
+    } else setItems(arr => arr.filter((_, j) => j !== i))
   }
 
   return (
@@ -235,6 +249,7 @@ function GallerySection({ inv, reload, notify }) {
     } catch { notify('Gagal mengunggah') } finally { setBusy(false) }
   }
   async function del(id) {
+    if (!window.confirm('Hapus foto ini?')) return
     try { await api.delete(`/my/invitations/${inv.slug}/photos/${id}/`); notify('Foto dihapus'); reload() } catch { notify('Gagal menghapus') }
   }
 
@@ -278,8 +293,10 @@ function GiftsSection({ inv, reload, notify }) {
     } catch { notify('Gagal menyimpan') }
   }
   async function delOne(it, i) {
-    if (it.id) { try { await api.delete(`/my/invitations/${inv.slug}/bank-accounts/${it.id}/`); notify('Dihapus'); reload() } catch { notify('Gagal menghapus') } }
-    else setItems(arr => arr.filter((_, j) => j !== i))
+    if (it.id) {
+      if (!window.confirm('Hapus rekening ini?')) return
+      try { await api.delete(`/my/invitations/${inv.slug}/bank-accounts/${it.id}/`); notify('Dihapus'); reload() } catch { notify('Gagal menghapus') }
+    } else setItems(arr => arr.filter((_, j) => j !== i))
   }
 
   return (
@@ -422,6 +439,9 @@ export default function EditorPage() {
   function logout() {
     localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); navigate('/dashboard')
   }
+  function copyLink() {
+    navigator.clipboard.writeText(`${window.location.origin}/${inv.slug}`).then(() => notify('Link undangan disalin'))
+  }
 
   if (status === 'loading') return <div className="ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Memuat editor…</p></div>
   if (status === 'error') return <div className="ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Gagal memuat. Coba muat ulang.</p></div>
@@ -433,21 +453,31 @@ export default function EditorPage() {
         <div className="ed-bar-actions">
           <span className={`ed-badge ${inv.is_active ? 'active' : 'draft'}`}>{inv.is_active ? 'Aktif' : 'Draft'}</span>
           <a className="ed-link" href="/my">← Undangan Saya</a>
+          <button className="ed-link" onClick={copyLink}>Salin Link</button>
           <a className="ed-link" href={`/${inv.slug}`} target="_blank" rel="noopener noreferrer">Pratinjau ↗</a>
           <a className="ed-link" href={`/dashboard/${slug}`}>RSVP</a>
           <button className="ed-mini dark" onClick={logout}>Keluar</button>
         </div>
       </div>
 
+      <nav className="ed-nav">
+        <a href="#sec-pengaturan">Pengaturan</a>
+        <a href="#sec-mempelai">Mempelai</a>
+        <a href="#sec-acara">Acara</a>
+        <a href="#sec-kisah">Kisah</a>
+        <a href="#sec-galeri">Galeri</a>
+        <a href="#sec-amplop">Amplop</a>
+      </nav>
+
       <div className="ed-body">
         <PublishCard inv={inv} reload={load} notify={notify} />
         <TierBanner inv={inv} />
-        <SettingsSection inv={inv} reload={load} notify={notify} />
-        <CoupleSection inv={inv} reload={load} notify={notify} />
-        <EventsSection inv={inv} reload={load} notify={notify} />
-        <StoriesSection inv={inv} reload={load} notify={notify} />
-        <GallerySection inv={inv} reload={load} notify={notify} />
-        <GiftsSection inv={inv} reload={load} notify={notify} />
+        <div className="ed-anchor" id="sec-pengaturan"><SettingsSection inv={inv} reload={load} notify={notify} /></div>
+        <div className="ed-anchor" id="sec-mempelai"><CoupleSection inv={inv} reload={load} notify={notify} /></div>
+        <div className="ed-anchor" id="sec-acara"><EventsSection inv={inv} reload={load} notify={notify} /></div>
+        <div className="ed-anchor" id="sec-kisah"><StoriesSection inv={inv} reload={load} notify={notify} /></div>
+        <div className="ed-anchor" id="sec-galeri"><GallerySection inv={inv} reload={load} notify={notify} /></div>
+        <div className="ed-anchor" id="sec-amplop"><GiftsSection inv={inv} reload={load} notify={notify} /></div>
       </div>
 
       {toast && <div className="ed-toast">{toast}</div>}
