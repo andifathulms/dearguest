@@ -13,3 +13,8 @@ backend/staticfiles/
 # Runtime uploads (docker mounts ./media:/app/media). Demo media is
 # regenerated from backend/apps/invitations/seed_assets/ via seed_demos.
 /media/
+
+# Playwright visual-regression transient output (baselines ARE committed)
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
