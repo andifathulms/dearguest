@@ -34,19 +34,25 @@ export default function InvitationPage() {
 
   if (status === 'loading') {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', color: '#888' }}>
-        Memuat undangan...
+      <div className="inv-status">
+        <div className="inv-loader" aria-hidden="true">
+          <span /><span /><span />
+        </div>
+        <p className="inv-status-text">Membuka undangan…</p>
       </div>
     )
   }
 
   if (status === 'error') {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontFamily: 'Georgia, serif', color: '#888', padding: '2rem' }}>
-        <div>
-          <p style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>🤍</p>
-          <p>{errorMessage}</p>
+      <div className="inv-status">
+        <div className="inv-status-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+          </svg>
         </div>
+        <p className="inv-status-title">{errorMessage}</p>
+        <a className="inv-status-link" href="/">Kembali ke beranda</a>
       </div>
     )
   }

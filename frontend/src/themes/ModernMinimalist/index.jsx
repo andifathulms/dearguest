@@ -11,6 +11,7 @@ import AmplodDigital from '../../components/sections/AmplodDigital.jsx'
 import RSVPForm from '../../components/sections/RSVPForm.jsx'
 import WishesWall from '../../components/sections/WishesWall.jsx'
 import MapsSection from '../../components/sections/MapsSection.jsx'
+import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
 
@@ -55,6 +56,7 @@ export default function ModernMinimalist({ invitation, guestName }) {
       <Section><RSVPForm slug={invitation.slug} /></Section>
       <Section><WishesWall slug={invitation.slug} /></Section>
       <Section><MapsSection events={invitation.events} /></Section>
+      <Section><LiveStreamSection url={invitation.livestream_url} /></Section>
 
       <Rule />
       <WhatsAppShare

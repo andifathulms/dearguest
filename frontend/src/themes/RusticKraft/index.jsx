@@ -1,4 +1,4 @@
-import './FloralLight.css'
+import './RusticKraft.css'
 import { motion } from 'framer-motion'
 import HeroSection from '../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
@@ -15,18 +15,6 @@ import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
 
-const FloralSVG = () => (
-  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none">
-    <circle cx="100" cy="100" r="40" fill="#c4847a" opacity="0.3" />
-    <circle cx="60" cy="80" r="28" fill="#d4a09a" opacity="0.25" />
-    <circle cx="140" cy="80" r="28" fill="#d4a09a" opacity="0.25" />
-    <circle cx="80" cy="140" r="28" fill="#d4a09a" opacity="0.25" />
-    <circle cx="130" cy="140" r="28" fill="#d4a09a" opacity="0.25" />
-    <circle cx="100" cy="55" r="22" fill="#c4847a" opacity="0.2" />
-    <circle cx="100" cy="100" r="15" fill="#c4847a" opacity="0.4" />
-  </svg>
-)
-
 function Section({ children }) {
   return (
     <motion.div
@@ -40,22 +28,18 @@ function Section({ children }) {
   )
 }
 
-export default function FloralLight({ invitation, guestName }) {
+export default function RusticKraft({ invitation, guestName }) {
   const couple = invitation.couple || {}
   const akad = (invitation.events || []).find(e => e.event_type === 'akad')
 
   return (
-    <div className="floral-light">
-      <div style={{ position: 'relative' }}>
-        <div className="floral-corner floral-corner-tl"><FloralSVG /></div>
-        <div className="floral-corner floral-corner-br"><FloralSVG /></div>
-        <HeroSection
-          brideName={couple.bride_name}
-          groomName={couple.groom_name}
-          weddingDate={invitation.wedding_date}
-          theme="floral-light"
-        />
-      </div>
+    <div className="rustic-kraft">
+      <HeroSection
+        brideName={couple.bride_name}
+        groomName={couple.groom_name}
+        weddingDate={invitation.wedding_date}
+        theme="rustic-kraft"
+      />
 
       <Section><GuestGreeting guestName={guestName} openingText={invitation.opening_text} /></Section>
       <Section><CountdownTimer targetDate={akad?.datetime} /></Section>

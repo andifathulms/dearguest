@@ -1,5 +1,11 @@
+import secrets
 from django.db import models
 from datetime import timedelta
+
+
+def generate_guest_code():
+    """Short, URL-safe, unique code used in per-guest links and QR codes."""
+    return secrets.token_hex(4)  # 8 hex chars
 
 
 class Invitation(models.Model):
@@ -7,6 +13,9 @@ class Invitation(models.Model):
         ('javanese-dark', 'Javanese Malam Emas'),
         ('floral-light', 'Taman Bunga'),
         ('modern-minimalist', 'Minimalis Putih'),
+        ('luxury-emerald', 'Zamrud Mewah'),
+        ('rustic-kraft', 'Rustic Kraft'),
+        ('boho-terracotta', 'Senja Terakota'),
     ]
     slug = models.SlugField(unique=True, max_length=100)
     theme = models.CharField(max_length=30, choices=THEME_CHOICES, default='javanese-dark')
@@ -17,6 +26,7 @@ class Invitation(models.Model):
     closing_text = models.TextField(blank=True)
     watermark = models.BooleanField(default=True)
     music_file = models.FileField(upload_to='music/', null=True, blank=True)
+    livestream_url = models.URLField(blank=True)  # YouTube/Instagram/Zoom link for remote guests
     couple_user = models.OneToOneField(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='invitation'
@@ -89,10 +99,17 @@ class Photo(models.Model):
 
 
 class BankAccount(models.Model):
+    ACCOUNT_TYPES = [
+        ('bank', 'Bank'),
+        ('ewallet', 'E-Wallet'),
+        ('qris', 'QRIS'),
+    ]
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='bank_accounts')
-    bank_name = models.CharField(max_length=100)
-    account_number = models.CharField(max_length=50)
+    account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPES, default='bank')
+    bank_name = models.CharField(max_length=100)  # bank name, e-wallet name (GoPay/OVO/DANA), or "QRIS"
+    account_number = models.CharField(max_length=50, blank=True)  # phone for e-wallet; empty for QRIS
     account_name = models.CharField(max_length=200)
+    qris_image = models.ImageField(upload_to='qris/', null=True, blank=True)  # scannable QRIS image
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -116,3 +133,29 @@ class RSVP(models.Model):
 
     def __str__(self):
         return f"{self.guest_name} — {self.invitation.slug}"
+
+
+class Guest(models.Model):
+    """Pre-registered guest list for per-guest invitation links, QR codes, and check-in."""
+    invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='guests')
+    name = models.CharField(max_length=200)
+    whatsapp = models.CharField(max_length=20, blank=True)
+    group = models.CharField(max_length=100, blank=True)  # e.g. Keluarga, Teman Kantor
+    code = models.CharField(max_length=12, unique=True, blank=True)
+    checked_in = models.BooleanField(default=False)
+    checked_in_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            code = generate_guest_code()
+            while Guest.objects.filter(code=code).exists():
+                code = generate_guest_code()
+            self.code = code
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name} — {self.invitation.slug}"
