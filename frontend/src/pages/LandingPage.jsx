@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../api/client.js'
 import './LandingPage.css'
@@ -130,10 +131,11 @@ export default function LandingPage() {
             <a href="#fitur">Fitur</a>
             <a href="#harga">Harga</a>
             <a href="#faq">FAQ</a>
+            <Link to="/dashboard">Masuk</Link>
           </div>
-          <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-primary lp-nav-cta">
-            Pesan Sekarang
-          </a>
+          <Link to="/register" className="lp-btn lp-btn-primary lp-nav-cta">
+            Buat Undangan
+          </Link>
         </div>
       </nav>
 
@@ -151,10 +153,10 @@ export default function LandingPage() {
             RSVP, galeri, musik, dan amplop digital. Mudah dibagikan, tanpa kertas.
           </motion.p>
           <motion.div className="lp-hero-actions" {...fade(0.15)}>
+            <Link to="/register" className="lp-btn lp-btn-primary">Buat Undangan Gratis</Link>
             <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-wa">
-              {Icon.whatsapp} Pesan via WhatsApp
+              {Icon.whatsapp} Konsultasi via WhatsApp
             </a>
-            <a href="#tema" className="lp-btn lp-btn-ghost">Lihat Tema</a>
           </motion.div>
           <motion.div className="lp-hero-trust" {...fade(0.25)}>
             <div><strong>6</strong> Tema Eksklusif</div>
@@ -292,14 +294,18 @@ export default function LandingPage() {
                       <li key={ft}>{Icon.check}<span>{ft}</span></li>
                     ))}
                   </ul>
-                  <a
-                    href={wa(`Halo, saya tertarik dengan paket ${p.name} untuk undangan digital${pct ? ` (kode promo ${coupon.code})` : ''}`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`lp-btn ${p.featured ? 'lp-btn-primary' : 'lp-btn-ghost'}`}
-                  >
-                    {p.cta}
-                  </a>
+                  {isFree ? (
+                    <Link to="/register" className="lp-btn lp-btn-ghost">{p.cta}</Link>
+                  ) : (
+                    <a
+                      href={wa(`Halo, saya tertarik dengan paket ${p.name} untuk undangan digital${pct ? ` (kode promo ${coupon.code})` : ''}`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`lp-btn ${p.featured ? 'lp-btn-primary' : 'lp-btn-ghost'}`}
+                    >
+                      {p.cta}
+                    </a>
+                  )}
                 </motion.div>
               )
             })}
