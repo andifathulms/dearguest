@@ -2,13 +2,17 @@ import { motion } from 'framer-motion'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 
-export default function HeroSection({ brideName, groomName, weddingDate, theme }) {
+export default function HeroSection({ brideName, groomName, weddingDate, theme, heroPhoto }) {
   const formatted = weddingDate
     ? format(new Date(weddingDate), 'EEEE, d MMMM yyyy', { locale: id })
     : ''
 
   return (
-    <section className="hero-section">
+    <section
+      className={`hero-section ${heroPhoto ? 'has-photo' : ''}`}
+      style={heroPhoto ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+    >
+      {heroPhoto && <div className="hero-scrim" aria-hidden="true" />}
       <div className="hero-overlay" aria-hidden="true" />
       <motion.div
         className="hero-content"

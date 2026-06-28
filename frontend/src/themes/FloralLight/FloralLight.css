@@ -870,3 +870,6 @@
   .cover-gate::before, .cover-gate::after { width: 220px; height: 220px; }
   .floral-light .profile-card::before { top: 124px; }
 }
+
+/* Full-bleed hero photo scrim */
+.floral-light { --hero-scrim: linear-gradient(180deg, rgba(253,248,245,0.30) 0%, rgba(253,248,245,0.10) 45%, rgba(253,248,245,0.74) 100%); }

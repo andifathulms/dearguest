@@ -909,3 +909,6 @@
 /* ---------- Watermark ---------- */
 .boho-terracotta .watermark-footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: rgba(251,243,234,0.95); border-top: 1px solid var(--border); text-align: center; padding: 0.4rem; font-size: 0.7rem; color: var(--text-muted); }
 .boho-terracotta .watermark-footer a { color: var(--terracotta); text-decoration: none; }
+
+/* Full-bleed hero photo scrim */
+.boho-terracotta { --hero-scrim: linear-gradient(180deg, rgba(74,47,36,0.42) 0%, rgba(74,47,36,0.26) 42%, rgba(74,47,36,0.82) 100%); }

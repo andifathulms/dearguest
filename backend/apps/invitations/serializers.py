@@ -138,6 +138,7 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True, read_only=True)
     bank_accounts = BankAccountSerializer(many=True, read_only=True)
     music_file = serializers.SerializerMethodField()
+    hero_photo = serializers.SerializerMethodField()
     watermark = serializers.SerializerMethodField()
 
     class Meta:
@@ -145,9 +146,15 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'theme', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'watermark', 'music_file',
-            'livestream_url', 'wishlist_url',
+            'hero_photo', 'livestream_url', 'wishlist_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
+
+    def get_hero_photo(self, obj):
+        request = self.context.get('request')
+        if obj.hero_photo and request:
+            return request.build_absolute_uri(obj.hero_photo.url)
+        return None
 
     def get_watermark(self, obj):
         # Watermark is shown only on the free tier; paid tiers remove it.
@@ -205,7 +212,7 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = [
             'slug', 'theme', 'wedding_date', 'opening_text', 'closing_text', 'dress_code',
-            'music_file', 'livestream_url', 'wishlist_url', 'is_active', 'watermark', 'expires_at',
+            'music_file', 'hero_photo', 'livestream_url', 'wishlist_url', 'is_active', 'watermark', 'expires_at',
         ]
         read_only_fields = ['slug', 'is_active', 'watermark', 'expires_at']
 
@@ -263,7 +270,7 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
             'slug', 'theme', 'tier', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'watermark', 'is_active',
             'activation_requested', 'has_activation_code',
-            'music_file', 'music_preset', 'livestream_url', 'wishlist_url',
+            'music_file', 'music_preset', 'hero_photo', 'livestream_url', 'wishlist_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
 

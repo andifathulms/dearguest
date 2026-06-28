@@ -1077,3 +1077,6 @@
   .javanese-dark .section-title::before { padding: 0 48px; background-size: 38px 1px, 38px 1px; }
   .javanese-dark::before { background-size: 88px 88px; opacity: 0.04; }
 }
+
+/* Full-bleed hero photo scrim */
+.javanese-dark { --hero-scrim: linear-gradient(180deg, rgba(18,12,6,0.5) 0%, rgba(18,12,6,0.32) 42%, rgba(18,12,6,0.88) 100%); }

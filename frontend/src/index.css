@@ -116,6 +116,21 @@ body.cover-open {
 }
 .amplod-wishlist:hover { opacity: 0.75; transform: translateY(-1px); }
 
+/* Full-bleed hero photo. The photo is the section's own background (set
+   inline so it always wins); a scrim child veils it per theme. */
+.hero-section.has-photo { position: relative; }
+.hero-section.has-photo .hero-scrim {
+  position: absolute !important; inset: 0 !important; z-index: 1 !important;
+  margin: 0 !important;
+  background: var(--hero-scrim, linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.8)));
+}
+.hero-section.has-photo .hero-content,
+.hero-section.has-photo .hero-scroll-cue { position: relative; z-index: 3; }
+/* Hide theme corner ornaments + overlay over a photo — keep it clean and cinematic */
+.hero-section.has-photo::before,
+.hero-section.has-photo::after { opacity: 0 !important; }
+.hero-section.has-photo .hero-overlay { display: none !important; }
+
 /* Gallery lightbox (theme-agnostic) */
 .lightbox {
   position: fixed; inset: 0; z-index: 1200;

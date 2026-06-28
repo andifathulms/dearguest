@@ -25,6 +25,7 @@ function SettingsSection({ inv, reload, notify }) {
     wishlist_url: inv.wishlist_url || '',
   })
   const [music, setMusic] = useState(null)
+  const [heroPhoto, setHeroPhoto] = useState(null)
   const [presets, setPresets] = useState([])
   const [presetId, setPresetId] = useState(inv.music_preset || '')
   const [saving, setSaving] = useState(false)
@@ -44,6 +45,7 @@ function SettingsSection({ inv, reload, notify }) {
       const fd = new FormData()
       Object.entries(f).forEach(([k, v]) => fd.append(k, v))
       if (music) fd.append('music_file', music)
+      if (heroPhoto) fd.append('hero_photo', await compressImage(heroPhoto, 1800, 0.82))
       await api.patch(`/my/invitations/${inv.slug}/`, fd)
       notify('Pengaturan tersimpan')
       reload()
@@ -71,6 +73,10 @@ function SettingsSection({ inv, reload, notify }) {
       <div className="ed-field">
         <label htmlFor="set-closing">Teks penutup</label>
         <textarea id="set-closing" className="ed-textarea" value={f.closing_text} onChange={e => set('closing_text', e.target.value)} placeholder="Ucapan terima kasih…" />
+      </div>
+      <div className="ed-field">
+        <label htmlFor="set-hero">Foto hero (tampil penuh di awal undangan) {inv.hero_photo && <a href={inv.hero_photo} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(foto saat ini)</a>}</label>
+        <input id="set-hero" className="ed-file" type="file" accept="image/*" onChange={e => setHeroPhoto(e.target.files[0] || null)} />
       </div>
       <div className="ed-field">
         <label htmlFor="set-dress">Dress code (opsional)</label>

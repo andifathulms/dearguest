@@ -51,6 +51,8 @@ class Command(BaseCommand):
                 groom_bio='Putra kedua yang penuh tanggung jawab.',
             ))
             # Tasteful sample photos (idempotent — only attach when missing).
+            if not inv.hero_photo:
+                _attach(inv.hero_photo, 'hero.jpg', f'{slug}-hero.jpg')
             if not couple.bride_photo:
                 _attach(couple.bride_photo, 'bride.jpg', f'{slug}-bride.jpg')
             if not couple.groom_photo:

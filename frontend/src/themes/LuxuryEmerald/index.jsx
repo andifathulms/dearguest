@@ -39,6 +39,7 @@ export default function LuxuryEmerald({ invitation, guestName }) {
         brideName={couple.bride_name}
         groomName={couple.groom_name}
         weddingDate={invitation.wedding_date}
+        heroPhoto={invitation.hero_photo}
         theme="luxury-emerald"
       />
 

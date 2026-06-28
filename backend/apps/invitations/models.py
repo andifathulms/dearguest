@@ -31,6 +31,7 @@ class Invitation(models.Model):
     opening_text = models.TextField(blank=True)
     closing_text = models.TextField(blank=True)
     dress_code = models.CharField(max_length=200, blank=True)
+    hero_photo = models.ImageField(upload_to='hero/', null=True, blank=True)  # full-bleed hero background
     watermark = models.BooleanField(default=True)
     music_file = models.FileField(upload_to='music/', null=True, blank=True)
     music_preset = models.ForeignKey('MusicPreset', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
