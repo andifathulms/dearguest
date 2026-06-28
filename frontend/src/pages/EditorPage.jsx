@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
 import ImageCropper from '../components/ui/ImageCropper.jsx'
+import { compressImage } from '../utils/compressImage.js'
 import './Editor.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -325,8 +326,9 @@ function GallerySection({ inv, reload, notify }) {
     if (!file) return
     setBusy(true)
     try {
+      const compressed = await compressImage(file)
       const fd = new FormData()
-      fd.append('image', file); fd.append('caption', caption); fd.append('order', inv.photos.length)
+      fd.append('image', compressed); fd.append('caption', caption); fd.append('order', inv.photos.length)
       await api.post(`/my/invitations/${inv.slug}/photos/`, fd)
       setFile(null); setCaption(''); notify('Foto diunggah'); reload()
     } catch { notify('Gagal mengunggah') } finally { setBusy(false) }
