@@ -293,6 +293,20 @@
 .tp-modern .tp-names { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; }
 .tp-modern .tp-amp, .tp-modern .tp-label, .tp-modern .tp-date { color: #8a9e8a; }
 .tp-modern .tp-rule { background: #8a9e8a; }
+.tp-emerald { background: radial-gradient(ellipse at center, rgba(212,175,90,0.14), #0e1f17 75%); color: #f2ede0; }
+.tp-emerald .tp-names { font-family: 'Playfair Display', serif; font-style: italic; color: #d4af5a; }
+.tp-emerald .tp-amp, .tp-emerald .tp-label, .tp-emerald .tp-date { color: #b6a06a; }
+.tp-emerald .tp-rule { background: #d4af5a; }
+.tp-kraft { background: linear-gradient(160deg, #e9ddc8, #f3ece0); color: #3a3026; }
+.tp-kraft .tp-names { font-family: 'Playfair Display', serif; color: #3a3026; }
+.tp-kraft .tp-amp, .tp-kraft .tp-label { color: #7c8b6b; }
+.tp-kraft .tp-date { color: #8a7a63; }
+.tp-kraft .tp-rule { background: #7c8b6b; }
+.tp-boho { background: radial-gradient(ellipse at 50% 120%, rgba(192,106,77,0.28), #fbf3ea 70%); color: #4a2f24; }
+.tp-boho .tp-names { font-family: 'Playfair Display', serif; color: #4a2f24; }
+.tp-boho .tp-amp, .tp-boho .tp-label { color: #c06a4d; }
+.tp-boho .tp-date { color: #9c7a66; }
+.tp-boho .tp-rule { background: #c06a4d; }
 
 .lp-theme-body { padding: 1.4rem 1.5rem 1.6rem; }
 .lp-theme-body h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.4rem; }

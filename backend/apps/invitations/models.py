@@ -13,6 +13,9 @@ class Invitation(models.Model):
         ('javanese-dark', 'Javanese Malam Emas'),
         ('floral-light', 'Taman Bunga'),
         ('modern-minimalist', 'Minimalis Putih'),
+        ('luxury-emerald', 'Zamrud Mewah'),
+        ('rustic-kraft', 'Rustic Kraft'),
+        ('boho-terracotta', 'Senja Terakota'),
     ]
     slug = models.SlugField(unique=True, max_length=100)
     theme = models.CharField(max_length=30, choices=THEME_CHOICES, default='javanese-dark')

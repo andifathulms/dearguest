@@ -22,7 +22,7 @@ const Icon = {
 }
 
 const features = [
-  { icon: Icon.palette, title: '3 Tema Eksklusif', desc: 'Javanese Malam Emas, Taman Bunga, dan Minimalis Putih — dirancang dengan tipografi dan palet premium.' },
+  { icon: Icon.palette, title: '6 Tema Eksklusif', desc: 'Dari Javanese emas, floral, minimalis, hingga zamrud mewah, rustic, dan terakota — semua dengan palet premium.' },
   { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
   { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
   { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
@@ -36,6 +36,9 @@ const themes = [
   { id: 'javanese-dark', name: 'Javanese Malam Emas', desc: 'Elegan dengan sentuhan emas pada latar gelap tembakau.', preview: 'tp-javanese', colors: ['#1a1208', '#c9a84c', '#f5eed6'] },
   { id: 'floral-light', name: 'Taman Bunga', desc: 'Romantis dengan nuansa mawar pada latar putih blush.', preview: 'tp-floral', colors: ['#fdf8f5', '#c4847a', '#f7ede8'] },
   { id: 'modern-minimalist', name: 'Minimalis Putih', desc: 'Bersih dan modern dengan aksen sage yang menenangkan.', preview: 'tp-modern', colors: ['#ffffff', '#1f1f1f', '#8a9e8a'] },
+  { id: 'luxury-emerald', name: 'Zamrud Mewah', desc: 'Mewah dengan zamrud gelap dan aksen emas yang berkilau.', preview: 'tp-emerald', colors: ['#0e1f17', '#d4af5a', '#1f4d3a'] },
+  { id: 'rustic-kraft', name: 'Rustic Kraft', desc: 'Hangat dan natural dengan nuansa kertas kraft & dedaunan.', preview: 'tp-kraft', colors: ['#f3ece0', '#7c8b6b', '#b9694f'] },
+  { id: 'boho-terracotta', name: 'Senja Terakota', desc: 'Bohemian hangat dengan gradasi terakota dan senja.', preview: 'tp-boho', colors: ['#fbf3ea', '#c06a4d', '#d8b48a'] },
 ]
 
 const steps = [
@@ -127,7 +130,7 @@ export default function LandingPage() {
             <a href="#tema" className="lp-btn lp-btn-ghost">Lihat Tema</a>
           </motion.div>
           <motion.div className="lp-hero-trust" {...fade(0.25)}>
-            <div><strong>3</strong> Tema Eksklusif</div>
+            <div><strong>6</strong> Tema Eksklusif</div>
             <div><strong>1–2</strong> Hari Pengerjaan</div>
             <div><strong>100%</strong> Responsif di HP</div>
           </motion.div>
