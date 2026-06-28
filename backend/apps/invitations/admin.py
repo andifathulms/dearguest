@@ -71,7 +71,7 @@ class ActivationRequestAdmin(admin.ModelAdmin):
     list_display = ['slug', 'couple_names', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
     list_editable = ['tier', 'activation_code', 'is_active']
     readonly_fields = ['activation_requested_at']
-    actions = ['issue_activation_code']
+    actions = ['fulfill_premium', 'fulfill_bisnis', 'issue_activation_code']
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(activation_requested=True, is_active=False)
@@ -84,7 +84,30 @@ class ActivationRequestAdmin(admin.ModelAdmin):
             return '—'
         return f"{c.bride_name} & {c.groom_name}"
 
-    @admin.action(description='Terbitkan kode aktivasi')
+    def _issue(self, inv):
+        inv.activation_code = secrets.token_hex(3).upper()
+        inv.save(update_fields=['tier', 'activation_code'])
+
+    @admin.action(description='✓ Konfirmasi lunas → Premium + terbitkan kode')
+    def fulfill_premium(self, request, queryset):
+        for inv in queryset:
+            inv.tier = 'premium'
+            self._issue(inv)
+        self.message_user(request, f'{queryset.count()} undangan disetel Premium + kode diterbitkan. Kirim kode ke pasangan via WhatsApp.')
+
+    @admin.action(description='✓ Konfirmasi lunas → Bisnis (2 undangan) + terbitkan kode')
+    def fulfill_bisnis(self, request, queryset):
+        for inv in queryset:
+            inv.tier = 'bisnis'
+            self._issue(inv)
+            if inv.couple_user:
+                profile, _ = CoupleProfile.objects.get_or_create(user=inv.couple_user)
+                if profile.max_invitations < 2:
+                    profile.max_invitations = 2
+                    profile.save(update_fields=['max_invitations'])
+        self.message_user(request, f'{queryset.count()} undangan disetel Bisnis (2 undangan) + kode diterbitkan.')
+
+    @admin.action(description='Terbitkan kode aktivasi saja')
     def issue_activation_code(self, request, queryset):
         for inv in queryset:
             inv.activation_code = secrets.token_hex(3).upper()
