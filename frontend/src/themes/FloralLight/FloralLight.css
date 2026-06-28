@@ -368,10 +368,11 @@
   margin-bottom: 1.5rem;
 }
 .floral-light .hero-label {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--rose-muted);
+  color: #a8685c;
+  font-weight: 500;
   margin-bottom: 1rem;
 }
 .floral-light .hero-names {
