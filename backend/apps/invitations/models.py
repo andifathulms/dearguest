@@ -26,6 +26,7 @@ class Invitation(models.Model):
     closing_text = models.TextField(blank=True)
     watermark = models.BooleanField(default=True)
     music_file = models.FileField(upload_to='music/', null=True, blank=True)
+    livestream_url = models.URLField(blank=True)  # YouTube/Instagram/Zoom link for remote guests
     couple_user = models.OneToOneField(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='invitation'

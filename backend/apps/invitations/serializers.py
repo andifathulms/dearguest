@@ -111,6 +111,7 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'theme', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'watermark', 'music_file',
+            'livestream_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
 
