@@ -21,21 +21,19 @@ export default function DashboardLogin() {
       localStorage.setItem('access_token', res.data.access)
       localStorage.setItem('refresh_token', res.data.refresh)
 
-      // Fetch the invitation slug associated with the couple_user
+      // Route based on whether the user already has an invitation.
       try {
         const profileRes = await api.get('/auth/me/')
         const slug = profileRes.data.invitation_slug
         if (slug) {
           navigate(`/dashboard/${slug}`)
-          return
+        } else {
+          navigate('/onboarding')
         }
+        return
       } catch {
-        // /auth/me/ might not exist — ask for slug manually below
+        navigate('/onboarding')
       }
-
-      // Fallback: redirect to a slug prompt
-      const slug = prompt('Masukkan slug undangan Anda:')
-      if (slug) navigate(`/dashboard/${slug}`)
     } catch (err) {
       setError('Username atau password salah.')
     } finally {
@@ -90,7 +88,10 @@ export default function DashboardLogin() {
             {loading ? 'Masuk...' : 'Masuk'}
           </button>
         </form>
-        <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+        <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.82rem', color: '#888' }}>
+          Belum punya akun? <a href="/register" style={{ color: '#b8924e', textDecoration: 'none', fontWeight: 500 }}>Daftar gratis</a>
+        </p>
+        <p style={{ textAlign: 'center', marginTop: '1rem' }}>
           <a href="/" style={{ color: '#888', fontSize: '0.75rem', textDecoration: 'none' }}>← Kembali ke Beranda</a>
         </p>
       </div>
