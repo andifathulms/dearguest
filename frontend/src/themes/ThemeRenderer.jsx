@@ -1,6 +1,7 @@
 import JavaneseDark from './JavaneseDark/index.jsx'
 import FloralLight from './FloralLight/index.jsx'
 import ModernMinimalist from './ModernMinimalist/index.jsx'
+import CoverGate from '../components/ui/CoverGate.jsx'
 
 const themes = {
   'javanese-dark': JavaneseDark,
@@ -9,6 +10,13 @@ const themes = {
 }
 
 export default function ThemeRenderer({ invitation, guestName }) {
-  const Theme = themes[invitation.theme] || JavaneseDark
-  return <Theme invitation={invitation} guestName={guestName} />
+  const themeKey = themes[invitation.theme] ? invitation.theme : 'javanese-dark'
+  const Theme = themes[themeKey]
+
+  return (
+    <>
+      <CoverGate invitation={invitation} guestName={guestName} themeClass={themeKey} />
+      <Theme invitation={invitation} guestName={guestName} />
+    </>
+  )
 }

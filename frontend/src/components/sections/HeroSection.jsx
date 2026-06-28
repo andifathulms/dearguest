@@ -9,6 +9,7 @@ export default function HeroSection({ brideName, groomName, weddingDate, theme }
 
   return (
     <section className="hero-section">
+      <div className="hero-overlay" aria-hidden="true" />
       <motion.div
         className="hero-content"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -17,6 +18,7 @@ export default function HeroSection({ brideName, groomName, weddingDate, theme }
       >
         <p className="hero-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
         <p className="hero-label">We Are Getting Married</p>
+        <span className="hero-ornament" aria-hidden="true" />
         <motion.h1
           className="hero-names"
           initial={{ opacity: 0, y: 20 }}
@@ -36,6 +38,9 @@ export default function HeroSection({ brideName, groomName, weddingDate, theme }
           {formatted}
         </motion.p>
       </motion.div>
+      <div className="hero-scroll-cue" aria-hidden="true">
+        <span />
+      </div>
     </section>
   )
 }
