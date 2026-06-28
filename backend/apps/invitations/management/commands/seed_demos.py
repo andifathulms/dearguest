@@ -1,8 +1,20 @@
 """Seed one public demo invitation per theme so the landing page can link to
 live examples. Idempotent — safe to run repeatedly."""
+import os
 from datetime import date, datetime
+from django.core.files import File
 from django.core.management.base import BaseCommand
-from apps.invitations.models import Invitation, Couple, Event, Story, BankAccount
+from apps.invitations.models import Invitation, Couple, Event, Story, BankAccount, Photo
+
+ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'seed_assets')
+GALLERY = ['gallery-1.jpg', 'gallery-2.jpg', 'gallery-3.jpg', 'gallery-4.jpg', 'gallery-5.jpg']
+
+
+def _attach(field, fname, savename):
+    src = os.path.join(ASSETS, fname)
+    if os.path.exists(src):
+        with open(src, 'rb') as fh:
+            field.save(savename, File(fh), save=True)
 
 THEMES = [
     ('javanese-dark', 'demo-javanese'),
@@ -32,12 +44,22 @@ class Command(BaseCommand):
                     tier='free',
                 ),
             )
-            Couple.objects.update_or_create(invitation=inv, defaults=dict(
+            couple, _ = Couple.objects.update_or_create(invitation=inv, defaults=dict(
                 bride_name='Andini', bride_parents='Bapak Suryadi & Ibu Lestari',
                 bride_bio='Putri pertama yang penuh kasih.',
                 groom_name='Bagus', groom_parents='Bapak Hartono & Ibu Wulandari',
                 groom_bio='Putra kedua yang penuh tanggung jawab.',
             ))
+            # Tasteful sample photos (idempotent — only attach when missing).
+            if not couple.bride_photo:
+                _attach(couple.bride_photo, 'bride.jpg', f'{slug}-bride.jpg')
+            if not couple.groom_photo:
+                _attach(couple.groom_photo, 'groom.jpg', f'{slug}-groom.jpg')
+            if inv.photos.count() == 0:
+                for n, fname in enumerate(GALLERY):
+                    if os.path.exists(os.path.join(ASSETS, fname)):
+                        photo = Photo(invitation=inv, caption='', order=n)
+                        _attach(photo.image, fname, f'{slug}-g{n + 1}.jpg')
             inv.events.all().delete()
             Event.objects.create(invitation=inv, event_type='akad', datetime=datetime(2026, 12, 12, 8, 0),
                                  venue_name='Masjid Agung', address='Jl. Merdeka No. 1, Yogyakarta',
