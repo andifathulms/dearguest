@@ -80,7 +80,13 @@ class RSVPCreateView(generics.CreateAPIView):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(invitation=invitation)
+
+        # Link to a pre-registered guest if they came via a personal link (?g=code).
+        guest = None
+        guest_code = (request.data.get('guest_code') or '').strip()
+        if guest_code:
+            guest = Guest.objects.filter(invitation=invitation, code=guest_code).first()
+        serializer.save(invitation=invitation, guest=guest)
 
         cache.set(cache_key, count + 1, timeout=3600)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

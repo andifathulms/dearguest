@@ -158,7 +158,10 @@ export default function GuestManager({ slug, brideName, groomName }) {
                 <div className="gm-row-name">{g.name}</div>
                 <div className="gm-row-meta">
                   {g.group ? `${g.group} · ` : ''}kode {g.code}
-                  {g.checked_in ? ' · hadir ✓' : ''}
+                  {g.responded
+                    ? (g.attending ? ' · RSVP: Hadir ✓' : ' · RSVP: Tidak hadir')
+                    : ' · belum RSVP'}
+                  {g.checked_in ? ' · check-in ✓' : ''}
                 </div>
               </div>
               <div className="gm-row-actions">

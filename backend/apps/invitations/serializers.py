@@ -28,10 +28,21 @@ class WishSerializer(serializers.ModelSerializer):
 
 
 class GuestSerializer(serializers.ModelSerializer):
+    responded = serializers.SerializerMethodField()
+    attending = serializers.SerializerMethodField()
+
     class Meta:
         model = Guest
-        fields = ['id', 'name', 'whatsapp', 'group', 'code', 'checked_in', 'checked_in_at', 'created_at']
+        fields = ['id', 'name', 'whatsapp', 'group', 'code', 'checked_in', 'checked_in_at',
+                  'responded', 'attending', 'created_at']
         read_only_fields = ['code', 'checked_in_at', 'created_at']
+
+    def get_responded(self, obj):
+        return obj.rsvps.exists()
+
+    def get_attending(self, obj):
+        rsvp = obj.rsvps.first()  # RSVP default ordering is newest-first
+        return rsvp.attending if rsvp else None
 
     def update(self, instance, validated_data):
         if 'checked_in' in validated_data:

@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../../api/client.js'
 
 export default function RSVPForm({ slug }) {
+  const [searchParams] = useSearchParams()
+  const guestCode = searchParams.get('g') || ''
   const [form, setForm] = useState({
-    guest_name: '',
+    guest_name: searchParams.get('to') || '',
     whatsapp: '',
     attending: true,
     pax: 1,
@@ -35,6 +38,7 @@ export default function RSVPForm({ slug }) {
       await api.post(`/invitations/${slug}/rsvp/`, {
         ...form,
         pax: form.attending ? parseInt(form.pax, 10) : 1,
+        guest_code: guestCode,
       })
       setSubmitted(true)
     } catch (err) {
