@@ -20,6 +20,7 @@ function SettingsSection({ inv, reload, notify }) {
     theme: inv.theme, wedding_date: inv.wedding_date || '',
     opening_text: inv.opening_text || '', closing_text: inv.closing_text || '',
     dress_code: inv.dress_code || '', livestream_url: inv.livestream_url || '',
+    wishlist_url: inv.wishlist_url || '',
   })
   const [music, setMusic] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -66,6 +67,10 @@ function SettingsSection({ inv, reload, notify }) {
       <div className="ed-field">
         <label>Link live streaming (opsional — YouTube, dll.)</label>
         <input className="ed-input" value={f.livestream_url} onChange={e => set('livestream_url', e.target.value)} placeholder="https://youtube.com/watch?v=…" />
+      </div>
+      <div className="ed-field">
+        <label>Link wishlist / gift registry (opsional)</label>
+        <input className="ed-input" value={f.wishlist_url} onChange={e => set('wishlist_url', e.target.value)} placeholder="https://tokopedia.link/… atau registry kalian" />
       </div>
       <div className="ed-field">
         <label>Musik latar {inv.music_file && <a href={inv.music_file} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(file saat ini)</a>}</label>

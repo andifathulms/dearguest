@@ -51,8 +51,9 @@ function BankCard({ account }) {
   )
 }
 
-export default function AmplodDigital({ bankAccounts }) {
-  if (!bankAccounts || bankAccounts.length === 0) return null
+export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
+  const hasBanks = bankAccounts && bankAccounts.length > 0
+  if (!hasBanks && !wishlistUrl) return null
   return (
     <section className="amplod-section">
       <h2 className="section-title">Amplop Digital</h2>
@@ -60,11 +61,20 @@ export default function AmplodDigital({ bankAccounts }) {
         Doa restu Anda merupakan karunia yang berarti. Bagi yang ingin memberikan tanda kasih,
         dapat melalui rekening, e-wallet, atau QRIS berikut:
       </p>
-      <div className="bank-cards">
-        {bankAccounts.map(account => (
-          <BankCard key={account.id} account={account} />
-        ))}
-      </div>
+      {hasBanks && (
+        <div className="bank-cards">
+          {bankAccounts.map(account => (
+            <BankCard key={account.id} account={account} />
+          ))}
+        </div>
+      )}
+      {wishlistUrl && (
+        <div className="amplod-wishlist-wrap">
+          <a className="amplod-wishlist" href={wishlistUrl} target="_blank" rel="noopener noreferrer">
+            🎁 Lihat Wishlist Kami →
+          </a>
+        </div>
+      )}
     </section>
   )
 }

@@ -94,6 +94,21 @@ body.cover-open {
 }
 .events-dresscode strong { color: var(--text-primary); }
 
+/* Gift wishlist button — theme-common variables */
+.amplod-wishlist-wrap { text-align: center; margin-top: 1.5rem; }
+.amplod-wishlist {
+  display: inline-block;
+  padding: 0.65rem 1.6rem;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  border-radius: 4px;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.amplod-wishlist:hover { opacity: 0.75; transform: translateY(-1px); }
+
 /* Invitation loading / error screen */
 .inv-status {
   min-height: 100vh;

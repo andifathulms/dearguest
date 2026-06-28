@@ -34,6 +34,7 @@ class Invitation(models.Model):
     watermark = models.BooleanField(default=True)
     music_file = models.FileField(upload_to='music/', null=True, blank=True)
     livestream_url = models.URLField(blank=True)  # YouTube/Instagram/Zoom link for remote guests
+    wishlist_url = models.URLField(blank=True)  # gift registry / wishlist link
     # Manual activation (no payment gateway): admin issues activation_code after
     # confirming payment; the couple enters it in the editor to go live.
     activation_code = models.CharField(max_length=20, blank=True)

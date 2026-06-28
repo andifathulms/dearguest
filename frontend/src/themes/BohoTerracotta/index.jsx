@@ -47,7 +47,7 @@ export default function BohoTerracotta({ invitation, guestName }) {
       <Section><StorySection stories={invitation.stories} /></Section>
       <Section><ProfileSection couple={couple} /></Section>
       <Section><GallerySection photos={invitation.photos} /></Section>
-      <Section><AmplodDigital bankAccounts={invitation.bank_accounts} /></Section>
+      <Section><AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} /></Section>
       <Section><RSVPForm slug={invitation.slug} /></Section>
       <Section><WishesWall slug={invitation.slug} /></Section>
       <Section><MapsSection events={invitation.events} /></Section>
