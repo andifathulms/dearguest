@@ -3,14 +3,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import RegisterSerializer
+
+
+class ThrottledLoginView(TokenObtainPairView):
+    """Login with abuse throttling."""
+    throttle_scope = 'login'
 
 
 class RegisterView(generics.CreateAPIView):
     """Public self-registration. Returns JWT tokens so the user is logged in immediately."""
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
+    throttle_scope = 'register'
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

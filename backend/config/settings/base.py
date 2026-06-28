@@ -81,6 +81,15 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
+    # Scoped throttling: only views that set `throttle_scope` are limited.
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'register': '10/hour',
+        'login': '20/hour',
+        'password_reset': '5/hour',
+    },
 }
 
 SIMPLE_JWT = {
@@ -93,3 +102,17 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+# Email (console backend in dev; configure SMTP via env in production).
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Undangan Digital <noreply@undangan.local>')
+ADMIN_EMAIL = config('ADMIN_EMAIL', default='admin@undangan.local')
+
+# Public URLs used in emails, share pages, and redirects.
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173').rstrip('/')
+ADMIN_WHATSAPP_NUMBER = config('ADMIN_WHATSAPP_NUMBER', default='628123456789')
