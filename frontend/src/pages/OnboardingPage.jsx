@@ -53,7 +53,7 @@ export default function OnboardingPage() {
       await api.post('/my/invitations/', { slug, theme, wedding_date: weddingDate })
       navigate(`/dashboard/${slug}/edit`)
     } catch (err) {
-      setError(err.response?.data?.slug?.[0] || 'Gagal membuat undangan. Coba lagi.')
+      setError(err.response?.data?.detail || err.response?.data?.slug?.[0] || 'Gagal membuat undangan. Coba lagi.')
       setLoading(false)
     }
   }

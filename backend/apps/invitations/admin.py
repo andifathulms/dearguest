@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest
+from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, CoupleProfile
 
 
 class CoupleInline(admin.StackedInline):
@@ -59,6 +59,13 @@ class RSVPAdmin(admin.ModelAdmin):
     list_display = ['guest_name', 'invitation', 'attending', 'pax', 'submitted_at']
     list_filter = ['invitation', 'attending']
     readonly_fields = ['guest_name', 'whatsapp', 'attending', 'pax', 'wishes', 'submitted_at']
+
+
+@admin.register(CoupleProfile)
+class CoupleProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'max_invitations']
+    list_editable = ['max_invitations']
+    search_fields = ['user__username']
 
 
 @admin.register(Guest)

@@ -53,6 +53,16 @@ class Invitation(models.Model):
         return self.slug
 
 
+class CoupleProfile(models.Model):
+    """Per-account settings. max_invitations is the cap; admin bumps it to 2
+    for Bisnis customers after payment (free/Premium = 1)."""
+    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
+    max_invitations = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.user.username} (maks {self.max_invitations})"
+
+
 class Couple(models.Model):
     invitation = models.OneToOneField(Invitation, on_delete=models.CASCADE, related_name='couple')
     bride_name = models.CharField(max_length=200)

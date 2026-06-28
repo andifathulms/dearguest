@@ -5,6 +5,8 @@ import { id } from 'date-fns/locale'
 import api from '../api/client.js'
 import './MyInvitations.css'
 
+const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
+
 const THEME_NAME = {
   'javanese-dark': 'Javanese Malam Emas',
   'floral-light': 'Taman Bunga',
@@ -31,11 +33,12 @@ function statusBadge(it) {
 export default function MyInvitationsPage() {
   const navigate = useNavigate()
   const [items, setItems] = useState(null)
+  const [max, setMax] = useState(1)
 
   useEffect(() => {
     if (!localStorage.getItem('access_token')) { navigate('/dashboard'); return }
     api.get('/my/invitations/')
-      .then(res => setItems(res.data))
+      .then(res => { setItems(res.data.invitations || []); setMax(res.data.max_invitations || 1) })
       .catch(err => {
         if (err.response?.status === 401) navigate('/dashboard')
         else setItems([])
@@ -65,9 +68,20 @@ export default function MyInvitationsPage() {
         <div className="mi-head">
           <div>
             <h1>Undangan Saya</h1>
-            <p>Kelola semua undangan pernikahan kamu di sini.</p>
+            <p>{items.length} dari {max} undangan terpakai.</p>
           </div>
-          <Link to="/onboarding" className="mi-btn">+ Buat Undangan Baru</Link>
+          {items.length < max ? (
+            <Link to="/onboarding" className="mi-btn">+ Buat Undangan Baru</Link>
+          ) : (
+            <a
+              className="mi-mini"
+              style={{ background: '#25d366', color: '#fff', borderColor: '#25d366' }}
+              href={`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent('Halo admin, saya ingin upgrade ke paket Bisnis (2 undangan).')}`}
+              target="_blank" rel="noopener noreferrer"
+            >
+              Upgrade ke Bisnis untuk undangan ke-2
+            </a>
+          )}
         </div>
 
         {items.length === 0 ? (

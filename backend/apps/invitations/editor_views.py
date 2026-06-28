@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount
+from .models import Invitation, Couple, Event, Story, Photo, BankAccount, CoupleProfile
 from .serializers import (
     EditorInvitationSerializer,
     InvitationListSerializer,
@@ -36,11 +36,23 @@ class MyInvitationsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = Invitation.objects.all() if request.user.is_staff else Invitation.objects.filter(couple_user=request.user)
+        profile, _ = CoupleProfile.objects.get_or_create(user=request.user)
+        if request.user.is_staff:
+            qs = Invitation.objects.all()
+            max_invitations = max(qs.count(), 1)
+        else:
+            qs = Invitation.objects.filter(couple_user=request.user)
+            max_invitations = profile.max_invitations
         data = InvitationListSerializer(qs.order_by('-created_at'), many=True, context={'request': request}).data
-        return Response(data)
+        return Response({'invitations': data, 'max_invitations': max_invitations})
 
     def post(self, request):
+        profile, _ = CoupleProfile.objects.get_or_create(user=request.user)
+        if not request.user.is_staff and request.user.invitations.count() >= profile.max_invitations:
+            return Response(
+                {'detail': f'Batas undangan tercapai ({profile.max_invitations}). Upgrade ke paket Bisnis untuk membuat 2 undangan.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         serializer = InvitationCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inv = serializer.save(couple_user=request.user, is_active=False)
