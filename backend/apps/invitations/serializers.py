@@ -255,12 +255,18 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
     stories = StoryWriteSerializer(many=True, read_only=True)
     photos = PhotoWriteSerializer(many=True, read_only=True)
     bank_accounts = BankAccountWriteSerializer(many=True, read_only=True)
+    has_activation_code = serializers.SerializerMethodField()
 
     class Meta:
         model = Invitation
         fields = [
             'slug', 'theme', 'tier', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'watermark', 'is_active',
-            'activation_requested', 'music_file', 'music_preset', 'livestream_url', 'wishlist_url',
+            'activation_requested', 'has_activation_code',
+            'music_file', 'music_preset', 'livestream_url', 'wishlist_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
+
+    def get_has_activation_code(self, obj):
+        # Signal that admin issued a code (without exposing the code itself).
+        return bool(obj.activation_code)

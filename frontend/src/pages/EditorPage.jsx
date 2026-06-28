@@ -483,10 +483,20 @@ function PublishCard({ inv, reload, notify }) {
     finally { setActivating(false) }
   }
 
+  // Status: draft → requested → code-issued → active
+  const step = inv.has_activation_code ? 2 : (inv.activation_requested ? 1 : 0)
+
   return (
     <div className="ed-card ed-publish">
       <h2>Publikasikan Undangan</h2>
-      <p className="ed-card-sub">Undangan masih draft. Ikuti 2 langkah berikut untuk mengaktifkannya.</p>
+      <p className="ed-card-sub">Undangan masih draft. Ikuti langkah berikut untuk mengaktifkannya.</p>
+
+      <div className="ed-stepper">
+        <div className={`ed-step ${step >= 1 ? 'done' : ''}`}><span>1</span> Minta aktivasi</div>
+        <div className={`ed-step ${step >= 2 ? 'done' : ''}`}><span>2</span> Konfirmasi pembayaran</div>
+        <div className="ed-step"><span>3</span> Masukkan kode</div>
+      </div>
+
       <ol className="ed-steps">
         <li>
           <strong>Hubungi admin & kirim bukti pembayaran.</strong>
@@ -496,9 +506,13 @@ function PublishCard({ inv, reload, notify }) {
               : <button className="ed-btn-ghost ed-btn ed-btn-sm" onClick={request} disabled={reqLoading}>{reqLoading ? '…' : 'Minta Aktivasi'}</button>}
             <a className="ed-mini" style={{ background: '#25d366', color: '#fff', borderColor: '#25d366' }} href={waUrl} target="_blank" rel="noopener noreferrer">WhatsApp Admin</a>
           </div>
+          {inv.activation_requested && !inv.has_activation_code && (
+            <p className="ed-pub-wait">⏳ Menunggu konfirmasi admin — biasanya dalam beberapa jam. Kode aktivasi akan dikirim via WhatsApp.</p>
+          )}
         </li>
         <li>
           <strong>Masukkan kode aktivasi dari admin.</strong>
+          {inv.has_activation_code && <p className="ed-pub-ready">✓ Admin sudah menerbitkan kode — cek WhatsApp lalu masukkan di bawah.</p>}
           <div className="ed-pub-row">
             <input className="ed-input" style={{ maxWidth: '200px', textTransform: 'uppercase', letterSpacing: '0.1em' }} value={code} onChange={e => setCode(e.target.value)} placeholder="mis. A7K2QX" />
             <button className="ed-btn ed-btn-sm" onClick={activate} disabled={activating}>{activating ? '…' : 'Aktifkan'}</button>

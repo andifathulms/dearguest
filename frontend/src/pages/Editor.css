@@ -153,6 +153,13 @@
 .ed-steps li strong { display: block; margin-bottom: 0.5rem; color: #1c1712; }
 .ed-pub-row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
 .ed-pub-err { color: #c0392b; font-size: 0.8rem; margin-top: 0.4rem; }
+.ed-pub-wait { color: #a9772a; font-size: 0.8rem; margin-top: 0.5rem; }
+.ed-pub-ready { color: #2e7d46; font-size: 0.8rem; margin-top: 0.5rem; font-weight: 500; }
+.ed-stepper { display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.ed-step { display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: #a89a86; }
+.ed-step span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #eee9e0; color: #a89a86; font-size: 0.72rem; }
+.ed-step.done { color: #1c1712; }
+.ed-step.done span { background: linear-gradient(135deg, #c79a52, #a87d3d); color: #fff; }
 
 /* Image cropper modal */
 .crop-overlay {
