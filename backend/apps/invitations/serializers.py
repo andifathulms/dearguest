@@ -192,6 +192,30 @@ class InvitationCreateSerializer(serializers.ModelSerializer):
         return value
 
 
+class InvitationListSerializer(serializers.ModelSerializer):
+    """Compact summary for the couple's "My Invitations" list."""
+    bride_name = serializers.SerializerMethodField()
+    groom_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Invitation
+        fields = ['slug', 'theme', 'wedding_date', 'is_active', 'activation_requested', 'bride_name', 'groom_name']
+
+    def _couple(self, obj):
+        try:
+            return obj.couple
+        except Couple.DoesNotExist:
+            return None
+
+    def get_bride_name(self, obj):
+        c = self._couple(obj)
+        return c.bride_name if c else ''
+
+    def get_groom_name(self, obj):
+        c = self._couple(obj)
+        return c.groom_name if c else ''
+
+
 class EditorInvitationSerializer(serializers.ModelSerializer):
     """Full read of the owner's invitation, including all nested editable content."""
     couple = CoupleWriteSerializer(read_only=True)

@@ -1,14 +1,18 @@
-"""Authenticated, owner-scoped editor API. Every endpoint operates on the
-invitation owned by request.user (couple_user). Couples manage their own draft;
-is_active/watermark remain admin-controlled (the paywall)."""
+"""Authenticated, owner-scoped editor API. A couple may own several invitations;
+every endpoint is scoped to {slug} and verifies the requester owns it (or is staff).
+is_active/watermark/tier remain admin-controlled (the paywall)."""
+import re
+from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Invitation, Couple, Event, Story, Photo, BankAccount
 from .serializers import (
     EditorInvitationSerializer,
+    InvitationListSerializer,
     InvitationSettingsSerializer,
     InvitationCreateSerializer,
     CoupleWriteSerializer,
@@ -19,55 +23,68 @@ from .serializers import (
 )
 
 
-def _my_invitation(user):
-    try:
-        return user.invitation
-    except Invitation.DoesNotExist:
-        return None
+def _owned(user, slug):
+    """The invitation with this slug if the user owns it (or is staff), else None."""
+    qs = Invitation.objects.filter(slug=slug)
+    if not user.is_staff:
+        qs = qs.filter(couple_user=user)
+    return qs.first()
 
 
-class MyInvitationView(APIView):
-    """GET own invitation (full), POST to create one, PATCH to update settings."""
+class MyInvitationsView(APIView):
+    """GET the couple's invitations; POST to create a new draft."""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        inv = _my_invitation(request.user)
-        if not inv:
-            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
-        return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
+        qs = Invitation.objects.all() if request.user.is_staff else Invitation.objects.filter(couple_user=request.user)
+        data = InvitationListSerializer(qs.order_by('-created_at'), many=True, context={'request': request}).data
+        return Response(data)
 
     def post(self, request):
-        if _my_invitation(request.user):
-            return Response({'detail': 'Anda sudah memiliki undangan.'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = InvitationCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inv = serializer.save(couple_user=request.user, is_active=False)
-        # Create a blank couple so the editor has something to edit immediately.
         Couple.objects.get_or_create(
             invitation=inv,
             defaults={'bride_name': '', 'bride_parents': '', 'groom_name': '', 'groom_parents': ''},
         )
         return Response(EditorInvitationSerializer(inv, context={'request': request}).data, status=status.HTTP_201_CREATED)
 
-    def patch(self, request):
-        inv = _my_invitation(request.user)
+
+class MyInvitationDetailView(APIView):
+    """GET full invitation, PATCH settings, DELETE the draft."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, slug):
+        inv = _owned(request.user, slug)
         if not inv:
-            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
+
+    def patch(self, request, slug):
+        inv = _owned(request.user, slug)
+        if not inv:
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = InvitationSettingsSerializer(inv, data=request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
 
+    def delete(self, request, slug):
+        inv = _owned(request.user, slug)
+        if not inv:
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        inv.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class RequestActivationView(APIView):
-    """Couple flags that they want to go live (after contacting admin to pay)."""
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        from django.utils import timezone
-        inv = _my_invitation(request.user)
+    def post(self, request, slug):
+        inv = _owned(request.user, slug)
         if not inv:
-            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
         if inv.is_active:
             return Response({'detail': 'Undangan sudah aktif.'}, status=status.HTTP_400_BAD_REQUEST)
         inv.activation_requested = True
@@ -77,13 +94,12 @@ class RequestActivationView(APIView):
 
 
 class ActivateView(APIView):
-    """Couple enters the activation code issued by admin to publish the invitation."""
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        inv = _my_invitation(request.user)
+    def post(self, request, slug):
+        inv = _owned(request.user, slug)
         if not inv:
-            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
         if inv.is_active:
             return Response({'is_active': True})
         code = (request.data.get('code') or '').strip()
@@ -95,11 +111,9 @@ class ActivateView(APIView):
 
 
 class SlugCheckView(APIView):
-    """GET ?slug=xyz -> {available: bool}. Used live during onboarding."""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        import re
         slug = (request.query_params.get('slug') or '').strip().lower()
         valid = bool(re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug))
         available = valid and not Invitation.objects.filter(slug=slug).exists()
@@ -107,20 +121,19 @@ class SlugCheckView(APIView):
 
 
 class MyCoupleView(APIView):
-    """GET / PUT the owner's couple profile (multipart for photos)."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        inv = _my_invitation(request.user)
+    def get(self, request, slug):
+        inv = _owned(request.user, slug)
         if not inv:
-            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
         couple, _ = Couple.objects.get_or_create(invitation=inv)
         return Response(CoupleWriteSerializer(couple, context={'request': request}).data)
 
-    def put(self, request):
-        inv = _my_invitation(request.user)
+    def put(self, request, slug):
+        inv = _owned(request.user, slug)
         if not inv:
-            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
         couple, _ = Couple.objects.get_or_create(invitation=inv)
         serializer = CoupleWriteSerializer(couple, data=request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -129,29 +142,32 @@ class MyCoupleView(APIView):
 
 
 class _OwnedChildList(generics.ListCreateAPIView):
-    """List/create child rows belonging to the owner's invitation."""
     permission_classes = [IsAuthenticated]
     model = None
     related_name = None
 
+    def _inv(self):
+        return _owned(self.request.user, self.kwargs['slug'])
+
     def get_queryset(self):
-        inv = _my_invitation(self.request.user)
+        inv = self._inv()
         if not inv:
             return self.model.objects.none()
         return getattr(inv, self.related_name).all()
 
     def perform_create(self, serializer):
-        inv = _my_invitation(self.request.user)
+        inv = self._inv()
+        if not inv:
+            raise PermissionDenied('Undangan tidak ditemukan.')
         serializer.save(invitation=inv)
 
 
 class _OwnedChildDetail(generics.RetrieveUpdateDestroyAPIView):
-    """Retrieve/update/delete a single child row, scoped to the owner."""
     permission_classes = [IsAuthenticated]
     model = None
 
     def get_queryset(self):
-        inv = _my_invitation(self.request.user)
+        inv = _owned(self.request.user, self.kwargs['slug'])
         if not inv:
             return self.model.objects.none()
         return self.model.objects.filter(invitation=inv)

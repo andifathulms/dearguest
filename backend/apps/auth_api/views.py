@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.invitations.models import Invitation
 from .serializers import RegisterSerializer
 
 
@@ -34,14 +33,12 @@ class MeView(APIView):
 
     def get(self, request):
         user = request.user
-        try:
-            inv = user.invitation
-        except Invitation.DoesNotExist:
-            inv = None
+        invitations = list(user.invitations.order_by('-created_at').values('slug', 'is_active'))
         return Response({
             'username': user.username,
             'email': user.email,
             'is_staff': user.is_staff,
-            'invitation_slug': inv.slug if inv else None,
-            'invitation_active': inv.is_active if inv else None,
+            'invitations': invitations,
+            # First slug for convenience / backward compatibility.
+            'invitation_slug': invitations[0]['slug'] if invitations else None,
         })

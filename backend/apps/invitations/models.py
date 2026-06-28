@@ -32,9 +32,9 @@ class Invitation(models.Model):
     activation_code = models.CharField(max_length=20, blank=True)
     activation_requested = models.BooleanField(default=False)
     activation_requested_at = models.DateTimeField(null=True, blank=True)
-    couple_user = models.OneToOneField(
+    couple_user = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='invitation'
+        related_name='invitations'
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

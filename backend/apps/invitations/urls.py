@@ -8,7 +8,8 @@ from .views import (
     GuestDetailView,
 )
 from .editor_views import (
-    MyInvitationView,
+    MyInvitationsView,
+    MyInvitationDetailView,
     RequestActivationView,
     ActivateView,
     SlugCheckView,
@@ -31,18 +32,19 @@ urlpatterns = [
     path('invitations/<slug:slug>/guests/', GuestListCreateView.as_view()),
     path('invitations/<slug:slug>/guests/<int:pk>/', GuestDetailView.as_view()),
 
-    # ===== Editor (authenticated, owner-scoped) =====
-    path('my/invitation/', MyInvitationView.as_view()),
-    path('my/invitation/request-activation/', RequestActivationView.as_view()),
-    path('my/invitation/activate/', ActivateView.as_view()),
+    # ===== Editor (authenticated, owner-scoped, multi-invitation) =====
     path('my/slug-check/', SlugCheckView.as_view()),
-    path('my/couple/', MyCoupleView.as_view()),
-    path('my/events/', EventListCreate.as_view()),
-    path('my/events/<int:pk>/', EventDetail.as_view()),
-    path('my/stories/', StoryListCreate.as_view()),
-    path('my/stories/<int:pk>/', StoryDetail.as_view()),
-    path('my/photos/', PhotoListCreate.as_view()),
-    path('my/photos/<int:pk>/', PhotoDetail.as_view()),
-    path('my/bank-accounts/', BankAccountListCreate.as_view()),
-    path('my/bank-accounts/<int:pk>/', BankAccountDetail.as_view()),
+    path('my/invitations/', MyInvitationsView.as_view()),
+    path('my/invitations/<slug:slug>/', MyInvitationDetailView.as_view()),
+    path('my/invitations/<slug:slug>/request-activation/', RequestActivationView.as_view()),
+    path('my/invitations/<slug:slug>/activate/', ActivateView.as_view()),
+    path('my/invitations/<slug:slug>/couple/', MyCoupleView.as_view()),
+    path('my/invitations/<slug:slug>/events/', EventListCreate.as_view()),
+    path('my/invitations/<slug:slug>/events/<int:pk>/', EventDetail.as_view()),
+    path('my/invitations/<slug:slug>/stories/', StoryListCreate.as_view()),
+    path('my/invitations/<slug:slug>/stories/<int:pk>/', StoryDetail.as_view()),
+    path('my/invitations/<slug:slug>/photos/', PhotoListCreate.as_view()),
+    path('my/invitations/<slug:slug>/photos/<int:pk>/', PhotoDetail.as_view()),
+    path('my/invitations/<slug:slug>/bank-accounts/', BankAccountListCreate.as_view()),
+    path('my/invitations/<slug:slug>/bank-accounts/<int:pk>/', BankAccountDetail.as_view()),
 ]
