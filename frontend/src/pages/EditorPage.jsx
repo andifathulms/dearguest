@@ -599,6 +599,7 @@ export default function EditorPage() {
 
       {showPreview && (
         <div className="ed-preview">
+          <button className="ed-preview-close" onClick={() => setShowPreview(false)}>Tutup ✕</button>
           <iframe key={previewKey} title="Pratinjau undangan" src={`/${inv.slug}?preview=1`} />
         </div>
       )}

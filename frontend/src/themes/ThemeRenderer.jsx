@@ -12,13 +12,14 @@ const themes = {
   'boho-terracotta': lazy(() => import('./BohoTerracotta/index.jsx')),
 }
 
-export default function ThemeRenderer({ invitation, guestName }) {
+export default function ThemeRenderer({ invitation, guestName, preview = false }) {
   const themeKey = themes[invitation.theme] ? invitation.theme : 'javanese-dark'
   const Theme = themes[themeKey]
 
   return (
     <>
-      <CoverGate invitation={invitation} guestName={guestName} themeClass={themeKey} />
+      {/* Editor preview renders the content directly, skipping the cover gate. */}
+      {!preview && <CoverGate invitation={invitation} guestName={guestName} themeClass={themeKey} />}
       <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
         <Theme invitation={invitation} guestName={guestName} />
       </Suspense>

@@ -59,5 +59,5 @@ export default function InvitationPage() {
     )
   }
 
-  return <ThemeRenderer invitation={invitation} guestName={guestName} />
+  return <ThemeRenderer invitation={invitation} guestName={guestName} preview={preview} />
 }
