@@ -1,5 +1,9 @@
+import secrets
 from django.contrib import admin
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, CoupleProfile
+from .models import (
+    Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
+    CoupleProfile, ActivationRequest,
+)
 
 
 class CoupleInline(admin.StackedInline):
@@ -59,6 +63,33 @@ class RSVPAdmin(admin.ModelAdmin):
     list_display = ['guest_name', 'invitation', 'attending', 'pax', 'submitted_at']
     list_filter = ['invitation', 'attending']
     readonly_fields = ['guest_name', 'whatsapp', 'attending', 'pax', 'wishes', 'submitted_at']
+
+
+@admin.register(ActivationRequest)
+class ActivationRequestAdmin(admin.ModelAdmin):
+    """Inbox of couples who requested activation but aren't live yet."""
+    list_display = ['slug', 'couple_names', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
+    list_editable = ['tier', 'activation_code', 'is_active']
+    readonly_fields = ['activation_requested_at']
+    actions = ['issue_activation_code']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(activation_requested=True, is_active=False)
+
+    @admin.display(description='Mempelai')
+    def couple_names(self, obj):
+        try:
+            c = obj.couple
+        except Couple.DoesNotExist:
+            return '—'
+        return f"{c.bride_name} & {c.groom_name}"
+
+    @admin.action(description='Terbitkan kode aktivasi')
+    def issue_activation_code(self, request, queryset):
+        for inv in queryset:
+            inv.activation_code = secrets.token_hex(3).upper()
+            inv.save(update_fields=['activation_code'])
+        self.message_user(request, f'Kode aktivasi diterbitkan untuk {queryset.count()} undangan.')
 
 
 @admin.register(CoupleProfile)

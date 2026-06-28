@@ -53,6 +53,14 @@ class Invitation(models.Model):
         return self.slug
 
 
+class ActivationRequest(Invitation):
+    """Proxy of Invitation for the admin 'pending activations' inbox."""
+    class Meta:
+        proxy = True
+        verbose_name = 'Permintaan Aktivasi'
+        verbose_name_plural = 'Permintaan Aktivasi (pending)'
+
+
 class CoupleProfile(models.Model):
     """Per-account settings. max_invitations is the cap; admin bumps it to 2
     for Bisnis customers after payment (free/Premium = 1)."""

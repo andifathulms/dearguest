@@ -2,6 +2,8 @@
 every endpoint is scoped to {slug} and verifies the requester owns it (or is staff).
 is_active/watermark/tier remain admin-controlled (the paywall)."""
 import re
+from django.conf import settings
+from django.core.mail import send_mail
 from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -102,6 +104,18 @@ class RequestActivationView(APIView):
         inv.activation_requested = True
         inv.activation_requested_at = timezone.now()
         inv.save(update_fields=['activation_requested', 'activation_requested_at'])
+        # Notify admin so they can confirm payment and issue an activation code.
+        couple = getattr(inv, 'couple', None)
+        names = f"{couple.bride_name} & {couple.groom_name}" if couple else inv.slug
+        send_mail(
+            f'[Aktivasi] Permintaan aktivasi: {inv.slug}',
+            f"Undangan '{inv.slug}' ({names}) meminta aktivasi.\n\n"
+            f"Konfirmasi pembayaran, lalu terbitkan kode aktivasi & set tier di admin:\n"
+            f"Buka admin → Permintaan Aktivasi.",
+            settings.DEFAULT_FROM_EMAIL,
+            [settings.ADMIN_EMAIL],
+            fail_silently=True,
+        )
         return Response({'activation_requested': True})
 
 
