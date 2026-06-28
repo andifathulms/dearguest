@@ -75,6 +75,15 @@ body.cover-open {
   isolation: isolate;
 }
 
+/* Event action links (maps + add-to-calendar) — color inherited from theme */
+.event-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
 /* Invitation loading / error screen */
 .inv-status {
   min-height: 100vh;
