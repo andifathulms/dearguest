@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
+import ImageCropper from '../components/ui/ImageCropper.jsx'
 import './Editor.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -91,6 +92,8 @@ function CoupleSection({ inv, reload, notify }) {
     groom_name: c.groom_name || '', groom_parents: c.groom_parents || '', groom_bio: c.groom_bio || '',
   })
   const [photos, setPhotos] = useState({ bride_photo: null, groom_photo: null })
+  const [previews, setPreviews] = useState({})
+  const [cropping, setCropping] = useState(null)
   const [saving, setSaving] = useState(false)
   const set = (k, v) => setF(s => ({ ...s, [k]: v }))
 
@@ -118,8 +121,8 @@ function CoupleSection({ inv, reload, notify }) {
           <div className="ed-field"><label>Bio (opsional)</label><textarea className="ed-textarea" value={f.bride_bio} onChange={e => set('bride_bio', e.target.value)} /></div>
           <div className="ed-field"><label>Foto</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              {c.bride_photo && <img className="ed-thumb" src={c.bride_photo} alt="Foto mempelai wanita" />}
-              <input className="ed-file" type="file" accept="image/*" onChange={e => setPhotos(p => ({ ...p, bride_photo: e.target.files[0] || null }))} />
+              {(previews.bride_photo || c.bride_photo) && <img className="ed-thumb" src={previews.bride_photo || c.bride_photo} alt="Foto mempelai wanita" />}
+              <input className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'bride_photo', file: e.target.files[0] })} />
             </div>
           </div>
         </div>
@@ -129,13 +132,25 @@ function CoupleSection({ inv, reload, notify }) {
           <div className="ed-field"><label>Bio (opsional)</label><textarea className="ed-textarea" value={f.groom_bio} onChange={e => set('groom_bio', e.target.value)} /></div>
           <div className="ed-field"><label>Foto</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              {c.groom_photo && <img className="ed-thumb" src={c.groom_photo} alt="Foto mempelai pria" />}
-              <input className="ed-file" type="file" accept="image/*" onChange={e => setPhotos(p => ({ ...p, groom_photo: e.target.files[0] || null }))} />
+              {(previews.groom_photo || c.groom_photo) && <img className="ed-thumb" src={previews.groom_photo || c.groom_photo} alt="Foto mempelai pria" />}
+              <input className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'groom_photo', file: e.target.files[0] })} />
             </div>
           </div>
         </div>
       </div>
       <div className="ed-save-row"><button className="ed-btn" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan Mempelai'}</button></div>
+
+      {cropping && (
+        <ImageCropper
+          file={cropping.file}
+          onCancel={() => setCropping(null)}
+          onDone={cropped => {
+            setPhotos(p => ({ ...p, [cropping.field]: cropped }))
+            setPreviews(pv => ({ ...pv, [cropping.field]: URL.createObjectURL(cropped) }))
+            setCropping(null)
+          }}
+        />
+      )}
     </div>
   )
 }
