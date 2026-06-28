@@ -77,7 +77,10 @@ export default function DashboardLogin() {
             {loading ? 'Masuk...' : 'Masuk'}
           </button>
         </form>
-        <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.82rem', color: '#888' }}>
+        <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.8rem' }}>
+          <a href="/forgot-password" style={{ color: '#888', textDecoration: 'none' }}>Lupa kata sandi?</a>
+        </p>
+        <p style={{ textAlign: 'center', marginTop: '0.75rem', fontSize: '0.82rem', color: '#888' }}>
           Belum punya akun? <a href="/register" style={{ color: '#b8924e', textDecoration: 'none', fontWeight: 500 }}>Daftar gratis</a>
         </p>
         <p style={{ textAlign: 'center', marginTop: '1rem' }}>
