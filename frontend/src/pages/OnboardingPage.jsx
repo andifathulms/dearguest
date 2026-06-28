@@ -26,15 +26,9 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false)
   const debounce = useRef(null)
 
-  // Redirect if not logged in or already has an invitation.
+  // Require login. A couple may create several invitations, so no redirect here.
   useEffect(() => {
-    if (!localStorage.getItem('access_token')) {
-      navigate('/dashboard')
-      return
-    }
-    api.get('/auth/me/')
-      .then(res => { if (res.data.invitation_slug) navigate(`/dashboard/${res.data.invitation_slug}/edit`) })
-      .catch(() => {})
+    if (!localStorage.getItem('access_token')) navigate('/dashboard')
   }, [navigate])
 
   // Debounced slug availability check.
@@ -56,7 +50,7 @@ export default function OnboardingPage() {
     if (!weddingDate) { setError('Isi tanggal pernikahan.'); return }
     setLoading(true)
     try {
-      await api.post('/my/invitation/', { slug, theme, wedding_date: weddingDate })
+      await api.post('/my/invitations/', { slug, theme, wedding_date: weddingDate })
       navigate(`/dashboard/${slug}/edit`)
     } catch (err) {
       setError(err.response?.data?.slug?.[0] || 'Gagal membuat undangan. Coba lagi.')

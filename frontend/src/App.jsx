@@ -4,6 +4,7 @@ import DashboardLogin from './pages/DashboardLogin.jsx'
 import DashboardRSVP from './pages/DashboardRSVP.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import OnboardingPage from './pages/OnboardingPage.jsx'
+import MyInvitationsPage from './pages/MyInvitationsPage.jsx'
 import EditorPage from './pages/EditorPage.jsx'
 import InvitationPage from './pages/InvitationPage.jsx'
 
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardLogin />} />
+        <Route path="/my" element={<MyInvitationsPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/dashboard/:slug" element={<DashboardRSVP />} />
         <Route path="/dashboard/:slug/edit" element={<EditorPage />} />

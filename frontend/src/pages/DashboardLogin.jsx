@@ -21,19 +21,8 @@ export default function DashboardLogin() {
       localStorage.setItem('access_token', res.data.access)
       localStorage.setItem('refresh_token', res.data.refresh)
 
-      // Route based on whether the user already has an invitation.
-      try {
-        const profileRes = await api.get('/auth/me/')
-        const slug = profileRes.data.invitation_slug
-        if (slug) {
-          navigate(`/dashboard/${slug}`)
-        } else {
-          navigate('/onboarding')
-        }
-        return
-      } catch {
-        navigate('/onboarding')
-      }
+      // Couples manage everything from the My Invitations hub.
+      navigate('/my')
     } catch (err) {
       setError('Username atau password salah.')
     } finally {

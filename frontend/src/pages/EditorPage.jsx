@@ -31,7 +31,7 @@ function SettingsSection({ inv, reload, notify }) {
       const fd = new FormData()
       Object.entries(f).forEach(([k, v]) => fd.append(k, v))
       if (music) fd.append('music_file', music)
-      await api.patch('/my/invitation/', fd)
+      await api.patch(`/my/invitations/${inv.slug}/`, fd)
       notify('Pengaturan tersimpan')
       reload()
     } catch { notify('Gagal menyimpan') } finally { setSaving(false) }
@@ -92,7 +92,7 @@ function CoupleSection({ inv, reload, notify }) {
       Object.entries(f).forEach(([k, v]) => fd.append(k, v))
       if (photos.bride_photo) fd.append('bride_photo', photos.bride_photo)
       if (photos.groom_photo) fd.append('groom_photo', photos.groom_photo)
-      await api.put('/my/couple/', fd)
+      await api.put(`/my/invitations/${inv.slug}/couple/`, fd)
       notify('Data mempelai tersimpan')
       reload()
     } catch { notify('Gagal menyimpan') } finally { setSaving(false) }
@@ -132,13 +132,13 @@ function EventsSection({ inv, reload, notify }) {
   async function saveOne(it) {
     const payload = { ...it }
     try {
-      if (it.id) await api.put(`/my/events/${it.id}/`, payload)
-      else await api.post('/my/events/', payload)
+      if (it.id) await api.put(`/my/invitations/${inv.slug}/events/${it.id}/`, payload)
+      else await api.post(`/my/invitations/${inv.slug}/events/`, payload)
       notify('Acara tersimpan'); reload()
     } catch { notify('Gagal menyimpan acara') }
   }
   async function delOne(it, i) {
-    if (it.id) { try { await api.delete(`/my/events/${it.id}/`); notify('Acara dihapus'); reload() } catch { notify('Gagal menghapus') } }
+    if (it.id) { try { await api.delete(`/my/invitations/${inv.slug}/events/${it.id}/`); notify('Acara dihapus'); reload() } catch { notify('Gagal menghapus') } }
     else setItems(arr => arr.filter((_, j) => j !== i))
   }
 
@@ -185,13 +185,13 @@ function StoriesSection({ inv, reload, notify }) {
   async function saveOne(it) {
     const payload = { ...it, date: it.date || null }
     try {
-      if (it.id) await api.put(`/my/stories/${it.id}/`, payload)
-      else await api.post('/my/stories/', payload)
+      if (it.id) await api.put(`/my/invitations/${inv.slug}/stories/${it.id}/`, payload)
+      else await api.post(`/my/invitations/${inv.slug}/stories/`, payload)
       notify('Kisah tersimpan'); reload()
     } catch { notify('Gagal menyimpan') }
   }
   async function delOne(it, i) {
-    if (it.id) { try { await api.delete(`/my/stories/${it.id}/`); notify('Kisah dihapus'); reload() } catch { notify('Gagal menghapus') } }
+    if (it.id) { try { await api.delete(`/my/invitations/${inv.slug}/stories/${it.id}/`); notify('Kisah dihapus'); reload() } catch { notify('Gagal menghapus') } }
     else setItems(arr => arr.filter((_, j) => j !== i))
   }
 
@@ -230,12 +230,12 @@ function GallerySection({ inv, reload, notify }) {
     try {
       const fd = new FormData()
       fd.append('image', file); fd.append('caption', caption); fd.append('order', inv.photos.length)
-      await api.post('/my/photos/', fd)
+      await api.post(`/my/invitations/${inv.slug}/photos/`, fd)
       setFile(null); setCaption(''); notify('Foto diunggah'); reload()
     } catch { notify('Gagal mengunggah') } finally { setBusy(false) }
   }
   async function del(id) {
-    try { await api.delete(`/my/photos/${id}/`); notify('Foto dihapus'); reload() } catch { notify('Gagal menghapus') }
+    try { await api.delete(`/my/invitations/${inv.slug}/photos/${id}/`); notify('Foto dihapus'); reload() } catch { notify('Gagal menghapus') }
   }
 
   return (
@@ -272,13 +272,13 @@ function GiftsSection({ inv, reload, notify }) {
       const fd = new FormData()
       ;['account_type', 'bank_name', 'account_number', 'account_name', 'order'].forEach(k => fd.append(k, it[k] ?? ''))
       if (qris[i]) fd.append('qris_image', qris[i])
-      if (it.id) await api.put(`/my/bank-accounts/${it.id}/`, fd)
-      else await api.post('/my/bank-accounts/', fd)
+      if (it.id) await api.put(`/my/invitations/${inv.slug}/bank-accounts/${it.id}/`, fd)
+      else await api.post(`/my/invitations/${inv.slug}/bank-accounts/`, fd)
       notify('Rekening tersimpan'); reload()
     } catch { notify('Gagal menyimpan') }
   }
   async function delOne(it, i) {
-    if (it.id) { try { await api.delete(`/my/bank-accounts/${it.id}/`); notify('Dihapus'); reload() } catch { notify('Gagal menghapus') } }
+    if (it.id) { try { await api.delete(`/my/invitations/${inv.slug}/bank-accounts/${it.id}/`); notify('Dihapus'); reload() } catch { notify('Gagal menghapus') } }
     else setItems(arr => arr.filter((_, j) => j !== i))
   }
 
@@ -338,14 +338,14 @@ function PublishCard({ inv, reload, notify }) {
 
   async function request() {
     setReqLoading(true)
-    try { await api.post('/my/invitation/request-activation/'); notify('Permintaan aktivasi terkirim'); reload() }
+    try { await api.post(`/my/invitations/${inv.slug}/request-activation/`); notify('Permintaan aktivasi terkirim'); reload() }
     catch { notify('Gagal mengirim permintaan') } finally { setReqLoading(false) }
   }
   async function activate() {
     setErr('')
     if (!code.trim()) { setErr('Masukkan kode aktivasi.'); return }
     setActivating(true)
-    try { await api.post('/my/invitation/activate/', { code }); notify('Undangan aktif! 🎉'); reload() }
+    try { await api.post(`/my/invitations/${inv.slug}/activate/`, { code }); notify('Undangan aktif! 🎉'); reload() }
     catch (e) { setErr(e.response?.data?.detail || 'Kode tidak valid.') }
     finally { setActivating(false) }
   }
@@ -388,14 +388,14 @@ export default function EditorPage() {
   const notify = useCallback(msg => { setToast(msg); setTimeout(() => setToast(''), 2200) }, [])
 
   const load = useCallback(() => {
-    api.get('/my/invitation/')
+    api.get(`/my/invitations/${slug}/`)
       .then(res => { setInv(res.data); setStatus('ok') })
       .catch(err => {
-        if (err.response?.status === 404) navigate('/onboarding')
+        if (err.response?.status === 404) navigate('/my')
         else if (err.response?.status === 401) navigate('/dashboard')
         else setStatus('error')
       })
-  }, [navigate])
+  }, [navigate, slug])
 
   useEffect(() => {
     if (!localStorage.getItem('access_token')) { navigate('/dashboard'); return }
@@ -415,6 +415,7 @@ export default function EditorPage() {
         <div className="ed-bar-title">Editor Undangan<small>{inv.slug}</small></div>
         <div className="ed-bar-actions">
           <span className={`ed-badge ${inv.is_active ? 'active' : 'draft'}`}>{inv.is_active ? 'Aktif' : 'Draft'}</span>
+          <a className="ed-link" href="/my">← Undangan Saya</a>
           <a className="ed-link" href={`/${inv.slug}`} target="_blank" rel="noopener noreferrer">Pratinjau ↗</a>
           <a className="ed-link" href={`/dashboard/${slug}`}>RSVP</a>
           <button className="ed-mini dark" onClick={logout}>Keluar</button>
