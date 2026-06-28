@@ -448,6 +448,31 @@ function TierBanner({ inv }) {
   )
 }
 
+/* ---------------- Completion checklist ---------------- */
+function ChecklistCard({ inv }) {
+  const c = inv.couple || {}
+  const items = [
+    { ok: !!(c.bride_name && c.groom_name), label: 'Nama kedua mempelai' },
+    { ok: (inv.events || []).length > 0, label: 'Tanggal & rangkaian acara' },
+    { ok: !!(c.bride_photo || c.groom_photo), label: 'Foto mempelai' },
+    { ok: (inv.photos || []).length > 0, label: 'Foto galeri' },
+    { ok: (inv.bank_accounts || []).length > 0 || !!inv.wishlist_url, label: 'Amplop digital / wishlist' },
+  ]
+  const done = items.filter(i => i.ok).length
+  if (done === items.length) return null
+  return (
+    <div className="ed-card">
+      <h2>Kelengkapan Undangan</h2>
+      <p className="ed-card-sub">{done}/{items.length} bagian utama sudah terisi. Lengkapi sisanya sebelum aktivasi.</p>
+      <ul className="ed-checklist">
+        {items.map(i => (
+          <li key={i.label} className={i.ok ? 'done' : ''}>{i.ok ? '✓' : '○'} {i.label}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 /* ---------------- Publish / activation ---------------- */
 function PublishCard({ inv, reload, notify }) {
   const [code, setCode] = useState('')
@@ -533,12 +558,26 @@ export default function EditorPage() {
   const [toast, setToast] = useState('')
   const [showPreview, setShowPreview] = useState(false)
   const [previewKey, setPreviewKey] = useState(0)
+  const [dirty, setDirty] = useState(false)
 
   const notify = useCallback(msg => { setToast(msg); setTimeout(() => setToast(''), 2200) }, [])
 
+  // Warn before leaving with unsaved edits.
+  useEffect(() => {
+    function onBeforeUnload(e) { if (dirty) { e.preventDefault(); e.returnValue = '' } }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [dirty])
+
+  function guardNav(e) {
+    if (dirty && !window.confirm('Ada perubahan yang belum disimpan. Tetap tinggalkan halaman?')) {
+      e.preventDefault()
+    }
+  }
+
   const load = useCallback(() => {
     api.get(`/my/invitations/${slug}/`)
-      .then(res => { setInv(res.data); setStatus('ok'); setPreviewKey(k => k + 1) })
+      .then(res => { setInv(res.data); setStatus('ok'); setPreviewKey(k => k + 1); setDirty(false) })
       .catch(err => {
         if (err.response?.status === 404) navigate('/my')
         else if (err.response?.status === 401) navigate('/dashboard')
@@ -567,12 +606,12 @@ export default function EditorPage() {
         <div className="ed-bar-title">Editor Undangan<small>{inv.slug}</small></div>
         <div className="ed-bar-actions">
           <span className={`ed-badge ${inv.is_active ? 'active' : 'draft'}`}>{inv.is_active ? 'Aktif' : 'Draft'}</span>
-          <a className="ed-link" href="/my">← Undangan Saya</a>
+          <a className="ed-link" href="/my" onClick={guardNav}>← Undangan Saya</a>
           <button className={`ed-link ${showPreview ? 'active' : ''}`} onClick={() => setShowPreview(s => !s)}>{showPreview ? 'Tutup Pratinjau' : 'Pratinjau Langsung'}</button>
           <button className="ed-link" onClick={copyLink}>Salin Link</button>
           <a className="ed-link" href={`/${inv.slug}`} target="_blank" rel="noopener noreferrer">Pratinjau ↗</a>
-          <a className="ed-link" href={`/dashboard/${slug}`}>RSVP</a>
-          <button className="ed-mini dark" onClick={logout}>Keluar</button>
+          <a className="ed-link" href={`/dashboard/${slug}`} onClick={guardNav}>RSVP</a>
+          <button className="ed-mini dark" onClick={e => { guardNav(e); if (!e.defaultPrevented) logout() }}>Keluar</button>
         </div>
       </div>
 
@@ -585,10 +624,11 @@ export default function EditorPage() {
         <a href="#sec-amplop">Amplop</a>
       </nav>
 
-      <div className={`ed-main ${showPreview ? 'with-preview' : ''}`}>
+      <div className={`ed-main ${showPreview ? 'with-preview' : ''}`} onChange={() => setDirty(true)}>
       <div className="ed-body">
         <PublishCard inv={inv} reload={load} notify={notify} />
         <TierBanner inv={inv} />
+        <ChecklistCard inv={inv} />
         <div className="ed-anchor" id="sec-pengaturan"><SettingsSection inv={inv} reload={load} notify={notify} /></div>
         <div className="ed-anchor" id="sec-mempelai"><CoupleSection inv={inv} reload={load} notify={notify} /></div>
         <div className="ed-anchor" id="sec-acara"><EventsSection inv={inv} reload={load} notify={notify} /></div>

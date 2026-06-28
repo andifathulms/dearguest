@@ -143,6 +143,11 @@
 .ed-save-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
 .ed-saved { font-size: 0.8rem; color: #2e7d46; }
 
+/* Completion checklist */
+.ed-checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.ed-checklist li { font-size: 0.86rem; color: #a9772a; }
+.ed-checklist li.done { color: #2e7d46; }
+
 /* Tier banner */
 .ed-tier {
   display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;
