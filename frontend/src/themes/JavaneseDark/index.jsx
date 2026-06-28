@@ -13,6 +13,7 @@ import WishesWall from '../../components/sections/WishesWall.jsx'
 import MapsSection from '../../components/sections/MapsSection.jsx'
 import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
+import FloatingRSVP from '../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
 
 const sectionVariants = {
@@ -86,6 +87,7 @@ export default function JavaneseDark({ invitation, guestName }) {
 
       <div className="kawung-border-bottom" />
       <MusicPlayer musicUrl={invitation.music_file} />
+      <FloatingRSVP />
     </div>
   )
 }
