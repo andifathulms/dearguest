@@ -1,5 +1,6 @@
+from django.utils import timezone
 from rest_framework import serializers
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP
+from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest
 
 
 class RSVPSerializer(serializers.ModelSerializer):
@@ -24,6 +25,21 @@ class WishSerializer(serializers.ModelSerializer):
     class Meta:
         model = RSVP
         fields = ['guest_name', 'wishes', 'submitted_at']
+
+
+class GuestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Guest
+        fields = ['id', 'name', 'whatsapp', 'group', 'code', 'checked_in', 'checked_in_at', 'created_at']
+        read_only_fields = ['code', 'checked_in_at', 'created_at']
+
+    def update(self, instance, validated_data):
+        if 'checked_in' in validated_data:
+            if validated_data['checked_in'] and not instance.checked_in:
+                instance.checked_in_at = timezone.now()
+            elif not validated_data['checked_in']:
+                instance.checked_in_at = None
+        return super().update(instance, validated_data)
 
 
 class CoupleSerializer(serializers.ModelSerializer):

@@ -4,13 +4,25 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Invitation, RSVP
+from .models import Invitation, RSVP, Guest
 from .serializers import (
     InvitationPublicSerializer,
     RSVPSerializer,
     RSVPCreateSerializer,
     WishSerializer,
+    GuestSerializer,
 )
+
+
+def _owner_or_error(request, slug):
+    """Return (invitation, None) if the requester owns the invitation, else (None, error_response)."""
+    try:
+        invitation = Invitation.objects.get(slug=slug)
+    except Invitation.DoesNotExist:
+        return None, Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+    if invitation.couple_user != request.user and not request.user.is_staff:
+        return None, Response({'detail': 'Akses ditolak.'}, status=status.HTTP_403_FORBIDDEN)
+    return invitation, None
 
 
 def _get_invitation_or_error(slug):
@@ -109,3 +121,52 @@ class WishesListView(generics.ListAPIView):
         return RSVP.objects.filter(
             invitation__slug=self.kwargs['slug'],
         ).exclude(wishes='')
+
+
+class GuestListCreateView(generics.ListCreateAPIView):
+    """Owner-only guest list. Supports single create and bulk paste via `names`."""
+    serializer_class = GuestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, slug=None, *args, **kwargs):
+        invitation, error = _owner_or_error(request, slug)
+        if error:
+            return error
+        guests = invitation.guests.all()
+        stats = {
+            'total': guests.count(),
+            'checked_in': guests.filter(checked_in=True).count(),
+        }
+        return Response({'guests': GuestSerializer(guests, many=True).data, 'stats': stats})
+
+    def create(self, request, slug=None, *args, **kwargs):
+        invitation, error = _owner_or_error(request, slug)
+        if error:
+            return error
+
+        names_raw = request.data.get('names')
+        if names_raw:
+            if isinstance(names_raw, str):
+                names = [n.strip() for n in names_raw.splitlines() if n.strip()]
+            else:
+                names = [str(n).strip() for n in names_raw if str(n).strip()]
+            created = [Guest.objects.create(invitation=invitation, name=n) for n in names]
+            return Response(GuestSerializer(created, many=True).data, status=status.HTTP_201_CREATED)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        guest = serializer.save(invitation=invitation)
+        return Response(GuestSerializer(guest).data, status=status.HTTP_201_CREATED)
+
+
+class GuestDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Owner-only guest edit / check-in toggle / delete. Non-owners get 404 via queryset scoping."""
+    serializer_class = GuestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = Guest.objects.filter(invitation__slug=self.kwargs['slug'])
+        user = self.request.user
+        if not user.is_staff:
+            qs = qs.filter(invitation__couple_user=user)
+        return qs
