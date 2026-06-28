@@ -56,12 +56,6 @@ const plans = [
   { name: 'Bisnis', desc: 'Untuk dua acara dalam satu akun.', price: '179', was: '299', featured: false, cta: 'Pilih Bisnis', features: ['Semua fitur Premium', '2 undangan dalam 1 akun', 'Kustomisasi warna & tata letak', 'Foto tanpa batas', 'Prioritas pengerjaan (24 jam)'] },
 ]
 
-const testimonials = [
-  { name: 'Dinda & Raka', city: 'Yogyakarta', quote: 'Undangannya elegan banget, tema Javanese-nya pas dengan adat kami. Tamu banyak yang muji desainnya mewah.', avatar: 'D' },
-  { name: 'Sarah & Bima', city: 'Jakarta', quote: 'Prosesnya cepat dan dibantu sampai detail. Fitur RSVP-nya bikin kami gampang rekap kehadiran tamu.', avatar: 'S' },
-  { name: 'Putri & Arya', city: 'Bandung', quote: 'Suka banget sama tema Taman Bunga. Personalisasi nama tamu bikin undangan terasa spesial dan personal.', avatar: 'P' },
-]
-
 const faqs = [
   { q: 'Berapa lama undangan selesai dibuat?', a: 'Umumnya 1–2 hari kerja setelah data lengkap kami terima. Paket Eksklusif diprioritaskan dalam 24 jam.' },
   { q: 'Apakah nama tamu bisa muncul otomatis?', a: 'Bisa. Setiap tamu mendapat link personal sehingga namanya tampil di sampul undangan, terasa lebih personal.' },
@@ -171,10 +165,10 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-stats-grid">
             {[
-              { value: '500+', label: 'Undangan Dibuat' },
-              { value: '25.000+', label: 'Tamu Terundang' },
-              { value: '4,9/5', label: 'Rating Pasangan' },
-              { value: '100%', label: 'Tanpa Kertas' },
+              { value: '6', label: 'Tema Eksklusif' },
+              { value: '100%', label: 'Optimal di HP' },
+              { value: '24 jam', label: 'Pengerjaan' },
+              { value: '0', label: 'Kertas Terbuang' },
             ].map((s, i) => (
               <motion.div className="lp-stat" key={s.label} {...fade(i * 0.06)}>
                 <strong className="lp-serif">{s.value}</strong>
@@ -309,31 +303,6 @@ export default function LandingPage() {
                 </motion.div>
               )
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Testimonials ===== */}
-      <section className="lp-section lp-testimonials">
-        <div className="lp-container">
-          <div className="lp-section-head">
-            <p className="lp-eyebrow">Kata Mereka</p>
-            <h2>Dipercaya pasangan bahagia</h2>
-          </div>
-          <div className="lp-testi-grid">
-            {testimonials.map((t, i) => (
-              <motion.div className="lp-testi" key={t.name} {...fade(i * 0.08)}>
-                <div className="lp-testi-stars">★★★★★</div>
-                <p className="lp-testi-quote">“{t.quote}”</p>
-                <div className="lp-testi-author">
-                  <span className="lp-testi-avatar lp-serif">{t.avatar}</span>
-                  <div>
-                    <strong>{t.name}</strong>
-                    <span>{t.city}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
