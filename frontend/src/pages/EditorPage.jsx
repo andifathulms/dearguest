@@ -498,12 +498,14 @@ export default function EditorPage() {
   const [inv, setInv] = useState(null)
   const [status, setStatus] = useState('loading')
   const [toast, setToast] = useState('')
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewKey, setPreviewKey] = useState(0)
 
   const notify = useCallback(msg => { setToast(msg); setTimeout(() => setToast(''), 2200) }, [])
 
   const load = useCallback(() => {
     api.get(`/my/invitations/${slug}/`)
-      .then(res => { setInv(res.data); setStatus('ok') })
+      .then(res => { setInv(res.data); setStatus('ok'); setPreviewKey(k => k + 1) })
       .catch(err => {
         if (err.response?.status === 404) navigate('/my')
         else if (err.response?.status === 401) navigate('/dashboard')
@@ -533,6 +535,7 @@ export default function EditorPage() {
         <div className="ed-bar-actions">
           <span className={`ed-badge ${inv.is_active ? 'active' : 'draft'}`}>{inv.is_active ? 'Aktif' : 'Draft'}</span>
           <a className="ed-link" href="/my">← Undangan Saya</a>
+          <button className={`ed-link ${showPreview ? 'active' : ''}`} onClick={() => setShowPreview(s => !s)}>{showPreview ? 'Tutup Pratinjau' : 'Pratinjau Langsung'}</button>
           <button className="ed-link" onClick={copyLink}>Salin Link</button>
           <a className="ed-link" href={`/${inv.slug}`} target="_blank" rel="noopener noreferrer">Pratinjau ↗</a>
           <a className="ed-link" href={`/dashboard/${slug}`}>RSVP</a>
@@ -549,6 +552,7 @@ export default function EditorPage() {
         <a href="#sec-amplop">Amplop</a>
       </nav>
 
+      <div className={`ed-main ${showPreview ? 'with-preview' : ''}`}>
       <div className="ed-body">
         <PublishCard inv={inv} reload={load} notify={notify} />
         <TierBanner inv={inv} />
@@ -558,6 +562,13 @@ export default function EditorPage() {
         <div className="ed-anchor" id="sec-kisah"><StoriesSection inv={inv} reload={load} notify={notify} /></div>
         <div className="ed-anchor" id="sec-galeri"><GallerySection inv={inv} reload={load} notify={notify} /></div>
         <div className="ed-anchor" id="sec-amplop"><GiftsSection inv={inv} reload={load} notify={notify} /></div>
+      </div>
+
+      {showPreview && (
+        <div className="ed-preview">
+          <iframe key={previewKey} title="Pratinjau undangan" src={`/${inv.slug}?preview=1`} />
+        </div>
+      )}
       </div>
 
       {toast && <div className="ed-toast">{toast}</div>}

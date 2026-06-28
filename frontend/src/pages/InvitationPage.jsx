@@ -7,13 +7,15 @@ export default function InvitationPage() {
   const { slug } = useParams()
   const [searchParams] = useSearchParams()
   const guestName = searchParams.get('to') || ''
+  // Owner draft preview: fetch via the authenticated editor endpoint.
+  const preview = searchParams.get('preview') === '1'
 
   const [invitation, setInvitation] = useState(null)
   const [status, setStatus] = useState('loading')
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    api.get(`/invitations/${slug}/`)
+    api.get(preview ? `/my/invitations/${slug}/` : `/invitations/${slug}/`)
       .then(res => {
         setInvitation(res.data)
         setStatus('ok')
@@ -30,7 +32,7 @@ export default function InvitationPage() {
         }
         setStatus('error')
       })
-  }, [slug])
+  }, [slug, preview])
 
   if (status === 'loading') {
     return (
