@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import api from '../api/client.js'
 import './LandingPage.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -88,7 +89,33 @@ function FaqItem({ q, a }) {
   )
 }
 
+function CouponBox({ code, setCode, coupon, setCoupon }) {
+  const [status, setStatus] = useState('')
+  async function apply(e) {
+    e.preventDefault()
+    if (!code.trim()) return
+    setStatus('checking')
+    try {
+      const res = await api.get(`/coupons/validate/?code=${encodeURIComponent(code)}`)
+      if (res.data.valid) { setCoupon(res.data); setStatus('ok') }
+      else { setCoupon(null); setStatus('bad') }
+    } catch { setStatus('bad') }
+  }
+  return (
+    <form className="lp-coupon" onSubmit={apply}>
+      <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="Kode promo (mis. CINTA20)" />
+      <button type="submit" className="lp-btn lp-btn-ghost">Pakai</button>
+      {status === 'ok' && coupon && <span className="lp-coupon-ok">✓ {coupon.code} −{coupon.discount_percent}% diterapkan</span>}
+      {status === 'bad' && <span className="lp-coupon-bad">Kode tidak valid</span>}
+    </form>
+  )
+}
+
 export default function LandingPage() {
+  const [code, setCode] = useState('')
+  const [coupon, setCoupon] = useState(null)
+  const pct = coupon?.discount_percent || 0
+
   return (
     <div className="lp">
       {/* ===== Nav ===== */}
@@ -239,9 +266,12 @@ export default function LandingPage() {
             <p>Mulai dari gratis. Tanpa biaya bulanan, tanpa biaya tersembunyi — dan setiap paket sudah termasuk pendampingan penuh via WhatsApp.</p>
           </div>
           <p className="lp-price-promo">🎉 Harga promo — hemat hingga 50% untuk periode terbatas</p>
+          <CouponBox code={code} setCode={setCode} coupon={coupon} setCoupon={setCoupon} />
           <div className="lp-price-grid">
             {plans.map((p, i) => {
               const isFree = p.price === '0'
+              const base = Number(p.price)
+              const finalPrice = pct ? Math.round(base * (1 - pct / 100)) : base
               return (
                 <motion.div className={`lp-price-card ${p.featured ? 'featured' : ''}`} key={p.name} {...fade(i * 0.08)}>
                   {p.featured && <span className="lp-price-tag">Paling Populer</span>}
@@ -251,8 +281,8 @@ export default function LandingPage() {
                     <div className="lp-price-amount lp-serif">Gratis</div>
                   ) : (
                     <div className="lp-price-amount lp-serif">
-                      {p.was && <span className="lp-price-was">Rp{p.was}.000</span>}
-                      <span><small>Rp</small>{p.price}.000</span>
+                      {pct ? <span className="lp-price-was">Rp{p.price}.000</span> : (p.was && <span className="lp-price-was">Rp{p.was}.000</span>)}
+                      <span><small>Rp</small>{finalPrice}.000</span>
                     </div>
                   )}
                   <p className="lp-price-note">{isFree ? 'tanpa kartu kredit' : 'sekali bayar / undangan'}</p>
@@ -262,7 +292,7 @@ export default function LandingPage() {
                     ))}
                   </ul>
                   <a
-                    href={wa(`Halo, saya tertarik dengan paket ${p.name} untuk undangan digital`)}
+                    href={wa(`Halo, saya tertarik dengan paket ${p.name} untuk undangan digital${pct ? ` (kode promo ${coupon.code})` : ''}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`lp-btn ${p.featured ? 'lp-btn-primary' : 'lp-btn-ghost'}`}

@@ -168,6 +168,30 @@ class RSVP(models.Model):
         return f"{self.guest_name} — {self.invitation.slug}"
 
 
+class Coupon(models.Model):
+    """Promo code shown on the pricing page; redeemed manually over WhatsApp."""
+    code = models.CharField(max_length=30, unique=True)
+    discount_percent = models.PositiveIntegerField(default=0)  # 0–100
+    description = models.CharField(max_length=200, blank=True)
+    active = models.BooleanField(default=True)
+    expires_at = models.DateField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.code = self.code.strip().upper()
+        super().save(*args, **kwargs)
+
+    def is_valid(self):
+        from datetime import date
+        if not self.active:
+            return False
+        if self.expires_at and date.today() > self.expires_at:
+            return False
+        return 1 <= self.discount_percent <= 100
+
+    def __str__(self):
+        return f"{self.code} (-{self.discount_percent}%)"
+
+
 class Guest(models.Model):
     """Pre-registered guest list for per-guest invitation links, QR codes, and check-in."""
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='guests')

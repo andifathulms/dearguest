@@ -4,7 +4,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Invitation, RSVP, Guest
+from rest_framework.views import APIView
+from .models import Invitation, RSVP, Guest, Coupon
 from .serializers import (
     InvitationPublicSerializer,
     RSVPSerializer,
@@ -121,6 +122,23 @@ class WishesListView(generics.ListAPIView):
         return RSVP.objects.filter(
             invitation__slug=self.kwargs['slug'],
         ).exclude(wishes='')
+
+
+class CouponValidateView(APIView):
+    """Public: validate a promo code and return its discount."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = (request.query_params.get('code') or '').strip().upper()
+        coupon = Coupon.objects.filter(code=code).first()
+        if not coupon or not coupon.is_valid():
+            return Response({'valid': False})
+        return Response({
+            'valid': True,
+            'code': coupon.code,
+            'discount_percent': coupon.discount_percent,
+            'description': coupon.description,
+        })
 
 
 class GuestListCreateView(generics.ListCreateAPIView):
