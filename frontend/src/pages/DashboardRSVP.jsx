@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import api from '../api/client.js'
+import GuestManager from '../components/GuestManager.jsx'
+import './Dashboard.css'
 
 function StatCard({ label, value, color }) {
   return (
@@ -37,6 +39,8 @@ export default function DashboardRSVP() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const [data, setData] = useState(null)
+  const [couple, setCouple] = useState({ bride_name: '', groom_name: '' })
+  const [tab, setTab] = useState('rsvp')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -61,6 +65,10 @@ export default function DashboardRSVP() {
           setLoading(false)
         }
       })
+    // Best-effort: fetch couple names for personalized guest invites.
+    api.get(`/invitations/${slug}/`)
+      .then(res => setCouple(res.data.couple || { bride_name: '', groom_name: '' }))
+      .catch(() => {})
   }, [slug, navigate])
 
   function handleLogout() {
@@ -113,6 +121,20 @@ export default function DashboardRSVP() {
       </div>
 
       <div style={{ padding: '2rem', maxWidth: '1100px', margin: '0 auto' }}>
+        {/* Tabs */}
+        <div className="dash-tabs">
+          <button className={`dash-tab ${tab === 'rsvp' ? 'active' : ''}`} onClick={() => setTab('rsvp')}>
+            Konfirmasi RSVP<span className="dash-tab-count">{rsvps.length}</span>
+          </button>
+          <button className={`dash-tab ${tab === 'guests' ? 'active' : ''}`} onClick={() => setTab('guests')}>
+            Daftar Tamu &amp; QR
+          </button>
+        </div>
+
+        {tab === 'guests' ? (
+          <GuestManager slug={slug} brideName={couple.bride_name} groomName={couple.groom_name} />
+        ) : (
+        <>
         {/* Stats */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
           <StatCard label="Total Konfirmasi" value={rsvps.length} />
@@ -159,6 +181,8 @@ export default function DashboardRSVP() {
               </tbody>
             </table>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
