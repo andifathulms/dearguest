@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
 import './Editor.css'
 
+const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
+
 const THEMES = [
   ['javanese-dark', 'Javanese Malam Emas'],
   ['floral-light', 'Taman Bunga'],
@@ -313,6 +315,68 @@ function GiftsSection({ inv, reload, notify }) {
   )
 }
 
+/* ---------------- Publish / activation ---------------- */
+function PublishCard({ inv, reload, notify }) {
+  const [code, setCode] = useState('')
+  const [reqLoading, setReqLoading] = useState(false)
+  const [activating, setActivating] = useState(false)
+  const [err, setErr] = useState('')
+
+  const waUrl = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
+    `Halo admin, saya ingin mengaktifkan undangan "${inv.slug}". Saya sudah melakukan pembayaran (bukti terlampir). Mohon kode aktivasinya 🙏`
+  )}`
+
+  if (inv.is_active) {
+    return (
+      <div className="ed-card ed-publish active">
+        <h2>🎉 Undangan Kamu Sudah Aktif</h2>
+        <p className="ed-card-sub">Undangan sudah bisa dibagikan ke tamu.</p>
+        <a className="ed-btn" style={{ textDecoration: 'none' }} href={`/${inv.slug}`} target="_blank" rel="noopener noreferrer">Lihat Undangan ↗</a>
+      </div>
+    )
+  }
+
+  async function request() {
+    setReqLoading(true)
+    try { await api.post('/my/invitation/request-activation/'); notify('Permintaan aktivasi terkirim'); reload() }
+    catch { notify('Gagal mengirim permintaan') } finally { setReqLoading(false) }
+  }
+  async function activate() {
+    setErr('')
+    if (!code.trim()) { setErr('Masukkan kode aktivasi.'); return }
+    setActivating(true)
+    try { await api.post('/my/invitation/activate/', { code }); notify('Undangan aktif! 🎉'); reload() }
+    catch (e) { setErr(e.response?.data?.detail || 'Kode tidak valid.') }
+    finally { setActivating(false) }
+  }
+
+  return (
+    <div className="ed-card ed-publish">
+      <h2>Publikasikan Undangan</h2>
+      <p className="ed-card-sub">Undangan masih draft. Ikuti 2 langkah berikut untuk mengaktifkannya.</p>
+      <ol className="ed-steps">
+        <li>
+          <strong>Hubungi admin & kirim bukti pembayaran.</strong>
+          <div className="ed-pub-row">
+            {inv.activation_requested
+              ? <span className="ed-saved">✓ Permintaan aktivasi terkirim</span>
+              : <button className="ed-btn-ghost ed-btn ed-btn-sm" onClick={request} disabled={reqLoading}>{reqLoading ? '…' : 'Minta Aktivasi'}</button>}
+            <a className="ed-mini" style={{ background: '#25d366', color: '#fff', borderColor: '#25d366' }} href={waUrl} target="_blank" rel="noopener noreferrer">WhatsApp Admin</a>
+          </div>
+        </li>
+        <li>
+          <strong>Masukkan kode aktivasi dari admin.</strong>
+          <div className="ed-pub-row">
+            <input className="ed-input" style={{ maxWidth: '200px', textTransform: 'uppercase', letterSpacing: '0.1em' }} value={code} onChange={e => setCode(e.target.value)} placeholder="mis. A7K2QX" />
+            <button className="ed-btn ed-btn-sm" onClick={activate} disabled={activating}>{activating ? '…' : 'Aktifkan'}</button>
+          </div>
+          {err && <p className="ed-pub-err">{err}</p>}
+        </li>
+      </ol>
+    </div>
+  )
+}
+
 /* ---------------- Page ---------------- */
 export default function EditorPage() {
   const navigate = useNavigate()
@@ -358,12 +422,7 @@ export default function EditorPage() {
       </div>
 
       <div className="ed-body">
-        {!inv.is_active && (
-          <div className="ed-note">
-            <strong>Undangan masih draft.</strong> Lengkapi data di bawah, lalu hubungi admin untuk aktivasi
-            setelah pembayaran. Kamu tetap bisa melihat pratinjau kapan saja.
-          </div>
-        )}
+        <PublishCard inv={inv} reload={load} notify={notify} />
         <SettingsSection inv={inv} reload={load} notify={notify} />
         <CoupleSection inv={inv} reload={load} notify={notify} />
         <EventsSection inv={inv} reload={load} notify={notify} />

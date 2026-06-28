@@ -92,6 +92,15 @@
 .ed-save-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
 .ed-saved { font-size: 0.8rem; color: #2e7d46; }
 
+/* Publish / activation card */
+.ed-publish { border-color: #f0dcb8; background: linear-gradient(180deg, #fffdf9, #fdf6ea); }
+.ed-publish.active { border-color: #bfe3c8; background: linear-gradient(180deg, #f6fbf7, #eef7f0); }
+.ed-steps { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 1rem; }
+.ed-steps li { font-size: 0.86rem; color: #4a4038; line-height: 1.5; }
+.ed-steps li strong { display: block; margin-bottom: 0.5rem; color: #1c1712; }
+.ed-pub-row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.ed-pub-err { color: #c0392b; font-size: 0.8rem; margin-top: 0.4rem; }
+
 .ed-toast {
   position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
   background: #1f1f1f; color: #fff; padding: 0.7rem 1.4rem; border-radius: 999px;
