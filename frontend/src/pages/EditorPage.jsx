@@ -223,6 +223,20 @@ function StoriesSection({ inv, reload, notify }) {
   const update = (i, k, v) => setItems(arr => arr.map((it, j) => j === i ? { ...it, [k]: v } : it))
   const addDraft = () => setItems(arr => [...arr, { title: '', description: '', date: '', order: arr.length }])
 
+  async function move(i, dir) {
+    const j = i + dir
+    if (j < 0 || j >= items.length) return
+    const arr = [...items]
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    setItems(arr)
+    const updates = arr.map((it, idx) => ({ it, idx })).filter(({ it, idx }) => it.id && it.order !== idx)
+    if (!updates.length) return
+    try {
+      await Promise.all(updates.map(({ it, idx }) => api.patch(`/my/invitations/${inv.slug}/stories/${it.id}/`, { order: idx })))
+      reload()
+    } catch { notify('Gagal mengubah urutan') }
+  }
+
   async function saveOne(it) {
     const payload = { ...it, date: it.date || null }
     try {
@@ -246,7 +260,13 @@ function StoriesSection({ inv, reload, notify }) {
       {items.map((it, i) => (
         <div className="ed-item" key={it.id || `new-${i}`}>
           <div className="ed-item-head"><strong>{it.title || 'Kisah baru'}</strong>
-            <button className="ed-mini ed-btn-danger" onClick={() => delOne(it, i)}>Hapus</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <div className="ed-reorder">
+                <button onClick={() => move(i, -1)} disabled={i === 0} aria-label="Naik">↑</button>
+                <button onClick={() => move(i, 1)} disabled={i === items.length - 1} aria-label="Turun">↓</button>
+              </div>
+              <button className="ed-mini ed-btn-danger" onClick={() => delOne(it, i)}>Hapus</button>
+            </div>
           </div>
           <div className="ed-row2">
             <div className="ed-field"><label>Judul</label><input className="ed-input" value={it.title} onChange={e => update(i, 'title', e.target.value)} /></div>
