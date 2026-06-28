@@ -205,6 +205,6 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'theme', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'watermark', 'is_active',
-            'music_file', 'livestream_url',
+            'activation_requested', 'music_file', 'livestream_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]

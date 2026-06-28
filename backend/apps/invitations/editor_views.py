@@ -59,6 +59,41 @@ class MyInvitationView(APIView):
         return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
 
 
+class RequestActivationView(APIView):
+    """Couple flags that they want to go live (after contacting admin to pay)."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        from django.utils import timezone
+        inv = _my_invitation(request.user)
+        if not inv:
+            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
+        if inv.is_active:
+            return Response({'detail': 'Undangan sudah aktif.'}, status=status.HTTP_400_BAD_REQUEST)
+        inv.activation_requested = True
+        inv.activation_requested_at = timezone.now()
+        inv.save(update_fields=['activation_requested', 'activation_requested_at'])
+        return Response({'activation_requested': True})
+
+
+class ActivateView(APIView):
+    """Couple enters the activation code issued by admin to publish the invitation."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        inv = _my_invitation(request.user)
+        if not inv:
+            return Response({'detail': 'Belum ada undangan.'}, status=status.HTTP_404_NOT_FOUND)
+        if inv.is_active:
+            return Response({'is_active': True})
+        code = (request.data.get('code') or '').strip()
+        if not inv.activation_code or code.upper() != inv.activation_code.strip().upper():
+            return Response({'detail': 'Kode aktivasi tidak valid.'}, status=status.HTTP_400_BAD_REQUEST)
+        inv.is_active = True
+        inv.save(update_fields=['is_active'])
+        return Response({'is_active': True})
+
+
 class SlugCheckView(APIView):
     """GET ?slug=xyz -> {available: bool}. Used live during onboarding."""
     permission_classes = [IsAuthenticated]

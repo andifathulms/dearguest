@@ -9,6 +9,8 @@ from .views import (
 )
 from .editor_views import (
     MyInvitationView,
+    RequestActivationView,
+    ActivateView,
     SlugCheckView,
     MyCoupleView,
     EventListCreate,
@@ -31,6 +33,8 @@ urlpatterns = [
 
     # ===== Editor (authenticated, owner-scoped) =====
     path('my/invitation/', MyInvitationView.as_view()),
+    path('my/invitation/request-activation/', RequestActivationView.as_view()),
+    path('my/invitation/activate/', ActivateView.as_view()),
     path('my/slug-check/', SlugCheckView.as_view()),
     path('my/couple/', MyCoupleView.as_view()),
     path('my/events/', EventListCreate.as_view()),
