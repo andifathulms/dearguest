@@ -36,8 +36,8 @@ export default function ForgotPasswordPage() {
             <p className="auth-sub">Masukkan username atau email akunmu. Kami akan kirim tautan untuk mengatur ulang kata sandi.</p>
             <form onSubmit={handleSubmit}>
               <div className="auth-field">
-                <label className="auth-label">Username atau Email</label>
-                <input className="auth-input" value={ident} onChange={e => setIdent(e.target.value)} required />
+                <label className="auth-label" htmlFor="fp-ident">Username atau Email</label>
+                <input className="auth-input" id="fp-ident" value={ident} onChange={e => setIdent(e.target.value)} required />
               </div>
               <button className="auth-btn" type="submit" disabled={loading}>{loading ? 'Mengirim…' : 'Kirim Tautan Reset'}</button>
             </form>

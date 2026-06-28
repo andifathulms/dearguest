@@ -77,6 +77,7 @@ export default function RSVPForm({ slug }) {
           className="rsvp-input"
           name="guest_name"
           placeholder="Nama Lengkap *"
+          aria-label="Nama lengkap"
           value={form.guest_name}
           onChange={handleChange}
           required
@@ -85,6 +86,7 @@ export default function RSVPForm({ slug }) {
           className="rsvp-input"
           name="whatsapp"
           placeholder="Nomor WhatsApp (opsional)"
+          aria-label="Nomor WhatsApp"
           value={form.whatsapp}
           onChange={handleChange}
         />
@@ -113,6 +115,7 @@ export default function RSVPForm({ slug }) {
               name="pax"
               min="1"
               max="10"
+              aria-label="Jumlah tamu"
               value={form.pax}
               onChange={handleChange}
             />
@@ -122,6 +125,7 @@ export default function RSVPForm({ slug }) {
           className="rsvp-textarea"
           name="wishes"
           placeholder="Doa & ucapan untuk kedua mempelai..."
+          aria-label="Doa dan ucapan"
           rows="4"
           value={form.wishes}
           onChange={handleChange}

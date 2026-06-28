@@ -73,11 +73,12 @@ export default function OnboardingPage() {
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label className="auth-label">Alamat undangan</label>
+            <label className="auth-label" htmlFor="onb-slug">Alamat undangan</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '0.82rem', color: '#a89a86' }}>{origin}/</span>
               <input
                 className="auth-input"
+                id="onb-slug"
                 style={{ flex: 1, minWidth: '160px' }}
                 value={slug}
                 onChange={e => setSlug(slugify(e.target.value))}
@@ -96,17 +97,23 @@ export default function OnboardingPage() {
             <label className="auth-label">Pilih tema</label>
             <div className="onb-themes">
               {THEMES.map(t => (
-                <div key={t.id} className={`onb-theme ${theme === t.id ? 'active' : ''}`} onClick={() => setTheme(t.id)}>
+                <button
+                  type="button"
+                  key={t.id}
+                  className={`onb-theme ${theme === t.id ? 'active' : ''}`}
+                  onClick={() => setTheme(t.id)}
+                  aria-pressed={theme === t.id}
+                >
                   <div className="onb-theme-swatch" style={{ background: t.swatch }} />
                   <div className="onb-theme-name">{t.name}</div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
 
           <div className="auth-field">
-            <label className="auth-label">Tanggal pernikahan</label>
-            <input className="auth-input" type="date" value={weddingDate} onChange={e => setWeddingDate(e.target.value)} required />
+            <label className="auth-label" htmlFor="onb-date">Tanggal pernikahan</label>
+            <input className="auth-input" id="onb-date" type="date" value={weddingDate} onChange={e => setWeddingDate(e.target.value)} required />
           </div>
 
           <button className="auth-btn" type="submit" disabled={loading || !check?.available}>

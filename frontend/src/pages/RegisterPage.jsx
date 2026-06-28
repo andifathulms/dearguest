@@ -48,18 +48,18 @@ export default function RegisterPage() {
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label className="auth-label">Username</label>
-            <input className="auth-input" name="username" value={form.username} onChange={handleChange}
+            <label className="auth-label" htmlFor="reg-username">Username</label>
+            <input className="auth-input" id="reg-username" name="username" value={form.username} onChange={handleChange}
               placeholder="mis. dinda.raka" required autoComplete="username" />
           </div>
           <div className="auth-field">
-            <label className="auth-label">Email (opsional)</label>
-            <input className="auth-input" type="email" name="email" value={form.email} onChange={handleChange}
+            <label className="auth-label" htmlFor="reg-email">Email (opsional)</label>
+            <input className="auth-input" id="reg-email" type="email" name="email" value={form.email} onChange={handleChange}
               placeholder="email@contoh.com" autoComplete="email" />
           </div>
           <div className="auth-field">
-            <label className="auth-label">Kata Sandi</label>
-            <input className="auth-input" type="password" name="password" value={form.password} onChange={handleChange}
+            <label className="auth-label" htmlFor="reg-password">Kata Sandi</label>
+            <input className="auth-input" id="reg-password" type="password" name="password" value={form.password} onChange={handleChange}
               placeholder="Minimal 6 karakter" required autoComplete="new-password" />
           </div>
           <button className="auth-btn" type="submit" disabled={loading}>

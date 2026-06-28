@@ -73,6 +73,7 @@
 .onb-theme {
   border: 1px solid #e2d8c8; border-radius: 10px; padding: 0.4rem; cursor: pointer; text-align: center;
   transition: border-color 0.2s, transform 0.2s;
+  background: #fff; font-family: inherit; width: 100%; display: block;
 }
 .onb-theme:hover { transform: translateY(-2px); }
 .onb-theme.active { border-color: #b8924e; box-shadow: 0 0 0 2px rgba(184,146,78,0.2); }

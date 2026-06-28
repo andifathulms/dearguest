@@ -49,12 +49,12 @@ export default function ResetPasswordPage() {
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label className="auth-label">Kata sandi baru</label>
-            <input className="auth-input" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" />
+            <label className="auth-label" htmlFor="rp-password">Kata sandi baru</label>
+            <input className="auth-input" id="rp-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" />
           </div>
           <div className="auth-field">
-            <label className="auth-label">Ulangi kata sandi</label>
-            <input className="auth-input" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required autoComplete="new-password" />
+            <label className="auth-label" htmlFor="rp-confirm">Ulangi kata sandi</label>
+            <input className="auth-input" id="rp-confirm" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required autoComplete="new-password" />
           </div>
           <button className="auth-btn" type="submit" disabled={loading}>{loading ? 'Menyimpan…' : 'Simpan Kata Sandi'}</button>
         </form>

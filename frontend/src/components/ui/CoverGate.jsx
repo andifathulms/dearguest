@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
@@ -11,15 +11,17 @@ import { id } from 'date-fns/locale'
  */
 export default function CoverGate({ invitation, guestName, themeClass }) {
   const [open, setOpen] = useState(false)
+  const openBtnRef = useRef(null)
   const couple = invitation.couple || {}
 
   const dateStr = invitation.wedding_date
     ? format(new Date(invitation.wedding_date), 'EEEE, d MMMM yyyy', { locale: id })
     : ''
 
-  // Lock scroll while the gate is showing.
+  // Lock scroll while the gate is showing, and move focus to the open button.
   useEffect(() => {
     document.body.classList.add('cover-open')
+    openBtnRef.current?.focus()
     return () => document.body.classList.remove('cover-open')
   }, [])
 
@@ -35,6 +37,9 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
       {!open && (
         <motion.div
           className={`cover-gate ${themeClass}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Pembuka undangan"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, y: -30, transition: { duration: 0.8, ease: 'easeInOut' } }}
         >
@@ -63,7 +68,7 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
               <p className="cover-guest-name">{guestName || 'Tamu Undangan'}</p>
             </div>
 
-            <button className="cover-open-btn" onClick={handleOpen}>
+            <button className="cover-open-btn" onClick={handleOpen} ref={openBtnRef}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M4 5h16v14H4z" />
                 <path d="M4 7l8 6 8-6" />
