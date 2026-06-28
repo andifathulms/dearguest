@@ -34,12 +34,12 @@ const features = [
 ]
 
 const themes = [
-  { id: 'javanese-dark', name: 'Javanese Malam Emas', desc: 'Elegan dengan sentuhan emas pada latar gelap tembakau.', preview: 'tp-javanese', colors: ['#1a1208', '#c9a84c', '#f5eed6'] },
-  { id: 'floral-light', name: 'Taman Bunga', desc: 'Romantis dengan nuansa mawar pada latar putih blush.', preview: 'tp-floral', colors: ['#fdf8f5', '#c4847a', '#f7ede8'] },
-  { id: 'modern-minimalist', name: 'Minimalis Putih', desc: 'Bersih dan modern dengan aksen sage yang menenangkan.', preview: 'tp-modern', colors: ['#ffffff', '#1f1f1f', '#8a9e8a'] },
-  { id: 'luxury-emerald', name: 'Zamrud Mewah', desc: 'Mewah dengan zamrud gelap dan aksen emas yang berkilau.', preview: 'tp-emerald', colors: ['#0e1f17', '#d4af5a', '#1f4d3a'] },
-  { id: 'rustic-kraft', name: 'Rustic Kraft', desc: 'Hangat dan natural dengan nuansa kertas kraft & dedaunan.', preview: 'tp-kraft', colors: ['#f3ece0', '#7c8b6b', '#b9694f'] },
-  { id: 'boho-terracotta', name: 'Senja Terakota', desc: 'Bohemian hangat dengan gradasi terakota dan senja.', preview: 'tp-boho', colors: ['#fbf3ea', '#c06a4d', '#d8b48a'] },
+  { id: 'javanese-dark', name: 'Javanese Malam Emas', desc: 'Elegan dengan sentuhan emas pada latar gelap tembakau.', preview: 'tp-javanese', demo: 'demo-javanese', colors: ['#1a1208', '#c9a84c', '#f5eed6'] },
+  { id: 'floral-light', name: 'Taman Bunga', desc: 'Romantis dengan nuansa mawar pada latar putih blush.', preview: 'tp-floral', demo: 'demo-floral', colors: ['#fdf8f5', '#c4847a', '#f7ede8'] },
+  { id: 'modern-minimalist', name: 'Minimalis Putih', desc: 'Bersih dan modern dengan aksen sage yang menenangkan.', preview: 'tp-modern', demo: 'demo-minimalis', colors: ['#ffffff', '#1f1f1f', '#8a9e8a'] },
+  { id: 'luxury-emerald', name: 'Zamrud Mewah', desc: 'Mewah dengan zamrud gelap dan aksen emas yang berkilau.', preview: 'tp-emerald', demo: 'demo-emerald', colors: ['#0e1f17', '#d4af5a', '#1f4d3a'] },
+  { id: 'rustic-kraft', name: 'Rustic Kraft', desc: 'Hangat dan natural dengan nuansa kertas kraft & dedaunan.', preview: 'tp-kraft', demo: 'demo-rustic', colors: ['#f3ece0', '#7c8b6b', '#b9694f'] },
+  { id: 'boho-terracotta', name: 'Senja Terakota', desc: 'Bohemian hangat dengan gradasi terakota dan senja.', preview: 'tp-boho', demo: 'demo-boho', colors: ['#fbf3ea', '#c06a4d', '#d8b48a'] },
 ]
 
 const steps = [
@@ -211,6 +211,7 @@ export default function LandingPage() {
                   <div className="lp-theme-swatches">
                     {t.colors.map(c => <span key={c} style={{ background: c }} />)}
                   </div>
+                  <a className="lp-theme-demo" href={`/${t.demo}`} target="_blank" rel="noopener noreferrer">Lihat Demo Lengkap ↗</a>
                 </div>
               </motion.div>
             ))}

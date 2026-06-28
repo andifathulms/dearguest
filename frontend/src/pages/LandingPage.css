@@ -313,6 +313,11 @@
 .lp-theme-body p { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.6; }
 .lp-theme-swatches { display: flex; gap: 0.4rem; margin-top: 1rem; }
 .lp-theme-swatches span { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); }
+.lp-theme-demo {
+  display: inline-block; margin-top: 1rem; font-size: 0.82rem; font-weight: 500;
+  color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s;
+}
+.lp-theme-demo:hover { border-bottom-color: var(--gold); }
 
 /* ===== Features ===== */
 .lp-feature-grid {
