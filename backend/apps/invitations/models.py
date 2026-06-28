@@ -33,6 +33,7 @@ class Invitation(models.Model):
     dress_code = models.CharField(max_length=200, blank=True)
     watermark = models.BooleanField(default=True)
     music_file = models.FileField(upload_to='music/', null=True, blank=True)
+    music_preset = models.ForeignKey('MusicPreset', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     livestream_url = models.URLField(blank=True)  # YouTube/Instagram/Zoom link for remote guests
     wishlist_url = models.URLField(blank=True)  # gift registry / wishlist link
     # Manual activation (no payment gateway): admin issues activation_code after
@@ -169,6 +170,19 @@ class RSVP(models.Model):
 
     def __str__(self):
         return f"{self.guest_name} — {self.invitation.slug}"
+
+
+class MusicPreset(models.Model):
+    """Royalty-free background tracks (uploaded by admin) couples can pick from."""
+    title = models.CharField(max_length=120)
+    audio = models.FileField(upload_to='music_presets/')
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'title']
+
+    def __str__(self):
+        return self.title
 
 
 class Coupon(models.Model):

@@ -24,8 +24,18 @@ function SettingsSection({ inv, reload, notify }) {
     wishlist_url: inv.wishlist_url || '',
   })
   const [music, setMusic] = useState(null)
+  const [presets, setPresets] = useState([])
+  const [presetId, setPresetId] = useState(inv.music_preset || '')
   const [saving, setSaving] = useState(false)
   const set = (k, v) => setF(s => ({ ...s, [k]: v }))
+
+  useEffect(() => { api.get('/music-presets/').then(res => setPresets(res.data)).catch(() => {}) }, [])
+
+  async function pickPreset(id) {
+    setPresetId(id)
+    try { await api.post(`/my/invitations/${inv.slug}/music-preset/`, { preset_id: id || null }); notify(id ? 'Musik dipilih' : 'Musik preset dilepas'); reload() }
+    catch { notify('Gagal memilih musik') }
+  }
 
   async function save() {
     setSaving(true)
@@ -73,8 +83,17 @@ function SettingsSection({ inv, reload, notify }) {
         <label>Link wishlist / gift registry (opsional)</label>
         <input className="ed-input" value={f.wishlist_url} onChange={e => set('wishlist_url', e.target.value)} placeholder="https://tokopedia.link/… atau registry kalian" />
       </div>
+      {presets.length > 0 && (
+        <div className="ed-field">
+          <label>Pilih dari pustaka musik</label>
+          <select className="ed-select" value={presetId} onChange={e => pickPreset(e.target.value)}>
+            <option value="">— Tidak ada / pakai file unggahan —</option>
+            {presets.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+          </select>
+        </div>
+      )}
       <div className="ed-field">
-        <label>Musik latar {inv.music_file && <a href={inv.music_file} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(file saat ini)</a>}</label>
+        <label>Atau unggah musik sendiri {inv.music_file && <a href={inv.music_file} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(file saat ini)</a>}</label>
         <input className="ed-file" type="file" accept="audio/*" onChange={e => setMusic(e.target.files[0] || null)} />
       </div>
       <div className="ed-save-row">

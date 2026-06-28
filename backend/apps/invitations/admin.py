@@ -2,7 +2,7 @@ import secrets
 from django.contrib import admin
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
-    CoupleProfile, ActivationRequest, Coupon,
+    CoupleProfile, ActivationRequest, Coupon, MusicPreset,
 )
 
 
@@ -97,6 +97,12 @@ class CoupleProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'max_invitations']
     list_editable = ['max_invitations']
     search_fields = ['user__username']
+
+
+@admin.register(MusicPreset)
+class MusicPresetAdmin(admin.ModelAdmin):
+    list_display = ['title', 'order']
+    list_editable = ['order']
 
 
 @admin.register(Coupon)

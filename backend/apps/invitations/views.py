@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.views import APIView
-from .models import Invitation, RSVP, Guest, Coupon
+from .models import Invitation, RSVP, Guest, Coupon, MusicPreset
+from .serializers import MusicPresetSerializer
 from .serializers import (
     InvitationPublicSerializer,
     RSVPSerializer,
@@ -128,6 +129,13 @@ class WishesListView(generics.ListAPIView):
         return RSVP.objects.filter(
             invitation__slug=self.kwargs['slug'],
         ).exclude(wishes='')
+
+
+class MusicPresetListView(generics.ListAPIView):
+    """Public list of preset background tracks for the editor."""
+    serializer_class = MusicPresetSerializer
+    permission_classes = [AllowAny]
+    queryset = MusicPreset.objects.all()
 
 
 class CouponValidateView(APIView):

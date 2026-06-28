@@ -1,6 +1,20 @@
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest
+from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, MusicPreset
+
+
+class MusicPresetSerializer(serializers.ModelSerializer):
+    audio = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MusicPreset
+        fields = ['id', 'title', 'audio']
+
+    def get_audio(self, obj):
+        request = self.context.get('request')
+        if obj.audio and request:
+            return request.build_absolute_uri(obj.audio.url)
+        return obj.audio.url if obj.audio else None
 
 
 class RSVPSerializer(serializers.ModelSerializer):
@@ -140,9 +154,11 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
         return obj.tier == 'free'
 
     def get_music_file(self, obj):
+        # Uploaded file wins; otherwise fall back to the chosen preset track.
         request = self.context.get('request')
-        if obj.music_file and request:
-            return request.build_absolute_uri(obj.music_file.url)
+        f = obj.music_file or (obj.music_preset.audio if obj.music_preset else None)
+        if f and request:
+            return request.build_absolute_uri(f.url)
         return None
 
 
@@ -245,6 +261,6 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'theme', 'tier', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'watermark', 'is_active',
-            'activation_requested', 'music_file', 'livestream_url', 'wishlist_url',
+            'activation_requested', 'music_file', 'music_preset', 'livestream_url', 'wishlist_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]

@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount, CoupleProfile
+from .models import Invitation, Couple, Event, Story, Photo, BankAccount, CoupleProfile, MusicPreset
 from .serializers import (
     EditorInvitationSerializer,
     InvitationListSerializer,
@@ -82,6 +82,31 @@ class MyInvitationDetailView(APIView):
         serializer = InvitationSettingsSerializer(inv, data=request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        # Uploading a custom track supersedes any chosen preset.
+        if 'music_file' in request.FILES:
+            inv.music_preset = None
+            inv.save(update_fields=['music_preset'])
+        return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
+
+
+class MusicPresetSelectView(APIView):
+    """Owner picks (or clears) a preset background track."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        inv = _owned(request.user, slug)
+        if not inv:
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        preset_id = request.data.get('preset_id')
+        if preset_id:
+            preset = MusicPreset.objects.filter(pk=preset_id).first()
+            if not preset:
+                return Response({'detail': 'Preset tidak ditemukan.'}, status=status.HTTP_400_BAD_REQUEST)
+            inv.music_preset = preset
+            inv.music_file = None  # preset and upload are mutually exclusive
+        else:
+            inv.music_preset = None
+        inv.save(update_fields=['music_preset', 'music_file'])
         return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
 
     def delete(self, request, slug):

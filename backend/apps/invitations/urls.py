@@ -7,10 +7,12 @@ from .views import (
     GuestListCreateView,
     GuestDetailView,
     CouponValidateView,
+    MusicPresetListView,
 )
 from .editor_views import (
     MyInvitationsView,
     MyInvitationDetailView,
+    MusicPresetSelectView,
     RequestActivationView,
     ActivateView,
     SlugCheckView,
@@ -31,6 +33,7 @@ urlpatterns = [
     path('invitations/<slug:slug>/rsvps/', RSVPListView.as_view()),
     path('invitations/<slug:slug>/wishes/', WishesListView.as_view()),
     path('coupons/validate/', CouponValidateView.as_view()),
+    path('music-presets/', MusicPresetListView.as_view()),
     path('invitations/<slug:slug>/guests/', GuestListCreateView.as_view()),
     path('invitations/<slug:slug>/guests/<int:pk>/', GuestDetailView.as_view()),
 
@@ -40,6 +43,7 @@ urlpatterns = [
     path('my/invitations/<slug:slug>/', MyInvitationDetailView.as_view()),
     path('my/invitations/<slug:slug>/request-activation/', RequestActivationView.as_view()),
     path('my/invitations/<slug:slug>/activate/', ActivateView.as_view()),
+    path('my/invitations/<slug:slug>/music-preset/', MusicPresetSelectView.as_view()),
     path('my/invitations/<slug:slug>/couple/', MyCoupleView.as_view()),
     path('my/invitations/<slug:slug>/events/', EventListCreate.as_view()),
     path('my/invitations/<slug:slug>/events/<int:pk>/', EventDetail.as_view()),
