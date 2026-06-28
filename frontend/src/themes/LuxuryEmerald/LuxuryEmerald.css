@@ -20,18 +20,39 @@
   --font-label: 'Cinzel', serif;
   --font-body: 'Jost', sans-serif;
 
+  /* Art-deco assets */
+  --deco-fan: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 64'%3E%3Cg fill='none' stroke='%23d4af5a' stroke-width='1.1' stroke-linecap='round'%3E%3Cpath d='M60 62 V8'/%3E%3Cpath d='M60 62 L36 14'/%3E%3Cpath d='M60 62 L84 14'/%3E%3Cpath d='M60 62 L16 26'/%3E%3Cpath d='M60 62 L104 26'/%3E%3Cpath d='M60 62 L4 42'/%3E%3Cpath d='M60 62 L116 42'/%3E%3Cpath d='M4 42 A58 58 0 0 1 116 42' stroke-opacity='0.7'/%3E%3Cpath d='M16 26 A46 46 0 0 1 104 26' stroke-opacity='0.55'/%3E%3C/g%3E%3Ccircle cx='60' cy='62' r='2.4' fill='%23e7d29a'/%3E%3C/svg%3E");
+  --deco-diamond: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cg fill='none' stroke='%23d4af5a' stroke-width='1.2' stroke-linejoin='round'%3E%3Crect x='22' y='4' width='25.46' height='25.46' transform='rotate(45 22 4)' /%3E%3Crect x='22' y='12' width='14.14' height='14.14' transform='rotate(45 22 12)' stroke='%23e7d29a' /%3E%3C/g%3E%3Crect x='22' y='17' width='7' height='7' transform='rotate(45 22 17)' fill='%23d4af5a'/%3E%3C/svg%3E");
+  --deco-corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23d4af5a' stroke-width='1.4' stroke-linecap='square'%3E%3Cpath d='M2 78 V30 L30 2 H78'/%3E%3Cpath d='M12 78 V36 L36 12 H78' stroke-opacity='0.6'/%3E%3Cpath d='M22 78 V42 L42 22 H78' stroke-opacity='0.35'/%3E%3C/g%3E%3Ccircle cx='30' cy='30' r='3' fill='%23e7d29a'/%3E%3C/svg%3E");
+  --deco-lattice: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23d4af5a' stroke-width='0.6' stroke-opacity='0.5'%3E%3Cpath d='M32 0 L64 32 L32 64 L0 32 Z'/%3E%3Cpath d='M32 16 L48 32 L32 48 L16 32 Z'/%3E%3Cpath d='M0 0 L16 0 L0 16 Z M64 0 L48 0 L64 16 Z M0 64 L16 64 L0 48 Z M64 64 L48 64 L64 48 Z'/%3E%3C/g%3E%3C/svg%3E");
+
   background-color: var(--bg-primary);
   background-image:
+    var(--deco-lattice),
     radial-gradient(120% 80% at 50% -10%, rgba(212,175,90,0.12) 0%, transparent 45%),
     radial-gradient(90% 60% at 50% 110%, rgba(31,77,58,0.45) 0%, transparent 55%),
     radial-gradient(140% 120% at 50% 50%, transparent 50%, rgba(0,0,0,0.6) 100%),
     linear-gradient(180deg, #122a1f 0%, #0e1f17 50%, #081410 100%);
+  background-size: 96px 96px, auto, auto, auto, auto;
+  background-attachment: fixed, scroll, scroll, scroll, scroll;
   color: var(--text-primary);
   font-family: var(--font-body);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
   scroll-behavior: smooth;
+}
+/* faint deco lattice wash overlaid on whole theme */
+.luxury-emerald::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: var(--deco-lattice);
+  background-size: 110px 110px;
+  opacity: 0.05;
+  mix-blend-mode: screen;
 }
 
 /* ---------- Cover Gate ---------- */
@@ -79,14 +100,58 @@
 }
 .luxury-emerald .cover-ornaments::before { top: -130px; left: -110px; }
 .luxury-emerald .cover-ornaments::after { bottom: -130px; right: -110px; }
+/* art-deco corner pieces on the cover */
+.cover-gate.luxury-emerald .cover-ornaments {
+  background-image: var(--deco-corner), var(--deco-corner);
+  background-repeat: no-repeat, no-repeat;
+  background-position: 18px 18px, calc(100% - 18px) calc(100% - 18px);
+  background-size: 96px 96px, 96px 96px;
+  opacity: 0.85;
+}
+.cover-gate.luxury-emerald .cover-ornaments::before,
+.cover-gate.luxury-emerald .cover-ornaments::after {
+  filter: blur(14px);
+}
 .luxury-emerald .cover-inner {
   position: relative;
   z-index: 1;
   max-width: 520px;
   width: 100%;
-  padding: 1.5rem;
+  padding: 3rem 2.4rem;
   text-align: center;
   animation: le-cover-rise 1.1s ease both;
+}
+/* stepped art-deco gold frame around cover content */
+.luxury-emerald .cover-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid var(--border-bright);
+  box-shadow:
+    inset 0 0 0 5px rgba(14,31,23,0.55),
+    inset 0 0 0 6px rgba(212,175,90,0.45),
+    inset 0 0 40px rgba(212,175,90,0.06),
+    0 0 60px rgba(0,0,0,0.5);
+  -webkit-mask:
+    linear-gradient(#000 0 0) padding-box,
+    radial-gradient(circle 11px at 0 0, transparent 98%, #000) 0 0/50% 50% no-repeat,
+    radial-gradient(circle 11px at 100% 0, transparent 98%, #000) 100% 0/50% 50% no-repeat,
+    radial-gradient(circle 11px at 0 100%, transparent 98%, #000) 0 100%/50% 50% no-repeat,
+    radial-gradient(circle 11px at 100% 100%, transparent 98%, #000) 100% 100%/50% 50% no-repeat;
+}
+/* sunburst fan ornament above the cover names */
+.luxury-emerald .cover-inner::after {
+  content: '';
+  position: absolute;
+  top: 1.4rem;
+  left: 50%;
+  width: 90px;
+  height: 48px;
+  transform: translateX(-50%);
+  background: var(--deco-fan) center/contain no-repeat;
+  opacity: 0.9;
+  pointer-events: none;
 }
 @keyframes le-cover-rise {
   from { opacity: 0; transform: translateY(24px); }
@@ -106,9 +171,19 @@
   font-weight: 500;
   font-size: clamp(2.8rem, 11vw, 4.6rem);
   line-height: 1.08;
-  color: var(--gold);
-  text-shadow: 0 0 30px rgba(212,175,90,0.45), 0 2px 4px rgba(0,0,0,0.55);
   margin-bottom: 0.4rem;
+  background: linear-gradient(100deg, #b78f3e 0%, #d4af5a 30%, #fff6d8 48%, #d4af5a 66%, #b78f3e 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--gold);
+  filter: drop-shadow(0 0 28px rgba(212,175,90,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.55));
+  animation: le-shimmer 6s ease-in-out infinite;
+}
+@keyframes le-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -60% center; }
 }
 .luxury-emerald .cover-amp {
   display: block;
@@ -179,6 +254,8 @@
   color: var(--gold);
 }
 .luxury-emerald .cover-open-btn {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
@@ -192,12 +269,33 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 10px 28px -10px rgba(212,175,90,0.7);
+  box-shadow: 0 10px 28px -10px rgba(212,175,90,0.7), inset 0 0 0 3px rgba(14,31,23,0.18);
   transition: transform 0.28s ease, box-shadow 0.28s ease, filter 0.28s ease;
+}
+/* sheen sweep across gold buttons */
+.luxury-emerald .cover-open-btn::after,
+.luxury-emerald .rsvp-submit::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.6), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.luxury-emerald .cover-open-btn:hover::after,
+.luxury-emerald .rsvp-submit:hover::after {
+  animation: le-sheen 0.8s ease forwards;
+}
+@keyframes le-sheen {
+  from { left: -120%; }
+  to { left: 160%; }
 }
 .luxury-emerald .cover-open-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 16px 36px -10px rgba(212,175,90,0.9);
+  box-shadow: 0 16px 36px -10px rgba(212,175,90,0.9), inset 0 0 0 3px rgba(14,31,23,0.18);
   filter: brightness(1.07);
 }
 .luxury-emerald .cover-open-btn svg { width: 18px; height: 18px; }
@@ -222,10 +320,37 @@
   inset: 0;
   pointer-events: none;
   background:
+    var(--deco-corner),
+    var(--deco-corner),
     radial-gradient(120% 90% at 50% 0%, rgba(212,175,90,0.1) 0%, transparent 50%),
     radial-gradient(120% 120% at 50% 100%, transparent 52%, rgba(0,0,0,0.68) 100%),
     repeating-radial-gradient(circle at 50% 50%, rgba(212,175,90,0.025) 0px, rgba(212,175,90,0.025) 1px, transparent 1px, transparent 28px);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position: 22px 22px, calc(100% - 22px) 22px, center, center, center;
+  background-size: 92px 92px, 92px 92px, auto, auto, auto;
   opacity: 0.9;
+}
+/* mirror the top-right deco corner so both top corners point inward */
+.luxury-emerald .hero-section { isolation: isolate; }
+.luxury-emerald .hero-section::before {
+  content: '';
+  position: absolute;
+  bottom: 22px; left: 22px;
+  width: 92px; height: 92px;
+  background: var(--deco-corner) center/contain no-repeat;
+  transform: scaleY(-1);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.luxury-emerald .hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: 22px; right: 22px;
+  width: 92px; height: 92px;
+  background: var(--deco-corner) center/contain no-repeat;
+  transform: scale(-1, -1);
+  opacity: 0.55;
+  pointer-events: none;
 }
 .luxury-emerald .hero-bismillah {
   position: relative;
@@ -253,16 +378,37 @@
   gap: 0.25rem;
   margin: 0.5rem 0 1.5rem;
 }
+/* sunburst fan glowing behind the hero names */
+.luxury-emerald .hero-names::before {
+  content: '';
+  position: absolute;
+  top: -3.2rem;
+  left: 50%;
+  width: 180px;
+  height: 96px;
+  transform: translateX(-50%);
+  background: var(--deco-fan) center/contain no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: -1;
+}
 .luxury-emerald .hero-bride,
 .luxury-emerald .hero-groom {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
   font-size: clamp(2.8rem, 9.5vw, 5.2rem);
-  color: var(--gold);
   line-height: 1.12;
-  text-shadow: 0 0 34px rgba(212,175,90,0.5), 0 2px 6px rgba(0,0,0,0.55);
+  background: linear-gradient(100deg, #b78f3e 0%, #d4af5a 30%, #fff6d8 48%, #d4af5a 66%, #b78f3e 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--gold);
+  filter: drop-shadow(0 0 32px rgba(212,175,90,0.55)) drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+  animation: le-shimmer 6.5s ease-in-out infinite;
 }
+.luxury-emerald .hero-groom { animation-delay: 0.5s; }
 .luxury-emerald .hero-ampersand {
   font-family: var(--font-serif);
   font-size: 1.7rem;
@@ -272,30 +418,35 @@
 }
 .luxury-emerald .hero-ornament {
   position: relative;
-  width: 130px;
-  height: 1px;
-  margin: 0.5rem auto 1.5rem;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  width: 240px;
+  height: 36px;
+  margin: 1rem auto 1.5rem;
+  background:
+    linear-gradient(90deg, transparent, var(--gold) 18%, transparent 42%) left center/100% 1px no-repeat,
+    linear-gradient(90deg, transparent 58%, var(--gold) 82%, transparent) right center/100% 1px no-repeat;
 }
+/* stepped-diamond deco motif centered on the tapering rules */
 .luxury-emerald .hero-ornament::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 8px;
-  height: 8px;
-  background: var(--gold);
-  transform: translate(-50%, -50%) rotate(45deg);
-  box-shadow: 0 0 12px rgba(212,175,90,0.75);
+  width: 36px;
+  height: 36px;
+  transform: translate(-50%, -50%);
+  background: var(--deco-diamond) center/contain no-repeat;
+  filter: drop-shadow(0 0 8px rgba(212,175,90,0.55));
 }
 .luxury-emerald .hero-ornament::after {
-  content: '❦';
+  content: '';
   position: absolute;
   left: 50%;
-  top: -1.6rem;
-  transform: translateX(-50%);
-  color: var(--gold-soft);
-  font-size: 1rem;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--gold-soft);
+  box-shadow: 0 0 10px rgba(231,210,154,0.8);
 }
 .luxury-emerald .hero-date {
   position: relative;
@@ -345,21 +496,26 @@
   text-shadow: 0 0 20px rgba(212,175,90,0.28);
 }
 .luxury-emerald .section-title::before {
-  content: '❦';
+  content: '';
   display: block;
-  font-size: 0.95rem;
-  font-style: normal;
-  color: var(--gold-soft);
-  margin-bottom: 0.6rem;
-  opacity: 0.9;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 0.7rem;
+  background: var(--deco-diamond) center/contain no-repeat;
+  filter: drop-shadow(0 0 7px rgba(212,175,90,0.5));
+  opacity: 0.95;
 }
 .luxury-emerald .section-title::after {
   content: '';
   display: block;
-  width: 72px;
-  height: 1px;
-  margin: 0.8rem auto 0;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  width: 200px;
+  max-width: 70vw;
+  height: 18px;
+  margin: 0.9rem auto 0;
+  background:
+    linear-gradient(90deg, transparent, var(--gold) 22%, transparent 46%) left center/100% 1px no-repeat,
+    linear-gradient(90deg, transparent 54%, var(--gold) 78%, transparent) right center/100% 1px no-repeat,
+    radial-gradient(circle 3px at 50% 50%, var(--gold-soft) 99%, transparent) center/100% 100% no-repeat;
 }
 .luxury-emerald section {
   position: relative;
@@ -367,6 +523,21 @@
   max-width: 900px;
   margin: 0 auto;
   border-bottom: 1px solid var(--border);
+  z-index: 1;
+}
+/* art-deco divider motif centered on each section's bottom rule */
+.luxury-emerald section::after {
+  content: '';
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translateX(-50%);
+  background:
+    var(--deco-diamond) center/contain no-repeat,
+    var(--bg-primary);
+  filter: drop-shadow(0 0 6px rgba(212,175,90,0.45));
 }
 
 /* ---------- Countdown ---------- */
@@ -380,19 +551,35 @@
 .luxury-emerald .countdown-unit {
   position: relative;
   text-align: center;
-  min-width: 88px;
-  padding: 1.2rem 0.9rem;
+  min-width: 92px;
+  padding: 1.35rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: linear-gradient(160deg, rgba(31,77,58,0.6) 0%, rgba(14,31,23,0.4) 60%, rgba(212,175,90,0.05) 100%);
-  box-shadow: var(--shadow-soft);
+  border-radius: 4px;
+  background:
+    linear-gradient(160deg, rgba(31,77,58,0.6) 0%, rgba(14,31,23,0.4) 60%, rgba(212,175,90,0.05) 100%);
+  box-shadow: var(--shadow-soft), inset 0 0 0 4px rgba(14,31,23,0.45), inset 0 0 0 5px rgba(212,175,90,0.18);
   transition: border-color 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
 }
+/* deco corner ticks on countdown tiles */
+.luxury-emerald .countdown-unit::before,
+.luxury-emerald .countdown-unit::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: solid var(--gold-muted);
+  border-width: 0;
+  transition: border-color 0.28s ease;
+}
+.luxury-emerald .countdown-unit::before { top: 8px; left: 8px; border-top-width: 1px; border-left-width: 1px; }
+.luxury-emerald .countdown-unit::after { bottom: 8px; right: 8px; border-bottom-width: 1px; border-right-width: 1px; }
 .luxury-emerald .countdown-unit:hover {
   border-color: var(--border-bright);
   transform: translateY(-3px);
-  box-shadow: 0 22px 46px -18px rgba(0,0,0,0.82);
+  box-shadow: 0 22px 46px -18px rgba(0,0,0,0.82), inset 0 0 0 4px rgba(14,31,23,0.45), inset 0 0 0 5px rgba(212,175,90,0.4);
 }
+.luxury-emerald .countdown-unit:hover::before,
+.luxury-emerald .countdown-unit:hover::after { border-color: var(--gold); }
 .luxury-emerald .countdown-value {
   display: block;
   font-family: var(--font-serif);
@@ -551,8 +738,28 @@
   gap: 2rem;
   align-items: center;
 }
-.luxury-emerald .profile-card { text-align: center; }
+.luxury-emerald .profile-card { position: relative; text-align: center; }
+/* gold art-deco frame wrapper behind the photo */
+.luxury-emerald .profile-card::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  transform: translateX(-50%) rotate(45deg);
+  border: 1px solid var(--border-bright);
+  box-shadow: inset 0 0 0 6px rgba(212,175,90,0.12);
+  pointer-events: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.luxury-emerald .profile-card:hover::before {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 6px rgba(212,175,90,0.22), 0 0 30px rgba(212,175,90,0.18);
+}
 .luxury-emerald .profile-photo {
+  position: relative;
+  z-index: 1;
   width: 168px;
   height: 168px;
   border-radius: 50%;
@@ -599,8 +806,8 @@
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .luxury-emerald .gallery-item:hover::after {
-  border-color: var(--border-bright);
-  box-shadow: inset 0 0 0 1px rgba(212,175,90,0.28);
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold), inset 0 0 0 6px rgba(14,31,23,0.5), inset 0 0 0 7px rgba(212,175,90,0.5);
 }
 .luxury-emerald .gallery-item img {
   width: 100%;
@@ -722,6 +929,8 @@
 .luxury-emerald .rsvp-pax .rsvp-input { width: 80px; }
 .luxury-emerald .rsvp-error { color: #e98686; font-size: 0.85rem; }
 .luxury-emerald .rsvp-submit {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(135deg, #e7d29a 0%, #d4af5a 45%, #a8842f 100%);
   color: var(--emerald-deep);
   border: none;
@@ -750,7 +959,26 @@
   box-shadow: var(--shadow-soft);
   transition: border-color 0.28s ease, transform 0.28s ease;
 }
+.luxury-emerald .wish-card::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 8px;
+  width: 13px; height: 13px;
+  border-top: 1px solid var(--gold-muted);
+  border-left: 1px solid var(--gold-muted);
+  transition: border-color 0.28s ease;
+}
+.luxury-emerald .wish-card::after {
+  content: '\201D';
+  position: absolute;
+  top: 0.6rem; right: 1rem;
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: rgba(212,175,90,0.28);
+}
 .luxury-emerald .wish-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+.luxury-emerald .wish-card:hover::before { border-color: var(--gold); }
 .luxury-emerald .wish-name { font-family: var(--font-serif); font-style: italic; font-size: 1.1rem; color: var(--gold); margin-bottom: 0.4rem; }
 .luxury-emerald .wish-text { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin-bottom: 0.4rem; }
 .luxury-emerald .wish-time { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.04em; }
@@ -826,3 +1054,20 @@
 }
 .luxury-emerald .watermark-footer a { color: var(--gold-muted); text-decoration: none; transition: color 0.28s ease; }
 .luxury-emerald .watermark-footer a:hover { color: var(--gold); }
+
+/* ---------- Mobile refinements for deco elements ---------- */
+@media (max-width: 640px) {
+  .luxury-emerald .cover-inner { padding: 2.4rem 1.5rem; }
+  .luxury-emerald .cover-inner::after { width: 70px; height: 38px; top: 1rem; }
+  .cover-gate.luxury-emerald .cover-ornaments {
+    background-size: 66px 66px, 66px 66px;
+    background-position: 12px 12px, calc(100% - 12px) calc(100% - 12px);
+  }
+  .luxury-emerald .hero-overlay { background-size: 62px 62px, 62px 62px, auto, auto, auto; }
+  .luxury-emerald .hero-section::before,
+  .luxury-emerald .hero-section::after { width: 62px; height: 62px; }
+  .luxury-emerald .hero-names::before { width: 130px; height: 70px; top: -2.4rem; }
+  .luxury-emerald .hero-ornament { width: 200px; }
+  .luxury-emerald .profile-card::before { width: 176px; height: 176px; }
+  .luxury-emerald .music-btn { bottom: 1.4rem; right: 1.4rem; }
+}

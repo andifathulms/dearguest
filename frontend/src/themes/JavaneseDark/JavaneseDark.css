@@ -10,8 +10,16 @@
   --text-muted: #8a7a5a;
   --border: rgba(201,168,76,0.2);
   --border-bright: rgba(201,168,76,0.55);
+  --gold-deep: #9c7f38;
+  --gold-pale: #f3e4ad;
   --card-grad: linear-gradient(155deg, rgba(201,168,76,0.10) 0%, rgba(201,168,76,0.02) 55%, rgba(26,18,8,0.0) 100%);
+  --card-grad-rich: linear-gradient(155deg, rgba(201,168,76,0.16) 0%, rgba(201,168,76,0.05) 42%, rgba(26,18,8,0.0) 100%);
   --shadow-soft: 0 18px 40px -18px rgba(0,0,0,0.7);
+  --shadow-gold: 0 0 40px -6px rgba(201,168,76,0.18);
+  /* Authentic kawung batik motif — interlocking quatrefoil ellipses, faint gold */
+  --kawung: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-width='1.1'%3E%3Cellipse cx='20' cy='20' rx='12' ry='17' transform='rotate(45 20 20)'/%3E%3Cellipse cx='20' cy='20' rx='12' ry='17' transform='rotate(-45 20 20)'/%3E%3Cellipse cx='60' cy='20' rx='12' ry='17' transform='rotate(45 60 20)'/%3E%3Cellipse cx='60' cy='20' rx='12' ry='17' transform='rotate(-45 60 20)'/%3E%3Cellipse cx='20' cy='60' rx='12' ry='17' transform='rotate(45 20 60)'/%3E%3Cellipse cx='20' cy='60' rx='12' ry='17' transform='rotate(-45 20 60)'/%3E%3Cellipse cx='60' cy='60' rx='12' ry='17' transform='rotate(45 60 60)'/%3E%3Cellipse cx='60' cy='60' rx='12' ry='17' transform='rotate(-45 60 60)'/%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3Ccircle cx='60' cy='20' r='2'/%3E%3Ccircle cx='20' cy='60' r='2'/%3E%3Ccircle cx='60' cy='60' r='2'/%3E%3Ccircle cx='40' cy='40' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+  /* Ornamental corner filigree — symmetric Javanese-style scroll */
+  --filigree: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M6 6 L6 50 Q6 70 26 70 Q44 70 44 52 Q44 38 30 38 Q20 38 20 48'/%3E%3Cpath d='M6 6 L50 6 Q70 6 70 26 Q70 44 52 44 Q38 44 38 30 Q38 20 48 20'/%3E%3Cpath d='M6 6 Q40 14 60 38 Q80 62 86 86' stroke-width='0.9' opacity='0.7'/%3E%3Ccircle cx='30' cy='30' r='3'/%3E%3C/g%3E%3C/svg%3E");
   --font-display: 'Great Vibes', cursive;
   --font-serif: 'Cormorant Garamond', serif;
   --font-label: 'Cinzel', serif;
@@ -30,6 +38,20 @@
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
+
+/* Faint tiling kawung batik texture across the whole invitation */
+.javanese-dark::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--kawung);
+  background-size: 110px 110px;
+  opacity: 0.05;
+  mix-blend-mode: screen;
+}
+.javanese-dark > * { position: relative; z-index: 1; }
 
 /* Kawung batik border SVG */
 .javanese-dark .kawung-border-top,
@@ -80,6 +102,13 @@
     linear-gradient(180deg, #20160a 0%, #160f06 55%, #100a04 100%);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
+/* Kawung texture + faint vignette frame on the cover gate */
+.javanese-dark.cover-gate::before,
+.cover-gate.javanese-dark::before {
+  background-image: var(--kawung);
+  background-size: 96px 96px;
+  opacity: 0.06;
+}
 .javanese-dark.cover-gate.is-closing,
 .cover-gate.is-closing {
   opacity: 0;
@@ -104,6 +133,15 @@
 }
 .javanese-dark .cover-ornaments::before { top: -120px; left: -100px; }
 .javanese-dark .cover-ornaments::after { bottom: -120px; right: -100px; }
+
+/* Ornamental gold filigree in the four corners of the cover gate (mirrored) */
+.javanese-dark.cover-gate .cover-ornaments,
+.cover-gate.javanese-dark .cover-ornaments {
+  background-image: var(--filigree), var(--filigree), var(--filigree), var(--filigree);
+  background-repeat: no-repeat;
+  background-position: 18px 18px, calc(100% - 18px) 18px, 18px calc(100% - 18px), calc(100% - 18px) calc(100% - 18px);
+  background-size: 108px 108px;
+}
 .javanese-dark .cover-inner {
   position: relative;
   z-index: 1;
@@ -126,12 +164,33 @@
   margin-bottom: 1.4rem;
 }
 .javanese-dark .cover-names {
+  position: relative;
   font-family: var(--font-display);
   font-size: clamp(3.2rem, 13vw, 5.2rem);
   line-height: 1.05;
-  color: var(--gold);
-  text-shadow: 0 0 28px rgba(201,168,76,0.45), 0 2px 4px rgba(0,0,0,0.5);
   margin-bottom: 0.4rem;
+  background-image: linear-gradient(
+    100deg,
+    var(--gold-deep) 0%,
+    var(--gold) 28%,
+    var(--gold-pale) 46%,
+    #fffbe9 50%,
+    var(--gold-pale) 54%,
+    var(--gold) 72%,
+    var(--gold-deep) 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--gold);
+  filter: drop-shadow(0 0 30px rgba(201,168,76,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  animation: jv-shimmer 6s ease-in-out infinite;
+}
+@keyframes jv-shimmer {
+  0% { background-position: 180% center; }
+  50% { background-position: -40% center; }
+  100% { background-position: 180% center; }
 }
 .javanese-dark .cover-amp {
   display: block;
@@ -194,26 +253,45 @@
   color: var(--gold);
 }
 .javanese-dark .cover-open-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.9rem 2.2rem;
-  border: 1px solid var(--gold);
+  padding: 0.95rem 2.4rem;
+  border: 1px solid var(--gold-pale);
   border-radius: 999px;
-  background: linear-gradient(135deg, #d9bb63 0%, #c9a84c 45%, #9c7f38 100%);
+  background: linear-gradient(135deg, #f0d987 0%, #d9bb63 30%, #c9a84c 60%, #9c7f38 100%);
   color: #1a1208;
   font-family: var(--font-label);
   font-size: 0.82rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 10px 28px -10px rgba(201,168,76,0.7);
+  overflow: hidden;
+  box-shadow: 0 10px 28px -10px rgba(201,168,76,0.7), inset 0 1px 0 rgba(255,250,233,0.5);
   transition: transform 0.28s ease, box-shadow 0.28s ease, filter 0.28s ease;
+}
+/* gold sheen sweep */
+.javanese-dark .cover-open-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
 }
 .javanese-dark .cover-open-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 16px 34px -10px rgba(201,168,76,0.85);
+  box-shadow: 0 16px 36px -10px rgba(201,168,76,0.9), inset 0 1px 0 rgba(255,250,233,0.6);
   filter: brightness(1.06);
+}
+.javanese-dark .cover-open-btn:hover::after { animation: jv-sheen 0.9s ease forwards; }
+@keyframes jv-sheen {
+  from { left: -120%; }
+  to { left: 130%; }
 }
 .javanese-dark .cover-open-btn svg { width: 18px; height: 18px; }
 
@@ -232,6 +310,22 @@
     radial-gradient(ellipse at center, rgba(201,168,76,0.12) 0%, transparent 65%),
     radial-gradient(40% 30% at 50% 30%, rgba(201,168,76,0.10) 0%, transparent 70%);
 }
+/* Ornate gold filigree flourishes in the hero corners */
+.javanese-dark .hero-section::before,
+.javanese-dark .hero-section::after {
+  content: '';
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  background-image: var(--filigree);
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 1;
+}
+.javanese-dark .hero-section::before { top: 26px; left: 26px; }
+.javanese-dark .hero-section::after { bottom: 26px; right: 26px; transform: rotate(180deg); }
 .javanese-dark .hero-overlay {
   position: absolute;
   inset: 0;
@@ -270,12 +364,29 @@
 }
 .javanese-dark .hero-bride,
 .javanese-dark .hero-groom {
+  position: relative;
   font-family: var(--font-display);
   font-size: clamp(3rem, 10vw, 5.5rem);
-  color: var(--gold);
   line-height: 1.1;
-  text-shadow: 0 0 32px rgba(201,168,76,0.5), 0 2px 6px rgba(0,0,0,0.5);
+  background-image: linear-gradient(
+    100deg,
+    var(--gold-deep) 0%,
+    var(--gold) 28%,
+    var(--gold-pale) 46%,
+    #fffbe9 50%,
+    var(--gold-pale) 54%,
+    var(--gold) 72%,
+    var(--gold-deep) 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--gold);
+  filter: drop-shadow(0 0 34px rgba(201,168,76,0.55)) drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  animation: jv-shimmer 6.5s ease-in-out infinite;
 }
+.javanese-dark .hero-groom { animation-delay: 0.6s; }
 .javanese-dark .hero-ampersand {
   font-family: var(--font-serif);
   font-size: 1.6rem;
@@ -285,21 +396,22 @@
 }
 .javanese-dark .hero-ornament {
   position: relative;
-  width: 120px;
+  width: 220px;
   height: 1px;
-  margin: 0.5rem auto 1.5rem;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0.9rem auto 1.6rem;
+  background: linear-gradient(90deg, transparent, var(--gold-muted) 18%, var(--gold) 50%, var(--gold-muted) 82%, transparent);
 }
 .javanese-dark .hero-ornament::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 8px;
-  height: 8px;
-  background: var(--gold);
+  width: 11px;
+  height: 11px;
+  background: linear-gradient(135deg, var(--gold-pale), var(--gold) 55%, var(--gold-deep));
   transform: translate(-50%, -50%) rotate(45deg);
-  box-shadow: 0 0 12px rgba(201,168,76,0.7);
+  box-shadow: 0 0 16px rgba(201,168,76,0.8), inset 0 0 4px rgba(255,250,233,0.6);
+  border-radius: 1px;
 }
 .javanese-dark .hero-ornament::after {
   content: '❦';
@@ -359,27 +471,55 @@
 }
 .javanese-dark .section-title::before {
   content: '❦';
-  display: block;
-  font-size: 0.95rem;
+  display: inline-block;
+  position: relative;
+  font-size: 1.05rem;
   font-style: normal;
-  color: var(--gold-muted);
-  margin-bottom: 0.6rem;
-  opacity: 0.85;
+  color: var(--gold);
+  margin-bottom: 0.7rem;
+  opacity: 0.95;
+  text-shadow: 0 0 14px rgba(201,168,76,0.5);
+  /* tapering gold rules flanking the ornament */
+  padding: 0 70px;
+  background-image:
+    linear-gradient(90deg, transparent, var(--gold-muted) 70%, var(--gold)),
+    linear-gradient(90deg, var(--gold), var(--gold-muted) 30%, transparent);
+  background-repeat: no-repeat;
+  background-size: 56px 1px, 56px 1px;
+  background-position: left center, right center;
 }
 .javanese-dark .section-title::after {
   content: '';
   display: block;
-  width: 70px;
+  position: relative;
+  width: 90px;
   height: 1px;
-  margin: 0.8rem auto 0;
+  margin: 0.9rem auto 0;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
+.javanese-dark .section-title { isolation: isolate; }
+/* center diamond on the section-title underline */
+.javanese-dark .section-title > span,
+.javanese-dark .section-title em { font-style: inherit; }
 .javanese-dark section {
   position: relative;
   padding: 5rem 1.5rem;
   max-width: 900px;
   margin: 0 auto;
   border-bottom: 1px solid var(--border);
+}
+/* Delicate centered diamond ornament riding each section divider */
+.javanese-dark section::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(135deg, var(--gold-pale), var(--gold) 55%, var(--gold-deep));
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 0 0 12px rgba(201,168,76,0.55), inset 0 0 3px rgba(255,250,233,0.5);
+  pointer-events: none;
 }
 
 /* ---------- Countdown ---------- */
@@ -394,17 +534,29 @@
   position: relative;
   text-align: center;
   min-width: 88px;
-  padding: 1.2rem 0.9rem;
+  padding: 1.3rem 0.9rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--card-grad);
-  box-shadow: var(--shadow-soft);
-  transition: border-color 0.28s ease, transform 0.28s ease;
+  border-radius: 8px;
+  background: var(--card-grad-rich);
+  box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(201,168,76,0.05);
+  transition: border-color 0.32s ease, transform 0.32s ease, box-shadow 0.32s ease;
+}
+/* inner hairline frame */
+.javanese-dark .countdown-unit::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 5px;
+  pointer-events: none;
+  transition: border-color 0.32s ease;
 }
 .javanese-dark .countdown-unit:hover {
   border-color: var(--border-bright);
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px -20px rgba(0,0,0,0.8), var(--shadow-gold);
 }
+.javanese-dark .countdown-unit:hover::before { border-color: rgba(201,168,76,0.3); }
 .javanese-dark .countdown-value {
   display: block;
   font-family: var(--font-serif);
@@ -441,12 +593,12 @@
 .javanese-dark .event-card {
   position: relative;
   border: 1px solid var(--border);
-  background: var(--card-grad);
-  padding: 2.25rem 2rem;
+  background: var(--card-grad-rich);
+  padding: 2.4rem 2rem;
   text-align: center;
-  border-radius: 6px;
-  box-shadow: var(--shadow-soft);
-  transition: border-color 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
+  border-radius: 8px;
+  box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(201,168,76,0.06), inset 0 1px 0 rgba(255,250,233,0.05);
+  transition: border-color 0.32s ease, transform 0.32s ease, box-shadow 0.32s ease;
 }
 .javanese-dark .event-card::before,
 .javanese-dark .event-card::after {
@@ -469,8 +621,8 @@
 }
 .javanese-dark .event-card:hover {
   border-color: var(--border-bright);
-  transform: translateY(-4px);
-  box-shadow: 0 24px 50px -20px rgba(0,0,0,0.8);
+  transform: translateY(-5px);
+  box-shadow: 0 28px 56px -20px rgba(0,0,0,0.85), var(--shadow-gold), inset 0 0 0 1px rgba(201,168,76,0.12);
 }
 .javanese-dark .event-card:hover::before,
 .javanese-dark .event-card:hover::after {
@@ -570,15 +722,28 @@
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--gold);
-  padding: 5px;
-  background: var(--bg-primary);
-  margin-bottom: 1.25rem;
-  box-shadow: 0 0 0 1px var(--border), 0 0 0 8px rgba(201,168,76,0.06), 0 14px 34px -14px rgba(0,0,0,0.8);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 6px;
+  background:
+    linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+    conic-gradient(from 220deg, var(--gold-deep), var(--gold-pale), var(--gold), var(--gold-deep), var(--gold-pale), var(--gold-deep)) border-box;
+  margin-bottom: 1.4rem;
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 0 0 7px rgba(26,18,8,0.9),
+    0 0 0 8px rgba(201,168,76,0.35),
+    0 0 0 13px rgba(201,168,76,0.07),
+    0 16px 38px -14px rgba(0,0,0,0.85);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
 }
 .javanese-dark .profile-photo:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 0 1px var(--gold), 0 0 0 8px rgba(201,168,76,0.10), 0 18px 40px -16px rgba(0,0,0,0.85);
+  transform: scale(1.035) translateY(-2px);
+  box-shadow:
+    0 0 0 1px var(--gold),
+    0 0 0 7px rgba(26,18,8,0.9),
+    0 0 0 8px rgba(201,168,76,0.6),
+    0 0 0 14px rgba(201,168,76,0.12),
+    0 22px 46px -16px rgba(0,0,0,0.9),
+    var(--shadow-gold);
 }
 .javanese-dark .profile-name { font-family: var(--font-display); font-size: 2.4rem; color: var(--gold); margin-bottom: 0.5rem; text-shadow: 0 0 20px rgba(201,168,76,0.35); }
 .javanese-dark .profile-parents { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.5rem; }
@@ -593,7 +758,7 @@
 .javanese-dark .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  gap: 1.15rem;
 }
 .javanese-dark .gallery-item {
   position: relative;
@@ -611,8 +776,8 @@
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .javanese-dark .gallery-item:hover::after {
-  border-color: var(--border-bright);
-  box-shadow: inset 0 0 0 1px rgba(201,168,76,0.25);
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 3px rgba(201,168,76,0.3), inset 0 0 24px rgba(201,168,76,0.15);
 }
 .javanese-dark .gallery-item img {
   width: 100%;
@@ -622,7 +787,7 @@
   filter: brightness(0.88) sepia(0.08);
   transition: filter 0.35s ease, transform 0.45s ease;
 }
-.javanese-dark .gallery-item img:hover { filter: brightness(1.05) sepia(0); transform: scale(1.05); }
+.javanese-dark .gallery-item img:hover { filter: brightness(1.06) sepia(0); transform: scale(1.08); }
 .javanese-dark .gallery-caption { font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 0.35rem 0; letter-spacing: 0.04em; }
 
 /* ---------- Amplop Digital ---------- */
@@ -631,13 +796,13 @@
 .javanese-dark .bank-card {
   position: relative;
   border: 1px solid var(--border);
-  background: var(--card-grad);
-  padding: 2.25rem 2rem;
+  background: var(--card-grad-rich);
+  padding: 2.4rem 2rem;
   text-align: center;
   min-width: 240px;
-  border-radius: 6px;
-  box-shadow: var(--shadow-soft);
-  transition: border-color 0.28s ease, transform 0.28s ease;
+  border-radius: 8px;
+  box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(201,168,76,0.06);
+  transition: border-color 0.32s ease, transform 0.32s ease, box-shadow 0.32s ease;
 }
 .javanese-dark .bank-card::before {
   content: '';
@@ -659,7 +824,8 @@
 }
 .javanese-dark .bank-card:hover {
   border-color: var(--border-bright);
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+  box-shadow: 0 28px 56px -20px rgba(0,0,0,0.85), var(--shadow-gold), inset 0 0 0 1px rgba(201,168,76,0.12);
 }
 .javanese-dark .bank-card:hover::before,
 .javanese-dark .bank-card:hover::after { border-color: var(--gold); }
@@ -667,10 +833,12 @@
 .javanese-dark .bank-number { font-size: 1.5rem; font-family: var(--font-serif); color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: 0.06em; }
 .javanese-dark .bank-holder { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; }
 .javanese-dark .bank-copy-btn {
+  position: relative;
+  overflow: hidden;
   background: transparent;
   border: 1px solid var(--gold);
   color: var(--gold);
-  padding: 0.55rem 1.4rem;
+  padding: 0.6rem 1.5rem;
   cursor: pointer;
   font-family: var(--font-label);
   font-size: 0.72rem;
@@ -679,12 +847,25 @@
   border-radius: 999px;
   transition: background 0.28s ease, color 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
 }
+.javanese-dark .bank-copy-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,250,233,0.45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
 .javanese-dark .bank-copy-btn:hover {
-  background: var(--gold);
+  background: linear-gradient(135deg, #f0d987, #c9a84c 60%, #9c7f38);
   color: var(--bg-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px -8px rgba(201,168,76,0.7);
+  box-shadow: 0 10px 22px -8px rgba(201,168,76,0.75), inset 0 1px 0 rgba(255,250,233,0.5);
 }
+.javanese-dark .bank-copy-btn:hover::after { animation: jv-sheen 0.9s ease forwards; }
+.javanese-dark .bank-copy-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(201,168,76,0.3); }
 
 /* ---------- RSVP ---------- */
 .javanese-dark .rsvp-form { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
@@ -734,20 +915,34 @@
 .javanese-dark .rsvp-pax .rsvp-input { width: 80px; }
 .javanese-dark .rsvp-error { color: #e07070; font-size: 0.85rem; }
 .javanese-dark .rsvp-submit {
-  background: linear-gradient(135deg, #d9bb63 0%, #c9a84c 45%, #9c7f38 100%);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f0d987 0%, #d9bb63 30%, #c9a84c 60%, #9c7f38 100%);
   color: var(--bg-primary);
-  border: none;
-  padding: 0.95rem;
+  border: 1px solid rgba(243,228,173,0.4);
+  padding: 1rem;
   cursor: pointer;
   font-family: var(--font-label);
   font-size: 0.8rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  border-radius: 5px;
-  box-shadow: 0 10px 26px -12px rgba(201,168,76,0.7);
+  border-radius: 6px;
+  box-shadow: 0 10px 26px -12px rgba(201,168,76,0.7), inset 0 1px 0 rgba(255,250,233,0.5);
   transition: transform 0.28s ease, box-shadow 0.28s ease, filter 0.28s ease;
 }
-.javanese-dark .rsvp-submit:hover { transform: translateY(-2px); filter: brightness(1.06); box-shadow: 0 14px 30px -12px rgba(201,168,76,0.85); }
+.javanese-dark .rsvp-submit::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.5), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.javanese-dark .rsvp-submit:hover { transform: translateY(-2px); filter: brightness(1.06); box-shadow: 0 14px 32px -12px rgba(201,168,76,0.9), inset 0 1px 0 rgba(255,250,233,0.6); }
+.javanese-dark .rsvp-submit:hover::after { animation: jv-sheen 0.9s ease forwards; }
 .javanese-dark .rsvp-submit:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(201,168,76,0.3); }
 .javanese-dark .rsvp-success { text-align: center; font-family: var(--font-serif); font-size: 1.3rem; font-style: italic; color: var(--gold); text-shadow: 0 0 18px rgba(201,168,76,0.3); }
 
@@ -756,13 +951,31 @@
 .javanese-dark .wish-card {
   position: relative;
   border: 1px solid var(--border);
-  background: var(--card-grad);
-  padding: 1.35rem 1.6rem;
-  border-radius: 6px;
-  box-shadow: var(--shadow-soft);
-  transition: border-color 0.28s ease, transform 0.28s ease;
+  background: var(--card-grad-rich);
+  padding: 1.5rem 1.7rem 1.4rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(201,168,76,0.05);
+  overflow: hidden;
+  transition: border-color 0.32s ease, transform 0.32s ease, box-shadow 0.32s ease;
 }
-.javanese-dark .wish-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+/* decorative oversized quotation flourish */
+.javanese-dark .wish-card::before {
+  content: '\201C';
+  position: absolute;
+  top: -0.7rem;
+  right: 0.9rem;
+  font-family: var(--font-serif);
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--gold);
+  opacity: 0.14;
+  pointer-events: none;
+}
+.javanese-dark .wish-card:hover {
+  border-color: var(--border-bright);
+  transform: translateY(-3px);
+  box-shadow: 0 24px 48px -20px rgba(0,0,0,0.8), var(--shadow-gold);
+}
 .javanese-dark .wish-name { font-family: var(--font-serif); font-size: 1.05rem; color: var(--gold); margin-bottom: 0.4rem; }
 .javanese-dark .wish-text { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin-bottom: 0.4rem; }
 .javanese-dark .wish-time { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.04em; }
@@ -814,19 +1027,30 @@
 /* ---------- WhatsApp share ---------- */
 .javanese-dark .wa-share { text-align: center; padding: 2rem 0 1rem; }
 .javanese-dark .wa-share-btn {
+  position: relative; overflow: hidden;
   display: inline-flex; align-items: center; gap: 0.5rem;
   background: transparent; border: 1px solid var(--gold); color: var(--gold);
-  padding: 0.8rem 2.2rem; text-decoration: none;
+  padding: 0.85rem 2.4rem; text-decoration: none;
   font-family: var(--font-label); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase;
   border-radius: 999px;
   transition: background 0.28s ease, color 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
 }
+.javanese-dark .wa-share-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -120%;
+  width: 55%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,250,233,0.45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
 .javanese-dark .wa-share-btn:hover {
-  background: var(--gold);
+  background: linear-gradient(135deg, #f0d987, #c9a84c 60%, #9c7f38);
   color: var(--bg-primary);
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px -10px rgba(201,168,76,0.7);
+  box-shadow: 0 12px 26px -10px rgba(201,168,76,0.75), inset 0 1px 0 rgba(255,250,233,0.5);
 }
+.javanese-dark .wa-share-btn:hover::after { animation: jv-sheen 0.9s ease forwards; }
 
 /* ---------- Watermark footer ---------- */
 .javanese-dark .watermark-footer {
@@ -837,3 +1061,19 @@
 }
 .javanese-dark .watermark-footer a { color: var(--gold-muted); text-decoration: none; transition: color 0.28s ease; }
 .javanese-dark .watermark-footer a:hover { color: var(--gold); }
+
+/* ---------- Responsive tweaks for new decorative layers ---------- */
+@media (max-width: 640px) {
+  .javanese-dark .hero-section::before,
+  .javanese-dark .hero-section::after { width: 78px; height: 78px; opacity: 0.4; }
+  .javanese-dark .hero-section::before { top: 12px; left: 12px; }
+  .javanese-dark .hero-section::after { bottom: 12px; right: 12px; }
+  .javanese-dark.cover-gate .cover-ornaments,
+  .cover-gate.javanese-dark .cover-ornaments {
+    background-size: 72px 72px;
+    background-position: 10px 10px, calc(100% - 10px) 10px, 10px calc(100% - 10px), calc(100% - 10px) calc(100% - 10px);
+  }
+  .javanese-dark .hero-ornament { width: 160px; }
+  .javanese-dark .section-title::before { padding: 0 48px; background-size: 38px 1px, 38px 1px; }
+  .javanese-dark::before { background-size: 88px 88px; opacity: 0.04; }
+}
