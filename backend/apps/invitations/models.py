@@ -17,7 +17,13 @@ class Invitation(models.Model):
         ('rustic-kraft', 'Rustic Kraft'),
         ('boho-terracotta', 'Senja Terakota'),
     ]
+    TIER_CHOICES = [
+        ('free', 'Gratis'),
+        ('premium', 'Premium'),
+        ('bisnis', 'Bisnis'),
+    ]
     slug = models.SlugField(unique=True, max_length=100)
+    tier = models.CharField(max_length=10, choices=TIER_CHOICES, default='free')  # paid tiers remove the watermark
     theme = models.CharField(max_length=30, choices=THEME_CHOICES, default='javanese-dark')
     is_active = models.BooleanField(default=False)
     wedding_date = models.DateField()

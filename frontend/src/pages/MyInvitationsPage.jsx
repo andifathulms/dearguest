@@ -88,6 +88,7 @@ export default function MyInvitationsPage() {
                     <div className="mi-card-meta">
                       {THEME_NAME[it.theme] || it.theme}
                       {it.wedding_date ? ` · ${format(new Date(it.wedding_date), 'd MMM yyyy', { locale: id })}` : ''}
+                      {it.tier && it.tier !== 'free' ? ` · ${it.tier === 'bisnis' ? 'Bisnis' : 'Premium'}` : ''}
                     </div>
                     {statusBadge(it)}
                     <div className="mi-card-actions">

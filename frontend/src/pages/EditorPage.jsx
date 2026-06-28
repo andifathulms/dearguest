@@ -315,6 +315,23 @@ function GiftsSection({ inv, reload, notify }) {
   )
 }
 
+/* ---------------- Tier banner ---------------- */
+function TierBanner({ inv }) {
+  const tier = inv.tier || 'free'
+  if (tier !== 'free') {
+    return <div className="ed-tier paid">Paket <strong>{tier === 'bisnis' ? 'Bisnis' : 'Premium'}</strong> · undangan tampil tanpa watermark ✓</div>
+  }
+  const waUrl = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
+    `Halo admin, saya ingin upgrade undangan "${inv.slug}" ke paket Premium (tanpa watermark).`
+  )}`
+  return (
+    <div className="ed-tier">
+      <div>Paket <strong>Gratis</strong> · watermark "Undangan Digital" tampil di undanganmu.</div>
+      <a className="ed-mini" style={{ background: '#25d366', color: '#fff', borderColor: '#25d366' }} href={waUrl} target="_blank" rel="noopener noreferrer">Upgrade ke Premium</a>
+    </div>
+  )
+}
+
 /* ---------------- Publish / activation ---------------- */
 function PublishCard({ inv, reload, notify }) {
   const [code, setCode] = useState('')
@@ -424,6 +441,7 @@ export default function EditorPage() {
 
       <div className="ed-body">
         <PublishCard inv={inv} reload={load} notify={notify} />
+        <TierBanner inv={inv} />
         <SettingsSection inv={inv} reload={load} notify={notify} />
         <CoupleSection inv={inv} reload={load} notify={notify} />
         <EventsSection inv={inv} reload={load} notify={notify} />

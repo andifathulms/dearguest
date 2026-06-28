@@ -29,9 +29,9 @@ class BankAccountInline(admin.TabularInline):
 
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ['slug', 'theme', 'is_active', 'activation_requested', 'activation_code', 'wedding_date', 'expires_at']
-    list_filter = ['is_active', 'activation_requested', 'theme', 'watermark']
-    list_editable = ['is_active', 'activation_code']
+    list_display = ['slug', 'theme', 'tier', 'is_active', 'activation_requested', 'activation_code', 'wedding_date']
+    list_filter = ['is_active', 'activation_requested', 'tier', 'theme']
+    list_editable = ['tier', 'is_active', 'activation_code']
     search_fields = ['slug']
     readonly_fields = ['activation_requested', 'activation_requested_at', 'created_at']
     inlines = [CoupleInline, EventInline, StoryInline, PhotoInline, BankAccountInline]

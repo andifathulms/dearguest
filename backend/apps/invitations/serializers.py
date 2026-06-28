@@ -113,6 +113,7 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True, read_only=True)
     bank_accounts = BankAccountSerializer(many=True, read_only=True)
     music_file = serializers.SerializerMethodField()
+    watermark = serializers.SerializerMethodField()
 
     class Meta:
         model = Invitation
@@ -122,6 +123,10 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
             'livestream_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
+
+    def get_watermark(self, obj):
+        # Watermark is shown only on the free tier; paid tiers remove it.
+        return obj.tier == 'free'
 
     def get_music_file(self, obj):
         request = self.context.get('request')
@@ -199,7 +204,7 @@ class InvitationListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Invitation
-        fields = ['slug', 'theme', 'wedding_date', 'is_active', 'activation_requested', 'bride_name', 'groom_name']
+        fields = ['slug', 'theme', 'tier', 'wedding_date', 'is_active', 'activation_requested', 'bride_name', 'groom_name']
 
     def _couple(self, obj):
         try:
@@ -227,7 +232,7 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
         fields = [
-            'slug', 'theme', 'wedding_date', 'expires_at',
+            'slug', 'theme', 'tier', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'watermark', 'is_active',
             'activation_requested', 'music_file', 'livestream_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
