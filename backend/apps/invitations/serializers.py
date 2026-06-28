@@ -93,9 +93,17 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 
 class BankAccountSerializer(serializers.ModelSerializer):
+    qris_image = serializers.SerializerMethodField()
+
     class Meta:
         model = BankAccount
-        fields = ['id', 'bank_name', 'account_number', 'account_name', 'order']
+        fields = ['id', 'account_type', 'bank_name', 'account_number', 'account_name', 'qris_image', 'order']
+
+    def get_qris_image(self, obj):
+        request = self.context.get('request')
+        if obj.qris_image and request:
+            return request.build_absolute_uri(obj.qris_image.url)
+        return None
 
 
 class InvitationPublicSerializer(serializers.ModelSerializer):

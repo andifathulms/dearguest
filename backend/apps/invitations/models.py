@@ -99,10 +99,17 @@ class Photo(models.Model):
 
 
 class BankAccount(models.Model):
+    ACCOUNT_TYPES = [
+        ('bank', 'Bank'),
+        ('ewallet', 'E-Wallet'),
+        ('qris', 'QRIS'),
+    ]
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='bank_accounts')
-    bank_name = models.CharField(max_length=100)
-    account_number = models.CharField(max_length=50)
+    account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPES, default='bank')
+    bank_name = models.CharField(max_length=100)  # bank name, e-wallet name (GoPay/OVO/DANA), or "QRIS"
+    account_number = models.CharField(max_length=50, blank=True)  # phone for e-wallet; empty for QRIS
     account_name = models.CharField(max_length=200)
+    qris_image = models.ImageField(upload_to='qris/', null=True, blank=True)  # scannable QRIS image
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
