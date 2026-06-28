@@ -19,7 +19,7 @@ function SettingsSection({ inv, reload, notify }) {
   const [f, setF] = useState({
     theme: inv.theme, wedding_date: inv.wedding_date || '',
     opening_text: inv.opening_text || '', closing_text: inv.closing_text || '',
-    livestream_url: inv.livestream_url || '',
+    dress_code: inv.dress_code || '', livestream_url: inv.livestream_url || '',
   })
   const [music, setMusic] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -58,6 +58,10 @@ function SettingsSection({ inv, reload, notify }) {
       <div className="ed-field">
         <label>Teks penutup</label>
         <textarea className="ed-textarea" value={f.closing_text} onChange={e => set('closing_text', e.target.value)} placeholder="Ucapan terima kasih…" />
+      </div>
+      <div className="ed-field">
+        <label>Dress code (opsional)</label>
+        <input className="ed-input" value={f.dress_code} onChange={e => set('dress_code', e.target.value)} placeholder="mis. Batik / Earth tone / Formal" />
       </div>
       <div className="ed-field">
         <label>Link live streaming (opsional — YouTube, dll.)</label>

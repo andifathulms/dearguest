@@ -46,7 +46,7 @@ function EventCard({ event }) {
   )
 }
 
-export default function EventsSection({ events }) {
+export default function EventsSection({ events, dressCode }) {
   if (!events || events.length === 0) return null
   return (
     <section className="events-section">
@@ -56,6 +56,9 @@ export default function EventsSection({ events }) {
           <EventCard key={event.id} event={event} />
         ))}
       </div>
+      {dressCode && (
+        <p className="events-dresscode">Dress code: <strong>{dressCode}</strong></p>
+      )}
     </section>
   )
 }

@@ -30,6 +30,7 @@ class Invitation(models.Model):
     expires_at = models.DateField(null=True, blank=True)
     opening_text = models.TextField(blank=True)
     closing_text = models.TextField(blank=True)
+    dress_code = models.CharField(max_length=200, blank=True)
     watermark = models.BooleanField(default=True)
     music_file = models.FileField(upload_to='music/', null=True, blank=True)
     livestream_url = models.URLField(blank=True)  # YouTube/Instagram/Zoom link for remote guests

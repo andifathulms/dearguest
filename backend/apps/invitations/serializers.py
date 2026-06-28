@@ -130,7 +130,7 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = [
             'slug', 'theme', 'wedding_date', 'expires_at',
-            'opening_text', 'closing_text', 'watermark', 'music_file',
+            'opening_text', 'closing_text', 'dress_code', 'watermark', 'music_file',
             'livestream_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
@@ -188,7 +188,7 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
         fields = [
-            'slug', 'theme', 'wedding_date', 'opening_text', 'closing_text',
+            'slug', 'theme', 'wedding_date', 'opening_text', 'closing_text', 'dress_code',
             'music_file', 'livestream_url', 'is_active', 'watermark', 'expires_at',
         ]
         read_only_fields = ['slug', 'is_active', 'watermark', 'expires_at']
@@ -244,7 +244,7 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = [
             'slug', 'theme', 'tier', 'wedding_date', 'expires_at',
-            'opening_text', 'closing_text', 'watermark', 'is_active',
+            'opening_text', 'closing_text', 'dress_code', 'watermark', 'is_active',
             'activation_requested', 'music_file', 'livestream_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]

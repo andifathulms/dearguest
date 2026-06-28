@@ -84,6 +84,16 @@ body.cover-open {
   margin-top: 0.5rem;
 }
 
+/* Dress code line — uses theme-common CSS variables */
+.events-dresscode {
+  text-align: center;
+  margin-top: 1.75rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+.events-dresscode strong { color: var(--text-primary); }
+
 /* Invitation loading / error screen */
 .inv-status {
   min-height: 100vh;

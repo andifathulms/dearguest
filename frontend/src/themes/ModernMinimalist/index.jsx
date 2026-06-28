@@ -48,7 +48,7 @@ export default function ModernMinimalist({ invitation, guestName }) {
 
       <Section><GuestGreeting guestName={guestName} openingText={invitation.opening_text} /></Section>
       <Section><CountdownTimer targetDate={akad?.datetime} /></Section>
-      <Section><EventsSection events={invitation.events} /></Section>
+      <Section><EventsSection events={invitation.events} dressCode={invitation.dress_code} /></Section>
       <Section><StorySection stories={invitation.stories} /></Section>
       <Section><ProfileSection couple={couple} /></Section>
       <Section><GallerySection photos={invitation.photos} /></Section>
