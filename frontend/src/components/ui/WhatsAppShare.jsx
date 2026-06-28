@@ -1,5 +1,7 @@
+import { shareUrl } from '../../api/client.js'
+
 export default function WhatsAppShare({ slug, brideName, groomName }) {
-  const url = `${window.location.origin}/${slug}`
+  const url = shareUrl(slug)
   const text = encodeURIComponent(
     `Assalamualaikum, kami mengundang Anda ke pernikahan ${brideName} & ${groomName}. Lihat undangan kami di: ${url}`
   )
