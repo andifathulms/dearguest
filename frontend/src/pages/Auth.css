@@ -77,5 +77,11 @@
 }
 .onb-theme:hover { transform: translateY(-2px); }
 .onb-theme.active { border-color: #b8924e; box-shadow: 0 0 0 2px rgba(184,146,78,0.2); }
-.onb-theme-swatch { height: 54px; border-radius: 7px; margin-bottom: 0.5rem; }
+.onb-mock {
+  height: 70px; border-radius: 7px; margin-bottom: 0.5rem; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+}
+.onb-mock-label { font-size: 0.42rem; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.85; }
+.onb-mock-names { font-family: 'Playfair Display', serif; font-size: 0.9rem; line-height: 1; }
+.onb-mock-rule { width: 22px; height: 1px; opacity: 0.75; }
 .onb-theme-name { font-size: 0.74rem; color: #4a4038; line-height: 1.3; }

@@ -4,12 +4,12 @@ import api from '../api/client.js'
 import './Auth.css'
 
 const THEMES = [
-  { id: 'javanese-dark', name: 'Javanese Malam Emas', swatch: 'linear-gradient(135deg,#1a1208,#c9a84c)' },
-  { id: 'floral-light', name: 'Taman Bunga', swatch: 'linear-gradient(135deg,#f7ede8,#c4847a)' },
-  { id: 'modern-minimalist', name: 'Minimalis Putih', swatch: 'linear-gradient(135deg,#ffffff,#8a9e8a)' },
-  { id: 'luxury-emerald', name: 'Zamrud Mewah', swatch: 'linear-gradient(135deg,#0e1f17,#d4af5a)' },
-  { id: 'rustic-kraft', name: 'Rustic Kraft', swatch: 'linear-gradient(135deg,#e9ddc8,#7c8b6b)' },
-  { id: 'boho-terracotta', name: 'Senja Terakota', swatch: 'linear-gradient(135deg,#fbf3ea,#c06a4d)' },
+  { id: 'javanese-dark', name: 'Javanese Malam Emas', bg: 'radial-gradient(ellipse at center, rgba(201,168,76,0.16), #1a1208 75%)', fg: '#c9a84c', accent: '#b6a06a' },
+  { id: 'floral-light', name: 'Taman Bunga', bg: 'linear-gradient(160deg,#f7ede8,#fdf8f5)', fg: '#2d1f1c', accent: '#c4847a' },
+  { id: 'modern-minimalist', name: 'Minimalis Putih', bg: '#ffffff', fg: '#1f1f1f', accent: '#8a9e8a' },
+  { id: 'luxury-emerald', name: 'Zamrud Mewah', bg: 'radial-gradient(ellipse at center, rgba(212,175,90,0.14), #0e1f17 75%)', fg: '#d4af5a', accent: '#b6a06a' },
+  { id: 'rustic-kraft', name: 'Rustic Kraft', bg: 'linear-gradient(160deg,#e9ddc8,#f3ece0)', fg: '#3a3026', accent: '#7c8b6b' },
+  { id: 'boho-terracotta', name: 'Senja Terakota', bg: 'radial-gradient(ellipse at 50% 120%, rgba(192,106,77,0.28), #fbf3ea 70%)', fg: '#4a2f24', accent: '#c06a4d' },
 ]
 
 function slugify(s) {
@@ -104,7 +104,11 @@ export default function OnboardingPage() {
                   onClick={() => setTheme(t.id)}
                   aria-pressed={theme === t.id}
                 >
-                  <div className="onb-theme-swatch" style={{ background: t.swatch }} />
+                  <div className="onb-mock" style={{ background: t.bg, color: t.fg }}>
+                    <span className="onb-mock-label" style={{ color: t.accent }}>The Wedding Of</span>
+                    <span className="onb-mock-names">Andini &amp; Bagus</span>
+                    <span className="onb-mock-rule" style={{ background: t.accent }} />
+                  </div>
                   <div className="onb-theme-name">{t.name}</div>
                 </button>
               ))}
