@@ -1,117 +1,323 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
+import './LandingPage.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
-const waUrl = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent('Halo, saya ingin memesan undangan digital')}`
+const wa = (msg) => `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`
+const waOrder = wa('Halo, saya ingin memesan undangan digital')
+
+/* ---- inline SVG icon set (no emoji, crisp at any size) ---- */
+const Icon = {
+  rsvp: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>,
+  music: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="18" r="2.5" /><circle cx="17" cy="16" r="2.5" /><path d="M8.5 18V6l11-2v10" /></svg>,
+  map: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>,
+  gift: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v9h14v-9" /><path d="M12 8S10 3 7.5 4.5 9.5 8 12 8zM12 8s2-5 4.5-3.5S14.5 8 12 8z" /></svg>,
+  chart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="13" y="7" width="3" height="10" /></svg>,
+  palette: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r="1" /><circle cx="17.5" cy="10.5" r="1" /><circle cx="8.5" cy="7.5" r="1" /><circle cx="6.5" cy="12.5" r="1" /><path d="M12 2a10 10 0 0 0 0 20c1 0 1.5-.8 1.5-1.6 0-.5-.2-.9-.5-1.2-.3-.4-.5-.8-.5-1.2 0-.9.7-1.5 1.6-1.5H16a6 6 0 0 0 6-6c0-4.4-4.5-8-10-8z" /></svg>,
+  gallery: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></svg>,
+  heart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" /></svg>,
+  check: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>,
+  plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>,
+  whatsapp: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.6-.8-2.6-1.4-3.7-3.2-.3-.5.3-.4.8-1.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3 1.8.8 2.5.8 3.4.7.6-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2z" /></svg>,
+}
 
 const features = [
-  { icon: '🎨', title: '3 Tema Eksklusif', desc: 'Javanese Malam Emas, Taman Bunga, dan Minimalis Putih' },
-  { icon: '📩', title: 'Konfirmasi RSVP', desc: 'Tamu konfirmasi kehadiran langsung dari undangan' },
-  { icon: '🎵', title: 'Musik Latar', desc: 'Tambahkan lagu favorit kalian sebagai latar undangan' },
-  { icon: '🗺️', title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk kemudahan tamu' },
-  { icon: '💝', title: 'Amplop Digital', desc: 'Transfer hadiah langsung via rekening bank yang tersedia' },
-  { icon: '📊', title: 'Dashboard RSVP', desc: 'Pantau konfirmasi tamu secara real-time' },
+  { icon: Icon.palette, title: '3 Tema Eksklusif', desc: 'Javanese Malam Emas, Taman Bunga, dan Minimalis Putih — dirancang dengan tipografi dan palet premium.' },
+  { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
+  { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
+  { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
+  { icon: Icon.gift, title: 'Amplop Digital', desc: 'Terima hadiah via transfer dengan tombol salin nomor rekening yang praktis.' },
+  { icon: Icon.gallery, title: 'Galeri & Kisah', desc: 'Bagikan momen prewedding dan perjalanan cinta kalian dalam galeri yang elegan.' },
+  { icon: Icon.chart, title: 'Dashboard RSVP', desc: 'Pantau konfirmasi tamu real-time dan unduh data sebagai CSV kapan saja.' },
+  { icon: Icon.heart, title: 'Doa & Ucapan', desc: 'Dinding ucapan langsung dari tamu, tampil cantik dan diperbarui otomatis.' },
 ]
 
 const themes = [
-  { id: 'javanese-dark', name: 'Javanese Malam Emas', desc: 'Elegan dengan sentuhan emas pada latar gelap tembakau', colors: ['#1a1208', '#c9a84c', '#f5eed6'] },
-  { id: 'floral-light', name: 'Taman Bunga', desc: 'Romantis dengan nuansa mawar pada latar putih blush', colors: ['#fdf8f5', '#c4847a', '#f7ede8'] },
-  { id: 'modern-minimalist', name: 'Minimalis Putih', desc: 'Bersih dan modern dengan aksen sage hijau', colors: ['#ffffff', '#1f1f1f', '#8a9e8a'] },
+  { id: 'javanese-dark', name: 'Javanese Malam Emas', desc: 'Elegan dengan sentuhan emas pada latar gelap tembakau.', preview: 'tp-javanese', colors: ['#1a1208', '#c9a84c', '#f5eed6'] },
+  { id: 'floral-light', name: 'Taman Bunga', desc: 'Romantis dengan nuansa mawar pada latar putih blush.', preview: 'tp-floral', colors: ['#fdf8f5', '#c4847a', '#f7ede8'] },
+  { id: 'modern-minimalist', name: 'Minimalis Putih', desc: 'Bersih dan modern dengan aksen sage yang menenangkan.', preview: 'tp-modern', colors: ['#ffffff', '#1f1f1f', '#8a9e8a'] },
 ]
+
+const steps = [
+  { n: 1, title: 'Pesan & Konsultasi', desc: 'Hubungi kami via WhatsApp, pilih tema, dan ceritakan detail acara kalian.' },
+  { n: 2, title: 'Kirim Data', desc: 'Berikan foto, nama mempelai, jadwal, lokasi, dan rekening. Kami susun semuanya.' },
+  { n: 3, title: 'Undangan Jadi', desc: 'Undangan siap dalam 1–2 hari, lengkap dengan link personalisasi nama tamu.' },
+  { n: 4, title: 'Bagikan', desc: 'Sebar via WhatsApp ke semua tamu dan pantau RSVP dari dashboard.' },
+]
+
+const plans = [
+  { name: 'Gratis', desc: 'Coba dulu, tanpa biaya.', price: '0', was: null, featured: false, cta: 'Mulai Gratis', features: ['1 undangan aktif 14 hari', 'Tema dasar', 'RSVP & dinding ucapan', 'Countdown & peta lokasi'] },
+  { name: 'Premium', desc: 'Paling populer untuk pasangan.', price: '99', was: '199', featured: true, cta: 'Pilih Premium', features: ['Semua tema eksklusif', 'Galeri foto & kisah cinta', 'Musik latar & amplop digital', 'Dashboard RSVP + export CSV', 'Tanpa watermark'] },
+  { name: 'Bisnis', desc: 'Untuk dua acara dalam satu akun.', price: '179', was: '299', featured: false, cta: 'Pilih Bisnis', features: ['Semua fitur Premium', '2 undangan dalam 1 akun', 'Kustomisasi warna & tata letak', 'Foto tanpa batas', 'Prioritas pengerjaan (24 jam)'] },
+]
+
+const testimonials = [
+  { name: 'Dinda & Raka', city: 'Yogyakarta', quote: 'Undangannya elegan banget, tema Javanese-nya pas dengan adat kami. Tamu banyak yang muji desainnya mewah.', avatar: 'D' },
+  { name: 'Sarah & Bima', city: 'Jakarta', quote: 'Prosesnya cepat dan dibantu sampai detail. Fitur RSVP-nya bikin kami gampang rekap kehadiran tamu.', avatar: 'S' },
+  { name: 'Putri & Arya', city: 'Bandung', quote: 'Suka banget sama tema Taman Bunga. Personalisasi nama tamu bikin undangan terasa spesial dan personal.', avatar: 'P' },
+]
+
+const faqs = [
+  { q: 'Berapa lama undangan selesai dibuat?', a: 'Umumnya 1–2 hari kerja setelah data lengkap kami terima. Paket Eksklusif diprioritaskan dalam 24 jam.' },
+  { q: 'Apakah nama tamu bisa muncul otomatis?', a: 'Bisa. Setiap tamu mendapat link personal sehingga namanya tampil di sampul undangan, terasa lebih personal.' },
+  { q: 'Berapa lama undangan bisa diakses?', a: 'Undangan aktif hingga 3 bulan setelah tanggal pernikahan, cukup untuk seluruh rangkaian acara.' },
+  { q: 'Bagaimana cara membayar dan memesan?', a: 'Cukup klik tombol WhatsApp, kami akan memandu pemilihan tema, pengiriman data, hingga pembayaran.' },
+  { q: 'Apakah bisa request warna atau tema khusus?', a: 'Tentu. Pada paket Eksklusif kami melayani kustomisasi warna, tata letak, dan kebutuhan khusus lainnya.' },
+]
+
+const fade = (delay = 0) => ({
+  initial: { opacity: 0, y: 28 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-60px' },
+  transition: { duration: 0.6, delay },
+})
+
+function FaqItem({ q, a }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className={`lp-faq-item ${open ? 'open' : ''}`}>
+      <button className="lp-faq-q" onClick={() => setOpen(o => !o)} aria-expanded={open}>
+        <span>{q}</span>
+        <span className="ic">{Icon.plus}</span>
+      </button>
+      {open && <p className="lp-faq-a">{a}</p>}
+    </div>
+  )
+}
 
 export default function LandingPage() {
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", color: '#1f1f1f', overflowX: 'hidden' }}>
-      {/* Hero */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '4rem 2rem', background: 'linear-gradient(180deg, #fdf8f5 0%, #fff 100%)' }}>
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#888', marginBottom: '1rem' }}>Digital Wedding Invitation</p>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(2.5rem, 8vw, 5rem)', fontWeight: 400, marginBottom: '1.5rem', lineHeight: 1.1 }}>
-            Undangan Digital
-          </h1>
-          <p style={{ fontSize: '1.05rem', color: '#555', maxWidth: '500px', lineHeight: 1.7, marginBottom: '2.5rem' }}>
-            Undangan pernikahan digital yang indah untuk pasangan Indonesia. Desain eksklusif, mudah dibagikan, tanpa kertas.
-          </p>
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-block', background: '#25D366', color: 'white', padding: '0.9rem 2.5rem', textDecoration: 'none', fontSize: '0.9rem', letterSpacing: '0.05em', borderRadius: '2px' }}
-          >
-            Pesan via WhatsApp
+    <div className="lp">
+      {/* ===== Nav ===== */}
+      <nav className="lp-nav">
+        <div className="lp-container lp-nav-inner">
+          <a href="#top" className="lp-brand" style={{ textDecoration: 'none' }}>
+            <span className="lp-brand-mark">U</span>
+            <span>Undangan<span style={{ fontStyle: 'italic' }}>Digital</span></span>
+          </a>
+          <div className="lp-nav-menu lp-nav-links">
+            <a href="#tema">Tema</a>
+            <a href="#fitur">Fitur</a>
+            <a href="#harga">Harga</a>
+            <a href="#faq">FAQ</a>
+          </div>
+          <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-primary lp-nav-cta">
+            Pesan Sekarang
+          </a>
+        </div>
+      </nav>
+
+      {/* ===== Hero ===== */}
+      <header className="lp-hero" id="top">
+        <div className="lp-hero-inner">
+          <motion.div {...fade(0)}>
+            <span className="lp-hero-badge"><span className="dot" /> Dipercaya pasangan di seluruh Indonesia</span>
+          </motion.div>
+          <motion.h1 {...fade(0.05)}>
+            Undangan Pernikahan <em>Digital</em> yang Elegan & Berkesan
+          </motion.h1>
+          <motion.p className="lp-hero-sub" {...fade(0.1)}>
+            Rayakan hari bahagia kalian dengan undangan online yang indah — tema eksklusif,
+            RSVP, galeri, musik, dan amplop digital. Mudah dibagikan, tanpa kertas.
+          </motion.p>
+          <motion.div className="lp-hero-actions" {...fade(0.15)}>
+            <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-wa">
+              {Icon.whatsapp} Pesan via WhatsApp
+            </a>
+            <a href="#tema" className="lp-btn lp-btn-ghost">Lihat Tema</a>
+          </motion.div>
+          <motion.div className="lp-hero-trust" {...fade(0.25)}>
+            <div><strong>3</strong> Tema Eksklusif</div>
+            <div><strong>1–2</strong> Hari Pengerjaan</div>
+            <div><strong>100%</strong> Responsif di HP</div>
+          </motion.div>
+        </div>
+      </header>
+
+      {/* ===== Themes ===== */}
+      <section className="lp-section lp-themes" id="tema">
+        <div className="lp-container">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">Pilihan Tema</p>
+            <h2>Tiga karakter, satu kesan: mewah</h2>
+            <p>Setiap tema dirancang dengan tipografi, warna, dan ornamen yang harmonis untuk menonjolkan momen kalian.</p>
+          </div>
+          <div className="lp-theme-grid">
+            {themes.map((t, i) => (
+              <motion.div className="lp-theme-card" key={t.id} {...fade(i * 0.08)}>
+                <div className={`lp-theme-preview ${t.preview}`}>
+                  <span className="tp-label">The Wedding Of</span>
+                  <div className="tp-names lp-serif">
+                    Andini<span className="tp-amp">&amp;</span>Bagus
+                  </div>
+                  <div className="tp-rule" />
+                  <span className="tp-date">12 · 12 · 2026</span>
+                </div>
+                <div className="lp-theme-body">
+                  <h3>{t.name}</h3>
+                  <p>{t.desc}</p>
+                  <div className="lp-theme-swatches">
+                    {t.colors.map(c => <span key={c} style={{ background: c }} />)}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Features ===== */}
+      <section className="lp-section" id="fitur">
+        <div className="lp-container">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">Fitur Lengkap</p>
+            <h2>Semua yang kalian butuhkan, dalam satu tautan</h2>
+            <p>Dirancang untuk memudahkan kalian dan memanjakan tamu undangan.</p>
+          </div>
+          <div className="lp-feature-grid">
+            {features.map((f, i) => (
+              <motion.div className="lp-feature" key={f.title} {...fade((i % 4) * 0.06)}>
+                <div className="lp-feature-icon">{f.icon}</div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== How it works ===== */}
+      <section className="lp-section lp-steps">
+        <div className="lp-container">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">Cara Pesan</p>
+            <h2>Hanya 4 langkah mudah</h2>
+          </div>
+          <div className="lp-step-grid">
+            {steps.map((s, i) => (
+              <motion.div className="lp-step" key={s.n} {...fade(i * 0.08)}>
+                <div className="lp-step-num">{s.n}</div>
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Pricing ===== */}
+      <section className="lp-section" id="harga">
+        <div className="lp-container">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">Harga</p>
+            <h2>Harga terjangkau, sekali bayar</h2>
+            <p>Mulai dari gratis. Tanpa biaya bulanan, tanpa biaya tersembunyi — dan setiap paket sudah termasuk pendampingan penuh via WhatsApp.</p>
+          </div>
+          <p className="lp-price-promo">🎉 Harga promo — hemat hingga 50% untuk periode terbatas</p>
+          <div className="lp-price-grid">
+            {plans.map((p, i) => {
+              const isFree = p.price === '0'
+              return (
+                <motion.div className={`lp-price-card ${p.featured ? 'featured' : ''}`} key={p.name} {...fade(i * 0.08)}>
+                  {p.featured && <span className="lp-price-tag">Paling Populer</span>}
+                  <div className="lp-price-name lp-serif">{p.name}</div>
+                  <p className="lp-price-desc">{p.desc}</p>
+                  {isFree ? (
+                    <div className="lp-price-amount lp-serif">Gratis</div>
+                  ) : (
+                    <div className="lp-price-amount lp-serif">
+                      {p.was && <span className="lp-price-was">Rp{p.was}.000</span>}
+                      <span><small>Rp</small>{p.price}.000</span>
+                    </div>
+                  )}
+                  <p className="lp-price-note">{isFree ? 'tanpa kartu kredit' : 'sekali bayar / undangan'}</p>
+                  <ul className="lp-price-features">
+                    {p.features.map(ft => (
+                      <li key={ft}>{Icon.check}<span>{ft}</span></li>
+                    ))}
+                  </ul>
+                  <a
+                    href={wa(`Halo, saya tertarik dengan paket ${p.name} untuk undangan digital`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`lp-btn ${p.featured ? 'lp-btn-primary' : 'lp-btn-ghost'}`}
+                  >
+                    {p.cta}
+                  </a>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Testimonials ===== */}
+      <section className="lp-section lp-testimonials">
+        <div className="lp-container">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">Kata Mereka</p>
+            <h2>Dipercaya pasangan bahagia</h2>
+          </div>
+          <div className="lp-testi-grid">
+            {testimonials.map((t, i) => (
+              <motion.div className="lp-testi" key={t.name} {...fade(i * 0.08)}>
+                <div className="lp-testi-stars">★★★★★</div>
+                <p className="lp-testi-quote">“{t.quote}”</p>
+                <div className="lp-testi-author">
+                  <span className="lp-testi-avatar lp-serif">{t.avatar}</span>
+                  <div>
+                    <strong>{t.name}</strong>
+                    <span>{t.city}</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== FAQ ===== */}
+      <section className="lp-section" id="faq">
+        <div className="lp-container">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">FAQ</p>
+            <h2>Pertanyaan yang sering ditanyakan</h2>
+          </div>
+          <div className="lp-faq-list">
+            {faqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CTA ===== */}
+      <section className="lp-cta">
+        <motion.div {...fade(0)}>
+          <h2>Siap membuat undangan <em>impian</em>?</h2>
+          <p>Konsultasikan kebutuhan acara kalian sekarang. Gratis, tanpa komitmen.</p>
+          <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-wa">
+            {Icon.whatsapp} Chat WhatsApp Sekarang
           </a>
         </motion.div>
       </section>
 
-      {/* Themes */}
-      <section style={{ padding: '5rem 2rem', background: '#f9f9f7' }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', textAlign: 'center', marginBottom: '3rem', fontWeight: 400, fontStyle: 'italic' }}>
-          Pilih Tema Favoritmu
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', maxWidth: '900px', margin: '0 auto' }}>
-          {themes.map((theme, i) => (
-            <motion.div
-              key={theme.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.6 }}
-              style={{ background: 'white', padding: '2rem', border: '1px solid #e8e8e4' }}
-            >
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                {theme.colors.map(c => (
-                  <div key={c} style={{ width: 24, height: 24, borderRadius: '50%', background: c, border: '1px solid #e8e8e4' }} />
-                ))}
-              </div>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', fontWeight: 400, marginBottom: '0.5rem' }}>{theme.name}</h3>
-              <p style={{ fontSize: '0.85rem', color: '#888', lineHeight: 1.6 }}>{theme.desc}</p>
-            </motion.div>
-          ))}
+      {/* ===== Footer ===== */}
+      <footer className="lp-footer">
+        <div className="lp-container">
+          <div className="lp-footer-inner">
+            <div className="lp-brand">
+              <span className="lp-brand-mark">U</span>
+              <span>Undangan<span style={{ fontStyle: 'italic' }}>Digital</span></span>
+            </div>
+            <div className="lp-footer-links">
+              <a href="#tema">Tema</a>
+              <a href="#fitur">Fitur</a>
+              <a href="#harga">Harga</a>
+              <a href="#faq">FAQ</a>
+              <a href={waOrder} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            </div>
+          </div>
+          <p className="lp-footer-copy">© {new Date().getFullYear()} Undangan Digital · Undangan pernikahan online untuk pasangan Indonesia 🤍</p>
         </div>
-      </section>
-
-      {/* Features */}
-      <section style={{ padding: '5rem 2rem' }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', textAlign: 'center', marginBottom: '3rem', fontWeight: 400, fontStyle: 'italic' }}>
-          Fitur Lengkap
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.5 }}
-              style={{ textAlign: 'center' }}
-            >
-              <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{f.icon}</div>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.4rem' }}>{f.title}</h3>
-              <p style={{ fontSize: '0.8rem', color: '#888', lineHeight: 1.6 }}>{f.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ padding: '5rem 2rem', background: '#1f1f1f', textAlign: 'center', color: 'white' }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', fontWeight: 400, fontStyle: 'italic', marginBottom: '1rem' }}>
-          Siap Membuat Undangan?
-        </h2>
-        <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.9rem' }}>
-          Hubungi kami via WhatsApp untuk konsultasi dan pemesanan.
-        </p>
-        <a
-          href={waUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ display: 'inline-block', background: '#25D366', color: 'white', padding: '0.9rem 2.5rem', textDecoration: 'none', fontSize: '0.9rem', letterSpacing: '0.05em', borderRadius: '2px' }}
-        >
-          Chat WhatsApp Sekarang
-        </a>
-      </section>
-
-      <footer style={{ padding: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#888', borderTop: '1px solid #f0f0ee' }}>
-        © {new Date().getFullYear()} Undangan Digital
       </footer>
     </div>
   )
