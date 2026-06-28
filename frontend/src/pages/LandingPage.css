@@ -190,6 +190,47 @@
   font-weight: 600;
 }
 
+/* ===== Trust stats band ===== */
+.lp-stats {
+  background: var(--ink);
+  color: #f5eed6;
+  padding: 3rem 0;
+}
+.lp-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  text-align: center;
+}
+.lp-stat strong {
+  display: block;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 600;
+  color: var(--gold-soft);
+  line-height: 1;
+}
+.lp-stat span {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b3a99c;
+}
+.lp-stats-eco {
+  text-align: center;
+  margin-top: 2.2rem;
+  font-size: 0.88rem;
+  color: #cbbfa6;
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+@media (max-width: 560px) {
+  .lp-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem 1rem; }
+}
+
 /* ===== Section frame ===== */
 .lp-section { padding: 5rem 0; }
 .lp-section-head { text-align: center; max-width: 620px; margin: 0 auto 3.5rem; }

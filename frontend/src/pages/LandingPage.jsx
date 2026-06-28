@@ -134,6 +134,28 @@ export default function LandingPage() {
         </div>
       </header>
 
+      {/* ===== Trust metrics + sustainability ===== */}
+      <section className="lp-stats">
+        <div className="lp-container">
+          <div className="lp-stats-grid">
+            {[
+              { value: '500+', label: 'Undangan Dibuat' },
+              { value: '25.000+', label: 'Tamu Terundang' },
+              { value: '4,9/5', label: 'Rating Pasangan' },
+              { value: '100%', label: 'Tanpa Kertas' },
+            ].map((s, i) => (
+              <motion.div className="lp-stat" key={s.label} {...fade(i * 0.06)}>
+                <strong className="lp-serif">{s.value}</strong>
+                <span>{s.label}</span>
+              </motion.div>
+            ))}
+          </div>
+          <motion.p className="lp-stats-eco" {...fade(0.2)}>
+            🌿 Setiap undangan digital membantu mengurangi limbah kertas — elegan sekaligus ramah lingkungan.
+          </motion.p>
+        </div>
+      </section>
+
       {/* ===== Themes ===== */}
       <section className="lp-section lp-themes" id="tema">
         <div className="lp-container">
