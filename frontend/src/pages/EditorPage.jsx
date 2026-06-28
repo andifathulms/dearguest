@@ -139,6 +139,20 @@ function EventsSection({ inv, reload, notify }) {
   const update = (i, k, v) => setItems(arr => arr.map((it, j) => j === i ? { ...it, [k]: v } : it))
   const addDraft = () => setItems(arr => [...arr, { event_type: 'akad', datetime: '', venue_name: '', address: '', gmaps_url: '', gmaps_embed_url: '' }])
 
+  async function move(i, dir) {
+    const j = i + dir
+    if (j < 0 || j >= items.length) return
+    const arr = [...items]
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    setItems(arr)
+    const updates = arr.map((it, idx) => ({ it, idx })).filter(({ it, idx }) => it.id && it.order !== idx)
+    if (!updates.length) return
+    try {
+      await Promise.all(updates.map(({ it, idx }) => api.patch(`/my/invitations/${inv.slug}/events/${it.id}/`, { order: idx })))
+      reload()
+    } catch { notify('Gagal mengubah urutan') }
+  }
+
   async function saveOne(it) {
     const payload = { ...it }
     try {
@@ -163,7 +177,13 @@ function EventsSection({ inv, reload, notify }) {
         <div className="ed-item" key={it.id || `new-${i}`}>
           <div className="ed-item-head">
             <strong>{it.event_type === 'akad' ? 'Akad Nikah' : 'Resepsi'}</strong>
-            <button className="ed-mini ed-btn-danger" onClick={() => delOne(it, i)}>Hapus</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <div className="ed-reorder">
+                <button onClick={() => move(i, -1)} disabled={i === 0} aria-label="Naik">↑</button>
+                <button onClick={() => move(i, 1)} disabled={i === items.length - 1} aria-label="Turun">↓</button>
+              </div>
+              <button className="ed-mini ed-btn-danger" onClick={() => delOne(it, i)}>Hapus</button>
+            </div>
           </div>
           <div className="ed-row2">
             <div className="ed-field"><label>Jenis</label>
@@ -252,6 +272,18 @@ function GallerySection({ inv, reload, notify }) {
     if (!window.confirm('Hapus foto ini?')) return
     try { await api.delete(`/my/invitations/${inv.slug}/photos/${id}/`); notify('Foto dihapus'); reload() } catch { notify('Gagal menghapus') }
   }
+  async function move(i, dir) {
+    const arr = [...inv.photos]
+    const j = i + dir
+    if (j < 0 || j >= arr.length) return
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    const updates = arr.map((p, idx) => ({ p, idx })).filter(({ p, idx }) => p.order !== idx)
+    if (!updates.length) return
+    try {
+      await Promise.all(updates.map(({ p, idx }) => api.patch(`/my/invitations/${inv.slug}/photos/${p.id}/`, { order: idx })))
+      reload()
+    } catch { notify('Gagal mengubah urutan') }
+  }
 
   return (
     <div className="ed-card">
@@ -259,10 +291,14 @@ function GallerySection({ inv, reload, notify }) {
       <p className="ed-card-sub">Foto prewedding dan momen kalian.</p>
       {inv.photos.length > 0 && (
         <div className="ed-gallery-grid">
-          {inv.photos.map(p => (
+          {inv.photos.map((p, idx) => (
             <div className="ed-gallery-cell" key={p.id}>
               <img src={p.image} alt={p.caption || ''} />
               <button className="ed-gallery-del" onClick={() => del(p.id)} aria-label="Hapus">×</button>
+              <div className="ed-gallery-move">
+                <button onClick={() => move(idx, -1)} disabled={idx === 0} aria-label="Geser kiri">‹</button>
+                <button onClick={() => move(idx, 1)} disabled={idx === inv.photos.length - 1} aria-label="Geser kanan">›</button>
+              </div>
             </div>
           ))}
         </div>

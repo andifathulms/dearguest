@@ -151,7 +151,7 @@ class CoupleWriteSerializer(serializers.ModelSerializer):
 class EventWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['id', 'event_type', 'datetime', 'venue_name', 'address', 'gmaps_url', 'gmaps_embed_url']
+        fields = ['id', 'event_type', 'datetime', 'venue_name', 'address', 'gmaps_url', 'gmaps_embed_url', 'order']
 
 
 class StoryWriteSerializer(serializers.ModelSerializer):

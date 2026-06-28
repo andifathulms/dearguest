@@ -87,6 +87,10 @@ class Event(models.Model):
     address = models.TextField()
     gmaps_url = models.URLField(blank=True)
     gmaps_embed_url = models.URLField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
 
     def __str__(self):
         return f"{self.invitation.slug} — {self.get_event_type_display()}"

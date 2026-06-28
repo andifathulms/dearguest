@@ -102,6 +102,21 @@
   position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%;
   border: none; cursor: pointer; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.8rem; line-height: 1;
 }
+.ed-gallery-move {
+  position: absolute; bottom: 4px; left: 4px; display: flex; gap: 3px;
+}
+.ed-gallery-move button {
+  width: 22px; height: 22px; border-radius: 6px; border: none; cursor: pointer;
+  background: rgba(0,0,0,0.6); color: #fff; font-size: 0.85rem; line-height: 1; display: grid; place-items: center;
+}
+.ed-gallery-move button:disabled { opacity: 0.3; cursor: default; }
+.ed-reorder { display: inline-flex; gap: 3px; margin-right: 0.4rem; }
+.ed-reorder button {
+  width: 26px; height: 26px; border-radius: 6px; border: 1px solid #e0d8c8; background: #fff;
+  cursor: pointer; font-size: 0.85rem; line-height: 1; color: #6b5f50;
+}
+.ed-reorder button:hover:not(:disabled) { border-color: #b8924e; color: #b8924e; }
+.ed-reorder button:disabled { opacity: 0.35; cursor: default; }
 .ed-file { font-size: 0.8rem; }
 .ed-save-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
 .ed-saved { font-size: 0.8rem; color: #2e7d46; }
