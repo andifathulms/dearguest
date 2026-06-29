@@ -1,7 +1,17 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Stars, Line } from '@react-three/drei'
+import { Stars, Line, PerformanceMonitor } from '@react-three/drei'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+
+// Quality tiers — we START at the highest and only step DOWN if the device
+// can't keep up, so capable phones always get the full experience.
+const TIERS = {
+  high: { stars1: 5200, stars2: 1800, dust: 320, dpr: [1, 2], shooting: true },
+  medium: { stars1: 3200, stars2: 1100, dust: 200, dpr: [1, 1.5], shooting: true },
+  low: { stars1: 1600, stars2: 600, dust: 90, dpr: [1, 1], shooting: false },
+}
+const ORDER = ['low', 'medium', 'high']
+const step = (q, d) => ORDER[Math.min(ORDER.length - 1, Math.max(0, ORDER.indexOf(q) + d))]
 
 // ---- canvas-drawn textures (no external assets) ----
 
@@ -254,12 +264,13 @@ function usePrefersReducedMotion() {
   return reduce
 }
 
-export default function CelestialScene() {
+export default function CelestialScene({ quality = 'high', onQuality }) {
   const reduce = usePrefersReducedMotion()
+  const cfg = reduce ? { stars1: 1600, stars2: 600, dust: 70, dpr: [1, 1], shooting: false } : TIERS[quality]
   return (
     <div className="cc-canvas" aria-hidden="true">
       <Canvas
-        dpr={[1, 1.75]}
+        dpr={cfg.dpr}
         camera={{ position: [0, 0, 12], fov: 60 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         frameloop={reduce ? 'demand' : 'always'}
@@ -267,17 +278,29 @@ export default function CelestialScene() {
         <color attach="background" args={['#070b1f']} />
         <fog attach="fog" args={['#070b1f', 16, 42]} />
         <ambientLight intensity={0.6} />
+        {/* Watch real frame-rate; drop a tier on sustained decline, recover on
+            sustained incline. Lock to 'low' if the device keeps flip-flopping. */}
+        {!reduce && onQuality && (
+          <PerformanceMonitor
+            onDecline={() => onQuality(q => step(q, -1))}
+            onIncline={() => onQuality(q => step(q, +1))}
+            flipflops={3}
+            onFallback={() => onQuality('low')}
+          />
+        )}
         <Suspense fallback={null}>
           <Nebula />
           <SkyGroup reduce={reduce}>
-            <Stars radius={90} depth={55} count={reduce ? 1600 : 5200} factor={4.2} saturation={0} fade speed={reduce ? 0 : 0.55} />
-            <Stars radius={50} depth={30} count={reduce ? 600 : 1800} factor={2.4} saturation={0.5} fade speed={reduce ? 0 : 0.9} />
-            <GoldDust count={reduce ? 70 : 320} reduce={reduce} />
+            {/* key by count so a tier change remounts cleanly — three.js can't
+                resize an existing buffer attribute in place. */}
+            <Stars key={`s1-${cfg.stars1}`} radius={90} depth={55} count={cfg.stars1} factor={4.2} saturation={0} fade speed={reduce ? 0 : 0.55} />
+            <Stars key={`s2-${cfg.stars2}`} radius={50} depth={30} count={cfg.stars2} factor={2.4} saturation={0.5} fade speed={reduce ? 0 : 0.9} />
+            <GoldDust key={`d-${cfg.dust}`} count={cfg.dust} reduce={reduce} />
             <Constellation position={[-6.5, 3.6, -7]} scale={1.25} shape={CASSIOPEIA} />
             <Constellation position={[6.4, -3.4, -8]} scale={1.05} shape={DIPPER} />
           </SkyGroup>
           <Moon />
-          {!reduce && <ShootingStar />}
+          {!reduce && cfg.shooting && <ShootingStar />}
           <Rig reduce={reduce} />
         </Suspense>
       </Canvas>

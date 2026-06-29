@@ -1,6 +1,6 @@
 import '../MidnightCelestial/MidnightCelestial.css'
 import './CelestialCinematic.css'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { motion } from 'framer-motion'
 import HeroSection from '../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
@@ -21,13 +21,16 @@ import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
 // WebGL backdrop is its own lazy chunk so three.js only loads for this theme.
 const CelestialScene = lazy(() => import('./CelestialScene.jsx'))
 
+// Opacity-only wrapper: the universal baseline reveal (works in every browser).
+// Browsers that support scroll-driven animations layer a richer per-element
+// rise/stagger on top via CSS (see CelestialCinematic.css).
 function Section({ children }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.6 }}
     >
       {children}
     </motion.div>
@@ -37,11 +40,14 @@ function Section({ children }) {
 export default function CelestialCinematic({ invitation, guestName }) {
   const couple = invitation.couple || {}
   const akad = (invitation.events || []).find(e => e.event_type === 'akad')
+  // Adaptive quality: starts highest, the scene drops it only if the device
+  // can't sustain the frame-rate. The class gates the expensive CSS blur.
+  const [quality, setQuality] = useState('high')
 
   return (
-    <div className="midnight-celestial celestial-cinematic">
+    <div className={`midnight-celestial celestial-cinematic cc-q-${quality}`}>
       <Suspense fallback={null}>
-        <CelestialScene />
+        <CelestialScene quality={quality} onQuality={setQuality} />
       </Suspense>
 
       <div className="cc-content">

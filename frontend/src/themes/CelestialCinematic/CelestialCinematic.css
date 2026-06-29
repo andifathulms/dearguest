@@ -122,3 +122,68 @@ body.cover-open .celestial-cinematic .cc-content {
     background: rgba(13, 19, 48, 0.72) !important;
   }
 }
+
+/* ===== Adaptive quality: drop the expensive backdrop-blur on the low tier
+   (more opaque fill compensates) — capable devices keep the frosted glass. ===== */
+.celestial-cinematic.cc-q-low .event-card,
+.celestial-cinematic.cc-q-low .bank-card,
+.celestial-cinematic.cc-q-low .wish-card,
+.celestial-cinematic.cc-q-low .rsvp-form,
+.celestial-cinematic.cc-q-low .story-content,
+.celestial-cinematic.cc-q-low .map-item,
+.celestial-cinematic.cc-q-low .profile-card,
+.celestial-cinematic.cc-q-low .countdown-unit,
+.celestial-cinematic.cc-q-low.cover-gate .cover-inner {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(13, 19, 48, 0.8) !important;
+}
+
+/* ===== Scroll-driven per-element reveals =====
+   Cards, titles and names rise + fade in as they scroll into view, and the
+   hero parallaxes out as you leave it. Pure CSS on the compositor (cheap).
+   Gated by @supports so non-supporting browsers just show content (the
+   framer opacity fade still covers them). Disabled for reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .celestial-cinematic .cc-content .section-title,
+    .celestial-cinematic .greeting-text,
+    .celestial-cinematic .countdown-unit,
+    .celestial-cinematic .event-card,
+    .celestial-cinematic .story-content,
+    .celestial-cinematic .profile-card,
+    .celestial-cinematic .gallery-item,
+    .celestial-cinematic .amplod-desc,
+    .celestial-cinematic .bank-card,
+    .celestial-cinematic .rsvp-form,
+    .celestial-cinematic .wish-card,
+    .celestial-cinematic .map-item {
+      animation: cc-rise both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 32%;
+    }
+    /* stagger items inside grids so they cascade rather than pop together */
+    .celestial-cinematic .countdown-unit:nth-child(2) { animation-range: entry 6% cover 35%; }
+    .celestial-cinematic .countdown-unit:nth-child(3) { animation-range: entry 11% cover 38%; }
+    .celestial-cinematic .countdown-unit:nth-child(4) { animation-range: entry 16% cover 41%; }
+    .celestial-cinematic .gallery-item:nth-child(2n) { animation-range: entry 9% cover 36%; }
+    .celestial-cinematic .gallery-item:nth-child(3n) { animation-range: entry 14% cover 40%; }
+    .celestial-cinematic .bank-card:nth-child(2n) { animation-range: entry 9% cover 36%; }
+
+    /* hero names drift up + fade as the hero scrolls away (parallax) */
+    .celestial-cinematic .hero-names {
+      animation: cc-hero-out both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+  }
+
+  @keyframes cc-rise {
+    from { opacity: 0; transform: translateY(36px) scale(0.965); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes cc-hero-out {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0.15; transform: translateY(-70px); }
+  }
+}
