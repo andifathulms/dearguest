@@ -35,8 +35,10 @@ const AURORA_FRAG = /* glsl */ `
     float intensity = curtain * 0.5 + 0.5 + streak * 0.06;
     intensity = clamp(intensity, 0.0, 1.0);
 
-    // Stronger near the top, fading out toward the bottom so content stays clear.
-    float band = smoothstep(0.0, 1.0, vUv.y);
+    // Bright through the middle of the plane (which maps to the centre of the
+    // viewport), fading top and bottom — so the aurora reads on the cover, not
+    // off-screen above.
+    float band = smoothstep(0.05, 0.45, vUv.y) * smoothstep(0.95, 0.55, vUv.y);
 
     // Color shifts through teal → green → violet driven by the curtain & height.
     vec3 teal   = vec3(0.25, 0.71, 0.63);
@@ -44,7 +46,7 @@ const AURORA_FRAG = /* glsl */ `
     vec3 violet = vec3(0.48, 0.36, 0.75);
     float m1 = smoothstep(-0.2, 0.6, curtain);
     vec3 col = mix(teal, green, m1);
-    col = mix(col, violet, smoothstep(0.4, 1.0, vUv.y) * 0.7);
+    col = mix(col, violet, smoothstep(0.45, 0.8, vUv.y) * 0.65);
 
     float alpha = intensity * band * 0.85;
     gl_FragColor = vec4(col * (0.55 + intensity * 0.8), alpha);
@@ -84,14 +86,14 @@ function SceneInner({ cfg, reduce }) {
     <>
       {/* Two layered aurora curtains at different phase/scale for depth. */}
       <AuroraCurtain
-        position={[0, 3.5, -6.5]}
+        position={[0, 1, -6.5]}
         rotation={[0, 0, 0.08]}
         scale={[66, 38, 1]}
         phase={0}
         reduce={reduce}
       />
       <AuroraCurtain
-        position={[-3, 5, -9]}
+        position={[-3, 2.5, -9]}
         rotation={[0, 0, -0.12]}
         scale={[58, 34, 1]}
         phase={2.4}
@@ -154,8 +156,8 @@ export default function AuroraScene({ quality, onQuality }) {
       onQuality={onQuality}
       bg="#070b1f"
       fog={['#070b1f', 24, 54]}
-      baseZ={12}
-      warpTo={7}
+      baseZ={8.5}
+      warpTo={6}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>
