@@ -33,8 +33,9 @@ export const THEME_CATALOG = [
 // Filter categories for the gallery (order matters; "Semua" first).
 export const THEME_CATEGORIES = ['Semua', 'Elegan & Mewah', 'Floral & Lembut', 'Klasik', 'Modern', 'Rustic & Botani']
 
-// A curated, visually diverse 6 surfaced on the landing page.
-export const FEATURED_THEME_IDS = ['javanese-dark', 'luxury-emerald', 'midnight-celestial', 'floral-light', 'sage-botanical', 'ivory-classic']
+// A curated, visually diverse 6 surfaced on the landing page — leading with
+// the most striking statement themes, balanced dark/light.
+export const FEATURED_THEME_IDS = ['deco-noir', 'rose-gold', 'royal-purple', 'floral-light', 'midnight-celestial', 'ivory-classic']
 
 export const FEATURED_THEMES = FEATURED_THEME_IDS
   .map(id => THEME_CATALOG.find(t => t.id === id))
