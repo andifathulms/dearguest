@@ -1,0 +1,10 @@
+/* Aurora Dream — deep night cinematic. */
+.aurora-3d {
+  --cc-base: #070b1f;
+  --cc-card: rgba(12, 20, 40, 0.5);
+  --cc-card-solid: rgba(12, 20, 40, 0.82);
+  --cc-border: rgba(120, 180, 168, 0.32);
+  --cc-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.7);
+  --cc-veil: linear-gradient(180deg, rgba(7,11,31,0.34) 0%, rgba(7,11,31,0.55) 100%);
+  --cc-vignette: rgba(4, 6, 18, 0.6);
+}

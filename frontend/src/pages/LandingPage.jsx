@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../api/client.js'
-import { FEATURED_THEMES, THEME_CATALOG } from '../data/themes.js'
+import { FEATURED_THEMES, THEME_CATALOG, CINEMATIC_THEMES } from '../data/themes.js'
 import './LandingPage.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -174,11 +174,47 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ===== Cinematic collection (flagship tier) ===== */}
+      <section className="lp-section lp-cinematic" id="cinematic">
+        <div className="lp-container">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow lp-eyebrow-cine">✦ Koleksi Cinematic</p>
+            <h2>Undangan dengan animasi 3D yang hidup</h2>
+            <p>Koleksi eksklusif tertinggi kami — animasi 3D real-time yang bergerak: bintang, kelopak bunga, aurora, dan cahaya keemasan. Kesan pertama yang tak terlupakan saat undangan dibuka.</p>
+          </div>
+          <div className="lp-cine-grid">
+            {CINEMATIC_THEMES.map((t, i) => (
+              <motion.a
+                className="lp-cine-card"
+                key={t.id}
+                href={`/${t.demo}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                {...fade(i * 0.07)}
+              >
+                <div className={`lp-theme-preview lp-cine-preview ${t.preview}`}>
+                  <span className="tp-badge">✦ 3D</span>
+                  <span className="tp-label">The Wedding Of</span>
+                  <div className="tp-names lp-serif">Andini<span className="tp-amp">&amp;</span>Bagus</div>
+                  <div className="tp-rule" />
+                  <span className="tp-date">12 · 12 · 2026</span>
+                </div>
+                <div className="lp-cine-body">
+                  <h3>{t.name}</h3>
+                  <p>{t.desc}</p>
+                  <span className="lp-cine-link">Lihat Demo Animasi ↗</span>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== Themes ===== */}
       <section className="lp-section lp-themes" id="tema">
         <div className="lp-container">
           <div className="lp-section-head">
-            <p className="lp-eyebrow">Pilihan Tema</p>
+            <p className="lp-eyebrow">Koleksi Premium</p>
             <h2>{THEME_CATALOG.length} tema, satu kesan: mewah</h2>
             <p>Setiap tema dirancang dengan tipografi, warna, dan ornamen yang harmonis untuk menonjolkan momen kalian. Berikut beberapa favorit kami.</p>
           </div>

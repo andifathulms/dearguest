@@ -1,0 +1,114 @@
+/* ===== Shared structure for Cinematic (WebGL) themes =====
+   Theme-agnostic layout: the fixed canvas backdrop, frosted-glass content
+   cards, the live-3D cover, and adaptive-blur. Colours come from per-theme
+   CSS variables:
+     --cc-base      solid fallback bg behind the canvas
+     --cc-card      frosted card background (translucent)
+     --cc-border    card border colour
+     --cc-shadow    card shadow
+     --cc-veil      cover-gate veil gradient
+     --cc-vignette  edge vignette colour (rgba)
+   A theme also adds its own class for these selectors via `.cc-root`. */
+
+.cc-root { background: var(--cc-base, #070b1f) !important; }
+
+/* Hide a base theme's full-page decorative pseudo-backgrounds — the WebGL
+   scene is the background now. */
+.cc-root::before,
+.cc-root::after { display: none !important; }
+
+/* Fixed full-bleed WebGL backdrop, behind everything, non-interactive. */
+.cc-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.cc-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
+.cc-canvas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 92% 82% at 50% 36%, transparent 42%, var(--cc-vignette, rgba(4, 6, 18, 0.6)) 100%);
+}
+
+.cc-content { position: relative; z-index: 1; }
+
+/* Section wrappers see-through so the scene drifts behind them. */
+.cc-root .greeting-section,
+.cc-root .countdown-section,
+.cc-root .events-section,
+.cc-root .story-section,
+.cc-root .profile-section,
+.cc-root .gallery-section,
+.cc-root .amplod-section,
+.cc-root .rsvp-section,
+.cc-root .wishes-section,
+.cc-root .maps-section,
+.cc-root .livestream-section,
+.cc-root section:not(.hero-section) { background: transparent !important; }
+/* When there's no hero photo, let the scene show behind the hero text too. */
+.cc-root .hero-section:not(.has-photo) { background: transparent !important; }
+
+/* Frosted-glass cards. */
+.cc-root .event-card,
+.cc-root .bank-card,
+.cc-root .wish-card,
+.cc-root .rsvp-form,
+.cc-root .story-content,
+.cc-root .map-item,
+.cc-root .profile-card,
+.cc-root .countdown-unit,
+.cc-root .livestream-card {
+  background: var(--cc-card, rgba(13, 19, 48, 0.5)) !important;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border-color: var(--cc-border, rgba(216, 192, 116, 0.3)) !important;
+  box-shadow: var(--cc-shadow, 0 14px 40px -16px rgba(0, 0, 0, 0.7));
+}
+
+/* Cinematic cover: live 3D behind a frosted veil; no static corner ornaments. */
+.cc-root.cover-gate {
+  background: var(--cc-veil, linear-gradient(180deg, rgba(7, 11, 31, 0.5) 0%, rgba(7, 11, 31, 0.66) 100%)) !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.cc-root.cover-gate .cover-ornaments { display: none !important; }
+.cc-root.cover-gate .cover-inner {
+  background: var(--cc-card, rgba(13, 19, 48, 0.32)) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 18px;
+}
+
+/* Hide the body while the cover is up so the scene (not the hero) shows. */
+.cc-root .cc-content { transition: opacity 0.6s ease; }
+body.cover-open .cc-root .cc-content { opacity: 0; pointer-events: none; }
+
+/* Adaptive quality: drop the expensive blur on the low tier (more opaque
+   fill compensates). Capable devices keep the frosted glass. */
+.cc-root.cc-q-low .event-card,
+.cc-root.cc-q-low .bank-card,
+.cc-root.cc-q-low .wish-card,
+.cc-root.cc-q-low .rsvp-form,
+.cc-root.cc-q-low .story-content,
+.cc-root.cc-q-low .map-item,
+.cc-root.cc-q-low .profile-card,
+.cc-root.cc-q-low .countdown-unit,
+.cc-root.cc-q-low.cover-gate .cover-inner {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--cc-card-solid, var(--cc-card)) !important;
+}
+
+/* On very small screens, blur is costly — drop it, keep translucency. */
+@media (max-width: 560px) {
+  .cc-root .event-card,
+  .cc-root .bank-card,
+  .cc-root .wish-card,
+  .cc-root .rsvp-form,
+  .cc-root .story-content,
+  .cc-root .map-item,
+  .cc-root .profile-card,
+  .cc-root .countdown-unit {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--cc-card-solid, var(--cc-card)) !important;
+  }
+}

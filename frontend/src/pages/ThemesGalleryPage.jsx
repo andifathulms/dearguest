@@ -8,11 +8,13 @@ import './ThemesGalleryPage.css'
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
 const waOrder = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent('Halo, saya ingin memesan undangan digital')}`
 
+// 'Cinematic' filters by collection; everything else by category.
+const matchCat = (t, cat) =>
+  cat === 'Semua' ? true : cat === 'Cinematic' ? t.collection === 'cinematic' : t.category === cat
+
 export default function ThemesGalleryPage() {
   const [category, setCategory] = useState('Semua')
-  const list = category === 'Semua'
-    ? THEME_CATALOG
-    : THEME_CATALOG.filter(t => t.category === category)
+  const list = THEME_CATALOG.filter(t => matchCat(t, category))
 
   return (
     <div className="lp tg-page">
@@ -43,14 +45,14 @@ export default function ThemesGalleryPage() {
       <div className="tg-filter-wrap">
         <div className="lp-container tg-filter">
           {THEME_CATEGORIES.map(cat => {
-            const count = cat === 'Semua' ? THEME_CATALOG.length : THEME_CATALOG.filter(t => t.category === cat).length
+            const count = THEME_CATALOG.filter(t => matchCat(t, cat)).length
             return (
               <button
                 key={cat}
-                className={`tg-chip ${category === cat ? 'active' : ''}`}
+                className={`tg-chip ${category === cat ? 'active' : ''} ${cat === 'Cinematic' ? 'tg-chip-cine' : ''}`}
                 onClick={() => setCategory(cat)}
               >
-                {cat} <span className="tg-chip-count">{count}</span>
+                {cat === 'Cinematic' ? '✨ Cinematic' : cat} <span className="tg-chip-count">{count}</span>
               </button>
             )
           })}

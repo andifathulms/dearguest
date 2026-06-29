@@ -32,6 +32,10 @@ const THEMES = [
   { id: 'royal-purple', name: 'Royal Purple', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(203,163,90,0.18), transparent 60%), #1e1233', fg: '#efe9f5', accent: '#cba35a' },
   { id: 'marble-white', name: 'White Marble', bg: 'linear-gradient(160deg, #efece5, #f8f6f2)', fg: '#3a342a', accent: '#c2a35e' },
   { id: 'celestial-cinematic', name: 'Celestial 3D', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(216,192,116,0.18), transparent 62%), #070b1f', fg: '#eef0fa', accent: '#d8c074' },
+  { id: 'petals-3d', name: 'Enchanted Petals', bg: 'linear-gradient(160deg, #f7dde3, #fbeef0)', fg: '#4a2e34', accent: '#c4847a' },
+  { id: 'aurora-3d', name: 'Aurora Dream', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(63,182,160,0.22), transparent 62%), #070b1f', fg: '#e8f3f1', accent: '#3fb6a0' },
+  { id: 'golden-3d', name: 'Golden Aura', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(232,200,121,0.22), transparent 62%), #0c0c0e', fg: '#f2efe6', accent: '#e8c879' },
+  { id: 'clouds-3d', name: 'Ethereal Clouds', bg: 'linear-gradient(160deg, #dfe6f0, #eef1f6)', fg: '#3a342a', accent: '#c9a86a' },
 ]
 
 function slugify(s) {

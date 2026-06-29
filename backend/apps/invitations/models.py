@@ -38,6 +38,10 @@ class Invitation(models.Model):
         ('royal-purple', 'Royal Purple'),
         ('marble-white', 'White Marble'),
         ('celestial-cinematic', 'Celestial 3D'),
+        ('petals-3d', 'Enchanted Petals'),
+        ('aurora-3d', 'Aurora Dream'),
+        ('golden-3d', 'Golden Aura'),
+        ('clouds-3d', 'Ethereal Clouds'),
     ]
     TIER_CHOICES = [
         ('free', 'Gratis'),

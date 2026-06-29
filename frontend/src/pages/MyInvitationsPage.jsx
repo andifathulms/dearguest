@@ -36,6 +36,10 @@ const THEME_NAME = {
   'royal-purple': 'Royal Purple',
   'marble-white': 'White Marble',
   'celestial-cinematic': 'Celestial 3D',
+  'petals-3d': 'Enchanted Petals',
+  'aurora-3d': 'Aurora Dream',
+  'golden-3d': 'Golden Aura',
+  'clouds-3d': 'Ethereal Clouds',
 }
 const THEME_SWATCH = {
   'javanese-dark': 'linear-gradient(135deg,#1a1208,#c9a84c)',
@@ -66,6 +70,10 @@ const THEME_SWATCH = {
   'royal-purple': 'linear-gradient(135deg,#46276b,#cba35a)',
   'marble-white': 'linear-gradient(135deg,#d8d2c6,#c2a35e)',
   'celestial-cinematic': 'linear-gradient(135deg,#1b234e,#d8c074)',
+  'petals-3d': 'linear-gradient(135deg,#c4847a,#f3c0cd)',
+  'aurora-3d': 'linear-gradient(135deg,#3fb6a0,#7a5cc0)',
+  'golden-3d': 'linear-gradient(135deg,#0c0c0e,#e8c879)',
+  'clouds-3d': 'linear-gradient(135deg,#c9a86a,#eef1f6)',
 }
 
 function statusBadge(it) {

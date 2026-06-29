@@ -32,12 +32,20 @@ const themes = {
   'royal-purple': lazy(() => import('./RoyalPurple/index.jsx')),
   'marble-white': lazy(() => import('./MarbleWhite/index.jsx')),
   'celestial-cinematic': lazy(() => import('./CelestialCinematic/index.jsx')),
+  'petals-3d': lazy(() => import('./EnchantedPetals/index.jsx')),
+  'aurora-3d': lazy(() => import('./AuroraDream/index.jsx')),
+  'golden-3d': lazy(() => import('./GoldenAura/index.jsx')),
+  'clouds-3d': lazy(() => import('./EtherealClouds/index.jsx')),
 }
 
 // Themes that reuse another theme's cover-gate styling need that theme's class
 // on the cover too (the cover-gate selectors are scoped per theme).
 const COVER_CLASS = {
   'celestial-cinematic': 'midnight-celestial celestial-cinematic',
+  'petals-3d': 'floral-light petals-3d cc-root',
+  'aurora-3d': 'midnight-celestial aurora-3d cc-root',
+  'golden-3d': 'deco-noir golden-3d cc-root',
+  'clouds-3d': 'ivory-classic clouds-3d cc-root',
 }
 
 export default function ThemeRenderer({ invitation, guestName, preview = false }) {

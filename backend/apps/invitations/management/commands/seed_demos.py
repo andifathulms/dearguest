@@ -45,6 +45,10 @@ THEMES = [
     ('royal-purple', 'demo-ungu'),
     ('marble-white', 'demo-marmerputih'),
     ('celestial-cinematic', 'demo-celestial-3d'),
+    ('petals-3d', 'demo-petals-3d'),
+    ('aurora-3d', 'demo-aurora-3d'),
+    ('golden-3d', 'demo-golden-3d'),
+    ('clouds-3d', 'demo-clouds-3d'),
 ]
 
 
@@ -100,4 +104,4 @@ class Command(BaseCommand):
             BankAccount.objects.create(invitation=inv, account_type='bank', bank_name='BCA', account_number='1234567890', account_name='Andini', order=0)
             BankAccount.objects.create(invitation=inv, account_type='ewallet', bank_name='GoPay', account_number='081234567890', account_name='Bagus', order=1)
             self.stdout.write(f'  demo ready: /{slug} ({theme})')
-        self.stdout.write(self.style.SUCCESS('All 28 demo invitations seeded.'))
+        self.stdout.write(self.style.SUCCESS('All 32 demo invitations seeded.'))

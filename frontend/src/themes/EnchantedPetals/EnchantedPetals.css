@@ -1,0 +1,10 @@
+/* Enchanted Petals — light blush cinematic. Colours for the shared structure. */
+.petals-3d {
+  --cc-base: #fbeef0;
+  --cc-card: rgba(255, 250, 251, 0.5);
+  --cc-card-solid: rgba(255, 250, 251, 0.88);
+  --cc-border: rgba(196, 132, 122, 0.32);
+  --cc-shadow: 0 14px 40px -16px rgba(120, 60, 70, 0.32);
+  --cc-veil: linear-gradient(180deg, rgba(251, 238, 240, 0.42) 0%, rgba(251, 238, 240, 0.64) 100%);
+  --cc-vignette: rgba(150, 100, 110, 0.32);
+}

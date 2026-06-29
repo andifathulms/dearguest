@@ -28,11 +28,18 @@ export const THEME_CATALOG = [
   { id: 'mono-editorial', name: 'Editorial Mono', desc: 'Editorial monokrom hitam-putih dengan tipografi tegas.', preview: 'tp-mono', demo: 'demo-mono', colors: ['#ffffff', '#111111', '#777777'], category: 'Modern' },
   { id: 'royal-purple', name: 'Royal Purple', desc: 'Megah dan regal dengan ungu kerajaan dan emas.', preview: 'tp-purple', demo: 'demo-ungu', colors: ['#1e1233', '#cba35a', '#46276b'], category: 'Elegan & Mewah' },
   { id: 'marble-white', name: 'White Marble', desc: 'Mewah dan bersih dengan tekstur marmer putih dan emas.', preview: 'tp-marble', demo: 'demo-marmerputih', colors: ['#f8f6f2', '#c2a35e', '#d8d2c6'], category: 'Klasik' },
-  { id: 'celestial-cinematic', name: 'Celestial 3D', desc: 'Animasi 3D sinematik dengan bintang bergerak, debu emas, dan bulan bercahaya.', preview: 'tp-midnight', demo: 'demo-celestial-3d', colors: ['#070b1f', '#d8c074', '#1b234e'], category: 'Elegan & Mewah', badge: '3D' },
+  { id: 'celestial-cinematic', name: 'Celestial 3D', desc: 'Animasi 3D sinematik dengan bintang bergerak, debu emas, dan bulan bercahaya.', preview: 'tp-midnight', demo: 'demo-celestial-3d', colors: ['#070b1f', '#d8c074', '#1b234e'], category: 'Elegan & Mewah', collection: 'cinematic', badge: '3D' },
+  { id: 'petals-3d', name: 'Enchanted Petals', desc: 'Animasi 3D — kelopak bunga berguguran dengan cahaya bokeh lembut.', preview: 'tp-petals', demo: 'demo-petals-3d', colors: ['#fbeef0', '#c4847a', '#e8b9c2'], category: 'Floral & Lembut', collection: 'cinematic', badge: '3D' },
+  { id: 'aurora-3d', name: 'Aurora Dream', desc: 'Animasi 3D — pita aurora mengalir di langit malam berbintang.', preview: 'tp-aurora', demo: 'demo-aurora-3d', colors: ['#070b1f', '#3fb6a0', '#7a5cc0'], category: 'Elegan & Mewah', collection: 'cinematic', badge: '3D' },
+  { id: 'golden-3d', name: 'Golden Aura', desc: 'Animasi 3D — bola cahaya emas dan kilau mewah yang berkilauan.', preview: 'tp-golden', demo: 'demo-golden-3d', colors: ['#0c0c0e', '#e8c879', '#cda349'], category: 'Elegan & Mewah', collection: 'cinematic', badge: '3D' },
+  { id: 'clouds-3d', name: 'Ethereal Clouds', desc: 'Animasi 3D — awan lembut melayang dengan cahaya keemasan surgawi.', preview: 'tp-clouds', demo: 'demo-clouds-3d', colors: ['#eef1f6', '#c9a86a', '#e3d2ac'], category: 'Klasik', collection: 'cinematic', badge: '3D' },
 ]
 
+// The animated WebGL "Cinematic" collection — the flagship tier above Premium.
+export const CINEMATIC_THEMES = THEME_CATALOG.filter(t => t.collection === 'cinematic')
+
 // Filter categories for the gallery (order matters; "Semua" first).
-export const THEME_CATEGORIES = ['Semua', 'Elegan & Mewah', 'Floral & Lembut', 'Klasik', 'Modern', 'Rustic & Botani']
+export const THEME_CATEGORIES = ['Semua', 'Cinematic', 'Elegan & Mewah', 'Floral & Lembut', 'Klasik', 'Modern', 'Rustic & Botani']
 
 // A curated, visually diverse 6 surfaced on the landing page — leading with
 // the most striking statement themes, balanced dark/light.
