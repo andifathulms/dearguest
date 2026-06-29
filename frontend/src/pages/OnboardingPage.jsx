@@ -10,6 +10,9 @@ const THEMES = [
   { id: 'luxury-emerald', name: 'Zamrud Mewah', bg: 'radial-gradient(ellipse at center, rgba(212,175,90,0.14), #0e1f17 75%)', fg: '#d4af5a', accent: '#b6a06a' },
   { id: 'rustic-kraft', name: 'Rustic Kraft', bg: 'linear-gradient(160deg,#e9ddc8,#f3ece0)', fg: '#3a3026', accent: '#7c8b6b' },
   { id: 'boho-terracotta', name: 'Senja Terakota', bg: 'radial-gradient(ellipse at 50% 120%, rgba(192,106,77,0.28), #fbf3ea 70%)', fg: '#4a2f24', accent: '#c06a4d' },
+  { id: 'burgundy-gold', name: 'Marun Anggun', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(203,163,90,0.18), transparent 60%), #2a0e16', fg: '#f4e7df', accent: '#cba35a' },
+  { id: 'dusty-blue', name: 'Biru Senja', bg: 'linear-gradient(160deg, #e3eaf0, #eef2f6)', fg: '#2b3a47', accent: '#6e88a6' },
+  { id: 'midnight-celestial', name: 'Langit Malam', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(216,192,116,0.16), transparent 62%), #0d1330', fg: '#eef0fa', accent: '#d8c074' },
 ]
 
 function slugify(s) {

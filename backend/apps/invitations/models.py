@@ -16,6 +16,9 @@ class Invitation(models.Model):
         ('luxury-emerald', 'Zamrud Mewah'),
         ('rustic-kraft', 'Rustic Kraft'),
         ('boho-terracotta', 'Senja Terakota'),
+        ('burgundy-gold', 'Marun Anggun'),
+        ('dusty-blue', 'Biru Senja'),
+        ('midnight-celestial', 'Langit Malam'),
     ]
     TIER_CHOICES = [
         ('free', 'Gratis'),

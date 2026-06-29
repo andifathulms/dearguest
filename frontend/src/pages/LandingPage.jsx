@@ -24,7 +24,7 @@ const Icon = {
 }
 
 const features = [
-  { icon: Icon.palette, title: '6 Tema Eksklusif', desc: 'Dari Javanese emas, floral, minimalis, hingga zamrud mewah, rustic, dan terakota — semua dengan palet premium.' },
+  { icon: Icon.palette, title: '9 Tema Eksklusif', desc: 'Dari Javanese emas, floral, minimalis, zamrud, rustic, terakota, hingga marun, biru senja, dan langit malam — semua dengan palet premium.' },
   { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
   { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
   { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
@@ -41,6 +41,9 @@ const themes = [
   { id: 'luxury-emerald', name: 'Zamrud Mewah', desc: 'Mewah dengan zamrud gelap dan aksen emas yang berkilau.', preview: 'tp-emerald', demo: 'demo-emerald', colors: ['#0e1f17', '#d4af5a', '#1f4d3a'] },
   { id: 'rustic-kraft', name: 'Rustic Kraft', desc: 'Hangat dan natural dengan nuansa kertas kraft & dedaunan.', preview: 'tp-kraft', demo: 'demo-rustic', colors: ['#f3ece0', '#7c8b6b', '#b9694f'] },
   { id: 'boho-terracotta', name: 'Senja Terakota', desc: 'Bohemian hangat dengan gradasi terakota dan senja.', preview: 'tp-boho', demo: 'demo-boho', colors: ['#fbf3ea', '#c06a4d', '#d8b48a'] },
+  { id: 'burgundy-gold', name: 'Marun Anggun', desc: 'Mewah dengan nuansa marun anggur dan kilau emas.', preview: 'tp-burgundy', demo: 'demo-marun', colors: ['#2a0e16', '#cba35a', '#6e1f31'] },
+  { id: 'dusty-blue', name: 'Biru Senja', desc: 'Elegan dan tenang dengan biru dusty pada latar krem.', preview: 'tp-blue', demo: 'demo-biru', colors: ['#eef2f6', '#6e88a6', '#2c3a47'] },
+  { id: 'midnight-celestial', name: 'Langit Malam', desc: 'Romantis dengan langit malam, bintang, dan aksen emas.', preview: 'tp-midnight', demo: 'demo-langit', colors: ['#0d1330', '#d8c074', '#1b234e'] },
 ]
 
 const steps = [

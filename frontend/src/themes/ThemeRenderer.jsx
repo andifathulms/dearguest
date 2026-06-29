@@ -10,6 +10,9 @@ const themes = {
   'luxury-emerald': lazy(() => import('./LuxuryEmerald/index.jsx')),
   'rustic-kraft': lazy(() => import('./RusticKraft/index.jsx')),
   'boho-terracotta': lazy(() => import('./BohoTerracotta/index.jsx')),
+  'burgundy-gold': lazy(() => import('./BurgundyGold/index.jsx')),
+  'dusty-blue': lazy(() => import('./DustyBlue/index.jsx')),
+  'midnight-celestial': lazy(() => import('./MidnightCelestial/index.jsx')),
 }
 
 export default function ThemeRenderer({ invitation, guestName, preview = false }) {

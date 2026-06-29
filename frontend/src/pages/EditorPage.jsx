@@ -14,6 +14,9 @@ const THEMES = [
   ['luxury-emerald', 'Zamrud Mewah'],
   ['rustic-kraft', 'Rustic Kraft'],
   ['boho-terracotta', 'Senja Terakota'],
+  ['burgundy-gold', 'Marun Anggun'],
+  ['dusty-blue', 'Biru Senja'],
+  ['midnight-celestial', 'Langit Malam'],
 ]
 
 /* ---------------- Settings ---------------- */

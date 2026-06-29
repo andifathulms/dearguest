@@ -9,6 +9,9 @@ const THEMES = [
   'demo-emerald',
   'demo-rustic',
   'demo-boho',
+  'demo-marun',
+  'demo-biru',
+  'demo-langit',
 ]
 
 for (const slug of THEMES) {

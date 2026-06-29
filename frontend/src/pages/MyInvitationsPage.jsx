@@ -14,6 +14,9 @@ const THEME_NAME = {
   'luxury-emerald': 'Zamrud Mewah',
   'rustic-kraft': 'Rustic Kraft',
   'boho-terracotta': 'Senja Terakota',
+  'burgundy-gold': 'Marun Anggun',
+  'dusty-blue': 'Biru Senja',
+  'midnight-celestial': 'Langit Malam',
 }
 const THEME_SWATCH = {
   'javanese-dark': 'linear-gradient(135deg,#1a1208,#c9a84c)',
@@ -22,6 +25,9 @@ const THEME_SWATCH = {
   'luxury-emerald': 'linear-gradient(135deg,#0e1f17,#d4af5a)',
   'rustic-kraft': 'linear-gradient(135deg,#7c8b6b,#c9b48f)',
   'boho-terracotta': 'linear-gradient(135deg,#c06a4d,#d8b48a)',
+  'burgundy-gold': 'linear-gradient(135deg,#6e1f31,#cba35a)',
+  'dusty-blue': 'linear-gradient(135deg,#6e88a6,#b9c4cf)',
+  'midnight-celestial': 'linear-gradient(135deg,#1b234e,#d8c074)',
 }
 
 function statusBadge(it) {
