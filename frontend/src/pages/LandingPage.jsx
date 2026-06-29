@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../api/client.js'
+import { FEATURED_THEMES, THEME_CATALOG } from '../data/themes.js'
 import './LandingPage.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -24,7 +25,7 @@ const Icon = {
 }
 
 const features = [
-  { icon: Icon.palette, title: '9 Tema Eksklusif', desc: 'Dari Javanese emas, floral, minimalis, zamrud, rustic, terakota, hingga marun, biru senja, dan langit malam — semua dengan palet premium.' },
+  { icon: Icon.palette, title: '18 Tema Eksklusif', desc: 'Dari Javanese emas, floral, minimalis, zamrud, hingga marun, langit malam, arabesque, dan banyak lagi — semua dengan palet premium.' },
   { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
   { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
   { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
@@ -32,18 +33,6 @@ const features = [
   { icon: Icon.gallery, title: 'Galeri & Kisah', desc: 'Bagikan momen prewedding dan perjalanan cinta kalian dalam galeri yang elegan.' },
   { icon: Icon.chart, title: 'Dashboard RSVP', desc: 'Pantau konfirmasi tamu real-time dan unduh data sebagai CSV kapan saja.' },
   { icon: Icon.heart, title: 'Doa & Ucapan', desc: 'Dinding ucapan langsung dari tamu, tampil cantik dan diperbarui otomatis.' },
-]
-
-const themes = [
-  { id: 'javanese-dark', name: 'Javanese Malam Emas', desc: 'Elegan dengan sentuhan emas pada latar gelap tembakau.', preview: 'tp-javanese', demo: 'demo-javanese', colors: ['#1a1208', '#c9a84c', '#f5eed6'] },
-  { id: 'floral-light', name: 'Taman Bunga', desc: 'Romantis dengan nuansa mawar pada latar putih blush.', preview: 'tp-floral', demo: 'demo-floral', colors: ['#fdf8f5', '#c4847a', '#f7ede8'] },
-  { id: 'modern-minimalist', name: 'Minimalis Putih', desc: 'Bersih dan modern dengan aksen sage yang menenangkan.', preview: 'tp-modern', demo: 'demo-minimalis', colors: ['#ffffff', '#1f1f1f', '#8a9e8a'] },
-  { id: 'luxury-emerald', name: 'Zamrud Mewah', desc: 'Mewah dengan zamrud gelap dan aksen emas yang berkilau.', preview: 'tp-emerald', demo: 'demo-emerald', colors: ['#0e1f17', '#d4af5a', '#1f4d3a'] },
-  { id: 'rustic-kraft', name: 'Rustic Kraft', desc: 'Hangat dan natural dengan nuansa kertas kraft & dedaunan.', preview: 'tp-kraft', demo: 'demo-rustic', colors: ['#f3ece0', '#7c8b6b', '#b9694f'] },
-  { id: 'boho-terracotta', name: 'Senja Terakota', desc: 'Bohemian hangat dengan gradasi terakota dan senja.', preview: 'tp-boho', demo: 'demo-boho', colors: ['#fbf3ea', '#c06a4d', '#d8b48a'] },
-  { id: 'burgundy-gold', name: 'Marun Anggun', desc: 'Mewah dengan nuansa marun anggur dan kilau emas.', preview: 'tp-burgundy', demo: 'demo-marun', colors: ['#2a0e16', '#cba35a', '#6e1f31'] },
-  { id: 'dusty-blue', name: 'Biru Senja', desc: 'Elegan dan tenang dengan biru dusty pada latar krem.', preview: 'tp-blue', demo: 'demo-biru', colors: ['#eef2f6', '#6e88a6', '#2c3a47'] },
-  { id: 'midnight-celestial', name: 'Langit Malam', desc: 'Romantis dengan langit malam, bintang, dan aksen emas.', preview: 'tp-midnight', demo: 'demo-langit', colors: ['#0d1330', '#d8c074', '#1b234e'] },
 ]
 
 const steps = [
@@ -190,11 +179,11 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-section-head">
             <p className="lp-eyebrow">Pilihan Tema</p>
-            <h2>Tiga karakter, satu kesan: mewah</h2>
-            <p>Setiap tema dirancang dengan tipografi, warna, dan ornamen yang harmonis untuk menonjolkan momen kalian.</p>
+            <h2>18 tema, satu kesan: mewah</h2>
+            <p>Setiap tema dirancang dengan tipografi, warna, dan ornamen yang harmonis untuk menonjolkan momen kalian. Berikut beberapa favorit kami.</p>
           </div>
           <div className="lp-theme-grid">
-            {themes.map((t, i) => (
+            {FEATURED_THEMES.map((t, i) => (
               <motion.div className="lp-theme-card" key={t.id} {...fade(i * 0.08)}>
                 <div className={`lp-theme-preview ${t.preview}`}>
                   <span className="tp-label">The Wedding Of</span>
@@ -214,6 +203,11 @@ export default function LandingPage() {
                 </div>
               </motion.div>
             ))}
+          </div>
+          <div className="lp-themes-more">
+            <Link className="lp-btn lp-btn-primary" to="/tema">
+              Jelajahi Semua {THEME_CATALOG.length} Tema {Icon.palette}
+            </Link>
           </div>
         </div>
       </section>

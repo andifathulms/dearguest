@@ -1,0 +1,113 @@
+/* ===== Themes gallery page (/tema) ===== */
+.tg-page { min-height: 100vh; background: var(--cream); padding-bottom: 2rem; }
+
+.tg-header { padding: 3rem 0 1.5rem; text-align: center; }
+.tg-back {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.tg-back:hover { color: var(--gold); }
+.tg-header h1 {
+  font-weight: 500;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.tg-sub {
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+/* Sticky filter bar */
+.tg-filter-wrap {
+  position: sticky;
+  top: 68px;
+  z-index: 40;
+  background: rgba(250, 246, 241, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 1rem 0;
+  margin-top: 1.5rem;
+}
+.tg-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+.tg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+.tg-chip:hover { border-color: var(--gold); color: var(--ink); transform: translateY(-1px); }
+.tg-chip.active {
+  background: linear-gradient(135deg, #c79a52, #a87d3d);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(168, 125, 61, 0.28);
+}
+.tg-chip-count {
+  font-size: 0.72rem;
+  opacity: 0.7;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+}
+.tg-chip.active .tg-chip-count { background: rgba(255, 255, 255, 0.25); opacity: 0.95; }
+
+.tg-grid-section { padding-top: 2.5rem; }
+
+/* Card head with category tag */
+.tg-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+.tg-card-cat {
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.18rem 0.6rem;
+}
+
+/* Bottom CTA */
+.tg-cta {
+  text-align: center;
+  padding: 3rem 0 2rem;
+}
+.tg-cta h2 {
+  font-weight: 500;
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  margin-bottom: 0.7rem;
+}
+.tg-cta p { color: var(--ink-soft); margin-bottom: 1.6rem; }
+
+@media (max-width: 560px) {
+  .tg-filter-wrap { top: 60px; }
+  .tg-chip { padding: 0.45rem 0.85rem; font-size: 0.8rem; }
+}

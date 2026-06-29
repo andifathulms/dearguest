@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // Route-level code splitting: each page (and its deps) loads on demand,
 // so a guest opening an invitation never downloads the editor/cropper/etc.
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'))
+const ThemesGalleryPage = lazy(() => import('./pages/ThemesGalleryPage.jsx'))
 const DashboardLogin = lazy(() => import('./pages/DashboardLogin.jsx'))
 const DashboardRSVP = lazy(() => import('./pages/DashboardRSVP.jsx'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'))
@@ -28,6 +29,7 @@ export default function App() {
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/tema" element={<ThemesGalleryPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<DashboardLogin />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
