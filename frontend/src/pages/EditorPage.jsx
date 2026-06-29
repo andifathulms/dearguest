@@ -17,6 +17,15 @@ const THEMES = [
   ['burgundy-gold', 'Marun Anggun'],
   ['dusty-blue', 'Biru Senja'],
   ['midnight-celestial', 'Langit Malam'],
+  ['sage-botanical', 'Kebun Sage'],
+  ['mauve-rose', 'Mauve Anggun'],
+  ['ivory-classic', 'Klasik Gading'],
+  ['tropical-green', 'Tropis Hijau'],
+  ['lavender-dream', 'Lembayung'],
+  ['coral-peach', 'Koral Hangat'],
+  ['charcoal-marble', 'Marmer Arang'],
+  ['islamic-arabesque', 'Arabesque Emas'],
+  ['navy-gold', 'Navy Klasik'],
 ]
 
 /* ---------------- Settings ---------------- */

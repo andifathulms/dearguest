@@ -13,6 +13,15 @@ const THEMES = [
   { id: 'burgundy-gold', name: 'Marun Anggun', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(203,163,90,0.18), transparent 60%), #2a0e16', fg: '#f4e7df', accent: '#cba35a' },
   { id: 'dusty-blue', name: 'Biru Senja', bg: 'linear-gradient(160deg, #e3eaf0, #eef2f6)', fg: '#2b3a47', accent: '#6e88a6' },
   { id: 'midnight-celestial', name: 'Langit Malam', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(216,192,116,0.16), transparent 62%), #0d1330', fg: '#eef0fa', accent: '#d8c074' },
+  { id: 'sage-botanical', name: 'Kebun Sage', bg: 'linear-gradient(160deg, #e2eadd, #eef2ea)', fg: '#2c3a2c', accent: '#7d9471' },
+  { id: 'mauve-rose', name: 'Mauve Anggun', bg: 'linear-gradient(160deg, #ece0e4, #f6eef0)', fg: '#3a2a30', accent: '#b07c8a' },
+  { id: 'ivory-classic', name: 'Klasik Gading', bg: 'linear-gradient(160deg, #efe6d4, #f7f1e6)', fg: '#3d3324', accent: '#c9a86a' },
+  { id: 'tropical-green', name: 'Tropis Hijau', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(216,182,90,0.18), transparent 60%), #0f2417', fg: '#eef3ea', accent: '#d8b65a' },
+  { id: 'lavender-dream', name: 'Lembayung', bg: 'linear-gradient(160deg, #e6def2, #f1edf7)', fg: '#322a40', accent: '#8a76b0' },
+  { id: 'coral-peach', name: 'Koral Hangat', bg: 'linear-gradient(160deg, #f8ded2, #fdf0ea)', fg: '#43291f', accent: '#e08a6a' },
+  { id: 'charcoal-marble', name: 'Marmer Arang', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(201,168,106,0.16), transparent 60%), #1e1e22', fg: '#f0f0f2', accent: '#c9a86a' },
+  { id: 'islamic-arabesque', name: 'Arabesque Emas', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(212,175,90,0.18), transparent 60%), #0e2a24', fg: '#f1ece0', accent: '#d4af5a' },
+  { id: 'navy-gold', name: 'Navy Klasik', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(201,168,106,0.16), transparent 62%), #101a33', fg: '#eef1f8', accent: '#c9a86a' },
 ]
 
 function slugify(s) {
