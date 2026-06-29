@@ -79,12 +79,32 @@
   box-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.7);
 }
 
-/* Cover gate gets a frosted inner card too (it renders the midnight-celestial
-   cover styling via the combined class passed from ThemeRenderer). */
+/* Cinematic cover: instead of an opaque panel with flat corner constellations,
+   show the LIVE 3D sky behind a frosted dark veil. */
+.celestial-cinematic.cover-gate {
+  background: linear-gradient(180deg, rgba(7, 11, 31, 0.5) 0%, rgba(7, 11, 31, 0.66) 100%) !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+/* Drop the static SVG corner constellations — the real 3D ones replace them. */
+.celestial-cinematic.cover-gate .cover-ornaments {
+  display: none !important;
+}
+/* Frosted guest card on the cover. */
 .celestial-cinematic.cover-gate .cover-inner {
-  background: rgba(13, 19, 48, 0.45) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(13, 19, 48, 0.32) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 18px;
+}
+/* While the cover is up, hide the invitation body so the starfield — not the
+   hero — is what shows through the translucent cover (canvas stays visible). */
+.celestial-cinematic .cc-content {
+  transition: opacity 0.6s ease;
+}
+body.cover-open .celestial-cinematic .cc-content {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* On very small screens, blur is expensive — drop it, keep translucency. */
