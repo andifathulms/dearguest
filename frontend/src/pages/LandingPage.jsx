@@ -338,6 +338,36 @@ export default function LandingPage() {
               )
             })}
           </div>
+
+          {/* Cinematic collection — premium add-on / top tier */}
+          <motion.div className="lp-cine-upsell" {...fade(0.1)}>
+            <div className="lp-cine-upsell-main">
+              <p className="lp-eyebrow lp-eyebrow-cine">✦ Koleksi Cinematic</p>
+              <h3>Upgrade ke undangan animasi 3D</h3>
+              <p>5 tema eksklusif dengan animasi WebGL real-time — bintang, kelopak bunga, aurora, dan cahaya emas yang bergerak. Kesan pertama paling memukau saat undangan dibuka.</p>
+              <ul className="lp-cine-upsell-feats">
+                <li>{Icon.check}<span>Semua fitur paket Premium</span></li>
+                <li>{Icon.check}<span>5 tema animasi 3D (Celestial, Aurora, Petals, Golden, Clouds)</span></li>
+                <li>{Icon.check}<span>Efek bergerak real-time + animasi saat scroll</span></li>
+              </ul>
+            </div>
+            <div className="lp-cine-upsell-buy">
+              <div className="lp-cine-price">
+                <span className="lp-cine-was">Rp499.000</span>
+                <span className="lp-cine-now"><small>Rp</small>{pct ? Math.round(299 * (1 - pct / 100)) : 299}.000</span>
+                <span className="lp-cine-per">/ undangan</span>
+              </div>
+              <a
+                href={wa(`Halo, saya tertarik dengan Koleksi Cinematic (tema animasi 3D)${pct ? ` (kode promo ${coupon.code})` : ''}`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lp-btn lp-btn-cine"
+              >
+                Pilih Cinematic
+              </a>
+              <a href="#cinematic" className="lp-cine-upsell-link">Lihat 5 tema animasi ↑</a>
+            </div>
+          </motion.div>
         </div>
       </section>
 
