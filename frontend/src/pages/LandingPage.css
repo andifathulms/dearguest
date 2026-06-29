@@ -592,3 +592,54 @@
 /* "Jelajahi semua tema" button under the featured grid */
 .lp-themes-more { text-align: center; margin-top: 3rem; }
 .lp-themes-more .lp-btn svg { width: 18px; height: 18px; }
+
+/* ===== Preview palettes — 9 more themes (27 total) ===== */
+.tp-plum { background: radial-gradient(ellipse 80% 70% at center, rgba(203,163,90,0.16) 0%, transparent 60%), #241026; color: #f3e8f0; }
+.tp-plum .tp-names { font-family: 'Playfair Display', serif; font-style: italic; color: #cba35a; }
+.tp-plum .tp-amp, .tp-plum .tp-label, .tp-plum .tp-date { color: #b89ab5; }
+.tp-plum .tp-rule { background: #cba35a; }
+
+.tp-teal { background: radial-gradient(ellipse 80% 70% at center, rgba(214,180,92,0.16) 0%, transparent 60%), #07252b; color: #e8f3f1; }
+.tp-teal .tp-names { font-family: 'Playfair Display', serif; font-style: italic; color: #d6b45c; }
+.tp-teal .tp-amp, .tp-teal .tp-label, .tp-teal .tp-date { color: #94b3b0; }
+.tp-teal .tp-rule { background: #d6b45c; }
+
+.tp-deco { background: radial-gradient(ellipse 80% 70% at center, rgba(205,163,73,0.18) 0%, transparent 60%), #0c0c0e; color: #f2efe6; }
+.tp-deco .tp-names { font-family: 'Cinzel', serif; letter-spacing: 0.04em; color: #cda349; }
+.tp-deco .tp-amp, .tp-deco .tp-label, .tp-deco .tp-date { color: #9a968c; }
+.tp-deco .tp-rule { background: #cda349; }
+
+.tp-sunflower { background: linear-gradient(160deg, #f7ebc8, #fdf6e3); color: #3d3018; }
+.tp-sunflower .tp-names { font-family: 'Playfair Display', serif; color: #8a6418; }
+.tp-sunflower .tp-amp, .tp-sunflower .tp-label { color: #d49a2a; }
+.tp-sunflower .tp-date { color: #8a7340; }
+.tp-sunflower .tp-rule { background: #d49a2a; }
+
+.tp-beige { background: linear-gradient(160deg, #e8dfd2, #f3ede4); color: #4a4136; }
+.tp-beige .tp-names { font-family: 'Cormorant Garamond', serif; color: #6b5f4e; }
+.tp-beige .tp-amp, .tp-beige .tp-label { color: #a89a86; }
+.tp-beige .tp-date { color: #8a7f70; }
+.tp-beige .tp-rule { background: #a89a86; }
+
+.tp-rosegold { background: linear-gradient(160deg, #f3ddd3, #fbeee9); color: #4a2e28; }
+.tp-rosegold .tp-names { font-family: 'Playfair Display', serif; color: #9c5a4a; }
+.tp-rosegold .tp-amp, .tp-rosegold .tp-label { color: #c98a76; }
+.tp-rosegold .tp-date { color: #9c7468; }
+.tp-rosegold .tp-rule { background: #c98a76; }
+
+.tp-mono { background: linear-gradient(160deg, #f4f4f4, #ffffff); color: #141414; }
+.tp-mono .tp-names { font-family: 'Playfair Display', serif; font-weight: 700; color: #111111; }
+.tp-mono .tp-amp, .tp-mono .tp-label { color: #555555; }
+.tp-mono .tp-date { color: #777777; }
+.tp-mono .tp-rule { background: #111111; }
+
+.tp-purple { background: radial-gradient(ellipse 80% 70% at center, rgba(203,163,90,0.16) 0%, transparent 60%), #1e1233; color: #efe9f5; }
+.tp-purple .tp-names { font-family: 'Playfair Display', serif; font-style: italic; color: #cba35a; }
+.tp-purple .tp-amp, .tp-purple .tp-label, .tp-purple .tp-date { color: #ada0c4; }
+.tp-purple .tp-rule { background: #cba35a; }
+
+.tp-marble { background: linear-gradient(160deg, #efece5, #f8f6f2); color: #3a342a; }
+.tp-marble .tp-names { font-family: 'Cormorant Garamond', serif; font-style: italic; color: #6b5a32; }
+.tp-marble .tp-amp, .tp-marble .tp-label { color: #c2a35e; }
+.tp-marble .tp-date { color: #8a8270; }
+.tp-marble .tp-rule { background: #c2a35e; }

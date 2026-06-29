@@ -26,6 +26,15 @@ const THEME_NAME = {
   'charcoal-marble': 'Marmer Arang',
   'islamic-arabesque': 'Arabesque Emas',
   'navy-gold': 'Navy Klasik',
+  'plum-gold': 'Plum Anggur',
+  'teal-ocean': 'Teal Samudra',
+  'deco-noir': 'Deco Hitam Emas',
+  'sunflower-mustard': 'Bunga Matahari',
+  'beige-korean': 'Aesthetic Beige',
+  'rose-gold': 'Rose Gold',
+  'mono-editorial': 'Editorial Mono',
+  'royal-purple': 'Ungu Kerajaan',
+  'marble-white': 'Marmer Putih',
 }
 const THEME_SWATCH = {
   'javanese-dark': 'linear-gradient(135deg,#1a1208,#c9a84c)',
@@ -46,6 +55,15 @@ const THEME_SWATCH = {
   'charcoal-marble': 'linear-gradient(135deg,#2a2a30,#b8b8c0)',
   'islamic-arabesque': 'linear-gradient(135deg,#1f6b56,#d4af5a)',
   'navy-gold': 'linear-gradient(135deg,#2a3f66,#c9a86a)',
+  'plum-gold': 'linear-gradient(135deg,#5a2a5e,#cba35a)',
+  'teal-ocean': 'linear-gradient(135deg,#1f6b6b,#d6b45c)',
+  'deco-noir': 'linear-gradient(135deg,#16161a,#cda349)',
+  'sunflower-mustard': 'linear-gradient(135deg,#d49a2a,#f7ebc8)',
+  'beige-korean': 'linear-gradient(135deg,#a89a86,#e8dfd2)',
+  'rose-gold': 'linear-gradient(135deg,#c98a76,#e6b9a8)',
+  'mono-editorial': 'linear-gradient(135deg,#111111,#bbbbbb)',
+  'royal-purple': 'linear-gradient(135deg,#46276b,#cba35a)',
+  'marble-white': 'linear-gradient(135deg,#d8d2c6,#c2a35e)',
 }
 
 function statusBadge(it) {

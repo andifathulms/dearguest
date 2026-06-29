@@ -22,6 +22,15 @@ const themes = {
   'charcoal-marble': lazy(() => import('./CharcoalMarble/index.jsx')),
   'islamic-arabesque': lazy(() => import('./IslamicArabesque/index.jsx')),
   'navy-gold': lazy(() => import('./NavyGold/index.jsx')),
+  'plum-gold': lazy(() => import('./PlumGold/index.jsx')),
+  'teal-ocean': lazy(() => import('./TealOcean/index.jsx')),
+  'deco-noir': lazy(() => import('./DecoNoir/index.jsx')),
+  'sunflower-mustard': lazy(() => import('./SunflowerMustard/index.jsx')),
+  'beige-korean': lazy(() => import('./BeigeKorean/index.jsx')),
+  'rose-gold': lazy(() => import('./RoseGold/index.jsx')),
+  'mono-editorial': lazy(() => import('./MonoEditorial/index.jsx')),
+  'royal-purple': lazy(() => import('./RoyalPurple/index.jsx')),
+  'marble-white': lazy(() => import('./MarbleWhite/index.jsx')),
 }
 
 export default function ThemeRenderer({ invitation, guestName, preview = false }) {

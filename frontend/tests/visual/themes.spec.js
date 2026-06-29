@@ -21,6 +21,15 @@ const THEMES = [
   'demo-marmer',
   'demo-arabesque',
   'demo-navy',
+  'demo-plum',
+  'demo-teal',
+  'demo-deco',
+  'demo-matahari',
+  'demo-beige',
+  'demo-rosegold',
+  'demo-mono',
+  'demo-ungu',
+  'demo-marmerputih',
 ]
 
 for (const slug of THEMES) {

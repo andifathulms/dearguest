@@ -25,7 +25,7 @@ const Icon = {
 }
 
 const features = [
-  { icon: Icon.palette, title: '18 Tema Eksklusif', desc: 'Dari Javanese emas, floral, minimalis, zamrud, hingga marun, langit malam, arabesque, dan banyak lagi — semua dengan palet premium.' },
+  { icon: Icon.palette, title: `${THEME_CATALOG.length} Tema Eksklusif`, desc: 'Dari Javanese emas, floral, dan minimalis hingga zamrud, marun, langit malam, arabesque, art deco, dan rose gold — semua dengan palet premium.' },
   { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
   { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
   { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
@@ -145,7 +145,7 @@ export default function LandingPage() {
             </a>
           </motion.div>
           <motion.div className="lp-hero-trust" {...fade(0.25)}>
-            <div><strong>6</strong> Tema Eksklusif</div>
+            <div><strong>{THEME_CATALOG.length}</strong> Tema Eksklusif</div>
             <div><strong>1–2</strong> Hari Pengerjaan</div>
             <div><strong>100%</strong> Responsif di HP</div>
           </motion.div>
@@ -157,7 +157,7 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-stats-grid">
             {[
-              { value: '6', label: 'Tema Eksklusif' },
+              { value: `${THEME_CATALOG.length}`, label: 'Tema Eksklusif' },
               { value: '100%', label: 'Optimal di HP' },
               { value: '24 jam', label: 'Pengerjaan' },
               { value: '0', label: 'Kertas Terbuang' },
@@ -179,7 +179,7 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-section-head">
             <p className="lp-eyebrow">Pilihan Tema</p>
-            <h2>18 tema, satu kesan: mewah</h2>
+            <h2>{THEME_CATALOG.length} tema, satu kesan: mewah</h2>
             <p>Setiap tema dirancang dengan tipografi, warna, dan ornamen yang harmonis untuk menonjolkan momen kalian. Berikut beberapa favorit kami.</p>
           </div>
           <div className="lp-theme-grid">

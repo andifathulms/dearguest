@@ -28,6 +28,15 @@ class Invitation(models.Model):
         ('charcoal-marble', 'Marmer Arang'),
         ('islamic-arabesque', 'Arabesque Emas'),
         ('navy-gold', 'Navy Klasik'),
+        ('plum-gold', 'Plum Anggur'),
+        ('teal-ocean', 'Teal Samudra'),
+        ('deco-noir', 'Deco Hitam Emas'),
+        ('sunflower-mustard', 'Bunga Matahari'),
+        ('beige-korean', 'Aesthetic Beige'),
+        ('rose-gold', 'Rose Gold'),
+        ('mono-editorial', 'Editorial Mono'),
+        ('royal-purple', 'Ungu Kerajaan'),
+        ('marble-white', 'Marmer Putih'),
     ]
     TIER_CHOICES = [
         ('free', 'Gratis'),
