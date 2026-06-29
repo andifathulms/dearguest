@@ -35,6 +35,7 @@ const THEME_NAME = {
   'mono-editorial': 'Editorial Mono',
   'royal-purple': 'Royal Purple',
   'marble-white': 'White Marble',
+  'celestial-cinematic': 'Celestial 3D',
 }
 const THEME_SWATCH = {
   'javanese-dark': 'linear-gradient(135deg,#1a1208,#c9a84c)',
@@ -64,6 +65,7 @@ const THEME_SWATCH = {
   'mono-editorial': 'linear-gradient(135deg,#111111,#bbbbbb)',
   'royal-purple': 'linear-gradient(135deg,#46276b,#cba35a)',
   'marble-white': 'linear-gradient(135deg,#d8d2c6,#c2a35e)',
+  'celestial-cinematic': 'linear-gradient(135deg,#1b234e,#d8c074)',
 }
 
 function statusBadge(it) {

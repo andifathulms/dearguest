@@ -35,6 +35,7 @@ const THEMES = [
   ['mono-editorial', 'Editorial Mono'],
   ['royal-purple', 'Royal Purple'],
   ['marble-white', 'White Marble'],
+  ['celestial-cinematic', 'Celestial 3D'],
 ]
 
 /* ---------------- Settings ---------------- */

@@ -31,6 +31,13 @@ const themes = {
   'mono-editorial': lazy(() => import('./MonoEditorial/index.jsx')),
   'royal-purple': lazy(() => import('./RoyalPurple/index.jsx')),
   'marble-white': lazy(() => import('./MarbleWhite/index.jsx')),
+  'celestial-cinematic': lazy(() => import('./CelestialCinematic/index.jsx')),
+}
+
+// Themes that reuse another theme's cover-gate styling need that theme's class
+// on the cover too (the cover-gate selectors are scoped per theme).
+const COVER_CLASS = {
+  'celestial-cinematic': 'midnight-celestial celestial-cinematic',
 }
 
 export default function ThemeRenderer({ invitation, guestName, preview = false }) {
@@ -40,7 +47,7 @@ export default function ThemeRenderer({ invitation, guestName, preview = false }
   return (
     <>
       {/* Editor preview renders the content directly, skipping the cover gate. */}
-      {!preview && <CoverGate invitation={invitation} guestName={guestName} themeClass={themeKey} />}
+      {!preview && <CoverGate invitation={invitation} guestName={guestName} themeClass={COVER_CLASS[themeKey] || themeKey} />}
       <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
         <Theme invitation={invitation} guestName={guestName} />
       </Suspense>

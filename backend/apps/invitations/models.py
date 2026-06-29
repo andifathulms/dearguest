@@ -37,6 +37,7 @@ class Invitation(models.Model):
         ('mono-editorial', 'Editorial Mono'),
         ('royal-purple', 'Royal Purple'),
         ('marble-white', 'White Marble'),
+        ('celestial-cinematic', 'Celestial 3D'),
     ]
     TIER_CHOICES = [
         ('free', 'Gratis'),

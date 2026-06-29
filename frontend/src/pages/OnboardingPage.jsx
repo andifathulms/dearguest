@@ -31,6 +31,7 @@ const THEMES = [
   { id: 'mono-editorial', name: 'Editorial Mono', bg: 'linear-gradient(160deg, #f4f4f4, #ffffff)', fg: '#141414', accent: '#111111' },
   { id: 'royal-purple', name: 'Royal Purple', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(203,163,90,0.18), transparent 60%), #1e1233', fg: '#efe9f5', accent: '#cba35a' },
   { id: 'marble-white', name: 'White Marble', bg: 'linear-gradient(160deg, #efece5, #f8f6f2)', fg: '#3a342a', accent: '#c2a35e' },
+  { id: 'celestial-cinematic', name: 'Celestial 3D', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(216,192,116,0.18), transparent 62%), #070b1f', fg: '#eef0fa', accent: '#d8c074' },
 ]
 
 function slugify(s) {

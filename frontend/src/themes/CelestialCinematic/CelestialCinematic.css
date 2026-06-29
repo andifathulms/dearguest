@@ -1,0 +1,96 @@
+/* ===== Celestial 3D — cinematic WebGL layer over the Celestial Night theme =====
+   Inherits all section styling from `.midnight-celestial`; this file just lets
+   the live 3D starfield show behind the content via frosted-glass cards. */
+
+/* Base dark so there's never a flash before the canvas paints. */
+.celestial-cinematic {
+  background: #070b1f !important;
+}
+/* The Celestial Night theme paints its own CSS starfield in ::before/::after —
+   hide it so we don't double up on the WebGL stars. */
+.celestial-cinematic::before,
+.celestial-cinematic::after {
+  display: none !important;
+}
+
+/* Fixed full-bleed WebGL backdrop, behind everything, non-interactive. */
+.cc-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.cc-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* All invitation content sits above the canvas. */
+.cc-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Let section wrappers be see-through so the stars drift behind them. */
+.celestial-cinematic .greeting-section,
+.celestial-cinematic .countdown-section,
+.celestial-cinematic .events-section,
+.celestial-cinematic .story-section,
+.celestial-cinematic .profile-section,
+.celestial-cinematic .gallery-section,
+.celestial-cinematic .amplod-section,
+.celestial-cinematic .rsvp-section,
+.celestial-cinematic .wishes-section,
+.celestial-cinematic .maps-section,
+.celestial-cinematic .livestream-section,
+.celestial-cinematic section:not(.hero-section) {
+  background: transparent !important;
+}
+/* Keep an uploaded hero photo; just darken its veil so the starfield reads
+   as the photo fades out at the bottom. */
+.celestial-cinematic .hero-section.has-photo {
+  --hero-scrim: linear-gradient(180deg, rgba(7,11,31,0.5) 0%, rgba(7,11,31,0.4) 42%, rgba(7,11,31,0.95) 100%);
+}
+
+/* Frosted-glass cards: translucent navy + blur so the 3D reads through. */
+.celestial-cinematic .event-card,
+.celestial-cinematic .bank-card,
+.celestial-cinematic .wish-card,
+.celestial-cinematic .rsvp-form,
+.celestial-cinematic .story-content,
+.celestial-cinematic .map-item,
+.celestial-cinematic .profile-card,
+.celestial-cinematic .countdown-unit,
+.celestial-cinematic .livestream-card,
+.celestial-cinematic .greeting-section .greeting-text {
+  background: rgba(13, 19, 48, 0.5) !important;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border-color: rgba(216, 192, 116, 0.3) !important;
+  box-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.7);
+}
+
+/* Cover gate gets a frosted inner card too (it renders the midnight-celestial
+   cover styling via the combined class passed from ThemeRenderer). */
+.celestial-cinematic.cover-gate .cover-inner {
+  background: rgba(13, 19, 48, 0.45) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* On very small screens, blur is expensive — drop it, keep translucency. */
+@media (max-width: 560px) {
+  .celestial-cinematic .event-card,
+  .celestial-cinematic .bank-card,
+  .celestial-cinematic .wish-card,
+  .celestial-cinematic .rsvp-form,
+  .celestial-cinematic .story-content,
+  .celestial-cinematic .map-item,
+  .celestial-cinematic .profile-card,
+  .celestial-cinematic .countdown-unit {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(13, 19, 48, 0.72) !important;
+  }
+}
