@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="auth">
       <div className="auth-card">
-        <div className="auth-brand"><span className="auth-brand-mark">U</span><span>Undangan<em>Digital</em></span></div>
+        <div className="auth-brand"><span className="auth-brand-mark">D</span><span>Dear<em>Guest</em></span></div>
         <h1>Atur Ulang Kata Sandi</h1>
         <p className="auth-sub">Masukkan kata sandi baru untuk akunmu.</p>
         {error && <div className="auth-error">{error}</div>}

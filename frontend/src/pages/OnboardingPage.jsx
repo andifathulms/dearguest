@@ -64,8 +64,8 @@ export default function OnboardingPage() {
     <div className="auth">
       <div className="auth-card auth-wide">
         <div className="auth-brand">
-          <span className="auth-brand-mark">U</span>
-          <span>Undangan<em>Digital</em></span>
+          <span className="auth-brand-mark">D</span>
+          <span>Dear<em>Guest</em></span>
         </div>
         <h1>Buat Undangan Baru</h1>
         <p className="auth-sub">Tentukan alamat, tema, dan tanggal. Semua bisa diubah nanti di editor.</p>

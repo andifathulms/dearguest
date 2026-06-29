@@ -39,8 +39,8 @@ export default function RegisterPage() {
     <div className="auth">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="auth-brand-mark">U</span>
-          <span>Undangan<em>Digital</em></span>
+          <span className="auth-brand-mark">D</span>
+          <span>Dear<em>Guest</em></span>
         </div>
         <h1>Buat Akun</h1>
         <p className="auth-sub">Daftar gratis dan mulai rancang undangan pernikahan digital kalian.</p>

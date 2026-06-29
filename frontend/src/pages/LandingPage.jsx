@@ -117,8 +117,8 @@ export default function LandingPage() {
       <nav className="lp-nav">
         <div className="lp-container lp-nav-inner">
           <a href="#top" className="lp-brand" style={{ textDecoration: 'none' }}>
-            <span className="lp-brand-mark">U</span>
-            <span>Undangan<span style={{ fontStyle: 'italic' }}>Digital</span></span>
+            <span className="lp-brand-mark">D</span>
+            <span>Dear<span style={{ fontStyle: 'italic' }}>Guest</span></span>
           </a>
           <div className="lp-nav-menu lp-nav-links">
             <a href="#tema">Tema</a>
@@ -336,8 +336,8 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-footer-inner">
             <div className="lp-brand">
-              <span className="lp-brand-mark">U</span>
-              <span>Undangan<span style={{ fontStyle: 'italic' }}>Digital</span></span>
+              <span className="lp-brand-mark">D</span>
+              <span>Dear<span style={{ fontStyle: 'italic' }}>Guest</span></span>
             </div>
             <div className="lp-footer-links">
               <a href="#tema">Tema</a>
@@ -347,7 +347,7 @@ export default function LandingPage() {
               <a href={waOrder} target="_blank" rel="noopener noreferrer">WhatsApp</a>
             </div>
           </div>
-          <p className="lp-footer-copy">© {new Date().getFullYear()} Undangan Digital · Undangan pernikahan online untuk pasangan Indonesia 🤍</p>
+          <p className="lp-footer-copy">© {new Date().getFullYear()} Dear Guest · Undangan pernikahan online untuk pasangan Indonesia 🤍</p>
         </div>
       </footer>
     </div>

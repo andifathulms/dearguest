@@ -450,7 +450,7 @@ function TierBanner({ inv }) {
   )}`
   return (
     <div className="ed-tier">
-      <div>Paket <strong>Gratis</strong> · watermark "Undangan Digital" tampil di undanganmu.</div>
+      <div>Paket <strong>Gratis</strong> · watermark "Dear Guest" tampil di undanganmu.</div>
       <a className="ed-mini" style={{ background: '#25d366', color: '#fff', borderColor: '#25d366' }} href={waUrl} target="_blank" rel="noopener noreferrer">Upgrade ke Premium</a>
     </div>
   )

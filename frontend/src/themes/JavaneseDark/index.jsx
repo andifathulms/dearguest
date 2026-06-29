@@ -82,7 +82,7 @@ export default function JavaneseDark({ invitation, guestName }) {
 
       {invitation.watermark && (
         <div className="watermark-footer">
-          Dibuat dengan <a href="/">Undangan Digital</a>
+          Dibuat dengan <a href="/">Dear Guest</a>
         </div>
       )}
 

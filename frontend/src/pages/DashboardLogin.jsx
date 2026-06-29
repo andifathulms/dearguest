@@ -32,7 +32,7 @@ export default function DashboardLogin() {
   return (
     <div className="auth">
       <div className="auth-card">
-        <div className="auth-brand"><span className="auth-brand-mark">U</span><span>Undangan<em>Digital</em></span></div>
+        <div className="auth-brand"><span className="auth-brand-mark">D</span><span>Dear<em>Guest</em></span></div>
         <h1>Masuk</h1>
         <p className="auth-sub">Masuk untuk mengelola undangan dan melihat data RSVP kamu.</p>
 

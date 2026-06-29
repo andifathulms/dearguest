@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="auth">
       <div className="auth-card">
-        <div className="auth-brand"><span className="auth-brand-mark">U</span><span>Undangan<em>Digital</em></span></div>
+        <div className="auth-brand"><span className="auth-brand-mark">D</span><span>Dear<em>Guest</em></span></div>
         <h1>Lupa Kata Sandi</h1>
         {sent ? (
           <>

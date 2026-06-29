@@ -57,7 +57,7 @@ export default function MyInvitationsPage() {
     <div className="mi">
       <div className="mi-bar">
         <Link to="/" className="mi-brand" style={{ textDecoration: 'none' }}>
-          <span className="mi-brand-mark">U</span><span>Undangan<em>Digital</em></span>
+          <span className="mi-brand-mark">D</span><span>Dear<em>Guest</em></span>
         </Link>
         <div className="mi-bar-actions">
           <button className="mi-mini dark" onClick={logout}>Keluar</button>

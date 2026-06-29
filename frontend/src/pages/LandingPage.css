@@ -500,25 +500,27 @@
   text-align: center;
   color: #f5eed6;
   padding: 5.5rem 1.5rem;
-  background: radial-gradient(ellipse at center, rgba(201,168,76,0.16), #1a1208 78%);
+  /* Subtle gold glow layered over a SOLID dark base (a transparent first
+     stop would let the white page bleed through and kill text contrast). */
+  background: radial-gradient(ellipse 85% 75% at center, rgba(201,168,76,0.14) 0%, transparent 62%), #1a1208;
   overflow: hidden;
 }
 .lp-cta h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 1rem; }
 .lp-cta h2 em { color: var(--gold-soft); font-style: italic; }
-.lp-cta p { color: #cbbfa6; max-width: 480px; margin: 0 auto 2.2rem; line-height: 1.7; }
+.lp-cta p { color: #ece1cb; max-width: 480px; margin: 0 auto 2.2rem; line-height: 1.7; }
 
 /* ===== Footer ===== */
-.lp-footer { background: var(--ink); color: #c9bdaf; padding: 3rem 1.5rem 2rem; }
+.lp-footer { background: var(--ink); color: #d8cdbd; padding: 3rem 1.5rem 2rem; }
 .lp-footer-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 1.2rem;
-  color: #b3a99c;
+  color: #cabfae;
 }
 .lp-footer .lp-brand { color: #f5eed6; }
 .lp-footer-links { display: flex; gap: 1.5rem; }
-.lp-footer-links a { font-size: 0.82rem; text-decoration: none; color: #b3a99c; transition: color 0.2s; }
+.lp-footer-links a { font-size: 0.85rem; text-decoration: none; color: #d0c5b4; transition: color 0.2s; }
 .lp-footer-links a:hover { color: var(--gold-soft); }
-.lp-footer-copy { text-align: center; font-size: 0.76rem; color: #877d70; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); }
+.lp-footer-copy { text-align: center; font-size: 0.78rem; color: #a89a86; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.12); }
