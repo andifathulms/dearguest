@@ -82,6 +82,19 @@ body.cover-open {
   isolation: isolate;
 }
 
+/* Profile photo: the global `img { display:block }` reset stops text-align
+   from centering it, so center the block explicitly (all themes). */
+.profile-photo { margin-left: auto !important; margin-right: auto !important; object-position: center !important; }
+
+/* Section-title flourish: stack the ornament ABOVE the centered title
+   (ornament strip → title → underline) instead of inline beside it. */
+.section-title::before {
+  display: block !important;
+  width: fit-content !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 /* Event action links (maps + add-to-calendar) — color inherited from theme */
 .event-actions {
   display: flex;
@@ -100,6 +113,17 @@ body.cover-open {
   color: var(--text-muted);
 }
 .events-dresscode strong { color: var(--text-primary); }
+
+/* Payment brand badges in the digital envelope */
+.bank-logo-wrap { display: flex; justify-content: center; margin-bottom: 0.85rem; }
+.pay-logo {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 56px; height: 30px; padding: 0 0.7rem; border-radius: 7px;
+  font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.01em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.pay-logo-generic { background: #fff; color: #6b5f50; border: 1px solid var(--border, #e0e0dc); box-shadow: none; }
+.pay-logo-generic svg { width: 18px; height: 18px; }
 
 /* Gift wishlist button — theme-common variables */
 .amplod-wishlist-wrap { text-align: center; margin-top: 1.5rem; }
@@ -126,6 +150,16 @@ body.cover-open {
 }
 .hero-section.has-photo .hero-content,
 .hero-section.has-photo .hero-scroll-cue { position: relative; z-index: 3; }
+/* Lift hero text off the photo for legibility (all themes) */
+.hero-section.has-photo .hero-names,
+.hero-section.has-photo .hero-bismillah,
+.hero-section.has-photo .hero-label,
+.hero-section.has-photo .hero-date { text-shadow: 0 2px 16px rgba(0,0,0,0.45); }
+
+/* Story timeline: center the dot exactly on the line on mobile (all themes) */
+@media (max-width: 640px) {
+  .story-timeline .story-dot { left: 1rem !important; right: auto !important; transform: translateX(-50%); }
+}
 /* Hide theme corner ornaments + overlay over a photo — keep it clean and cinematic */
 .hero-section.has-photo::before,
 .hero-section.has-photo::after { opacity: 0 !important; }

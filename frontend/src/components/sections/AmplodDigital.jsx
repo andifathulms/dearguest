@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import PaymentLogo from '../ui/PaymentLogo.jsx'
 
 function typeLabel(account) {
   if (account.account_type === 'ewallet') return 'Nomor E-Wallet'
@@ -26,6 +27,7 @@ function BankCard({ account }) {
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
     >
+      <div className="bank-logo-wrap"><PaymentLogo name={account.bank_name} /></div>
       <p className="bank-name">{account.bank_name || typeLabel(account)}</p>
 
       {isQris ? (

@@ -160,6 +160,7 @@
   letter-spacing: 0.42em;
   text-transform: uppercase;
   color: var(--gold-muted);
+  margin-top: 2rem; /* clear the sunburst fan above */
   margin-bottom: 1.4rem;
 }
 .luxury-emerald .cover-names {
@@ -1070,4 +1071,4 @@
 }
 
 /* Full-bleed hero photo scrim */
-.luxury-emerald { --hero-scrim: linear-gradient(180deg, rgba(8,18,13,0.5) 0%, rgba(8,18,13,0.32) 42%, rgba(8,18,13,0.9) 100%); }
+.luxury-emerald { --hero-scrim: linear-gradient(180deg, rgba(8,18,13,0.64) 0%, rgba(8,18,13,0.48) 42%, rgba(8,18,13,0.92) 100%); }
