@@ -643,3 +643,20 @@
 .tp-marble .tp-amp, .tp-marble .tp-label { color: #c2a35e; }
 .tp-marble .tp-date { color: #8a8270; }
 .tp-marble .tp-rule { background: #c2a35e; }
+
+/* "3D" badge on animated theme cards */
+.lp-theme-preview .tp-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #1a1208;
+  background: linear-gradient(135deg, #f0dba6, #c79a52);
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}

@@ -70,6 +70,7 @@ export default function ThemesGalleryPage() {
                 transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.4) }}
               >
                 <div className={`lp-theme-preview ${t.preview}`}>
+                  {t.badge && <span className="tp-badge">{t.badge}</span>}
                   <span className="tp-label">The Wedding Of</span>
                   <div className="tp-names lp-serif">
                     Andini<span className="tp-amp">&amp;</span>Bagus

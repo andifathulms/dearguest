@@ -25,6 +25,14 @@
   width: 100% !important;
   height: 100% !important;
 }
+/* Cinematic vignette — darken the edges to focus the eye on the content. */
+.cc-canvas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 92% 82% at 50% 36%, transparent 42%, rgba(4, 6, 18, 0.6) 100%);
+}
 
 /* All invitation content sits above the canvas. */
 .cc-content {

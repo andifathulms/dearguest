@@ -28,7 +28,7 @@ export const THEME_CATALOG = [
   { id: 'mono-editorial', name: 'Editorial Mono', desc: 'Editorial monokrom hitam-putih dengan tipografi tegas.', preview: 'tp-mono', demo: 'demo-mono', colors: ['#ffffff', '#111111', '#777777'], category: 'Modern' },
   { id: 'royal-purple', name: 'Royal Purple', desc: 'Megah dan regal dengan ungu kerajaan dan emas.', preview: 'tp-purple', demo: 'demo-ungu', colors: ['#1e1233', '#cba35a', '#46276b'], category: 'Elegan & Mewah' },
   { id: 'marble-white', name: 'White Marble', desc: 'Mewah dan bersih dengan tekstur marmer putih dan emas.', preview: 'tp-marble', demo: 'demo-marmerputih', colors: ['#f8f6f2', '#c2a35e', '#d8d2c6'], category: 'Klasik' },
-  { id: 'celestial-cinematic', name: 'Celestial 3D', desc: 'Animasi 3D sinematik — bintang bergerak, debu emas, dan bulan bercahaya.', preview: 'tp-midnight', demo: 'demo-celestial-3d', colors: ['#070b1f', '#d8c074', '#1b234e'], category: 'Elegan & Mewah' },
+  { id: 'celestial-cinematic', name: 'Celestial 3D', desc: 'Animasi 3D sinematik dengan bintang bergerak, debu emas, dan bulan bercahaya.', preview: 'tp-midnight', demo: 'demo-celestial-3d', colors: ['#070b1f', '#d8c074', '#1b234e'], category: 'Elegan & Mewah', badge: '3D' },
 ]
 
 // Filter categories for the gallery (order matters; "Semua" first).

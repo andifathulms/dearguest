@@ -186,6 +186,7 @@ export default function LandingPage() {
             {FEATURED_THEMES.map((t, i) => (
               <motion.div className="lp-theme-card" key={t.id} {...fade(i * 0.08)}>
                 <div className={`lp-theme-preview ${t.preview}`}>
+                  {t.badge && <span className="tp-badge">{t.badge}</span>}
                   <span className="tp-label">The Wedding Of</span>
                   <div className="tp-names lp-serif">
                     Andini<span className="tp-amp">&amp;</span>Bagus
