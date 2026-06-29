@@ -1,46 +1,7 @@
 import '../MidnightCelestial/MidnightCelestial.css'
 import './CelestialCinematic.css'
-import { lazy, Suspense, useState, useRef, useEffect } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { motion } from 'framer-motion'
-
-// Selectors for the elements that reveal on scroll.
-const REVEAL_SEL = '.section-title,.greeting-text,.countdown-unit,.event-card,.story-content,.profile-card,.gallery-item,.amplod-desc,.bank-card,.rsvp-form,.wish-card,.map-item,.hero-names'
-
-// Reveal each element (rise + fade) as it scrolls into view, staggered within
-// its group. IntersectionObserver works in every browser; rescans pick up
-// async-loaded content (wishes/gallery). No-op under reduced motion.
-function useScrollReveal(rootRef) {
-  useEffect(() => {
-    const root = rootRef.current
-    if (!root || typeof IntersectionObserver === 'undefined') return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) { e.target.classList.add('cc-in'); io.unobserve(e.target) }
-      }
-    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' })
-
-    const scan = () => {
-      root.querySelectorAll(REVEAL_SEL).forEach((el) => {
-        if (el.dataset.ccr) return
-        el.dataset.ccr = '1'
-        el.classList.add('cc-reveal')
-        const sibs = el.parentElement ? Array.from(el.parentElement.children) : []
-        const idx = sibs.indexOf(el)
-        if (idx > 0) el.style.transitionDelay = `${Math.min(idx, 6) * 80}ms`
-        io.observe(el)
-      })
-    }
-    scan()
-    // Re-scan on any DOM change (async wishes/gallery, or React re-renders from
-    // a quality-tier switch) so newly-added/replaced nodes still reveal.
-    let raf = 0
-    const mo = new MutationObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(scan) })
-    mo.observe(root, { childList: true, subtree: true })
-    return () => { io.disconnect(); mo.disconnect(); cancelAnimationFrame(raf) }
-  }, [rootRef])
-}
 import HeroSection from '../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
 import CountdownTimer from '../../components/sections/CountdownTimer.jsx'
@@ -60,10 +21,22 @@ import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
 // WebGL backdrop is its own lazy chunk so three.js only loads for this theme.
 const CelestialScene = lazy(() => import('./CelestialScene.jsx'))
 
-// Plain layout wrapper — the per-element scroll reveal is handled by
-// useScrollReveal (IntersectionObserver) so there's a single, reliable system.
+// Each section RISES + fades in as it scrolls into view. This is the only
+// reveal layer we add — the section components already animate their own
+// items (gallery scale-in, wishes slide-in, …), and framer transforms compose
+// cleanly with those (parent translate + child opacity), with no DOM-class
+// fighting. `once` so it never re-triggers/blinks.
 function Section({ children }) {
-  return <div>{children}</div>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 64, scale: 0.965 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.85, ease: [0.16, 0.84, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
 }
 
 export default function CelestialCinematic({ invitation, guestName }) {
@@ -72,8 +45,6 @@ export default function CelestialCinematic({ invitation, guestName }) {
   // Adaptive quality: starts highest, the scene drops it only if the device
   // can't sustain the frame-rate. The class gates the expensive CSS blur.
   const [quality, setQuality] = useState('high')
-  const contentRef = useRef(null)
-  useScrollReveal(contentRef)
 
   return (
     <div className={`midnight-celestial celestial-cinematic cc-q-${quality}`}>
@@ -81,7 +52,7 @@ export default function CelestialCinematic({ invitation, guestName }) {
         <CelestialScene quality={quality} onQuality={setQuality} />
       </Suspense>
 
-      <div className="cc-content" ref={contentRef}>
+      <div className="cc-content">
         <HeroSection
           brideName={couple.bride_name}
           groomName={couple.groom_name}

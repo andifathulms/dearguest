@@ -139,19 +139,3 @@ body.cover-open .celestial-cinematic .cc-content {
   background: rgba(13, 19, 48, 0.8) !important;
 }
 
-/* ===== Scroll-driven per-element reveals (IntersectionObserver) =====
-   Cards, titles and names rise + fade in as they scroll into view, with a
-   per-group stagger. JS adds `.cc-reveal` (hidden) on mount and `.cc-in` when
-   the element enters the viewport. Works in every browser; if JS is disabled
-   the class is never added so content stays visible. Off for reduced-motion. */
-@media (prefers-reduced-motion: no-preference) {
-  .celestial-cinematic .cc-reveal {
-    opacity: 0;
-    transform: translateY(40px) scale(0.955);
-    transition: opacity 0.75s ease, transform 0.85s cubic-bezier(0.16, 0.84, 0.3, 1);
-  }
-  .celestial-cinematic .cc-reveal.cc-in {
-    opacity: 1;
-    transform: none;
-  }
-}
