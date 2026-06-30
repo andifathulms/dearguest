@@ -6,6 +6,34 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { CinematicCanvas, DriftPoints, softTexture, cloudTexture } from '../_cinematic/shared.jsx'
 
+// A graduated sky (soft blue top → warm cream bottom) painted on a big backdrop
+// plane. Without it, white clouds on a near-white background have no contrast.
+function skyTexture() {
+  const c = document.createElement('canvas')
+  c.width = 4; c.height = 256
+  const ctx = c.getContext('2d')
+  const g = ctx.createLinearGradient(0, 0, 0, 256)
+  g.addColorStop(0, '#a7c2e8')   // soft blue zenith
+  g.addColorStop(0.42, '#cadcf0')
+  g.addColorStop(0.72, '#eaeef0')
+  g.addColorStop(1, '#f7ecda')   // warm horizon
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 4, 256)
+  const t = new THREE.CanvasTexture(c)
+  t.needsUpdate = true
+  return t
+}
+
+function SkyBackdrop() {
+  const tex = useMemo(() => skyTexture(), [])
+  return (
+    <mesh position={[0, 0, -18]} scale={[100, 60, 1]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial map={tex} depthWrite={false} fog={false} toneMapped={false} />
+    </mesh>
+  )
+}
+
 // ---- signature: soft billowy clouds that drift across and wrap at the edges ----
 function Clouds({ count }) {
   const grp = useRef()
@@ -18,10 +46,10 @@ function Clouds({ count }) {
     x: (Math.random() - 0.5) * area[0],
     y: (Math.random() - 0.5) * area[1],
     z: (Math.random() - 0.5) * area[2] - 4,
-    scale: 6 + Math.random() * 8,           // ~6–14
-    opacity: 0.5 + Math.random() * 0.3,     // ~0.5–0.8
+    scale: 8 + Math.random() * 9,           // ~8–17 (bigger, more present)
+    opacity: 0.78 + Math.random() * 0.2,    // ~0.78–0.98 (opaque enough to read)
     speed: 0.25 + Math.random() * 0.7,      // slow per-cloud drift
-    warm: i % 4 === 0,                       // a few warmer clouds
+    warm: i % 3 === 0,                       // more warm clouds for variety
     bob: Math.random() * Math.PI * 2,
   })), [count, area])
 
@@ -70,8 +98,8 @@ function GodRays({ reduce }) {
   return (
     <group ref={grp} position={[0, 8, -10]}>
       {rays.map((r, i) => (
-        <sprite key={i} position={[r.x, 0, 0]} scale={[3, 28, 1]} material-rotation={r.angle}>
-          <spriteMaterial map={tex} transparent opacity={0.12} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <sprite key={i} position={[r.x, 0, 0]} scale={[3.2, 30, 1]} material-rotation={r.angle}>
+          <spriteMaterial map={tex} transparent opacity={0.24} depthWrite={false} blending={THREE.AdditiveBlending} />
         </sprite>
       ))}
     </group>
@@ -85,9 +113,12 @@ function SceneInner({ cfg, reduce }) {
 
   return (
     <>
-      {/* big soft warm sun glow, top-center behind everything */}
-      <sprite position={[0, 7, -12]} scale={[18, 18, 1]}>
-        <spriteMaterial map={sun} transparent opacity={0.4} depthWrite={false} blending={THREE.AdditiveBlending} />
+      {/* graduated sky so the clouds have something to read against */}
+      <SkyBackdrop />
+
+      {/* big soft warm sun glow, top-center */}
+      <sprite position={[0, 7, -13]} scale={[20, 20, 1]}>
+        <spriteMaterial map={sun} transparent opacity={0.55} depthWrite={false} blending={THREE.AdditiveBlending} />
       </sprite>
 
       <GodRays reduce={reduce} />
@@ -115,10 +146,10 @@ export default function CloudScene({ quality, onQuality }) {
     <CinematicCanvas
       quality={quality}
       onQuality={onQuality}
-      bg="#eef1f6"
-      fog={['#eef1f6', 20, 48]}
-      baseZ={12}
-      warpTo={7}
+      bg="#cadcf0"
+      fog={['#dbe7f2', 28, 60]}
+      baseZ={9}
+      warpTo={6.5}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>

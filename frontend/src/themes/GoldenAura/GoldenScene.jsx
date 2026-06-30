@@ -17,10 +17,10 @@ function GodRays({ reduce }) {
     if (!reduce && group.current) group.current.rotation.z += dt * 0.02
   })
   return (
-    <group ref={group} position={[0, 6, -9]}>
+    <group ref={group} position={[0, 4.5, -8]}>
       {rays.map((rot, i) => (
-        <sprite key={i} rotation={[0, 0, rot]} scale={[3, 26, 1]} position={[0, 0, 0]}>
-          <spriteMaterial map={tex} transparent opacity={0.12} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <sprite key={i} rotation={[0, 0, rot]} scale={[3.4, 28, 1]} position={[0, 0, 0]}>
+          <spriteMaterial map={tex} transparent opacity={0.26} depthWrite={false} blending={THREE.AdditiveBlending} />
         </sprite>
       ))}
     </group>
@@ -31,8 +31,8 @@ function GodRays({ reduce }) {
 function CentralGlow() {
   const tex = useMemo(() => softTexture('rgba(232,200,121,0.7)'), [])
   return (
-    <sprite scale={[26, 18, 1]} position={[0, -6, -12]}>
-      <spriteMaterial map={tex} transparent opacity={0.16} depthWrite={false} blending={THREE.AdditiveBlending} />
+    <sprite scale={[28, 20, 1]} position={[0, -5, -11]}>
+      <spriteMaterial map={tex} transparent opacity={0.32} depthWrite={false} blending={THREE.AdditiveBlending} />
     </sprite>
   )
 }
@@ -52,20 +52,20 @@ function SceneInner({ cfg, reduce }) {
       {/* Hero: large soft golden bokeh, plus a brighter, tighter layer for depth. */}
       <Bokeh
         key={'bokeh-' + bokehBig}
-        color="rgba(232,200,121,0.95)"
+        color="rgba(236,206,128,0.98)"
         count={bokehBig}
-        size={4}
-        opacity={0.5}
-        area={[24, 16, 9]}
+        size={5}
+        opacity={0.72}
+        area={[22, 15, 8]}
         reduce={reduce}
       />
       <Bokeh
         key={'bokeh2-' + bokehSmall}
-        color="rgba(245,228,170,0.95)"
+        color="rgba(247,232,178,0.98)"
         count={bokehSmall}
-        size={2.2}
-        opacity={0.6}
-        area={[20, 14, 7]}
+        size={2.8}
+        opacity={0.85}
+        area={[19, 13, 6]}
         reduce={reduce}
       />
 
@@ -73,10 +73,10 @@ function SceneInner({ cfg, reduce }) {
       <DriftPoints
         key={'dust-' + dust}
         count={dust}
-        size={0.1}
+        size={0.14}
         color="#e8c879"
-        opacity={0.85}
-        rise={0.4}
+        opacity={0.9}
+        rise={0.5}
         additive
         reduce={reduce}
       />
@@ -90,9 +90,9 @@ export default function GoldenScene({ quality, onQuality }) {
       quality={quality}
       onQuality={onQuality}
       bg="#0c0c0e"
-      fog={['#0c0c0e', 18, 46]}
-      baseZ={12}
-      warpTo={7}
+      fog={['#0c0c0e', 24, 56]}
+      baseZ={8.5}
+      warpTo={6}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>
