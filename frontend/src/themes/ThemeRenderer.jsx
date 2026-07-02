@@ -36,6 +36,9 @@ const themes = {
   'aurora-3d': lazy(() => import('./AuroraDream/index.jsx')),
   'golden-3d': lazy(() => import('./GoldenAura/index.jsx')),
   'clouds-3d': lazy(() => import('./EtherealClouds/index.jsx')),
+  'lanterns-3d': lazy(() => import('./FloatingLanterns/index.jsx')),
+  'fireflies-3d': lazy(() => import('./EnchantedFireflies/index.jsx')),
+  'snow-3d': lazy(() => import('./WinterSnow/index.jsx')),
 }
 
 // Themes that reuse another theme's cover-gate styling need that theme's class
@@ -46,6 +49,9 @@ const COVER_CLASS = {
   'aurora-3d': 'midnight-celestial aurora-3d cc-root',
   'golden-3d': 'deco-noir golden-3d cc-root',
   'clouds-3d': 'ivory-classic clouds-3d cc-root',
+  'lanterns-3d': 'navy-gold lanterns-3d cc-root',
+  'fireflies-3d': 'luxury-emerald fireflies-3d cc-root',
+  'snow-3d': 'dusty-blue snow-3d cc-root',
 }
 
 export default function ThemeRenderer({ invitation, guestName, preview = false }) {

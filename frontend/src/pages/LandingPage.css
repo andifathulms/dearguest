@@ -772,3 +772,20 @@
   .lp-cine-upsell { grid-template-columns: 1fr; gap: 1.4rem; text-align: center; padding: 1.8rem 1.4rem; }
   .lp-cine-upsell-feats li { text-align: left; }
 }
+
+/* ===== Preview palettes — Cinematic collection (batch 2) ===== */
+.tp-lanterns { background: radial-gradient(ellipse 80% 90% at 50% 105%, rgba(232,162,76,0.4) 0%, transparent 58%), linear-gradient(180deg, #101830 0%, #0b1226 60%); color: #f2ede0; }
+.tp-lanterns .tp-names { font-family: 'Playfair Display', serif; font-style: italic; color: #f0b968; }
+.tp-lanterns .tp-amp, .tp-lanterns .tp-label, .tp-lanterns .tp-date { color: #b9a888; }
+.tp-lanterns .tp-rule { background: #e8a24c; }
+
+.tp-fireflies { background: radial-gradient(ellipse 70% 70% at 50% 55%, rgba(230,210,122,0.22) 0%, transparent 58%), #0e1f17; color: #eef3ea; }
+.tp-fireflies .tp-names { font-family: 'Playfair Display', serif; font-style: italic; color: #ecdd8a; }
+.tp-fireflies .tp-amp, .tp-fireflies .tp-label, .tp-fireflies .tp-date { color: #9bb59e; }
+.tp-fireflies .tp-rule { background: #e6d27a; }
+
+.tp-snow { background: linear-gradient(180deg, #7f9fc4 0%, #b9cfe6 55%, #dbe7f2 100%); color: #2c3a47; }
+.tp-snow .tp-names { font-family: 'Playfair Display', serif; color: #33465a; }
+.tp-snow .tp-amp, .tp-snow .tp-label { color: #5f80a6; }
+.tp-snow .tp-date { color: #6d7f8e; }
+.tp-snow .tp-rule { background: #8fb3d9; }

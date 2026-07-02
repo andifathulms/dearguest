@@ -33,6 +33,9 @@ export const THEME_CATALOG = [
   { id: 'aurora-3d', name: 'Aurora Dream', desc: 'Animasi 3D — pita aurora mengalir di langit malam berbintang.', preview: 'tp-aurora', demo: 'demo-aurora-3d', colors: ['#070b1f', '#3fb6a0', '#7a5cc0'], category: 'Elegan & Mewah', collection: 'cinematic', badge: '3D' },
   { id: 'golden-3d', name: 'Golden Aura', desc: 'Animasi 3D — bola cahaya emas dan kilau mewah yang berkilauan.', preview: 'tp-golden', demo: 'demo-golden-3d', colors: ['#0c0c0e', '#e8c879', '#cda349'], category: 'Elegan & Mewah', collection: 'cinematic', badge: '3D' },
   { id: 'clouds-3d', name: 'Ethereal Clouds', desc: 'Animasi 3D — awan lembut melayang dengan cahaya keemasan surgawi.', preview: 'tp-clouds', demo: 'demo-clouds-3d', colors: ['#eef1f6', '#c9a86a', '#e3d2ac'], category: 'Klasik', collection: 'cinematic', badge: '3D' },
+  { id: 'lanterns-3d', name: 'Floating Lanterns', desc: 'Animasi 3D — lentera bercahaya melayang naik ke langit senja.', preview: 'tp-lanterns', demo: 'demo-lanterns-3d', colors: ['#101a33', '#e8a24c', '#c9a86a'], category: 'Elegan & Mewah', collection: 'cinematic', badge: '3D' },
+  { id: 'fireflies-3d', name: 'Enchanted Fireflies', desc: 'Animasi 3D — kunang-kunang berpendar di taman malam yang hijau.', preview: 'tp-fireflies', demo: 'demo-fireflies-3d', colors: ['#0e1f17', '#e6d27a', '#3c8f6a'], category: 'Rustic & Botani', collection: 'cinematic', badge: '3D' },
+  { id: 'snow-3d', name: 'Winter Snow', desc: 'Animasi 3D — salju lembut turun di langit senja musim dingin.', preview: 'tp-snow', demo: 'demo-snow-3d', colors: ['#cddff0', '#8fb3d9', '#4a6b8a'], category: 'Floral & Lembut', collection: 'cinematic', badge: '3D' },
 ]
 
 // The animated WebGL "Cinematic" collection — the flagship tier above Premium.

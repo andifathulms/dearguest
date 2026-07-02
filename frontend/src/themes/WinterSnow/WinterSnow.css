@@ -1,0 +1,10 @@
+/* Winter Snow — cool blue twilight cinematic. */
+.snow-3d {
+  --cc-base: #cdddf0;
+  --cc-card: rgba(250, 253, 255, 0.55);
+  --cc-card-solid: rgba(250, 253, 255, 0.9);
+  --cc-border: rgba(110, 136, 166, 0.34);
+  --cc-shadow: 0 14px 40px -16px rgba(50, 70, 100, 0.3);
+  --cc-veil: linear-gradient(180deg, rgba(205, 221, 240, 0.4) 0%, rgba(205, 221, 240, 0.62) 100%);
+  --cc-vignette: rgba(90, 110, 140, 0.3);
+}

@@ -40,6 +40,9 @@ const THEME_NAME = {
   'aurora-3d': 'Aurora Dream',
   'golden-3d': 'Golden Aura',
   'clouds-3d': 'Ethereal Clouds',
+  'lanterns-3d': 'Floating Lanterns',
+  'fireflies-3d': 'Enchanted Fireflies',
+  'snow-3d': 'Winter Snow',
 }
 const THEME_SWATCH = {
   'javanese-dark': 'linear-gradient(135deg,#1a1208,#c9a84c)',
@@ -74,6 +77,9 @@ const THEME_SWATCH = {
   'aurora-3d': 'linear-gradient(135deg,#3fb6a0,#7a5cc0)',
   'golden-3d': 'linear-gradient(135deg,#0c0c0e,#e8c879)',
   'clouds-3d': 'linear-gradient(135deg,#c9a86a,#eef1f6)',
+  'lanterns-3d': 'linear-gradient(135deg,#101a33,#e8a24c)',
+  'fireflies-3d': 'linear-gradient(135deg,#0e1f17,#e6d27a)',
+  'snow-3d': 'linear-gradient(135deg,#4a6b8a,#dbe7f2)',
 }
 
 function statusBadge(it) {

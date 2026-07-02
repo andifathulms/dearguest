@@ -1,0 +1,10 @@
+/* Enchanted Fireflies — deep forest green cinematic. */
+.fireflies-3d {
+  --cc-base: #081712;
+  --cc-card: rgba(12, 30, 22, 0.5);
+  --cc-card-solid: rgba(12, 30, 22, 0.84);
+  --cc-border: rgba(212, 175, 90, 0.32);
+  --cc-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.72);
+  --cc-veil: linear-gradient(180deg, rgba(8, 23, 18, 0.42) 0%, rgba(8, 23, 18, 0.64) 100%);
+  --cc-vignette: rgba(2, 10, 6, 0.62);
+}

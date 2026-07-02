@@ -36,6 +36,9 @@ const THEMES = [
   { id: 'aurora-3d', name: 'Aurora Dream', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(63,182,160,0.22), transparent 62%), #070b1f', fg: '#e8f3f1', accent: '#3fb6a0' },
   { id: 'golden-3d', name: 'Golden Aura', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(232,200,121,0.22), transparent 62%), #0c0c0e', fg: '#f2efe6', accent: '#e8c879' },
   { id: 'clouds-3d', name: 'Ethereal Clouds', bg: 'linear-gradient(160deg, #dfe6f0, #eef1f6)', fg: '#3a342a', accent: '#c9a86a' },
+  { id: 'lanterns-3d', name: 'Floating Lanterns', bg: 'radial-gradient(ellipse 80% 90% at 50% 100%, rgba(232,162,76,0.35), transparent 60%), #0b1226', fg: '#f2ede0', accent: '#e8a24c' },
+  { id: 'fireflies-3d', name: 'Enchanted Fireflies', bg: 'radial-gradient(ellipse 70% 70% at center, rgba(230,210,122,0.22), transparent 60%), #081712', fg: '#eef3ea', accent: '#e6d27a' },
+  { id: 'snow-3d', name: 'Winter Snow', bg: 'linear-gradient(180deg, #7f9fc4, #dbe7f2)', fg: '#2c3a47', accent: '#8fb3d9' },
 ]
 
 function slugify(s) {

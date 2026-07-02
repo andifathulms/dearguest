@@ -40,6 +40,9 @@ const THEMES = [
   ['aurora-3d', 'Aurora Dream'],
   ['golden-3d', 'Golden Aura'],
   ['clouds-3d', 'Ethereal Clouds'],
+  ['lanterns-3d', 'Floating Lanterns'],
+  ['fireflies-3d', 'Enchanted Fireflies'],
+  ['snow-3d', 'Winter Snow'],
 ]
 
 /* ---------------- Settings ---------------- */
