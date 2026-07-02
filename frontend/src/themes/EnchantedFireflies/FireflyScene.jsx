@@ -117,6 +117,8 @@ export default function FireflyScene({ quality, onQuality }) {
       fog={['#081712', 22, 52]}
       baseZ={9}
       warpTo={6.5}
+      bloom={1.5}
+      bloomThreshold={0.1}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>

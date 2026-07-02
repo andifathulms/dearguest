@@ -99,6 +99,7 @@ export default function SnowScene({ quality, onQuality }) {
       fog={['#c6d8ec', 28, 60]}
       baseZ={9}
       warpTo={6.5}
+      bloom={0}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>

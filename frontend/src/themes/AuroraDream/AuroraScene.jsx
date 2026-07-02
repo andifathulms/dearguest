@@ -158,6 +158,7 @@ export default function AuroraScene({ quality, onQuality }) {
       fog={['#070b1f', 24, 54]}
       baseZ={8.5}
       warpTo={6}
+      bloom={0}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>

@@ -3,16 +3,18 @@
 // systems, and canvas-drawn textures. Scenes compose these.
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerformanceMonitor } from '@react-three/drei'
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 // ---- quality tiers: start highest, step down only on sustained low FPS ----
+// `bloom` is the post-processing glow multiplier for that tier (0 = off).
 export const TIERS = {
-  high: { mul: 1, dpr: [1, 2] },
-  medium: { mul: 0.6, dpr: [1, 1.5] },
-  low: { mul: 0.34, dpr: [1, 1] },
+  high: { mul: 1, dpr: [1, 2], bloom: 1.15 },
+  medium: { mul: 0.62, dpr: [1, 1.5], bloom: 0.7 },
+  low: { mul: 0.34, dpr: [1, 1], bloom: 0 },
 }
-const REDUCED = { mul: 0.22, dpr: [1, 1] }
+const REDUCED = { mul: 0.22, dpr: [1, 1], bloom: 0 }
 const ORDER = ['low', 'medium', 'high']
 export const step = (q, d) => ORDER[Math.min(ORDER.length - 1, Math.max(0, ORDER.indexOf(q) + d))]
 
@@ -145,8 +147,10 @@ export function FallingParticles({ texture, count = 220, area = [34, 26, 14], fa
   )
 }
 
-// Drifting points (dust / sparkles / distant bokeh).
-export function DriftPoints({ count = 300, area = [36, 26, 16], size = 0.12, color = '#ffffff', opacity = 0.9, rise = 0.5, texture, reduce, additive = true }) {
+// Drifting points (dust / sparkles / distant bokeh). Points gently drift, the
+// cloud slowly rolls, and the whole field twinkles (size/opacity breathe) for
+// a lively, premium shimmer — especially under bloom.
+export function DriftPoints({ count = 300, area = [36, 26, 16], size = 0.12, color = '#ffffff', opacity = 0.9, rise = 0.5, texture, reduce, additive = true, twinkle = true }) {
   const ref = useRef()
   const tex = useMemo(() => texture || softTexture('rgba(255,255,255,0.95)'), [texture])
   const { positions, speeds } = useMemo(() => {
@@ -166,10 +170,15 @@ export function DriftPoints({ count = 300, area = [36, 26, 16], size = 0.12, col
     const t = state.clock.elapsedTime
     for (let i = 0; i < count; i++) {
       arr[i * 3 + 1] += speeds[i] * dt * rise
-      arr[i * 3] += Math.sin(t * 0.2 + i) * dt * 0.05
+      arr[i * 3] += Math.sin(t * 0.25 + i) * dt * 0.07
       if (arr[i * 3 + 1] > area[1] / 2) arr[i * 3 + 1] = -area[1] / 2
     }
     ref.current.geometry.attributes.position.needsUpdate = true
+    ref.current.rotation.z += dt * 0.012
+    if (twinkle) {
+      ref.current.material.size = size * (1 + Math.sin(t * 2.1) * 0.18)
+      ref.current.material.opacity = opacity * (0.82 + Math.abs(Math.sin(t * 1.3)) * 0.18)
+    }
   })
   return (
     <points ref={ref}>
@@ -241,10 +250,11 @@ export function Rig({ reduce, baseZ = 12, warpTo = 7 }) {
     const ease = 1 - Math.pow(1 - warp.current, 3)
     const z = open.current ? baseZ - (baseZ - warpTo) * ease : baseZ
     const t = state.clock.elapsedTime
-    const px = state.pointer.x * 0.7 + Math.sin(t * 0.08) * 0.5
-    const py = state.pointer.y * 0.45 - scroll.current * 0.0012 + Math.cos(t * 0.06) * 0.3
-    camera.position.x += (px - camera.position.x) * 0.04
-    camera.position.y += (py - camera.position.y) * 0.04
+    // Noticeable, living parallax: a wider continuous drift plus pointer/scroll.
+    const px = state.pointer.x * 0.95 + Math.sin(t * 0.11) * 0.85
+    const py = state.pointer.y * 0.6 - scroll.current * 0.0014 + Math.cos(t * 0.08) * 0.5
+    camera.position.x += (px - camera.position.x) * 0.045
+    camera.position.y += (py - camera.position.y) * 0.045
     camera.position.z += (z - camera.position.z) * (open.current ? 0.08 : 0.03)
     camera.lookAt(0, 0, 0)
   })
@@ -253,9 +263,10 @@ export function Rig({ reduce, baseZ = 12, warpTo = 7 }) {
 
 // Wrapper that wires up the adaptive canvas. `children` is a render function
 // receiving { cfg, reduce } so the scene can scale particle counts by cfg.mul.
-export function CinematicCanvas({ quality = 'high', onQuality, bg = '#070b1f', fog, baseZ = 12, warpTo = 7, lights, children }) {
+export function CinematicCanvas({ quality = 'high', onQuality, bg = '#070b1f', fog, baseZ = 12, warpTo = 7, lights, bloom = 1, bloomThreshold = 0.22, children }) {
   const reduce = usePrefersReducedMotion()
   const cfg = reduce ? REDUCED : TIERS[quality]
+  const bloomOn = !reduce && bloom > 0 && cfg.bloom > 0
   return (
     <div className="cc-canvas" aria-hidden="true">
       <Canvas
@@ -280,6 +291,14 @@ export function CinematicCanvas({ quality = 'high', onQuality, bg = '#070b1f', f
           {children({ cfg, reduce })}
           <Rig reduce={reduce} baseZ={baseZ} warpTo={warpTo} />
         </Suspense>
+        {/* Post-processing glow — the biggest premium lift; tier-gated off on
+            low/reduced so weak devices skip the cost entirely. */}
+        {bloomOn && (
+          <EffectComposer disableNormalPass>
+            <Bloom mipmapBlur intensity={bloom * cfg.bloom} luminanceThreshold={bloomThreshold} luminanceSmoothing={0.5} radius={0.72} />
+            <Vignette eskil={false} offset={0.28} darkness={0.42} />
+          </EffectComposer>
+        )}
       </Canvas>
     </div>
   )

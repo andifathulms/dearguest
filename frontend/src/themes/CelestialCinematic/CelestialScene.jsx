@@ -1,14 +1,15 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, Line, PerformanceMonitor } from '@react-three/drei'
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 // Quality tiers — we START at the highest and only step DOWN if the device
 // can't keep up, so capable phones always get the full experience.
 const TIERS = {
-  high: { stars1: 5200, stars2: 1800, dust: 320, dpr: [1, 2], shooting: true },
-  medium: { stars1: 3200, stars2: 1100, dust: 200, dpr: [1, 1.5], shooting: true },
-  low: { stars1: 1600, stars2: 600, dust: 90, dpr: [1, 1], shooting: false },
+  high: { stars1: 5200, stars2: 1800, dust: 320, dpr: [1, 2], shooting: true, bloom: 1.0 },
+  medium: { stars1: 3200, stars2: 1100, dust: 200, dpr: [1, 1.5], shooting: true, bloom: 0.6 },
+  low: { stars1: 1600, stars2: 600, dust: 90, dpr: [1, 1], shooting: false, bloom: 0 },
 }
 const ORDER = ['low', 'medium', 'high']
 const step = (q, d) => ORDER[Math.min(ORDER.length - 1, Math.max(0, ORDER.indexOf(q) + d))]
@@ -303,6 +304,12 @@ export default function CelestialScene({ quality = 'high', onQuality }) {
           {!reduce && cfg.shooting && <ShootingStar />}
           <Rig reduce={reduce} />
         </Suspense>
+        {!reduce && cfg.bloom > 0 && (
+          <EffectComposer disableNormalPass>
+            <Bloom mipmapBlur intensity={cfg.bloom} luminanceThreshold={0.18} luminanceSmoothing={0.5} radius={0.72} />
+            <Vignette eskil={false} offset={0.28} darkness={0.42} />
+          </EffectComposer>
+        )}
       </Canvas>
     </div>
   )

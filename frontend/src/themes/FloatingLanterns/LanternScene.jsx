@@ -183,6 +183,8 @@ export default function LanternScene({ quality, onQuality }) {
       fog={['#0b1226', 24, 58]}
       baseZ={9}
       warpTo={6.5}
+      bloom={1.2}
+      bloomThreshold={0.14}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>

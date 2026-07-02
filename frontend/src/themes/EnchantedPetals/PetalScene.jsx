@@ -90,6 +90,7 @@ export default function PetalScene({ quality, onQuality }) {
       fog={['#fbeef0', 18, 46]}
       baseZ={12}
       warpTo={7}
+      bloom={0}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>

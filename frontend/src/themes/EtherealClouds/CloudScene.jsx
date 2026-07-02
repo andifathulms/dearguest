@@ -150,6 +150,7 @@ export default function CloudScene({ quality, onQuality }) {
       fog={['#dbe7f2', 28, 60]}
       baseZ={9}
       warpTo={6.5}
+      bloom={0}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>

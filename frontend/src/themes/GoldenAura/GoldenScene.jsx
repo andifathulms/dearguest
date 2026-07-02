@@ -93,6 +93,8 @@ export default function GoldenScene({ quality, onQuality }) {
       fog={['#0c0c0e', 24, 56]}
       baseZ={8.5}
       warpTo={6}
+      bloom={1.4}
+      bloomThreshold={0.12}
     >
       {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
     </CinematicCanvas>
