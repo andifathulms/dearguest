@@ -570,3 +570,15 @@
   .mono-editorial .event-card { padding: 2.75rem 2rem; }
   .mono-editorial .profile-photo { width: 160px; height: 160px; }
 }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.mono-editorial {
+  --lx-script: 'Playfair Display';
+  --lx-script-style: italic;
+  --lx-script-scale: 0.92;
+  --lx-label: 'Inter';
+  --lx-accent: var(--ink);
+  --lx-soft: var(--ink);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(255, 255, 255, 0.5) 42%, rgba(255, 255, 255, 0.95) 100%);
+}

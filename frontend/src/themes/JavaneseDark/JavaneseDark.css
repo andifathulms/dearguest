@@ -1080,3 +1080,10 @@
 
 /* Full-bleed hero photo scrim */
 .javanese-dark { --hero-scrim: linear-gradient(180deg, rgba(18,12,6,0.62) 0%, rgba(18,12,6,0.46) 42%, rgba(18,12,6,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.javanese-dark {
+  --lx-script: 'Great Vibes';
+  --lx-script-scale: 1;
+  --lx-scrim: linear-gradient(180deg, rgba(26, 18, 8, 0.68) 0%, rgba(26, 18, 8, 0.55) 42%, rgba(26, 18, 8, 0.95) 100%);
+}

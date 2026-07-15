@@ -872,3 +872,13 @@
 
 /* Full-bleed hero photo scrim */
 .lavender-dream { --hero-scrim: linear-gradient(180deg, rgba(241,237,247,0.32) 0%, rgba(241,237,247,0.12) 45%, rgba(241,237,247,0.78) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.lavender-dream {
+  --lx-script: 'Great Vibes';
+  --lx-script-scale: 1;
+  --lx-accent: var(--lavender);
+  --lx-soft: var(--lavender-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(241, 237, 247, 0.66) 0%, rgba(241, 237, 247, 0.5) 42%, rgba(241, 237, 247, 0.95) 100%);
+}

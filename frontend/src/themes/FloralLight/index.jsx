@@ -1,4 +1,5 @@
 import './FloralLight.css'
+import '../_luxe/luxe.css'
 import { motion } from 'framer-motion'
 import HeroSection from '../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
@@ -46,7 +47,7 @@ export default function FloralLight({ invitation, guestName }) {
   const akad = (invitation.events || []).find(e => e.event_type === 'akad')
 
   return (
-    <div className="floral-light">
+    <div className="floral-light lx-root">
       <div style={{ position: 'relative' }}>
         <div className="floral-corner floral-corner-tl"><FloralSVG /></div>
         <div className="floral-corner floral-corner-br"><FloralSVG /></div>

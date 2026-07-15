@@ -528,3 +528,15 @@
   .beige-korean .profile-photo { width: 158px; height: 158px; }
   .cover-ornaments { inset: 1.1rem; }
 }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.beige-korean {
+  --lx-script: 'Cormorant Garamond';
+  --lx-script-style: italic;
+  --lx-script-scale: 0.98;
+  --lx-label: 'Inter';
+  --lx-accent: var(--taupe-deep);
+  --lx-soft: var(--taupe-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(243, 237, 228, 0.66) 0%, rgba(243, 237, 228, 0.5) 42%, rgba(243, 237, 228, 0.95) 100%);
+}

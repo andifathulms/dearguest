@@ -1072,3 +1072,10 @@
 
 /* Full-bleed hero photo scrim */
 .luxury-emerald { --hero-scrim: linear-gradient(180deg, rgba(8,18,13,0.64) 0%, rgba(8,18,13,0.48) 42%, rgba(8,18,13,0.92) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.luxury-emerald {
+  --lx-script: 'Pinyon Script';
+  --lx-script-scale: 1.08;
+  --lx-scrim: linear-gradient(180deg, rgba(14, 31, 23, 0.68) 0%, rgba(14, 31, 23, 0.55) 42%, rgba(14, 31, 23, 0.95) 100%);
+}

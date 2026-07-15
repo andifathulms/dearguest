@@ -818,3 +818,13 @@
 
 /* Full-bleed hero photo scrim — light ivory veil */
 .ivory-classic { --hero-scrim: linear-gradient(180deg, rgba(247,241,230,0.34) 0%, rgba(247,241,230,0.14) 45%, rgba(247,241,230,0.8) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.ivory-classic {
+  --lx-script: 'Great Vibes';
+  --lx-script-scale: 1;
+  --lx-accent: var(--gold);
+  --lx-soft: var(--gold-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(247, 241, 230, 0.66) 0%, rgba(247, 241, 230, 0.5) 42%, rgba(247, 241, 230, 0.95) 100%);
+}

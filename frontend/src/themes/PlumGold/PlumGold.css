@@ -1077,3 +1077,10 @@
 
 /* Full-bleed hero photo scrim */
 .plum-gold { --hero-scrim: linear-gradient(180deg, rgba(36,16,38,0.6) 0%, rgba(36,16,38,0.44) 42%, rgba(36,16,38,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.plum-gold {
+  --lx-script: 'Great Vibes';
+  --lx-script-scale: 1;
+  --lx-scrim: linear-gradient(180deg, rgba(36, 16, 38, 0.68) 0%, rgba(36, 16, 38, 0.55) 42%, rgba(36, 16, 38, 0.95) 100%);
+}

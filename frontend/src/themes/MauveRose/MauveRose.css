@@ -870,3 +870,13 @@
 
 /* Full-bleed hero photo scrim — LIGHT mauve veil keeps photo bright, dark text readable */
 .mauve-rose { --hero-scrim: linear-gradient(180deg, rgba(246,238,240,0.32) 0%, rgba(246,238,240,0.12) 45%, rgba(246,238,240,0.78) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.mauve-rose {
+  --lx-script: 'Ephesis';
+  --lx-script-scale: 1.18;
+  --lx-accent: var(--mauve);
+  --lx-soft: var(--mauve-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(246, 238, 240, 0.66) 0%, rgba(246, 238, 240, 0.5) 42%, rgba(246, 238, 240, 0.95) 100%);
+}

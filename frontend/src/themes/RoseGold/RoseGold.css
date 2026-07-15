@@ -940,3 +940,16 @@
 
 /* Full-bleed hero photo scrim — light blush veil */
 .rose-gold { --hero-scrim: linear-gradient(180deg, rgba(251,238,233,0.32) 0%, rgba(251,238,233,0.12) 45%, rgba(251,238,233,0.78) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.rose-gold {
+  --lx-script: 'Alex Brush';
+  --lx-script-scale: 1.08;
+  /* deeper metal sheen: the base gradient's light-gold centre washed out
+     thin script strokes on the blush background */
+  --metal-gradient: linear-gradient(100deg, var(--copper) 0%, var(--rosegold-deep) 20%, var(--rosegold) 42%, #e0a68e 50%, var(--rosegold) 58%, var(--rosegold-deep) 80%, var(--copper) 100%);
+  --lx-accent: var(--rosegold);
+  --lx-soft: var(--rosegold-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(251, 238, 233, 0.66) 0%, rgba(251, 238, 233, 0.5) 42%, rgba(251, 238, 233, 0.95) 100%);
+}

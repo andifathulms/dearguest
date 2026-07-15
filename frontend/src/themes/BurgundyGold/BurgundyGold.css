@@ -1087,3 +1087,10 @@
 
 /* Full-bleed hero photo scrim */
 .burgundy-gold { --hero-scrim: linear-gradient(180deg, rgba(34,12,18,0.6) 0%, rgba(34,12,18,0.44) 42%, rgba(34,12,18,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.burgundy-gold {
+  --lx-script: 'Pinyon Script';
+  --lx-script-scale: 1.08;
+  --lx-scrim: linear-gradient(180deg, rgba(42, 14, 22, 0.68) 0%, rgba(42, 14, 22, 0.55) 42%, rgba(42, 14, 22, 0.95) 100%);
+}

@@ -868,3 +868,13 @@
   .cover-gate::before, .cover-gate::after { width: 220px; height: 220px; }
   .dusty-blue .profile-card::before { top: 124px; }
 }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.dusty-blue {
+  --lx-script: 'Alex Brush';
+  --lx-script-scale: 1.08;
+  --lx-accent: var(--blue);
+  --lx-soft: var(--blue-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(238, 242, 246, 0.66) 0%, rgba(238, 242, 246, 0.5) 42%, rgba(238, 242, 246, 0.95) 100%);
+}

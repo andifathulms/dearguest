@@ -1084,3 +1084,11 @@
   .deco-noir .profile-card::before { width: 176px; height: 176px; }
   .deco-noir .music-btn { bottom: 1.4rem; right: 1.4rem; }
 }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.deco-noir {
+  --lx-script: 'Pinyon Script';
+  --lx-script-scale: 1.08;
+  --lx-label: 'Cinzel';
+  --lx-scrim: linear-gradient(180deg, rgba(12, 12, 14, 0.68) 0%, rgba(12, 12, 14, 0.55) 42%, rgba(12, 12, 14, 0.95) 100%);
+}

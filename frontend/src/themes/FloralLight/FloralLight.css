@@ -873,3 +873,13 @@
 
 /* Full-bleed hero photo scrim */
 .floral-light { --hero-scrim: linear-gradient(180deg, rgba(253,248,245,0.30) 0%, rgba(253,248,245,0.10) 45%, rgba(253,248,245,0.74) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.floral-light {
+  --lx-script: 'Ephesis';
+  --lx-script-scale: 1.18;
+  --lx-accent: var(--rose);
+  --lx-soft: var(--rose-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(253, 248, 245, 0.66) 0%, rgba(253, 248, 245, 0.5) 42%, rgba(253, 248, 245, 0.95) 100%);
+}

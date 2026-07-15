@@ -1072,3 +1072,10 @@
 
 /* Full-bleed hero photo scrim — dark navy veil */
 .navy-gold { --hero-scrim: linear-gradient(180deg, rgba(16,26,51,0.6) 0%, rgba(16,26,51,0.44) 42%, rgba(16,26,51,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.navy-gold {
+  --lx-script: 'Pinyon Script';
+  --lx-script-scale: 1.08;
+  --lx-scrim: linear-gradient(180deg, rgba(16, 26, 51, 0.68) 0%, rgba(16, 26, 51, 0.55) 42%, rgba(16, 26, 51, 0.95) 100%);
+}

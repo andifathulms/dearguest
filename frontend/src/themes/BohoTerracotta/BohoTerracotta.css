@@ -912,3 +912,16 @@
 
 /* Full-bleed hero photo scrim */
 .boho-terracotta { --hero-scrim: linear-gradient(180deg, rgba(74,47,36,0.42) 0%, rgba(74,47,36,0.26) 42%, rgba(74,47,36,0.82) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.boho-terracotta {
+  --lx-script: 'Alex Brush';
+  --lx-cover-bg: rgba(122, 55, 37, 0.3);
+  --lx-frame: rgba(253, 246, 238, 0.55);
+  --lx-frame-inner: rgba(253, 246, 238, 0.28);
+  --lx-script-scale: 1.08;
+  --lx-accent: var(--terracotta);
+  --lx-soft: var(--terracotta-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(251, 243, 234, 0.66) 0%, rgba(251, 243, 234, 0.5) 42%, rgba(251, 243, 234, 0.95) 100%);
+}

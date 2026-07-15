@@ -808,3 +808,13 @@
   .cover-gate::before, .cover-gate::after { width: 210px; height: 210px; }
   .marble-white .profile-card::before { top: 124px; }
 }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.marble-white {
+  --lx-script: 'Pinyon Script';
+  --lx-script-scale: 1.08;
+  --lx-accent: var(--gold);
+  --lx-soft: var(--gold-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(248, 246, 242, 0.66) 0%, rgba(248, 246, 242, 0.5) 42%, rgba(248, 246, 242, 0.95) 100%);
+}

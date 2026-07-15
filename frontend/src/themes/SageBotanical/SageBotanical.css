@@ -872,3 +872,13 @@
 
 /* Full-bleed hero photo scrim — LIGHT veil so photo stays bright & dark text reads */
 .sage-botanical { --hero-scrim: linear-gradient(180deg, rgba(238,242,234,0.32) 0%, rgba(238,242,234,0.12) 45%, rgba(238,242,234,0.78) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.sage-botanical {
+  --lx-script: 'Alex Brush';
+  --lx-script-scale: 1.08;
+  --lx-accent: var(--sage);
+  --lx-soft: var(--sage-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(238, 242, 234, 0.66) 0%, rgba(238, 242, 234, 0.5) 42%, rgba(238, 242, 234, 0.95) 100%);
+}

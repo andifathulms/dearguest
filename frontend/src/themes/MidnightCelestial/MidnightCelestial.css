@@ -1106,3 +1106,10 @@
   .midnight-celestial .section-title::before { padding: 0 48px; background-size: 38px 1px, 38px 1px; }
   .midnight-celestial::before { background-size: 180px 180px; opacity: 0.13; }
 }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.midnight-celestial {
+  --lx-script: 'Pinyon Script';
+  --lx-script-scale: 1.08;
+  --lx-scrim: linear-gradient(180deg, rgba(13, 19, 48, 0.68) 0%, rgba(13, 19, 48, 0.55) 42%, rgba(13, 19, 48, 0.95) 100%);
+}

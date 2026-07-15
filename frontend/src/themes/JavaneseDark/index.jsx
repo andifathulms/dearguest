@@ -1,4 +1,5 @@
 import './JavaneseDark.css'
+import '../_luxe/luxe.css'
 import { motion } from 'framer-motion'
 import HeroSection from '../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
@@ -39,7 +40,7 @@ export default function JavaneseDark({ invitation, guestName }) {
   const akad = (invitation.events || []).find(e => e.event_type === 'akad')
 
   return (
-    <div className="javanese-dark">
+    <div className="javanese-dark lx-root">
       <div className="kawung-border-top" />
 
       <HeroSection

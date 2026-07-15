@@ -1080,3 +1080,10 @@
 
 /* Full-bleed hero photo scrim */
 .teal-ocean { --hero-scrim: linear-gradient(180deg, rgba(7,37,43,0.6) 0%, rgba(7,37,43,0.44) 42%, rgba(7,37,43,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.teal-ocean {
+  --lx-script: 'Alex Brush';
+  --lx-script-scale: 1.08;
+  --lx-scrim: linear-gradient(180deg, rgba(7, 37, 43, 0.68) 0%, rgba(7, 37, 43, 0.55) 42%, rgba(7, 37, 43, 0.95) 100%);
+}

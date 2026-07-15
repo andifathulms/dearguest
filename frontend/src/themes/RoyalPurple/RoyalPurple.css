@@ -1080,3 +1080,10 @@
 
 /* Full-bleed hero photo scrim */
 .royal-purple { --hero-scrim: linear-gradient(180deg, rgba(30,18,51,0.6) 0%, rgba(30,18,51,0.44) 42%, rgba(30,18,51,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.royal-purple {
+  --lx-script: 'Great Vibes';
+  --lx-script-scale: 1;
+  --lx-scrim: linear-gradient(180deg, rgba(30, 18, 51, 0.68) 0%, rgba(30, 18, 51, 0.55) 42%, rgba(30, 18, 51, 0.95) 100%);
+}

@@ -509,3 +509,15 @@
 
 /* Full-bleed hero photo scrim */
 .modern-minimalist { --hero-scrim: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.78) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.modern-minimalist {
+  --lx-script: 'Cormorant Garamond';
+  --lx-script-style: italic;
+  --lx-script-scale: 0.98;
+  --lx-label: 'Inter';
+  --lx-accent: var(--accent);
+  --lx-soft: var(--sage-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(255, 255, 255, 0.5) 42%, rgba(255, 255, 255, 0.95) 100%);
+}

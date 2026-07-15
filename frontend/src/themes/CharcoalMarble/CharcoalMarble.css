@@ -1074,3 +1074,10 @@
 
 /* Full-bleed hero photo scrim — dark charcoal veil */
 .charcoal-marble { --hero-scrim: linear-gradient(180deg, rgba(30,30,34,0.62) 0%, rgba(30,30,34,0.46) 42%, rgba(30,30,34,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.charcoal-marble {
+  --lx-script: 'Pinyon Script';
+  --lx-script-scale: 1.08;
+  --lx-scrim: linear-gradient(180deg, rgba(30, 30, 34, 0.68) 0%, rgba(30, 30, 34, 0.55) 42%, rgba(30, 30, 34, 0.95) 100%);
+}

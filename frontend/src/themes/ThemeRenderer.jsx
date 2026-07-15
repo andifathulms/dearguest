@@ -44,7 +44,7 @@ const themes = {
 // Themes that reuse another theme's cover-gate styling need that theme's class
 // on the cover too (the cover-gate selectors are scoped per theme).
 const COVER_CLASS = {
-  'celestial-cinematic': 'midnight-celestial celestial-cinematic',
+  'celestial-cinematic': 'midnight-celestial celestial-cinematic cc-root',
   'petals-3d': 'floral-light petals-3d cc-root',
   'aurora-3d': 'midnight-celestial aurora-3d cc-root',
   'golden-3d': 'deco-noir golden-3d cc-root',
@@ -61,7 +61,8 @@ export default function ThemeRenderer({ invitation, guestName, preview = false }
   return (
     <>
       {/* Editor preview renders the content directly, skipping the cover gate. */}
-      {!preview && <CoverGate invitation={invitation} guestName={guestName} themeClass={COVER_CLASS[themeKey] || themeKey} />}
+      {/* Every classic (non-WebGL) theme carries the luxe finish layer. */}
+      {!preview && <CoverGate invitation={invitation} guestName={guestName} themeClass={COVER_CLASS[themeKey] || `${themeKey} lx-root`} />}
       <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
         <Theme invitation={invitation} guestName={guestName} />
       </Suspense>

@@ -1,4 +1,5 @@
 import './DustyBlue.css'
+import '../_luxe/luxe.css'
 import { motion } from 'framer-motion'
 import HeroSection from '../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
@@ -34,7 +35,7 @@ export default function DustyBlue({ invitation, guestName }) {
   const akad = (invitation.events || []).find(e => e.event_type === 'akad')
 
   return (
-    <div className="dusty-blue">
+    <div className="dusty-blue lx-root">
       <HeroSection
         brideName={couple.bride_name}
         groomName={couple.groom_name}

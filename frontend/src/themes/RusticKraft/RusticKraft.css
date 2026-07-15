@@ -874,3 +874,13 @@
 
 /* Full-bleed hero photo scrim */
 .rustic-kraft { --hero-scrim: linear-gradient(180deg, rgba(243,236,224,0.32) 0%, rgba(243,236,224,0.12) 45%, rgba(243,236,224,0.74) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.rustic-kraft {
+  --lx-script: 'Alex Brush';
+  --lx-script-scale: 1.08;
+  --lx-accent: var(--terracotta);
+  --lx-soft: var(--terracotta-deep);
+  --lx-glow: rgba(255, 255, 255, 0.6);
+  --lx-scrim: linear-gradient(180deg, rgba(243, 236, 224, 0.66) 0%, rgba(243, 236, 224, 0.5) 42%, rgba(243, 236, 224, 0.95) 100%);
+}

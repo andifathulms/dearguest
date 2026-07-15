@@ -1077,3 +1077,10 @@
 
 /* Full-bleed hero photo scrim — dark green veil */
 .islamic-arabesque { --hero-scrim: linear-gradient(180deg, rgba(14,42,36,0.6) 0%, rgba(14,42,36,0.44) 42%, rgba(14,42,36,0.9) 100%); }
+
+/* ---------- Luxe layer identity (see _luxe/luxe.css) ---------- */
+.islamic-arabesque {
+  --lx-script: 'Great Vibes';
+  --lx-script-scale: 1;
+  --lx-scrim: linear-gradient(180deg, rgba(14, 42, 36, 0.68) 0%, rgba(14, 42, 36, 0.55) 42%, rgba(14, 42, 36, 0.95) 100%);
+}
