@@ -1,4 +1,5 @@
 import '../MidnightCelestial/MidnightCelestial.css'
+import '../_cinematic/cinematic.css'
 import './CelestialCinematic.css'
 import { lazy, Suspense, useState } from 'react'
 import { motion } from 'framer-motion'
@@ -47,7 +48,7 @@ export default function CelestialCinematic({ invitation, guestName }) {
   const [quality, setQuality] = useState('high')
 
   return (
-    <div className={`midnight-celestial celestial-cinematic cc-q-${quality}`}>
+    <div className={`midnight-celestial celestial-cinematic cc-root cc-q-${quality}`}>
       <Suspense fallback={null}>
         <CelestialScene quality={quality} onQuality={setQuality} />
       </Suspense>

@@ -1,10 +1,25 @@
-/* Aurora Dream — deep night cinematic. */
+/* Aurora Dream — deep night cinematic. Identity vars for the shared
+   cinematic design system (see _cinematic/cinematic.css for the contract). */
 .aurora-3d {
   --cc-base: #070b1f;
   --cc-card: rgba(12, 20, 40, 0.5);
-  --cc-card-solid: rgba(12, 20, 40, 0.82);
-  --cc-border: rgba(120, 180, 168, 0.32);
+  --cc-card-solid: rgba(12, 20, 40, 0.85);
+  --cc-border: rgba(120, 180, 168, 0.3);
   --cc-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.7);
-  --cc-veil: linear-gradient(180deg, rgba(7,11,31,0.34) 0%, rgba(7,11,31,0.55) 100%);
+  --cc-veil: linear-gradient(180deg, rgba(7, 11, 31, 0.34) 0%, rgba(7, 11, 31, 0.55) 100%);
   --cc-vignette: rgba(4, 6, 18, 0.6);
+  --cc-scrim: linear-gradient(180deg, rgba(7, 11, 31, 0.52) 0%, rgba(7, 11, 31, 0.4) 42%, rgba(7, 11, 31, 0.95) 100%);
+
+  --cc-script: 'Great Vibes';
+  --cc-script-scale: 1;
+  --cc-motif: '\2726'; /* ✦ */
+  --cc-accent: #8fe0c2;
+  --cc-accent-deep: #4fae8f;
+  --cc-accent-soft: #c5f2e0;
+  --cc-accent-hi: #f2fffa;
+  --cc-ink: #e9f3ee;
+  --cc-muted: #94ada3;
+  --cc-glow: rgba(143, 224, 194, 0.32);
+  --cc-btn-ink: #07261d;
+  --cc-field: rgba(4, 10, 20, 0.35);
 }

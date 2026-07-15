@@ -1,141 +1,25 @@
-/* ===== Celestial 3D — cinematic WebGL layer over the Celestial Night theme =====
-   Inherits all section styling from `.midnight-celestial`; this file just lets
-   the live 3D starfield show behind the content via frosted-glass cards. */
-
-/* Base dark so there's never a flash before the canvas paints. */
+/* Celestial 3D — midnight starfield cinematic. Identity vars for the shared
+   cinematic design system (see _cinematic/cinematic.css for the contract). */
 .celestial-cinematic {
-  background: #070b1f !important;
-}
-/* The Celestial Night theme paints its own CSS starfield in ::before/::after —
-   hide it so we don't double up on the WebGL stars. */
-.celestial-cinematic::before,
-.celestial-cinematic::after {
-  display: none !important;
-}
+  --cc-base: #070b1f;
+  --cc-card: rgba(13, 19, 48, 0.5);
+  --cc-card-solid: rgba(13, 19, 48, 0.85);
+  --cc-border: rgba(216, 192, 116, 0.3);
+  --cc-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.7);
+  --cc-veil: linear-gradient(180deg, rgba(7, 11, 31, 0.5) 0%, rgba(7, 11, 31, 0.66) 100%);
+  --cc-vignette: rgba(4, 6, 18, 0.6);
+  --cc-scrim: linear-gradient(180deg, rgba(7, 11, 31, 0.5) 0%, rgba(7, 11, 31, 0.4) 42%, rgba(7, 11, 31, 0.95) 100%);
 
-/* Fixed full-bleed WebGL backdrop, behind everything, non-interactive. */
-.cc-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
+  --cc-script: 'Pinyon Script';
+  --cc-script-scale: 1.08;
+  --cc-motif: '\2726'; /* ✦ */
+  --cc-accent: #d8c074;
+  --cc-accent-deep: #a8924c;
+  --cc-accent-soft: #eedfa6;
+  --cc-accent-hi: #fffbe9;
+  --cc-ink: #f1ead6;
+  --cc-muted: #a89c7e;
+  --cc-glow: rgba(238, 223, 166, 0.36);
+  --cc-btn-ink: #0d1330;
+  --cc-field: rgba(5, 8, 22, 0.35);
 }
-.cc-canvas canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-}
-/* Cinematic vignette — darken the edges to focus the eye on the content. */
-.cc-canvas::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 92% 82% at 50% 36%, transparent 42%, rgba(4, 6, 18, 0.6) 100%);
-}
-
-/* All invitation content sits above the canvas. */
-.cc-content {
-  position: relative;
-  z-index: 1;
-}
-
-/* Let section wrappers be see-through so the stars drift behind them. */
-.celestial-cinematic .greeting-section,
-.celestial-cinematic .countdown-section,
-.celestial-cinematic .events-section,
-.celestial-cinematic .story-section,
-.celestial-cinematic .profile-section,
-.celestial-cinematic .gallery-section,
-.celestial-cinematic .amplod-section,
-.celestial-cinematic .rsvp-section,
-.celestial-cinematic .wishes-section,
-.celestial-cinematic .maps-section,
-.celestial-cinematic .livestream-section,
-.celestial-cinematic section:not(.hero-section) {
-  background: transparent !important;
-}
-/* Keep an uploaded hero photo; just darken its veil so the starfield reads
-   as the photo fades out at the bottom. */
-.celestial-cinematic .hero-section.has-photo {
-  --hero-scrim: linear-gradient(180deg, rgba(7,11,31,0.5) 0%, rgba(7,11,31,0.4) 42%, rgba(7,11,31,0.95) 100%);
-}
-
-/* Frosted-glass cards: translucent navy + blur so the 3D reads through. */
-.celestial-cinematic .event-card,
-.celestial-cinematic .bank-card,
-.celestial-cinematic .wish-card,
-.celestial-cinematic .rsvp-form,
-.celestial-cinematic .story-content,
-.celestial-cinematic .map-item,
-.celestial-cinematic .profile-card,
-.celestial-cinematic .countdown-unit,
-.celestial-cinematic .livestream-card,
-.celestial-cinematic .greeting-section .greeting-text {
-  background: rgba(13, 19, 48, 0.5) !important;
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
-  border-color: rgba(216, 192, 116, 0.3) !important;
-  box-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.7);
-}
-
-/* Cinematic cover: instead of an opaque panel with flat corner constellations,
-   show the LIVE 3D sky behind a frosted dark veil. */
-.celestial-cinematic.cover-gate {
-  background: linear-gradient(180deg, rgba(7, 11, 31, 0.5) 0%, rgba(7, 11, 31, 0.66) 100%) !important;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-/* Drop the static SVG corner constellations — the real 3D ones replace them. */
-.celestial-cinematic.cover-gate .cover-ornaments {
-  display: none !important;
-}
-/* Frosted guest card on the cover. */
-.celestial-cinematic.cover-gate .cover-inner {
-  background: rgba(13, 19, 48, 0.32) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 18px;
-}
-/* While the cover is up, hide the invitation body so the starfield — not the
-   hero — is what shows through the translucent cover (canvas stays visible). */
-.celestial-cinematic .cc-content {
-  transition: opacity 0.6s ease;
-}
-body.cover-open .celestial-cinematic .cc-content {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* On very small screens, blur is expensive — drop it, keep translucency. */
-@media (max-width: 560px) {
-  .celestial-cinematic .event-card,
-  .celestial-cinematic .bank-card,
-  .celestial-cinematic .wish-card,
-  .celestial-cinematic .rsvp-form,
-  .celestial-cinematic .story-content,
-  .celestial-cinematic .map-item,
-  .celestial-cinematic .profile-card,
-  .celestial-cinematic .countdown-unit {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: rgba(13, 19, 48, 0.72) !important;
-  }
-}
-
-/* ===== Adaptive quality: drop the expensive backdrop-blur on the low tier
-   (more opaque fill compensates) — capable devices keep the frosted glass. ===== */
-.celestial-cinematic.cc-q-low .event-card,
-.celestial-cinematic.cc-q-low .bank-card,
-.celestial-cinematic.cc-q-low .wish-card,
-.celestial-cinematic.cc-q-low .rsvp-form,
-.celestial-cinematic.cc-q-low .story-content,
-.celestial-cinematic.cc-q-low .map-item,
-.celestial-cinematic.cc-q-low .profile-card,
-.celestial-cinematic.cc-q-low .countdown-unit,
-.celestial-cinematic.cc-q-low.cover-gate .cover-inner {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background: rgba(13, 19, 48, 0.8) !important;
-}
-
