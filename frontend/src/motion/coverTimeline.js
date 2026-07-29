@@ -1,4 +1,4 @@
-import { interpolate, spring, Easing } from 'remotion'
+import { interpolate, spring, Easing } from './timing.js'
 
 /**
  * The cover card's reveal, expressed as a pure function of frame.

@@ -18,7 +18,6 @@ import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
 import FloatingRSVP from '../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
-import AmbientLayer from '../../motion/AmbientLayer.jsx'
 
 const LanternScene = lazy(() => import('./LanternScene.jsx'))
 
@@ -49,11 +48,6 @@ export default function FloatingLanterns({ invitation, guestName }) {
 
   return (
     <div className={`navy-gold lanterns-3d cc-root cc-q-${quality}`}>
-      {/* Mounts the shared Player. Invisible here — the three.js canvas is the
-          visual; this exists purely to give the scene a deterministic,
-          seekable frame clock. */}
-      <AmbientLayer />
-
       <Suspense fallback={null}>
         {/* dpr defaults to an adaptive [min,max] range, so the canvas
             resolution itself varies between runs — pin it alongside the

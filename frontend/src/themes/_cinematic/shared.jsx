@@ -190,7 +190,7 @@ export function DriftPoints({ count = 300, area = [36, 26, 16], size = 0.12, col
     // Frame-driven: every value is a pure function of the shared clock, so the
     // scene is identical on a slow phone and a fast laptop, and any frame can
     // be seeked to and asserted against.
-    const frame = clock?.playerRef?.current?.getCurrentFrame?.()
+    const frame = clock?.getCurrentFrame?.()
     if (frame != null) {
       const t = frame / clock.fps
       const span = area[1]
@@ -286,7 +286,7 @@ export function Rig({ reduce, baseZ = 12, warpTo = 7, clock = null }) {
     const onOpen = () => {
       open.current = true
       warp.current = 0
-      openFrame.current = clock?.playerRef?.current?.getCurrentFrame?.() ?? null
+      openFrame.current = clock?.getCurrentFrame?.() ?? null
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('invitation:open', onOpen)
@@ -298,7 +298,7 @@ export function Rig({ reduce, baseZ = 12, warpTo = 7, clock = null }) {
   useFrame((state, dt) => {
     if (reduce) { camera.position.set(0, 0, warpTo); camera.lookAt(0, 0, 0); return }
 
-    const frame = clock?.playerRef?.current?.getCurrentFrame?.()
+    const frame = clock?.getCurrentFrame?.()
 
     if (frame != null) {
       // Deterministic path: the camera is a pure function of the shared clock.

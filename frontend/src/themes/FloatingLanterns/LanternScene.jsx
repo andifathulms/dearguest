@@ -110,7 +110,7 @@ function Lanterns({ count, clock }) {
     if (!grp.current) return
     // Prefer the shared clock so the scene is deterministic and seekable; fall
     // back to wall time while the motion chunk is still loading.
-    const frame = clock?.playerRef?.current?.getCurrentFrame?.()
+    const frame = clock?.getCurrentFrame?.()
     const t = frame != null ? frame / clock.fps : state.clock.elapsedTime
 
     grp.current.children.forEach((m, i) => {

@@ -1,4 +1,18 @@
-import { AbsoluteFill, interpolate, spring, random, useCurrentFrame, useVideoConfig, Easing } from 'remotion'
+import { createContext, useContext } from 'react'
+import { interpolate, spring, random, Easing } from './timing.js'
+
+// Frame + fps for the whole composition tree. Replaces Remotion's
+// useCurrentFrame()/useVideoConfig(), which did the same thing.
+const FrameContext = createContext({ frame: 0, fps: 30 })
+const useCurrentFrame = () => useContext(FrameContext).frame
+const useVideoConfig = () => useContext(FrameContext)
+
+/** Absolutely-positioned full-bleed layer. */
+function AbsoluteFill({ style, children }) {
+  return (
+    <div style={{ position: 'absolute', inset: 0, ...style }}>{children}</div>
+  )
+}
 
 /**
  * Animated backdrop for the javanese-dark cover gate.
@@ -175,7 +189,15 @@ function GoldDust() {
   )
 }
 
-export default function JavaneseBackdrop() {
+export default function JavaneseBackdrop({ frame = 0, fps = BACKDROP_FPS }) {
+  return (
+    <FrameContext.Provider value={{ frame, fps }}>
+      <BackdropLayers />
+    </FrameContext.Provider>
+  )
+}
+
+function BackdropLayers() {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
 

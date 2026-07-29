@@ -16,7 +16,9 @@ const AmbientStage = lazy(() => import('./AmbientStage.jsx'))
  */
 export default function AmbientLayer() {
   const clock = useMotionClock()
-  if (!clock) return null
+  // 'clock-only' themes draw themselves with three.js and read the clock
+  // directly from context — there is nothing for this layer to render.
+  if (!clock || clock.composition === 'clock-only') return null
 
   return (
     <SilentBoundary>

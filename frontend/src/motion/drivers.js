@@ -1,4 +1,4 @@
-import { interpolate, Easing } from 'remotion'
+import { interpolate, Easing } from './timing.js'
 import { revealAt, REVEAL_END } from './coverTimeline.js'
 
 /**
