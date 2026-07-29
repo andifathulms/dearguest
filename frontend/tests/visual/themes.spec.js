@@ -39,6 +39,17 @@ for (const slug of THEMES) {
     // Wait for fonts/photos and the entrance animation to settle.
     await page.waitForTimeout(1800)
 
+    // Remotion backdrops are driven by JS, so Playwright's `animations:
+    // 'disabled'` can't freeze them. Pin to a fixed frame for a stable
+    // snapshot. No-op on themes without a motion backdrop.
+    await page.evaluate(() => {
+      if (window.__backdrop) {
+        window.__backdrop.pause()
+        window.__backdrop.seekTo(180)
+      }
+    })
+    await page.waitForTimeout(400)
+
     await expect(page).toHaveScreenshot(`${slug}-1-cover.png`)
 
     const open = page.locator('.cover-open-btn')
