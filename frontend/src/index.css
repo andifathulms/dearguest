@@ -235,3 +235,12 @@ body.cover-open {
   font-size: 0.82rem; letter-spacing: 0.04em; text-decoration: none;
   color: #b8924e; border-bottom: 1px solid currentColor; padding-bottom: 2px;
 }
+
+/* Same affordance as the anchor variant, for the reload action. */
+button.inv-status-link {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  font-family: inherit;
+  cursor: pointer;
+}

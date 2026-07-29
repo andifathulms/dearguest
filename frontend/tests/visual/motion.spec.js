@@ -236,6 +236,19 @@ test('invitation survives the motion chunk failing to load', async ({ page }) =>
   await expect(page.locator('.story-timeline')).toHaveCount(1)
 })
 
+test('a failed theme chunk shows a reload prompt, not a blank page', async ({ page }) => {
+  await stubApi(page)
+  // Themes are lazy chunks; a stale hash after a deploy rejects the import.
+  // Suspense does not catch that, so without a boundary the whole invitation
+  // unmounts and the guest gets a white screen.
+  await page.route(/JavaneseDark\/index/, route => route.abort())
+
+  await page.goto('/demo-javanese?to=Budi+Santoso', { waitUntil: 'domcontentloaded' })
+
+  await expect(page.locator('.inv-status-title')).toBeVisible({ timeout: 15000 })
+  await expect(page.locator('button.inv-status-link')).toBeVisible()
+})
+
 test('reduced motion drops the motion layer but keeps the design', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await stubApi(page)

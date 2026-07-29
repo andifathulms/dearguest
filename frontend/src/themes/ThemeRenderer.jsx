@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import CoverGate from '../components/ui/CoverGate.jsx'
+import SilentBoundary from '../components/ui/SilentBoundary.jsx'
 import { MotionClockProvider } from '../motion/MotionClockContext.jsx'
 
 // Each theme (and its CSS) is a separate chunk — an invitation loads only
@@ -71,6 +72,26 @@ const MOTION_CLOCK = {
   },
 }
 
+// Every theme is a separate lazy chunk, so a stale hash after a deploy — the
+// classic trigger — rejects the import. Without a boundary that propagates past
+// Suspense and unmounts the whole invitation, leaving a blank page. A reload
+// fetches the current manifest, which is the actual fix.
+function ThemeUnavailable() {
+  return (
+    <div className="inv-status">
+      <div className="inv-status-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+        </svg>
+      </div>
+      <p className="inv-status-title">Undangan gagal dimuat.</p>
+      <button className="inv-status-link" type="button" onClick={() => window.location.reload()}>
+        Muat ulang
+      </button>
+    </div>
+  )
+}
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false)
   useEffect(() => {
@@ -104,9 +125,11 @@ export default function ThemeRenderer({ invitation, guestName, preview = false }
           themeClass={COVER_CLASS[themeKey] || `${themeKey} lx-root`}
         />
       )}
-      <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
-        <Theme invitation={invitation} guestName={guestName} />
-      </Suspense>
+      <SilentBoundary fallback={<ThemeUnavailable />}>
+        <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+          <Theme invitation={invitation} guestName={guestName} />
+        </Suspense>
+      </SilentBoundary>
     </MotionClockProvider>
   )
 }
