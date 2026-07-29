@@ -1087,3 +1087,113 @@
   --lx-script-scale: 1;
   --lx-scrim: linear-gradient(180deg, rgba(26, 18, 8, 0.68) 0%, rgba(26, 18, 8, 0.55) 42%, rgba(26, 18, 8, 0.95) 100%);
 }
+
+/* ------------------------------------------------------------------ */
+/* Remotion motion layer                                               */
+/* ------------------------------------------------------------------ */
+
+/* Purely additive layer behind everything — the theme's own background
+   gradient and kawung tile stay exactly as they were, so reduced-motion
+   guests lose the motion, not the design.
+
+   Fixed and z-index 0 so it sits above the theme root's background but below
+   its content, matching the existing `.javanese-dark::before` texture layer.
+   The `> .jd-ambient` selector outranks `.javanese-dark > *`, which would
+   otherwise lift it into the content layer. */
+.javanese-dark > .jd-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 1.2s ease;
+}
+
+/* Once the cover is open the backdrop is competing with photographs and body
+   copy, so it steps well back. */
+.javanese-dark > .jd-ambient--content {
+  opacity: 0.42;
+}
+
+/* The composition is authored at 1080x1920. Size the stage so that aspect
+   ratio *covers* the viewport instead of letterboxing inside it. */
+.jd-ambient-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100vw, 56.25vh);
+  height: max(177.78vw, 100vh);
+}
+
+/* Ornaments already sit above the tiled texture; keep them above the
+   ambient layer too, with the framed card (z-index 1) above both. */
+.javanese-dark.cover-gate--backdrop .cover-ornaments {
+  z-index: 0;
+}
+
+/* The ambient layer lives inside the theme root, but the cover gate is a fixed
+   z-index:1000 sibling — an opaque gate would simply hide it. So when a motion
+   clock is present the gate goes transparent and the invitation body behind it
+   is hidden instead. The theme root's own background becomes the cover's
+   background, which is the same palette the gate was painting anyway. */
+.javanese-dark.cover-gate--backdrop {
+  background-color: transparent;
+  background-image: none;
+}
+/* `:not(.cover-gate)` matters — the gate itself carries the theme class, so an
+   unscoped rule would hide the cover card along with the invitation body. */
+body.cover-open .javanese-dark:not(.cover-gate) > *:not(.jd-ambient) {
+  visibility: hidden;
+}
+
+/* --- Story spine, scrubbed to scroll position (driver kind 'story') ---
+   The static spine stays as the unlit track; this gold overlay draws down it
+   as the guest scrolls. --spine-draw is written by the driver each frame. */
+.javanese-dark .story-timeline::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  /* ::after is the last child, so without this it paints over the story cards
+     instead of behind them the way the static ::before track does. */
+  z-index: -1;
+  transform: translateX(-50%) scaleY(var(--spine-draw, 0));
+  transform-origin: top center;
+  background: linear-gradient(180deg, transparent, var(--gold) 10%, var(--gold) 90%, transparent);
+  box-shadow: 0 0 12px rgba(201,168,76,0.5);
+  opacity: 0.75;
+  pointer-events: none;
+}
+/* Must follow the rule above, not sit with the other mobile overrides earlier
+   in this file — same specificity, so source order decides. */
+@media (max-width: 640px) {
+  .javanese-dark .story-timeline::after { left: 1rem; }
+}
+
+/* --- Gallery ken-burns drift (driver kind 'gallery') ---
+   The driver scales each image slightly past its frame, so the item has to
+   clip or the grid gaps fill with overflow. */
+.javanese-dark .gallery-item {
+  overflow: hidden;
+}
+
+/* Card driven by the backdrop's frame clock (see useCoverReveal). The theme's
+   own entrance and shimmer must stand down so they don't fight the per-frame
+   inline styles for the same properties. */
+.javanese-dark .cover-inner--driven {
+  animation: none;
+}
+/* Each name paints its own gradient while driven, so the shared one on the
+   heading would show through underneath. */
+.cover-inner--driven .cover-names {
+  animation: none;
+  background-image: none;
+}
+/* ...but the ampersand relied on that heading gradient for its fill. */
+.cover-inner--driven .cover-amp {
+  -webkit-text-fill-color: currentColor;
+}
