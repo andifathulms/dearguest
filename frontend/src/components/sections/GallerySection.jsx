@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
 
 const container = {
   hidden: {},
@@ -52,12 +53,18 @@ function Lightbox({ photos, index, setIndex }) {
 
 export default function GallerySection({ photos }) {
   const [index, setIndex] = useState(null)
+  const gridRef = useRef(null)
+  // Slow ken-burns drift on themes with a motion clock. Drives the <img>
+  // transform only, so the Framer entrance on the wrapper is unaffected.
+  useMotionTarget('gallery', gridRef)
+
   if (!photos || photos.length === 0) return null
   return (
     <section className="gallery-section">
       <h2 className="section-title">Galeri</h2>
       <motion.div
         className="gallery-grid"
+        ref={gridRef}
         variants={container}
         initial="hidden"
         whileInView="show"
