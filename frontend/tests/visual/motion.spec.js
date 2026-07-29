@@ -65,14 +65,18 @@ const opacityOf = (page, sel) =>
 /** Open the cover and wait for the invitation body to be interactive. */
 async function openInvitation(page) {
   await page.locator('.cover-open-btn').click()
-  await expect(page.locator('.cover-gate')).toHaveCount(0)
+  // The gate fades out over 0.8s, and a loaded machine can take longer than
+  // the 5s default to get there.
+  await expect(page.locator('.cover-gate')).toHaveCount(0, { timeout: 15000 })
 }
 
 test('ambient layer plays behind an unchanged cover card', async ({ page }) => {
   await stubApi(page)
   await page.goto('/demo-javanese?to=Budi+Santoso', { waitUntil: 'domcontentloaded' })
 
-  await expect(page.locator('.jd-ambient')).toHaveCount(1)
+  // The motion layer is a lazy chunk, so allow for a slow fetch rather than
+  // the 5s default.
+  await expect(page.locator('.jd-ambient')).toHaveCount(1, { timeout: 15000 })
 
   // The card is real DOM, not painted into the composition — this is the whole
   // point of the layered approach, so assert every part of it survives.
@@ -93,13 +97,14 @@ test('ambient layer plays behind an unchanged cover card', async ({ page }) => {
 
 test('card reveal is staggered across the shared frame clock', async ({ page }) => {
   await stubApi(page)
-  await page.goto('/demo-javanese?to=Budi+Santoso', { waitUntil: 'domcontentloaded' })
+  // Pinned at frame 45 from the start — seeking after load races the reveal,
+  // which settles after ~6s and then cannot be inspected again.
+  await page.goto('/demo-javanese?to=Budi+Santoso&frame=45', { waitUntil: 'domcontentloaded' })
   await page.waitForFunction(() => window.__backdrop, null, { timeout: 15000 })
+  await page.waitForTimeout(400)
 
   // Mid-reveal: the label has landed, the closing beats have not. If these ever
   // match, the stagger has collapsed back into a single fade.
-  await page.evaluate(() => { window.__backdrop.pause(); window.__backdrop.seekTo(45) })
-  await page.waitForTimeout(250)
 
   expect(Number(await opacityOf(page, '.cover-label'))).toBeGreaterThan(0.8)
   expect(Number(await opacityOf(page, '.cover-name-bride'))).toBeGreaterThan(0.2)
@@ -141,8 +146,8 @@ test('ambient layer outlives the cover gate', async ({ page }) => {
   // Still mounted, still playing, and stepped back so it does not compete with
   // the invitation body. Previously the whole Remotion runtime was fetched,
   // played for six seconds and discarded here.
-  await expect(page.locator('.jd-ambient')).toHaveCount(1)
-  await expect(page.locator('.jd-ambient--content')).toHaveCount(1)
+  await expect(page.locator('.jd-ambient')).toHaveCount(1, { timeout: 15000 })
+  await expect(page.locator('.jd-ambient--content')).toHaveCount(1, { timeout: 15000 })
   expect(await page.evaluate(() => window.__backdrop.isPlaying())).toBe(true)
   expect(Number(await opacityOf(page, '.jd-ambient'))).toBeLessThan(0.6)
 })
@@ -159,19 +164,36 @@ test('story spine scrubs to scroll position', async ({ page }) => {
       return Number(getComputedStyle(el).getPropertyValue('--spine-draw')) || 0
     })
 
-  // Above the timeline: undrawn.
-  await page.evaluate(() => document.querySelector('.story-timeline').scrollIntoView({ block: 'end' }))
+  // Scroll targets are computed from the element at scroll time. A blind
+  // scrollIntoView + scrollBy drifts when content above the timeline changes
+  // height as images settle, which can leave the page above the timeline
+  // entirely — reading 0 for both samples.
+  const scrollSo = where =>
+    page.evaluate(w => {
+      const el = document.querySelector('.story-timeline')
+      const r = el.getBoundingClientRect()
+      const top = r.top + window.scrollY
+      window.scrollTo(0, w === 'below' ? top - window.innerHeight * 0.95 : top + r.height - window.innerHeight * 0.3)
+    }, where)
+
+  // Timeline still below the fold: undrawn.
+  await scrollSo('below')
   await page.waitForTimeout(300)
   const early = await drawAt()
 
-  // Scrolled past it: drawn further. This is the scroll-scrubbed timeline —
+  // Scrolled through it: drawn further. This is the scroll-scrubbed timeline —
   // the one place the clock is deliberately not the frame counter.
-  await page.evaluate(() => window.scrollBy(0, window.innerHeight * 1.5))
-  await page.waitForTimeout(300)
-  const late = await drawAt()
+  //
+  // Re-scrolls on every poll: sections below the story can still be settling,
+  // which moves the timeline out from under a one-shot scroll and reads 0.
+  await expect
+    .poll(async () => {
+      await scrollSo('past')
+      return drawAt()
+    }, { timeout: 10000 })
+    .toBeGreaterThan(early)
 
-  expect(late).toBeGreaterThan(early)
-  expect(late).toBeLessThanOrEqual(1)
+  expect(await drawAt()).toBeLessThanOrEqual(1)
 })
 
 test('gallery photos drift on the frame clock', async ({ page }) => {
