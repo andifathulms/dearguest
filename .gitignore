@@ -18,3 +18,10 @@ backend/staticfiles/
 frontend/test-results/
 frontend/playwright-report/
 frontend/blob-report/
+
+# Local brand-asset exports (SVG/PNG lockups). Generated output, kept out of
+# the repo — the source of truth lives with the design files.
+/exports/
+
+# macOS folder metadata
+.DS_Store
