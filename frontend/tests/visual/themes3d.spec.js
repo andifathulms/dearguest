@@ -49,7 +49,9 @@ for (const { slug, frame } of THEMES_3D) {
     }
 
     const first = await sample(frame)
-    const away = await sample(frame + 600)
+    // Not a multiple of the 600-frame loop, or the seek aliases straight back
+    // onto the same frame and the scene legitimately does not move.
+    const away = await sample(frame + 150)
     const back = await sample(frame)
 
     // Seeking must actually move the scene. Camera x drifts continuously;
