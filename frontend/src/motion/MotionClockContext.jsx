@@ -22,13 +22,21 @@ export function useMotionClock() {
   return useContext(MotionClockContext)
 }
 
-function createClock(fps) {
+function createClock(fps, composition, features) {
   const targets = new Set()
   const watchers = new Set()
   const notify = () => watchers.forEach(w => w())
 
   return {
     fps,
+    // Which composition the Player renders. 'clock-only' mounts a hidden
+    // Player purely as a frame source — used by the WebGL themes, where the
+    // three.js canvas is the visual and Remotion just supplies the clock.
+    composition,
+    // Which drivers this theme opts into. Drivers carry theme-specific styling
+    // assumptions, so they are enabled per theme rather than by the mere
+    // presence of a clock.
+    features,
     // Assigned by AmbientStage once the Player mounts.
     playerRef: { current: null },
     targets,
@@ -48,8 +56,14 @@ function createClock(fps) {
   }
 }
 
-export function MotionClockProvider({ enabled, fps = 30, children }) {
-  const clock = useMemo(() => (enabled ? createClock(fps) : null), [enabled, fps])
+export function MotionClockProvider({ config, fps = 30, children }) {
+  const compositionKey = config?.composition ?? null
+  const featureKey = config ? JSON.stringify(config.features || {}) : ''
+  const clock = useMemo(
+    () => (config ? createClock(fps, compositionKey, config.features || {}) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fps, compositionKey, featureKey]
+  )
   return <MotionClockContext.Provider value={clock}>{children}</MotionClockContext.Provider>
 }
 
@@ -67,7 +81,7 @@ export function useMotionTarget(kind, ref, options) {
   const optionsKey = options ? JSON.stringify(options) : ''
 
   useEffect(() => {
-    if (!clock || !ref.current) return
+    if (!clock?.features?.[kind] || !ref.current) return
     return clock.addTarget({ kind, node: ref.current, options: options || {} })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clock, kind, optionsKey])

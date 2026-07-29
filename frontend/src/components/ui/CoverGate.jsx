@@ -35,9 +35,10 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
     return () => document.body.classList.remove('cover-open')
   }, [])
 
-  // No clock means this theme has no motion layer, or the guest asked for
-  // reduced motion (see MotionClockProvider in ThemeRenderer).
-  const useBackdrop = Boolean(clock)
+  // Not every theme with a clock opts into the cover reveal — the driver still
+  // carries javanese-dark styling assumptions. See MOTION_CLOCK in
+  // ThemeRenderer.
+  const useBackdrop = Boolean(clock?.features?.cover)
 
   const onRevealStart = useCallback(() => setReveal('driven'), [])
 

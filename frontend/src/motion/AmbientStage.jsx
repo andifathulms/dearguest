@@ -8,6 +8,11 @@ import JavaneseBackdrop, {
   BACKDROP_HEIGHT,
 } from './JavaneseBackdrop.jsx'
 
+/** Renders nothing — used when the Player exists purely to be a clock. */
+function NullComposition() {
+  return null
+}
+
 /**
  * The invitation's single motion layer: one Remotion Player, mounted for the
  * life of the invitation, plus the one rAF loop that drives every registered
@@ -34,6 +39,16 @@ export default function AmbientStage({ clock }) {
     if (!player) return
     clock.playerRef.current = player
 
+    // Dev-only: `?frame=N` starts the clock paused on a given frame. Visual
+    // tests otherwise have to race the reveal — seek too late and the driver
+    // has already settled, so the frame can never be inspected again.
+    // Guard the null: Number(null) is 0, not NaN, which would pin every page
+    // at frame 0 rather than only the ones asking for it.
+    const frameParam = import.meta.env.DEV
+      ? new URLSearchParams(window.location.search).get('frame')
+      : null
+    const pinnedFrame = frameParam ? Number(frameParam) : NaN
+
     const start = () => {
       try {
         if (!player.isPlaying()) player.play()
@@ -42,7 +57,13 @@ export default function AmbientStage({ clock }) {
       }
     }
 
-    start()
+    if (Number.isFinite(pinnedFrame)) {
+      clock.pinned = true
+      player.pause()
+      player.seekTo(pinnedFrame)
+    } else {
+      start()
+    }
 
     if (import.meta.env.DEV) {
       window.__backdrop = player
@@ -50,7 +71,9 @@ export default function AmbientStage({ clock }) {
     }
 
     const events = ['pointerdown', 'touchstart', 'keydown', 'scroll']
-    events.forEach(e => window.addEventListener(e, start, { once: true, passive: true }))
+    if (!Number.isFinite(pinnedFrame)) {
+      events.forEach(e => window.addEventListener(e, start, { once: true, passive: true }))
+    }
     return () => {
       events.forEach(e => window.removeEventListener(e, start))
       clock.playerRef.current = null
@@ -86,7 +109,7 @@ export default function AmbientStage({ clock }) {
           seen.delete(target)
           continue
         }
-        const driver = createDriver(target, { fps: BACKDROP_FPS })
+        const driver = createDriver(target, { fps: BACKDROP_FPS, pinned: clock.pinned })
         if (driver) next.push({ target, driver })
       }
       // Anything still in `seen` was unregistered — let it clean up after itself.
@@ -127,6 +150,38 @@ export default function AmbientStage({ clock }) {
       drivers.forEach(d => d.driver.dispose?.())
     }
   }, [clock])
+
+  // 'clock-only' themes render their own visuals (three.js) and want nothing
+  // but the frame counter, so the Player is parked in a 1px offscreen box.
+  // Not display:none — that is the one thing that could stop it advancing.
+  const clockOnly = clock.composition === 'clock-only'
+
+  if (clockOnly) {
+    return (
+      <div
+        aria-hidden="true"
+        style={{ position: 'fixed', top: 0, left: 0, width: 1, height: 1, opacity: 0, pointerEvents: 'none', overflow: 'hidden' }}
+      >
+        <Player
+          ref={playerRef}
+          component={NullComposition}
+          durationInFrames={BACKDROP_DURATION}
+          fps={BACKDROP_FPS}
+          compositionWidth={16}
+          compositionHeight={16}
+          style={{ width: 16, height: 16 }}
+          autoPlay
+          loop
+          initiallyMuted
+          controls={false}
+          clickToPlay={false}
+          doubleClickToFullscreen={false}
+          spaceKeyToPlayOrPause={false}
+          allowFullscreen={false}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className={`jd-ambient${contentMode ? ' jd-ambient--content' : ''}`} aria-hidden="true">

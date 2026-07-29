@@ -55,8 +55,21 @@ const COVER_CLASS = {
   'snow-3d': 'dusty-blue snow-3d cc-root',
 }
 
-// Themes that mount a shared Remotion frame clock (see MotionClockContext).
-const MOTION_CLOCK = new Set(['javanese-dark'])
+// Themes that mount a shared Remotion frame clock, and what each opts into.
+//
+// `clock-only` mounts a hidden Player as nothing but a frame source: the WebGL
+// themes already render themselves with three.js, and what they gain from
+// Remotion is a deterministic, seekable clock rather than a second renderer.
+const MOTION_CLOCK = {
+  'javanese-dark': {
+    composition: 'javanese-backdrop',
+    features: { cover: true, story: true, gallery: true },
+  },
+  'lanterns-3d': {
+    composition: 'clock-only',
+    features: {},
+  },
+}
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false)
@@ -78,10 +91,10 @@ export default function ThemeRenderer({ invitation, guestName, preview = false }
   // One decision point for the whole invitation: no clock means no motion
   // layer anywhere, and every consumer degrades to its ordinary CSS/Framer
   // behaviour on its own.
-  const motionEnabled = MOTION_CLOCK.has(themeKey) && !reducedMotion
+  const motionConfig = reducedMotion ? null : MOTION_CLOCK[themeKey] || null
 
   return (
-    <MotionClockProvider enabled={motionEnabled}>
+    <MotionClockProvider config={motionConfig}>
       {/* Editor preview renders the content directly, skipping the cover gate. */}
       {/* Every classic (non-WebGL) theme carries the luxe finish layer. */}
       {!preview && (

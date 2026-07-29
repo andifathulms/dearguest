@@ -23,7 +23,7 @@ const STALL_MS = 1500
 /* cover — the gate's card, revealed once against the frame clock       */
 /* ------------------------------------------------------------------ */
 
-function coverDriver(card, { fps, onStart }) {
+function coverDriver(card, { fps, onStart, pinned }) {
   const el = {
     label: card.querySelector('.cover-label'),
     bride: card.querySelector('.cover-name-bride'),
@@ -124,7 +124,8 @@ function coverDriver(card, { fps, onStart }) {
         lastFrame = frame
         lastAdvance = performance.now()
         started = true
-      } else if (performance.now() - lastAdvance > STALL_MS) {
+      } else if (!pinned && performance.now() - lastAdvance > STALL_MS) {
+        // A deliberately pinned clock is not a stalled one.
         settle()
         return false
       }
