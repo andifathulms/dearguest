@@ -4,7 +4,8 @@
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import { CinematicCanvas, DriftPoints, softTexture } from '../_cinematic/shared.jsx'
+import { CinematicCanvas, DriftPoints, softTexture, seeded } from '../_cinematic/shared.jsx'
+import { useMotionClock } from '../../motion/MotionClockContext.jsx'
 
 // A graduated dusk sky (deep indigo zenith → warm amber horizon) painted on a
 // big backdrop plane. Gives the lanterns and embers something to glow against.
@@ -81,34 +82,47 @@ function lanternTexture() {
 }
 
 // ---- signature: warm lanterns that rise upward and wrap, swaying gently ----
-function Lanterns({ count }) {
+//
+// Every lantern's position is a pure function of elapsed time: seeded setup,
+// and a modulo wrap rather than mutating `d.y` frame by frame. The old version
+// accumulated `d.y += d.speed * dt`, which made the scene depend on how many
+// frames had been rendered — so it drifted differently on a slow phone than on
+// a fast laptop, and no frame could ever be reproduced or asserted against.
+function Lanterns({ count, clock }) {
   const grp = useRef()
   const tex = useMemo(() => lanternTexture(), [])
   const area = useMemo(() => [34, 30, 12], [])
-  const halfH = area[1] / 2 + 6 // padding so lanterns wrap fully off-screen
+  const span = area[1] + 12 // wrap distance, padded so lanterns leave the frame
 
-  const data = useMemo(() => Array.from({ length: count }, () => ({
-    x: (Math.random() - 0.5) * area[0],
-    y: (Math.random() - 0.5) * area[1],
-    z: -3 - Math.random() * 11,             // ~-3..-14
-    scale: 1 + Math.random() * 2,           // ~1–3
-    opacity: 0.8 + Math.random() * 0.2,     // ~0.8–1
-    speed: 0.35 + Math.random() * 0.7,      // slow rise
-    swayAmp: 0.3 + Math.random() * 0.9,
-    swayPh: Math.random() * Math.PI * 2,
-    swaySpeed: 0.15 + Math.random() * 0.25,
+  const data = useMemo(() => Array.from({ length: count }, (_, i) => ({
+    x: (seeded(i * 9 + 1) - 0.5) * area[0],
+    y: (seeded(i * 9 + 2) - 0.5) * area[1],
+    z: -3 - seeded(i * 9 + 3) * 11,             // ~-3..-14
+    scale: 1 + seeded(i * 9 + 4) * 2,           // ~1–3
+    opacity: 0.8 + seeded(i * 9 + 5) * 0.2,     // ~0.8–1
+    speed: 0.35 + seeded(i * 9 + 6) * 0.7,      // slow rise
+    swayAmp: 0.3 + seeded(i * 9 + 7) * 0.9,
+    swayPh: seeded(i * 9 + 8) * Math.PI * 2,
+    swaySpeed: 0.15 + seeded(i * 9 + 9) * 0.25,
   })), [count, area])
 
-  useFrame((state, dt) => {
+  useFrame((state) => {
     if (!grp.current) return
-    const t = state.clock.elapsedTime
+    // Prefer the shared clock so the scene is deterministic and seekable; fall
+    // back to wall time while the motion chunk is still loading.
+    const frame = clock?.playerRef?.current?.getCurrentFrame?.()
+    const t = frame != null ? frame / clock.fps : state.clock.elapsedTime
+
     grp.current.children.forEach((m, i) => {
       const d = data[i]
-      d.y += d.speed * dt
-      if (d.y > halfH) d.y = -halfH
-      m.position.y = d.y
+      const risen = d.y + t * d.speed + span / 2
+      m.position.y = ((risen % span) + span) % span - span / 2
       m.position.x = d.x + Math.sin(t * d.swaySpeed + d.swayPh) * d.swayAmp
     })
+    if (import.meta.env.DEV) {
+      const first = grp.current.children[0]
+      window.__lanterns = first ? { y: first.position.y, x: first.position.x } : null
+    }
   })
 
   return (
@@ -128,7 +142,7 @@ function Lanterns({ count }) {
   )
 }
 
-function SceneInner({ cfg, reduce }) {
+function SceneInner({ cfg, reduce, clock }) {
   const lanternCount = Math.round(18 * cfg.mul)
   const emberCount = Math.round(120 * cfg.mul)
   const starCount = Math.round(120 * cfg.mul)
@@ -145,7 +159,7 @@ function SceneInner({ cfg, reduce }) {
       </sprite>
 
       {/* signature rising lanterns — keyed by count (buffers can't resize) */}
-      <Lanterns key={`lanterns-${lanternCount}`} count={lanternCount} />
+      <Lanterns key={`lanterns-${lanternCount}`} count={lanternCount} clock={clock} />
 
       {/* rising sparks / embers */}
       <DriftPoints
@@ -157,6 +171,7 @@ function SceneInner({ cfg, reduce }) {
         rise={0.6}
         additive
         reduce={reduce}
+        clock={clock}
       />
 
       {/* cool stars in the upper sky */}
@@ -169,12 +184,14 @@ function SceneInner({ cfg, reduce }) {
         rise={0.1}
         additive
         reduce={reduce}
+        clock={clock}
       />
     </>
   )
 }
 
-export default function LanternScene({ quality, onQuality }) {
+export default function LanternScene({ quality, onQuality, dpr }) {
+  const clock = useMotionClock()
   return (
     <CinematicCanvas
       quality={quality}
@@ -185,8 +202,10 @@ export default function LanternScene({ quality, onQuality }) {
       warpTo={6.5}
       bloom={1.2}
       bloomThreshold={0.14}
+      clock={clock}
+      dpr={dpr}
     >
-      {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} />}
+      {({ cfg, reduce }) => <SceneInner cfg={cfg} reduce={reduce} clock={clock} />}
     </CinematicCanvas>
   )
 }

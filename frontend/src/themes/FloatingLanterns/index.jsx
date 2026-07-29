@@ -18,6 +18,7 @@ import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
 import FloatingRSVP from '../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
+import AmbientLayer from '../../motion/AmbientLayer.jsx'
 
 const LanternScene = lazy(() => import('./LanternScene.jsx'))
 
@@ -37,12 +38,31 @@ function Section({ children }) {
 export default function FloatingLanterns({ invitation, guestName }) {
   const couple = invitation.couple || {}
   const akad = (invitation.events || []).find(e => e.event_type === 'akad')
-  const [quality, setQuality] = useState('high')
+  // Particle counts scale with the quality tier, so PerformanceMonitor
+  // downgrading under load changes the scene itself — which makes any
+  // reproducible frame impossible. `?q=high` pins the tier in dev so visual
+  // tests compare like with like; production keeps adapting.
+  const pinnedQuality = import.meta.env.DEV
+    ? new URLSearchParams(window.location.search).get('q')
+    : null
+  const [quality, setQuality] = useState(pinnedQuality || 'high')
 
   return (
     <div className={`navy-gold lanterns-3d cc-root cc-q-${quality}`}>
+      {/* Mounts the shared Player. Invisible here — the three.js canvas is the
+          visual; this exists purely to give the scene a deterministic,
+          seekable frame clock. */}
+      <AmbientLayer />
+
       <Suspense fallback={null}>
-        <LanternScene quality={quality} onQuality={setQuality} />
+        {/* dpr defaults to an adaptive [min,max] range, so the canvas
+            resolution itself varies between runs — pin it alongside the
+            quality tier, or the frame is still not reproducible. */}
+        <LanternScene
+          quality={quality}
+          onQuality={pinnedQuality ? undefined : setQuality}
+          dpr={pinnedQuality ? 1 : undefined}
+        />
       </Suspense>
 
       <div className="cc-content">

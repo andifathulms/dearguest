@@ -147,26 +147,70 @@ export function FallingParticles({ texture, count = 220, area = [34, 26, 14], fa
   )
 }
 
+/**
+ * Deterministic 0-1 pseudo-random from an integer seed.
+ *
+ * Scene setup used bare Math.random(), which made every page load a different
+ * scene — pleasant enough, but it means no frame is ever reproducible, so the
+ * WebGL themes could not be snapshot-tested at all. Seeding is the first half
+ * of fixing that; driving positions from a frame number (see the `frame` prop
+ * on DriftPoints) is the second.
+ */
+export function seeded(seed) {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453
+  return x - Math.floor(x)
+}
+
 // Drifting points (dust / sparkles / distant bokeh). Points gently drift, the
 // cloud slowly rolls, and the whole field twinkles (size/opacity breathe) for
 // a lively, premium shimmer — especially under bloom.
-export function DriftPoints({ count = 300, area = [36, 26, 16], size = 0.12, color = '#ffffff', opacity = 0.9, rise = 0.5, texture, reduce, additive = true, twinkle = true }) {
+export function DriftPoints({ count = 300, area = [36, 26, 16], size = 0.12, color = '#ffffff', opacity = 0.9, rise = 0.5, texture, reduce, additive = true, twinkle = true, clock = null }) {
   const ref = useRef()
   const tex = useMemo(() => texture || softTexture('rgba(255,255,255,0.95)'), [texture])
-  const { positions, speeds } = useMemo(() => {
+  // Seeded, so the same field of points comes back on every load and on every
+  // device. `home` keeps the untouched starting positions, which the
+  // frame-driven path needs — it recomputes from origin rather than
+  // accumulating onto the live buffer.
+  const { positions, home, speeds } = useMemo(() => {
     const positions = new Float32Array(count * 3)
     const speeds = new Float32Array(count)
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * area[0]
-      positions[i * 3 + 1] = (Math.random() - 0.5) * area[1]
-      positions[i * 3 + 2] = (Math.random() - 0.5) * area[2] - 2
-      speeds[i] = 0.25 + Math.random() * 0.7
+      positions[i * 3] = (seeded(i * 3 + 1) - 0.5) * area[0]
+      positions[i * 3 + 1] = (seeded(i * 3 + 2) - 0.5) * area[1]
+      positions[i * 3 + 2] = (seeded(i * 3 + 3) - 0.5) * area[2] - 2
+      speeds[i] = 0.25 + seeded(i * 7 + 11) * 0.7
     }
-    return { positions, speeds }
+    return { positions, home: Float32Array.from(positions), speeds }
   }, [count, area])
+
   useFrame((state, dt) => {
     if (reduce || !ref.current) return
     const arr = ref.current.geometry.attributes.position.array
+
+    // Frame-driven: every value is a pure function of the shared clock, so the
+    // scene is identical on a slow phone and a fast laptop, and any frame can
+    // be seeked to and asserted against.
+    const frame = clock?.playerRef?.current?.getCurrentFrame?.()
+    if (frame != null) {
+      const t = frame / clock.fps
+      const span = area[1]
+      for (let i = 0; i < count; i++) {
+        // Modulo wrap instead of `if (y > half) y = -half`, so the position
+        // depends only on t — never on how many frames have been rendered.
+        const travelled = home[i * 3 + 1] + t * speeds[i] * rise + span / 2
+        arr[i * 3 + 1] = ((travelled % span) + span) % span - span / 2
+        arr[i * 3] = home[i * 3] + Math.sin(t * 0.25 + i) * 0.28
+      }
+      ref.current.geometry.attributes.position.needsUpdate = true
+      ref.current.rotation.z = t * 0.012
+      if (twinkle) {
+        ref.current.material.size = size * (1 + Math.sin(t * 2.1) * 0.18)
+        ref.current.material.opacity = opacity * (0.82 + Math.abs(Math.sin(t * 1.3)) * 0.18)
+      }
+      return
+    }
+
+    // Wall-clock fallback for the themes that have not been converted yet.
     const t = state.clock.elapsedTime
     for (let i = 0; i < count; i++) {
       arr[i * 3 + 1] += speeds[i] * dt * rise
@@ -228,24 +272,58 @@ export function Bokeh({ count = 14, color = 'rgba(232,200,121,0.9)', area = [22,
 
 // Camera: distant during the cover, warps in on `invitation:open`, then gentle
 // pointer + scroll parallax + auto-drift.
-export function Rig({ reduce, baseZ = 12, warpTo = 7 }) {
+export function Rig({ reduce, baseZ = 12, warpTo = 7, clock = null }) {
   const { camera } = useThree()
   const scroll = useRef(0)
   const open = useRef(false)
   const warp = useRef(0)
+  // Frame the cover was opened on, so the warp can be a function of elapsed
+  // frames rather than an accumulator.
+  const openFrame = useRef(null)
   useEffect(() => {
     camera.position.set(0, 0, baseZ)
     const onScroll = () => { scroll.current = window.scrollY || 0 }
-    const onOpen = () => { open.current = true; warp.current = 0 }
+    const onOpen = () => {
+      open.current = true
+      warp.current = 0
+      openFrame.current = clock?.playerRef?.current?.getCurrentFrame?.() ?? null
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('invitation:open', onOpen)
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('invitation:open', onOpen)
     }
-  }, [camera, baseZ])
+  }, [camera, baseZ, clock])
   useFrame((state, dt) => {
     if (reduce) { camera.position.set(0, 0, warpTo); camera.lookAt(0, 0, 0); return }
+
+    const frame = clock?.playerRef?.current?.getCurrentFrame?.()
+
+    if (frame != null) {
+      // Deterministic path: the camera is a pure function of the shared clock.
+      // The wall-clock path below both accumulates the warp and low-pass
+      // filters the position (`+= (target - current) * 0.045`), which converges
+      // over *frame count* — so the camera ends up somewhere slightly different
+      // on every device and on every run. That is the last thing standing
+      // between these scenes and a reproducible frame.
+      const t = frame / clock.fps
+      const since = openFrame.current == null ? 0 : (frame - openFrame.current) / clock.fps
+      const warped = open.current ? Math.min(1, Math.max(0, since * 0.7)) : 0
+      const ease = 1 - Math.pow(1 - warped, 3)
+
+      camera.position.x = state.pointer.x * 0.95 + Math.sin(t * 0.11) * 0.85
+      camera.position.y = state.pointer.y * 0.6 - scroll.current * 0.0014 + Math.cos(t * 0.08) * 0.5
+      camera.position.z = baseZ - (baseZ - warpTo) * ease
+      camera.lookAt(0, 0, 0)
+      // Dev-only probe: lets tests assert the camera is a pure function of the
+      // frame, which a pixel diff of slow drift cannot resolve.
+      if (import.meta.env.DEV) {
+        window.__rig = { frame, x: camera.position.x, y: camera.position.y, z: camera.position.z }
+      }
+      return
+    }
+
     if (open.current && warp.current < 1) warp.current = Math.min(1, warp.current + dt * 0.7)
     const ease = 1 - Math.pow(1 - warp.current, 3)
     const z = open.current ? baseZ - (baseZ - warpTo) * ease : baseZ
@@ -263,14 +341,14 @@ export function Rig({ reduce, baseZ = 12, warpTo = 7 }) {
 
 // Wrapper that wires up the adaptive canvas. `children` is a render function
 // receiving { cfg, reduce } so the scene can scale particle counts by cfg.mul.
-export function CinematicCanvas({ quality = 'high', onQuality, bg = '#070b1f', fog, baseZ = 12, warpTo = 7, lights, bloom = 1, bloomThreshold = 0.22, children }) {
+export function CinematicCanvas({ quality = 'high', onQuality, bg = '#070b1f', fog, baseZ = 12, warpTo = 7, lights, bloom = 1, bloomThreshold = 0.22, clock = null, dpr, children }) {
   const reduce = usePrefersReducedMotion()
   const cfg = reduce ? REDUCED : TIERS[quality]
   const bloomOn = !reduce && bloom > 0 && cfg.bloom > 0
   return (
     <div className="cc-canvas" aria-hidden="true">
       <Canvas
-        dpr={cfg.dpr}
+        dpr={dpr ?? cfg.dpr}
         camera={{ position: [0, 0, baseZ], fov: 60 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         frameloop={reduce ? 'demand' : 'always'}
@@ -289,7 +367,7 @@ export function CinematicCanvas({ quality = 'high', onQuality, bg = '#070b1f', f
         )}
         <Suspense fallback={null}>
           {children({ cfg, reduce })}
-          <Rig reduce={reduce} baseZ={baseZ} warpTo={warpTo} />
+          <Rig reduce={reduce} baseZ={baseZ} warpTo={warpTo} clock={clock} />
         </Suspense>
         {/* Post-processing glow — the biggest premium lift; tier-gated off on
             low/reduced so weak devices skip the cost entirely. */}
