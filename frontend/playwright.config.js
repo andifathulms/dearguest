@@ -7,6 +7,10 @@ export default defineConfig({
   testDir: './tests/visual',
   snapshotDir: './tests/visual/__screenshots__',
   fullyParallel: true,
+  // The suite now includes WebGL themes, and at default parallelism a loaded
+  // machine starves them enough to fail — including tests that have nothing to
+  // do with 3D. Two workers keeps it honest.
+  workers: 2,
   forbidOnly: !!process.env.CI,
   reporter: 'list',
   use: {
