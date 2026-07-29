@@ -16,6 +16,7 @@ import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
 import FloatingRSVP from '../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
+import AmbientLayer from '../../motion/AmbientLayer.jsx'
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -41,6 +42,10 @@ export default function JavaneseDark({ invitation, guestName }) {
 
   return (
     <div className="javanese-dark lx-root">
+      {/* Rendered here, not in ThemeRenderer, so it lands inside this theme's
+          stacking context — see `.javanese-dark > .jd-ambient` in the CSS. */}
+      <AmbientLayer />
+
       <div className="kawung-border-top" />
 
       <HeroSection

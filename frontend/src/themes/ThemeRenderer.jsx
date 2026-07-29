@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import CoverGate from '../components/ui/CoverGate.jsx'
+import { MotionClockProvider } from '../motion/MotionClockContext.jsx'
 
 // Each theme (and its CSS) is a separate chunk — an invitation loads only
 // the one theme it uses.
@@ -54,18 +55,45 @@ const COVER_CLASS = {
   'snow-3d': 'dusty-blue snow-3d cc-root',
 }
 
+// Themes that mount a shared Remotion frame clock (see MotionClockContext).
+const MOTION_CLOCK = new Set(['javanese-dark'])
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setReduced(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+  return reduced
+}
+
 export default function ThemeRenderer({ invitation, guestName, preview = false }) {
   const themeKey = themes[invitation.theme] ? invitation.theme : 'javanese-dark'
   const Theme = themes[themeKey]
+  const reducedMotion = usePrefersReducedMotion()
+
+  // One decision point for the whole invitation: no clock means no motion
+  // layer anywhere, and every consumer degrades to its ordinary CSS/Framer
+  // behaviour on its own.
+  const motionEnabled = MOTION_CLOCK.has(themeKey) && !reducedMotion
 
   return (
-    <>
+    <MotionClockProvider enabled={motionEnabled}>
       {/* Editor preview renders the content directly, skipping the cover gate. */}
       {/* Every classic (non-WebGL) theme carries the luxe finish layer. */}
-      {!preview && <CoverGate invitation={invitation} guestName={guestName} themeClass={COVER_CLASS[themeKey] || `${themeKey} lx-root`} />}
+      {!preview && (
+        <CoverGate
+          invitation={invitation}
+          guestName={guestName}
+          themeClass={COVER_CLASS[themeKey] || `${themeKey} lx-root`}
+        />
+      )}
       <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
         <Theme invitation={invitation} guestName={guestName} />
       </Suspense>
-    </>
+    </MotionClockProvider>
   )
 }
