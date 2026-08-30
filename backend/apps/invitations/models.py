@@ -1,3 +1,4 @@
+import re
 import secrets
 from django.db import models
 from datetime import timedelta
@@ -97,9 +98,21 @@ class ActivationRequest(Invitation):
 
 class CoupleProfile(models.Model):
     """Per-account settings. max_invitations is the cap; admin bumps it to 2
-    for Bisnis customers after payment (free/Premium = 1)."""
+    for Bisnis customers after payment (free/Premium = 1).
+
+    whatsapp is the couple's own number — activation runs over WhatsApp, so the
+    admin needs a way to reach them without waiting to be messaged first."""
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
     max_invitations = models.PositiveIntegerField(default=1)
+    whatsapp = models.CharField(max_length=20, blank=True)
+
+    @property
+    def whatsapp_intl(self):
+        """Digits in wa.me form: 08xx -> 628xx, +62 / spaces / dashes stripped."""
+        num = re.sub(r'\D', '', self.whatsapp or '')
+        if num.startswith('0'):
+            num = '62' + num[1:]
+        return num
 
     def __str__(self):
         return f"{self.user.username} (maks {self.max_invitations})"

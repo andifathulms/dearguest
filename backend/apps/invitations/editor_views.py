@@ -132,11 +132,16 @@ class RequestActivationView(APIView):
         # Notify admin so they can confirm payment and issue an activation code.
         couple = getattr(inv, 'couple', None)
         names = f"{couple.bride_name} & {couple.groom_name}" if couple else inv.slug
+        profile = getattr(request.user, 'profile', None)
+        wa = profile.whatsapp if profile else ''
         send_mail(
             f'[Aktivasi] Permintaan aktivasi: {inv.slug}',
             f"Undangan '{inv.slug}' ({names}) meminta aktivasi.\n\n"
+            f"Akun    : {request.user.username}\n"
+            f"WhatsApp: {wa or '(belum diisi)'}\n"
+            f"Email   : {request.user.email or '(kosong)'}\n\n"
             f"Konfirmasi pembayaran, lalu terbitkan kode aktivasi & set tier di admin:\n"
-            f"Buka admin → Permintaan Aktivasi.",
+            f"Buka admin → Permintaan Aktivasi (nomor WhatsApp bisa diklik di sana).",
             settings.DEFAULT_FROM_EMAIL,
             [settings.ADMIN_EMAIL],
             fail_silently=True,

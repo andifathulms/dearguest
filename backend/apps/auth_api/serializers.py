@@ -1,13 +1,22 @@
+import re
+
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
+
+from apps.invitations.models import CoupleProfile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=6)
+    password = serializers.CharField(write_only=True)
+    # Activation happens over WhatsApp, so this doubles as the recovery channel
+    # for accounts registered without an email.
+    whatsapp = serializers.CharField(write_only=True, max_length=20)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'whatsapp']
 
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
@@ -19,9 +28,32 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Email sudah terdaftar.')
         return value
 
+    def validate_whatsapp(self, value):
+        digits = re.sub(r'\D', '', value or '')
+        if digits.startswith('62'):
+            digits = '0' + digits[2:]
+        if not re.fullmatch(r'08\d{8,12}', digits):
+            raise serializers.ValidationError(
+                'Masukkan nomor WhatsApp yang valid, contoh: 081234567890.'
+            )
+        if CoupleProfile.objects.filter(whatsapp=digits).exists():
+            raise serializers.ValidationError('Nomor WhatsApp sudah terdaftar.')
+        return digits
+
+    def validate_password(self, value):
+        """Run Django's configured password validators, not just a length check."""
+        try:
+            validate_password(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+        return value
+
     def create(self, validated_data):
-        return User.objects.create_user(
+        whatsapp = validated_data.pop('whatsapp')
+        user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data.get('email', ''),
             password=validated_data['password'],
         )
+        CoupleProfile.objects.update_or_create(user=user, defaults={'whatsapp': whatsapp})
+        return user

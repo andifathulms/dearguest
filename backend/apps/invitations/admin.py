@@ -1,5 +1,8 @@
 import secrets
+from urllib.parse import quote
+
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset,
@@ -68,13 +71,30 @@ class RSVPAdmin(admin.ModelAdmin):
 @admin.register(ActivationRequest)
 class ActivationRequestAdmin(admin.ModelAdmin):
     """Inbox of couples who requested activation but aren't live yet."""
-    list_display = ['slug', 'couple_names', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
+    list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
     list_editable = ['tier', 'activation_code', 'is_active']
     readonly_fields = ['activation_requested_at']
     actions = ['fulfill_premium', 'fulfill_bisnis', 'issue_activation_code']
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(activation_requested=True, is_active=False)
+
+    @admin.display(description='WhatsApp')
+    def whatsapp_link(self, obj):
+        """One-click chat to send the activation code — the code is never sent
+        automatically, so the admin always does this by hand."""
+        profile = getattr(obj.couple_user, 'profile', None) if obj.couple_user else None
+        if not profile or not profile.whatsapp:
+            return '—'
+        text = (
+            f'Halo, pembayaran untuk undangan "{obj.slug}" sudah kami terima. '
+            f'Kode aktivasi kamu: {obj.activation_code or "(terbitkan dulu)"}. '
+            f'Masukkan di editor lalu klik Aktifkan. Terima kasih!'
+        )
+        return format_html(
+            '<a href="https://wa.me/{}?text={}" target="_blank" rel="noopener">{}</a>',
+            profile.whatsapp_intl, quote(text), profile.whatsapp,
+        )
 
     @admin.display(description='Mempelai')
     def couple_names(self, obj):
@@ -117,9 +137,9 @@ class ActivationRequestAdmin(admin.ModelAdmin):
 
 @admin.register(CoupleProfile)
 class CoupleProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'max_invitations']
-    list_editable = ['max_invitations']
-    search_fields = ['user__username']
+    list_display = ['user', 'whatsapp', 'max_invitations']
+    list_editable = ['whatsapp', 'max_invitations']
+    search_fields = ['user__username', 'whatsapp']
 
 
 @admin.register(MusicPreset)
