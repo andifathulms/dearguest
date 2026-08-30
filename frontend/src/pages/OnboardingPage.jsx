@@ -31,6 +31,7 @@ const THEMES = [
   { id: 'mono-editorial', name: 'Editorial Mono', bg: 'linear-gradient(160deg, #f4f4f4, #ffffff)', fg: '#141414', accent: '#111111' },
   { id: 'royal-purple', name: 'Royal Purple', bg: 'radial-gradient(ellipse 80% 70% at center, rgba(203,163,90,0.18), transparent 60%), #1e1233', fg: '#efe9f5', accent: '#cba35a' },
   { id: 'marble-white', name: 'White Marble', bg: 'linear-gradient(160deg, #efece5, #f8f6f2)', fg: '#3a342a', accent: '#c2a35e' },
+  { id: 'buginese-blue', name: 'Buginese Blue', bg: 'linear-gradient(160deg, #0c2542, #071a2f)', fg: '#f3ead6', accent: '#c9a227' },
   { id: 'celestial-cinematic', name: 'Celestial 3D', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(216,192,116,0.18), transparent 62%), #070b1f', fg: '#eef0fa', accent: '#d8c074' },
   { id: 'petals-3d', name: 'Enchanted Petals', bg: 'linear-gradient(160deg, #f7dde3, #fbeef0)', fg: '#4a2e34', accent: '#c4847a' },
   { id: 'aurora-3d', name: 'Aurora Dream', bg: 'radial-gradient(ellipse 90% 70% at center, rgba(63,182,160,0.22), transparent 62%), #070b1f', fg: '#e8f3f1', accent: '#3fb6a0' },

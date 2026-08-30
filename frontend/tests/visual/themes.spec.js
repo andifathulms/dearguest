@@ -30,6 +30,7 @@ const THEMES = [
   'demo-mono',
   'demo-ungu',
   'demo-marmerputih',
+  'demo-bugis',
 ]
 
 for (const slug of THEMES) {

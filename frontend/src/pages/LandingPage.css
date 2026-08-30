@@ -604,6 +604,11 @@
 .tp-teal .tp-amp, .tp-teal .tp-label, .tp-teal .tp-date { color: #94b3b0; }
 .tp-teal .tp-rule { background: #d6b45c; }
 
+.tp-bugis { background: repeating-linear-gradient(90deg, rgba(201,162,39,0.07) 0 1px, transparent 1px 22px), repeating-linear-gradient(0deg, rgba(201,162,39,0.07) 0 1px, transparent 1px 22px), radial-gradient(ellipse 80% 70% at center, rgba(31,78,121,0.5) 0%, transparent 62%), #071a2f; color: #f3ead6; }
+.tp-bugis .tp-names { font-family: 'Cormorant Garamond', serif; color: #f3ead6; }
+.tp-bugis .tp-amp, .tp-bugis .tp-label { color: #c9a227; }
+.tp-bugis .tp-date { color: #9db2c8; }
+.tp-bugis .tp-rule { background: #c9a227; }
 .tp-deco { background: radial-gradient(ellipse 80% 70% at center, rgba(205,163,73,0.18) 0%, transparent 60%), #0c0c0e; color: #f2efe6; }
 .tp-deco .tp-names { font-family: 'Cinzel', serif; letter-spacing: 0.04em; color: #cda349; }
 .tp-deco .tp-amp, .tp-deco .tp-label, .tp-deco .tp-date { color: #9a968c; }

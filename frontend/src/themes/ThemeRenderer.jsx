@@ -14,6 +14,7 @@ const themes = {
   'boho-terracotta': lazy(() => import('./BohoTerracotta/index.jsx')),
   'burgundy-gold': lazy(() => import('./BurgundyGold/index.jsx')),
   'dusty-blue': lazy(() => import('./DustyBlue/index.jsx')),
+  'buginese-blue': lazy(() => import('./BugineseBlue/index.jsx')),
   'midnight-celestial': lazy(() => import('./MidnightCelestial/index.jsx')),
   'sage-botanical': lazy(() => import('./SageBotanical/index.jsx')),
   'mauve-rose': lazy(() => import('./MauveRose/index.jsx')),

@@ -35,6 +35,7 @@ const THEMES = [
   ['mono-editorial', 'Editorial Mono'],
   ['royal-purple', 'Royal Purple'],
   ['marble-white', 'White Marble'],
+  ['buginese-blue', 'Buginese Blue'],
   ['celestial-cinematic', 'Celestial 3D'],
   ['petals-3d', 'Enchanted Petals'],
   ['aurora-3d', 'Aurora Dream'],
