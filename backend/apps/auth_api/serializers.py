@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.invitations.models import CoupleProfile
 
@@ -57,3 +58,37 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         CoupleProfile.objects.update_or_create(user=user, defaults={'whatsapp': whatsapp})
         return user
+
+
+class FlexibleTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Let couples sign in with their username, email or WhatsApp number.
+
+    They pick a username once at registration and rarely remember which one it
+    was; the number they gave us is the thing they know by heart. The identifier
+    is resolved to a username before the parent serializer authenticates, so
+    password checking and token issuing are untouched.
+    """
+
+    def validate(self, attrs):
+        ident = (attrs.get(self.username_field) or '').strip()
+        attrs[self.username_field] = _resolve_username(ident)
+        return super().validate(attrs)
+
+
+def _resolve_username(ident):
+    """Map an email or phone number to its username; pass anything else through."""
+    if not ident or User.objects.filter(username__iexact=ident).exists():
+        return ident
+
+    if '@' in ident:
+        match = User.objects.filter(email__iexact=ident).first()
+        return match.username if match else ident
+
+    digits = re.sub(r'\D', '', ident)
+    if digits.startswith('62'):
+        digits = '0' + digits[2:]
+    if digits.startswith('08'):
+        profile = CoupleProfile.objects.filter(whatsapp=digits).select_related('user').first()
+        if profile:
+            return profile.user.username
+    return ident

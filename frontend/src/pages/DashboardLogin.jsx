@@ -23,7 +23,7 @@ export default function DashboardLogin() {
       localStorage.setItem('refresh_token', res.data.refresh)
       navigate('/my')
     } catch (err) {
-      setError('Username atau password salah.')
+      setError('Akun atau kata sandi salah.')
     } finally {
       setLoading(false)
     }
@@ -39,9 +39,10 @@ export default function DashboardLogin() {
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label className="auth-label" htmlFor="login-username">Username</label>
+            <label className="auth-label" htmlFor="login-username">Username, email, atau nomor WhatsApp</label>
             <input className="auth-input" id="login-username" name="username" type="text" value={form.username}
-              onChange={handleChange} required autoComplete="username" />
+              onChange={handleChange} placeholder="mis. dinda.raka atau 081234567890"
+              required autoComplete="username" />
           </div>
           <div className="auth-field">
             <label className="auth-label" htmlFor="login-password">Kata Sandi</label>

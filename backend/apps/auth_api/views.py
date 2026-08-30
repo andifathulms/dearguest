@@ -11,11 +11,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, FlexibleTokenObtainPairSerializer
 
 
 class ThrottledLoginView(TokenObtainPairView):
-    """Login with abuse throttling."""
+    """Login with abuse throttling; accepts username, email or WhatsApp number."""
+    serializer_class = FlexibleTokenObtainPairSerializer
     throttle_scope = 'login'
 
 
