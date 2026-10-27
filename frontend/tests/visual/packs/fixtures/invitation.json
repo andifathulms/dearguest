@@ -20,26 +20,52 @@
     "groom_name": "Bagus",
     "groom_parents": "Bapak Hartono & Ibu Wulandari",
     "groom_photo": "http://fixtures.test/groom.jpg",
-    "groom_bio": "Putra kedua yang penuh tanggung jawab."
+    "groom_bio": "Putra kedua yang penuh tanggung jawab.",
+    "bride_photo_meta": null,
+    "groom_photo_meta": null,
+    "bride_child_order": "pertama",
+    "bride_father": "Suryadi",
+    "bride_father_deceased": false,
+    "bride_mother": "Lestari",
+    "bride_mother_deceased": false,
+    "bride_instagram": "",
+    "groom_child_order": "kedua",
+    "groom_father": "Hartono",
+    "groom_father_deceased": false,
+    "groom_mother": "Wulandari",
+    "groom_mother_deceased": false,
+    "groom_instagram": ""
   },
   "events": [
     {
       "id": 493,
       "event_type": "akad",
-      "datetime": "2026-12-12T08:00:00+07:00",
-      "venue_name": "Masjid Agung",
-      "address": "Jl. Merdeka No. 1, Yogyakarta",
-      "gmaps_url": "https://maps.google.com",
-      "gmaps_embed_url": ""
+      "title": "",
+      "start": "2026-12-12T08:00:00+07:00",
+      "end": "2026-12-12T10:00:00+07:00",
+      "timezone": "Asia/Jakarta",
+      "venue_name": "Masjid Gedhe Kauman",
+      "address": "Jl. Kauman, Ngupasan, Gondomanan, Kota Yogyakarta",
+      "maps_url": "https://www.google.com/maps/search/?api=1&query=-7.803820,110.362392",
+      "embed_url": "https://www.google.com/maps?q=-7.803820%2C110.362392&z=16&output=embed",
+      "dress_code": "",
+      "is_primary": true,
+      "order": 0
     },
     {
       "id": 494,
       "event_type": "resepsi",
-      "datetime": "2026-12-12T11:00:00+07:00",
-      "venue_name": "Gedung Graha",
-      "address": "Jl. Sudirman No. 45, Yogyakarta",
-      "gmaps_url": "https://maps.google.com",
-      "gmaps_embed_url": ""
+      "title": "",
+      "start": "2026-12-12T11:00:00+07:00",
+      "end": null,
+      "timezone": "Asia/Jakarta",
+      "venue_name": "Royal Ambarrukmo Yogyakarta",
+      "address": "Jl. Laksda Adisucipto No. 81, Caturtunggal, Depok, Sleman",
+      "maps_url": "https://www.google.com/maps/search/?api=1&query=-7.782146,110.402654",
+      "embed_url": "https://www.google.com/maps?q=-7.782146%2C110.402654&z=16&output=embed",
+      "dress_code": "",
+      "is_primary": false,
+      "order": 1
     }
   ],
   "stories": [
@@ -63,31 +89,36 @@
       "id": 181,
       "image": "http://fixtures.test/gallery-1.jpg",
       "caption": "",
-      "order": 0
+      "order": 0,
+      "image_meta": null
     },
     {
       "id": 182,
       "image": "http://fixtures.test/gallery-2.jpg",
       "caption": "",
-      "order": 1
+      "order": 1,
+      "image_meta": null
     },
     {
       "id": 183,
       "image": "http://fixtures.test/gallery-3.jpg",
       "caption": "",
-      "order": 2
+      "order": 2,
+      "image_meta": null
     },
     {
       "id": 184,
       "image": "http://fixtures.test/gallery-4.jpg",
       "caption": "",
-      "order": 3
+      "order": 3,
+      "image_meta": null
     },
     {
       "id": 185,
       "image": "http://fixtures.test/gallery-5.jpg",
       "caption": "",
-      "order": 4
+      "order": 4,
+      "image_meta": null
     }
   ],
   "bank_accounts": [
@@ -109,5 +140,13 @@
       "qris_image": null,
       "order": 1
     }
-  ]
+  ],
+  "hero_photo_meta": null,
+  "copy_variant": "islam",
+  "scripture_mode": "default",
+  "scripture_ref": "",
+  "scripture_text": "",
+  "gift_recipient": "",
+  "gift_address": "",
+  "gift_phone": ""
 }

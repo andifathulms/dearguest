@@ -2,7 +2,7 @@
 // Projects: Chromium + WebKit at 360×800, 390×844 and 1440×900
 // (playwright.packs.config.js). The API is stubbed (stub.js).
 import { test, expect } from '@playwright/test'
-import { NOW, SLUG, settle, stubInvitation } from './stub.js'
+import { NOW, SLUG, settle, stubInvitation, waitRevealed } from './stub.js'
 
 const PAGE = `/${SLUG}?to=Budi+Santoso`
 const SECTION_CSS = new URL('./sections.css', import.meta.url).pathname
@@ -29,7 +29,7 @@ test('opening: mid-way, finished cover, opened hero', async ({ page }) => {
   await expect(page).toHaveScreenshot('cover.png')
 
   await page.locator('.pk-open-btn').click()
-  await expect(page.locator('.pk-opening')).toHaveCount(0)
+  await expect(page.locator('.pk-opening')).toHaveCount(0, { timeout: 10_000 })
   await page.evaluate(() => window.scrollTo(0, 0))
   await settle(page, '.pk-hero')
   await expect(page).toHaveScreenshot('hero.png')
@@ -39,23 +39,14 @@ test('every section', async ({ page }) => {
   await page.goto(PAGE)
   await expect(page.locator('.pk-opening')).toHaveAttribute('data-state', 'done', { timeout: 10_000 })
   await page.locator('.pk-open-btn').click()
-  await expect(page.locator('.pk-opening')).toHaveCount(0)
+  await expect(page.locator('.pk-opening')).toHaveCount(0, { timeout: 10_000 })
 
   const wraps = page.locator('.pk-section-wrap')
   const count = await wraps.count()
   expect(count).toBeGreaterThanOrEqual(10)
   for (let i = 0; i < count; i++) {
     const wrap = wraps.nth(i)
-    // Centre it, then wait until its in-view reveal has finished. WebKit
-    // sometimes skips the intersection check after an instant programmatic
-    // scroll, so nudge with real wheel events while waiting (a person
-    // scrolling produces these continuously).
-    await wrap.evaluate(el => el.scrollIntoView({ block: 'center' }))
-    await expect.poll(async () => {
-      await page.mouse.wheel(0, 2)
-      await page.mouse.wheel(0, -2)
-      return wrap.evaluate(el => getComputedStyle(el).opacity)
-    }, { timeout: 15_000, intervals: [250] }).toBe('1')
+    await waitRevealed(page, wrap)
     const name = await wrap.evaluate(el => el.firstElementChild?.className.split(' ')[0] || 'section')
     await settle(page, '.pk-root')
     await expect(wrap).toHaveScreenshot(`section-${String(i).padStart(2, '0')}-${name}.png`, { stylePath: SECTION_CSS })
