@@ -9,6 +9,8 @@ import secrets
 from pathlib import Path
 
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.utils.deconstruct import deconstructible
 from django.utils.text import slugify
 
@@ -85,22 +87,33 @@ validate_image_upload = UploadValidator('image')
 validate_audio_upload = UploadValidator('audio')
 
 
-@deconstructible
-class SafeUploadTo:
-    """upload_to callable: '<prefix><slugified-stem>-<random><ext-from-content>'.
+def safe_name(name, content):
+    """'<slugified-stem>-<random><ext-from-content>'. Unknown content gets '.bin',
+    so even a file that slipped past validation (e.g. written by code) is never
+    served with an executable type."""
+    ext = {**IMAGE_TYPES, **AUDIO_TYPES}.get(sniff_file(content), '.bin')
+    stem = slugify(Path(name).stem)[:60] or 'file'
+    return f'{stem}-{secrets.token_hex(4)}{ext}'
 
-    Unknown content gets '.bin' so even a file that slipped past validation
-    (e.g. an older row re-saved) is never served with an executable type."""
 
-    def __init__(self, prefix, field):
-        self.prefix = prefix
-        self.field = field
+class _SafeNameMixin:
+    # FieldFile.save() is the one step every write path shares (forms, DRF,
+    # field.save() in code) and the only one that sees the content.
+    def save(self, name, content, save=True):
+        super().save(safe_name(name, content), content, save)
 
-    def __call__(self, instance, filename):
-        kind = sniff_file(getattr(instance, self.field).file)
-        ext = {**IMAGE_TYPES, **AUDIO_TYPES}.get(kind, '.bin')
-        stem = slugify(Path(filename).stem)[:60] or 'file'
-        return f'{self.prefix}{stem}-{secrets.token_hex(4)}{ext}'
 
-    def __eq__(self, other):
-        return isinstance(other, SafeUploadTo) and (self.prefix, self.field) == (other.prefix, other.field)
+class SafeFieldFile(_SafeNameMixin, FieldFile):
+    pass
+
+
+class SafeImageFieldFile(_SafeNameMixin, ImageFieldFile):
+    pass
+
+
+class SafeFileField(models.FileField):
+    attr_class = SafeFieldFile
+
+
+class SafeImageField(models.ImageField):
+    attr_class = SafeImageFieldFile

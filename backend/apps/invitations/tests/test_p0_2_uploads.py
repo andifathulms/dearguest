@@ -135,3 +135,21 @@ class AuditUploadsCommandTests(APITestBase):
         self.assertIn('Disallowed content: 1', report)
         self.assertNotIn('Photo#', report)
         self.assertTrue(inv.music_file.storage.exists(name))
+
+
+class ProgrammaticSaveTests(APITestBase):
+    """field.save(name, content) -- used by seed_demos and any server-side code --
+    must also name files from their content (and not crash)."""
+
+    def test_field_save_names_file_from_content(self):
+        from django.core.files.base import ContentFile
+        inv = self.make_invitation()
+        inv.hero_photo.save('demo-hero.html', ContentFile(png_bytes()), save=True)
+        inv.refresh_from_db()
+        self.assertTrue(inv.hero_photo.name.startswith('hero/demo-hero-'), inv.hero_photo.name)
+        self.assertTrue(inv.hero_photo.name.endswith('.png'), inv.hero_photo.name)
+
+    def test_seed_demos_runs(self):
+        call_command('seed_demos', stdout=io.StringIO())
+        inv = Invitation.objects.get(slug='demo-javanese')
+        self.assertTrue(inv.hero_photo.name.endswith('.jpg'), inv.hero_photo.name)
