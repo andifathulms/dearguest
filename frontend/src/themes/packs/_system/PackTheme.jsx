@@ -29,10 +29,11 @@ import Cover from './layout/Cover.jsx'
 // components (same content for every theme); the pack supplies tokens, art,
 // fonts, a layout variant and an opening (docs/theme-packs.md).
 
-function PackSection({ children }) {
+function PackSection({ children, tone }) {
   return (
     <motion.div
       className="pk-section-wrap"
+      data-tone={tone}
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -49,19 +50,24 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
   const couple = invitation.couple || {}
   const akad = (invitation.events || []).find(e => e.event_type === 'akad')
 
+  const events = invitation.events || []
+  const has = list => (list || []).length > 0
+  // Sections in order, each with whether it has anything to show. Empty ones
+  // are skipped (not rendered as blank wrappers) so alternating tones and
+  // dividers fall between real sections only.
   const sections = [
-    <GuestGreeting guestName={guestName} openingText={invitation.opening_text} />,
-    <CountdownTimer targetDate={akad?.datetime} />,
-    <EventsSection events={invitation.events} dressCode={invitation.dress_code} />,
-    <StorySection stories={invitation.stories} />,
-    <ProfileSection couple={couple} />,
-    <GallerySection photos={invitation.photos} />,
-    <AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} />,
-    <RSVPForm slug={invitation.slug} />,
-    <WishesWall slug={invitation.slug} />,
-    <MapsSection events={invitation.events} />,
-    <LiveStreamSection url={invitation.livestream_url} />,
-  ]
+    [true, <GuestGreeting guestName={guestName} openingText={invitation.opening_text} />],
+    [Boolean(akad?.datetime), <CountdownTimer targetDate={akad?.datetime} />],
+    [has(events), <EventsSection events={events} dressCode={invitation.dress_code} />],
+    [has(invitation.stories), <StorySection stories={invitation.stories} />],
+    [Boolean(invitation.couple), <ProfileSection couple={couple} />],
+    [has(invitation.photos), <GallerySection photos={invitation.photos} />],
+    [has(invitation.bank_accounts) || Boolean(invitation.wishlist_url), <AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} />],
+    [true, <RSVPForm slug={invitation.slug} />],
+    [true, <WishesWall slug={invitation.slug} />],
+    [events.some(e => e.gmaps_embed_url), <MapsSection events={events} />],
+    [Boolean(invitation.livestream_url), <LiveStreamSection url={invitation.livestream_url} />],
+  ].filter(([show]) => show).map(([, el]) => el)
 
   return (
     <MotionConfig reducedMotion="user">
@@ -86,7 +92,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
           {sections.map((section, i) => (
             <Fragment key={i}>
               {i > 0 && <ThemeAsset slot="divider" className="pk-divider" />}
-              <PackSection>{section}</PackSection>
+              <PackSection tone={i % 2 ? 'alt' : 'base'}>{section}</PackSection>
             </Fragment>
           ))}
 

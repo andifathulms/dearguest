@@ -7,9 +7,9 @@
       "name": "Minimal",
       "collection": "signature",
       "kind": "pack",
-      "status": "coming",
+      "status": "active",
       "tier": "premium",
-      "previewImage": null,
+      "previewImage": "/theme-previews/minimal.webp",
       "demoSlug": "demo-minimal",
       "demoTemporary": true,
       "catalog": {

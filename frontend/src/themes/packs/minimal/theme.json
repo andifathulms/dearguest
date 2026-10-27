@@ -1,0 +1,15 @@
+{
+  "id": "minimal",
+  "layoutVariant": "full-bleed",
+  "gallery": "editorial",
+  "opening": { "type": "css", "preset": "photo-crossfade-typeon", "durationMs": 1800 },
+  "fonts": { "preload": ["fonts/display-300.woff2", "fonts/body-400.woff2"] },
+  "photoFilters": ["none", "soft-warm", "bw"],
+  "slots": {
+    "texture": { "src": "assets/grain.webp", "width": 256, "height": 256, "repeat": true, "blend": "multiply", "opacity": 0.18 },
+    "monogram-frame": { "component": "slots/MonogramFrame.jsx" },
+    "heading-ornament": { "svg": "assets/heading.svg", "width": 56, "height": 8 }
+  },
+  "copyVariants": ["umum"],
+  "eventTypes": ["akad", "resepsi"]
+}

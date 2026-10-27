@@ -1,0 +1,31 @@
+/* Self-hosted, Latin-subset woff2 (SIL Open Font License; see fonts/LICENSE.md).
+   Family names are pack-specific so they never collide with fonts loaded
+   elsewhere on the site. */
+@font-face {
+  font-family: 'DG Minimal Display';
+  src: url('./display-300.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DG Minimal Display';
+  src: url('./display-300i.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DG Minimal Body';
+  src: url('./body-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DG Minimal Body';
+  src: url('./body-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

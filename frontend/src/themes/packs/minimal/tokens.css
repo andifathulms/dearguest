@@ -1,0 +1,59 @@
+/* Minimal — tokens (see DESIGN.md). Every token in docs/theme-packs.md §2. */
+.pk-root[data-pack='minimal'] {
+  /* colour */
+  --dg-bg: #f6f2ec;
+  --dg-bg-alt: #efe9e1;
+  --dg-surface: #fbf8f4;
+  --dg-surface-raised: #fffdfa;
+  --dg-ink: #1d1b18;
+  --dg-ink-muted: #5e574e;
+  --dg-ink-faint: #8d857a;
+  --dg-accent: #9a7b66;
+  --dg-on-accent: #fffdfa;
+  --dg-line: rgba(29, 27, 24, 0.12);
+  --dg-line-strong: rgba(29, 27, 24, 0.3);
+  --dg-scrim: linear-gradient(180deg, rgba(20, 17, 14, 0.2) 0%, rgba(20, 17, 14, 0) 22%, rgba(20, 17, 14, 0.38) 50%, rgba(20, 17, 14, 0.78) 78%, rgba(20, 17, 14, 0.86) 100%);
+  --dg-focus: #9a7b66;
+
+  /* type */
+  --dg-font-display: 'DG Minimal Display', Georgia, serif;
+  --dg-font-body: 'DG Minimal Body', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --dg-font-label: 'DG Minimal Body', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --dg-fs-names: clamp(3rem, 15vw, 6.5rem);
+  --dg-fs-title: clamp(2rem, 7.5vw, 3rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1rem;
+  --dg-fs-small: 0.875rem;
+  --dg-fs-label: 0.6875rem;
+  --dg-lh-tight: 1.02;
+  --dg-lh-body: 1.7;
+  --dg-tracking-label: 0.24em;
+  --dg-weight-display: 300;
+
+  /* shape */
+  --dg-radius-card: 2px;
+  --dg-radius-button: 0;
+  --dg-radius-photo: 0;
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4.5rem, 14vw, 8rem);
+  --dg-content-max: 760px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: none;
+  --dg-shadow-float: 0 4px 16px rgba(29, 27, 24, 0.12);
+
+  /* motion */
+  --dg-dur-fast: 160ms;
+  --dg-dur-base: 700ms;
+  --dg-dur-slow: 1800ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 70ms;
+}
