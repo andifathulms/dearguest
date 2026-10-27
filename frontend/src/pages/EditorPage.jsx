@@ -4,6 +4,7 @@ import api from '../api/client.js'
 import { invitationUrl } from '../utils/publicUrl.js'
 import { getTheme, selectableThemes, themeName } from '../themes/registry.js'
 import { makeT, variantOptions, variantMeta } from '../copy/copy.js'
+import { EVENT_TIMEZONES, TZ_LABEL, fromLocalInput, toLocalInputValue } from '../utils/dates.js'
 import scriptureData from '../copy/scripture.json'
 
 // Packs that offer photo filters declare them in their theme.json (tiny files,
@@ -233,12 +234,26 @@ function CoupleSection({ inv, reload, notify }) {
 }
 
 /* ---------------- Events ---------------- */
+const EVENT_TYPES = ['akad', 'pemberkatan', 'sakramen', 'resepsi', 'adat', 'ngunduh_mantu', 'lainnya']
+const LAST_TZ_KEY = 'dg:lastEventTz'
+const lastTz = () => { try { return localStorage.getItem(LAST_TZ_KEY) || 'Asia/Jakarta' } catch { return 'Asia/Jakarta' } }
+
+// Server times are instants; the editor shows and edits them as wall-clock
+// time in each event's own zone (WIB / WITA / WIT).
+const toDraft = e => ({ ...e, startLocal: toLocalInputValue(e.start, e.timezone), endLocal: toLocalInputValue(e.end, e.timezone) })
+
 function EventsSection({ inv, reload, notify }) {
-  const [items, setItems] = useState(inv.events.map(e => ({ ...e, datetime: (e.datetime || '').slice(0, 16) })))
-  useEffect(() => { setItems(inv.events.map(e => ({ ...e, datetime: (e.datetime || '').slice(0, 16) }))) }, [inv])
+  const t = makeT(inv.copy_variant)
+  const [items, setItems] = useState(inv.events.map(toDraft))
+  useEffect(() => { setItems(inv.events.map(toDraft)) }, [inv])
 
   const update = (i, k, v) => setItems(arr => arr.map((it, j) => j === i ? { ...it, [k]: v } : it))
-  const addDraft = () => setItems(arr => [...arr, { event_type: 'akad', datetime: '', venue_name: '', address: '', gmaps_url: '', gmaps_embed_url: '' }])
+  const addDraft = (type = 'resepsi') => setItems(arr => [...arr, {
+    event_type: type, title: '', startLocal: '', endLocal: '', timezone: arr.at(-1)?.timezone || lastTz(),
+    venue_name: '', address: '', maps_link: '', dress_code: '', is_primary: arr.length === 0,
+  }])
+  // The variant's usual events that aren't in the list yet, as one-click adds.
+  const suggestions = (variantMeta(inv.copy_variant)._defaultEvents || []).filter(type => !items.some(it => it.event_type === type))
 
   async function move(i, dir) {
     const j = i + dir
@@ -254,13 +269,23 @@ function EventsSection({ inv, reload, notify }) {
     } catch { notify('Gagal mengubah urutan') }
   }
 
-  async function saveOne(it) {
-    const payload = { ...it }
+  async function saveOne(it, i) {
+    if (!it.startLocal) { notify('Isi tanggal & waktu mulai'); return }
+    const payload = {
+      event_type: it.event_type, title: it.title, timezone: it.timezone,
+      start: fromLocalInput(it.startLocal, it.timezone), end: it.endLocal ? fromLocalInput(it.endLocal, it.timezone) : null,
+      venue_name: it.venue_name, address: it.address, maps_link: it.maps_link, dress_code: it.dress_code,
+      is_primary: it.is_primary, order: it.id ? it.order : i,
+    }
     try {
       if (it.id) await api.put(`/my/invitations/${inv.slug}/events/${it.id}/`, payload)
       else await api.post(`/my/invitations/${inv.slug}/events/`, payload)
+      try { localStorage.setItem(LAST_TZ_KEY, it.timezone) } catch { /* private mode */ }
       notify('Acara tersimpan'); reload()
-    } catch { notify('Gagal menyimpan acara') }
+    } catch (e) {
+      const data = e.response?.data || {}
+      notify(Object.values(data).flat()[0] || 'Gagal menyimpan acara')
+    }
   }
   async function delOne(it, i) {
     if (it.id) {
@@ -272,12 +297,12 @@ function EventsSection({ inv, reload, notify }) {
   return (
     <div className="ed-card">
       <h2>Rangkaian Acara</h2>
-      <p className="ed-card-sub">Akad nikah dan resepsi.</p>
+      <p className="ed-card-sub">Semua acara pernikahan kalian. Hitung mundur mengarah ke acara utama.</p>
       {items.length === 0 && <p className="ed-empty">Belum ada acara.</p>}
       {items.map((it, i) => (
         <div className="ed-item" key={it.id || `new-${i}`}>
           <div className="ed-item-head">
-            <strong>{it.event_type === 'akad' ? 'Akad Nikah' : 'Resepsi'}</strong>
+            <strong>{it.title || t(`events.type.${it.event_type}`)}</strong>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <div className="ed-reorder">
                 <button onClick={() => move(i, -1)} disabled={i === 0} aria-label="Naik">↑</button>
@@ -287,23 +312,44 @@ function EventsSection({ inv, reload, notify }) {
             </div>
           </div>
           <div className="ed-row2">
-            <div className="ed-field"><label htmlFor={`evt-${i}-type`}>Jenis</label>
+            <div className="ed-field"><label htmlFor={`evt-${i}-type`}>Jenis acara</label>
               <select id={`evt-${i}-type`} className="ed-select" value={it.event_type} onChange={e => update(i, 'event_type', e.target.value)}>
-                <option value="akad">Akad Nikah</option><option value="resepsi">Resepsi</option>
+                {EVENT_TYPES.map(type => <option key={type} value={type}>{t(`events.type.${type}`)}</option>)}
               </select>
             </div>
-            <div className="ed-field"><label htmlFor={`evt-${i}-dt`}>Tanggal & waktu</label><input id={`evt-${i}-dt`} className="ed-input" type="datetime-local" value={it.datetime} onChange={e => update(i, 'datetime', e.target.value)} /></div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-title`}>Nama sendiri (opsional)</label>
+              <input id={`evt-${i}-title`} className="ed-input" value={it.title} onChange={e => update(i, 'title', e.target.value)} placeholder="mis. Mappacci, Siraman, Midodareni" />
+            </div>
+          </div>
+          <div className="ed-row2">
+            <div className="ed-field"><label htmlFor={`evt-${i}-start`}>Mulai</label><input id={`evt-${i}-start`} className="ed-input" type="datetime-local" value={it.startLocal} onChange={e => update(i, 'startLocal', e.target.value)} /></div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-end`}>Selesai (kosongkan = "s.d. selesai")</label><input id={`evt-${i}-end`} className="ed-input" type="datetime-local" value={it.endLocal} onChange={e => update(i, 'endLocal', e.target.value)} /></div>
+          </div>
+          <div className="ed-row2">
+            <div className="ed-field"><label htmlFor={`evt-${i}-tz`}>Zona waktu</label>
+              <select id={`evt-${i}-tz`} className="ed-select" value={it.timezone} onChange={e => update(i, 'timezone', e.target.value)}>
+                {EVENT_TIMEZONES.map(tz => <option key={tz} value={tz}>{TZ_LABEL[tz]} ({tz})</option>)}
+              </select>
+            </div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-primary`}>Acara utama</label>
+              <label className="ed-check"><input id={`evt-${i}-primary`} type="radio" name="primary-event" checked={Boolean(it.is_primary)} onChange={() => setItems(arr => arr.map((x, j) => ({ ...x, is_primary: j === i })))} /> Hitung mundur ke acara ini</label>
+            </div>
           </div>
           <div className="ed-field"><label htmlFor={`evt-${i}-venue`}>Nama tempat</label><input id={`evt-${i}-venue`} className="ed-input" value={it.venue_name} onChange={e => update(i, 'venue_name', e.target.value)} /></div>
           <div className="ed-field"><label htmlFor={`evt-${i}-addr`}>Alamat</label><textarea id={`evt-${i}-addr`} className="ed-textarea" value={it.address} onChange={e => update(i, 'address', e.target.value)} /></div>
           <div className="ed-row2">
-            <div className="ed-field"><label htmlFor={`evt-${i}-gmaps`}>Link Google Maps</label><input id={`evt-${i}-gmaps`} className="ed-input" value={it.gmaps_url} onChange={e => update(i, 'gmaps_url', e.target.value)} placeholder="https://maps.app.goo.gl/…" /></div>
-            <div className="ed-field"><label htmlFor={`evt-${i}-embed`}>Link embed peta</label><input id={`evt-${i}-embed`} className="ed-input" value={it.gmaps_embed_url} onChange={e => update(i, 'gmaps_embed_url', e.target.value)} placeholder="https://www.google.com/maps?…&output=embed" /></div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-maps`}>Link Google Maps atau koordinat</label><input id={`evt-${i}-maps`} className="ed-input" value={it.maps_link} onChange={e => update(i, 'maps_link', e.target.value)} placeholder="https://maps.app.goo.gl/… atau -7.80, 110.36" /></div>
+            <div className="ed-field"><label htmlFor={`evt-${i}-dress`}>Dress code (opsional)</label><input id={`evt-${i}-dress`} className="ed-input" value={it.dress_code} onChange={e => update(i, 'dress_code', e.target.value)} /></div>
           </div>
-          <button className="ed-btn ed-btn-sm" onClick={() => saveOne(it)}>Simpan Acara</button>
+          <button className="ed-btn ed-btn-sm" onClick={() => saveOne(it, i)}>Simpan Acara</button>
         </div>
       ))}
-      <button className="ed-btn-ghost ed-btn ed-btn-sm" onClick={addDraft}>+ Tambah Acara</button>
+      <div className="ed-add-row">
+        {suggestions.map(type => (
+          <button key={type} className="ed-btn-ghost ed-btn ed-btn-sm" onClick={() => addDraft(type)}>+ {t(`events.type.${type}`)}</button>
+        ))}
+        <button className="ed-btn-ghost ed-btn ed-btn-sm" onClick={() => addDraft('lainnya')}>+ Acara lain</button>
+      </div>
     </div>
   )
 }
@@ -512,7 +558,8 @@ function ChecklistCard({ inv }) {
   const c = inv.couple || {}
   const items = [
     { ok: !!(c.bride_name && c.groom_name), label: 'Nama kedua mempelai' },
-    { ok: (inv.events || []).length > 0, label: 'Tanggal & rangkaian acara' },
+    { ok: (inv.events || []).some(e => e.is_primary && e.start), label: 'Acara utama & tanggalnya' },
+    { ok: (inv.events || []).length > 0 && inv.events.every(e => e.venue_name), label: 'Tempat setiap acara' },
     { ok: !!(c.bride_photo || c.groom_photo), label: 'Foto mempelai' },
     { ok: (inv.photos || []).length > 0, label: 'Foto galeri' },
     { ok: (inv.bank_accounts || []).length > 0 || !!inv.wishlist_url, label: 'Amplop digital / wishlist' },

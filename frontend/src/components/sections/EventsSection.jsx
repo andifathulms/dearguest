@@ -1,25 +1,43 @@
 import { motion } from 'framer-motion'
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 import { eventLabel } from '../../copy/copy.js'
+import { API_BASE } from '../../api/client.js'
+import { formatEventDate, formatEventRange, googleCalendarDates, localTimeNote } from '../../utils/dates.js'
 
-function gcalUrl(event, t) {
-  const start = new Date(event.datetime)
-  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000)
-  const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
-  const text = encodeURIComponent(eventLabel(event, t))
-  const details = encodeURIComponent(event.venue_name)
-  const loc = encodeURIComponent(event.address || event.venue_name)
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${fmt(start)}/${fmt(end)}&details=${details}&location=${loc}`
+const TWO_HOURS = 2 * 60 * 60 * 1000
+
+function googleCalendarUrl(event, title) {
+  const end = event.end || new Date(new Date(event.start).getTime() + TWO_HOURS).toISOString()
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    dates: googleCalendarDates(event.start, end, event.timezone),
+    ctz: event.timezone,
+    location: [event.venue_name, event.address].filter(Boolean).join(', '),
+    details: event.maps_url || '',
+  })
+  return `https://calendar.google.com/calendar/render?${params}`
+}
+
+// One "Simpan ke Kalender" control: Google Calendar, or an .ics file that
+// iPhone / Outlook open natively.
+function CalendarMenu({ event, title, slug, t }) {
+  return (
+    <details className="event-calendar">
+      <summary className="event-maps-link event-calendar-link">+ {t('events.calendar')}</summary>
+      <div className="event-calendar-menu">
+        <a href={googleCalendarUrl(event, title)} target="_blank" rel="noopener noreferrer">{t('events.calendarGoogle')}</a>
+        <a href={`${API_BASE}/invitations/${slug}/events/${event.id}/calendar.ics`} download>{t('events.calendarIcs')}</a>
+      </div>
+    </details>
+  )
 }
 
 function EventCard({ event }) {
-  const { t } = useCopy()
-  const dt = new Date(event.datetime)
-  const dateStr = format(dt, 'EEEE, d MMMM yyyy', { locale: id })
-  const timeStr = format(dt, 'HH:mm') + ' WIB'
+  const { t, invitation } = useCopy()
+  const title = eventLabel(event, t)
+  const local = localTimeNote(event.start, event.timezone)
 
   return (
     <motion.div
@@ -29,22 +47,20 @@ function EventCard({ event }) {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
-      <h3 className="event-type">
-        {eventLabel(event, t)}
-      </h3>
-      <p className="event-date">{dateStr}</p>
-      <p className="event-time">{timeStr}</p>
+      <h3 className="event-type">{title}</h3>
+      <p className="event-date">{formatEventDate(event.start, event.timezone)}</p>
+      <p className="event-time">{formatEventRange(event.start, event.end, event.timezone, t('events.until'))}</p>
+      {local && <p className="event-local-time">{t('events.localTime', { time: local })}</p>}
       <p className="event-venue">{event.venue_name}</p>
       <p className="event-address">{event.address}</p>
+      {event.dress_code && <p className="event-dresscode">{t('events.dressCode')}: <strong>{event.dress_code}</strong></p>}
       <div className="event-actions">
-        {event.gmaps_url && (
-          <a href={event.gmaps_url} target="_blank" rel="noopener noreferrer" className="event-maps-link">
+        {event.maps_url && (
+          <a href={event.maps_url} target="_blank" rel="noopener noreferrer" className="event-maps-link">
             {t('events.openMap')} →
           </a>
         )}
-        <a href={gcalUrl(event, t)} target="_blank" rel="noopener noreferrer" className="event-maps-link event-calendar-link">
-          + {t('events.calendar')}
-        </a>
+        <CalendarMenu event={event} title={title} slug={invitation?.slug} t={t} />
       </div>
     </motion.div>
   )

@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import { motion } from 'framer-motion'
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { formatDateOnly } from '../../utils/dates.js'
 import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
@@ -32,7 +31,7 @@ export default function StorySection({ stories }) {
             <div className="story-content">
               {story.date && (
                 <p className="story-date">
-                  {format(new Date(story.date), 'MMMM yyyy', { locale: id })}
+                  {formatDateOnly(story.date, { month: 'long', year: 'numeric' })}
                 </p>
               )}
               <h3 className="story-title">{story.title}</h3>

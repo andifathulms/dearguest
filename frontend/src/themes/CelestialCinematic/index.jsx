@@ -18,6 +18,7 @@ import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
 import FloatingRSVP from '../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
+import { primaryEvent } from '../../utils/events.js'
 
 // WebGL backdrop is its own lazy chunk so three.js only loads for this theme.
 const CelestialScene = lazy(() => import('./CelestialScene.jsx'))
@@ -42,7 +43,7 @@ function Section({ children }) {
 
 export default function CelestialCinematic({ invitation, guestName }) {
   const couple = invitation.couple || {}
-  const akad = (invitation.events || []).find(e => e.event_type === 'akad')
+  const primary = primaryEvent(invitation.events)
   // Adaptive quality: starts highest, the scene drops it only if the device
   // can't sustain the frame-rate. The class gates the expensive CSS blur.
   const [quality, setQuality] = useState('high')
@@ -63,7 +64,7 @@ export default function CelestialCinematic({ invitation, guestName }) {
         />
 
         <Section><GuestGreeting guestName={guestName} openingText={invitation.opening_text} /></Section>
-        <Section><CountdownTimer targetDate={akad?.datetime} /></Section>
+        <Section><CountdownTimer targetDate={primary?.start} /></Section>
         <Section><EventsSection events={invitation.events} dressCode={invitation.dress_code} /></Section>
         <Section><StorySection stories={invitation.stories} /></Section>
         <Section><ProfileSection couple={couple} /></Section>

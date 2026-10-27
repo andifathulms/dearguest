@@ -147,22 +147,47 @@ class Couple(models.Model):
 
 
 class Event(models.Model):
-    EVENT_TYPES = [('akad', 'Akad Nikah'), ('resepsi', 'Resepsi')]
+    EVENT_TYPES = [
+        ('akad', 'Akad Nikah'),
+        ('pemberkatan', 'Pemberkatan Nikah'),
+        ('sakramen', 'Sakramen Perkawinan'),
+        ('resepsi', 'Resepsi'),
+        ('adat', 'Upacara Adat'),
+        ('ngunduh_mantu', 'Ngunduh Mantu'),
+        ('lainnya', 'Lainnya'),
+    ]
+    # Indonesia's three time zones. Times are stored aware (UTC) and shown in
+    # the event's own zone, labelled WIB / WITA / WIT.
+    TIMEZONES = [
+        ('Asia/Jakarta', 'WIB'),
+        ('Asia/Makassar', 'WITA'),
+        ('Asia/Jayapura', 'WIT'),
+    ]
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='events')
-    event_type = models.CharField(max_length=10, choices=EVENT_TYPES)
-    datetime = models.DateTimeField()
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES)
+    title = models.CharField(max_length=120, blank=True, help_text='Nama sendiri, mis. "Mappacci" atau "Siraman".')
+    start = models.DateTimeField()
+    end = models.DateTimeField(null=True, blank=True)
+    timezone = models.CharField(max_length=40, choices=TIMEZONES, default='Asia/Jakarta')
     venue_name = models.CharField(max_length=300)
     address = models.TextField()
-    gmaps_url = models.URLField(blank=True)
-    gmaps_embed_url = models.URLField(blank=True)
+    maps_link = models.CharField(max_length=500, blank=True)  # as pasted: a Google Maps link or "lat, lng"
+    lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    dress_code = models.CharField(max_length=200, blank=True)
+    is_primary = models.BooleanField(default=False)  # the countdown's target; exactly one per invitation (API-enforced)
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['order']
+        ordering = ['order', 'start']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['invitation'], condition=models.Q(is_primary=True), name='one_primary_event_per_invitation',
+            ),
+        ]
 
     def __str__(self):
-        return f"{self.invitation.slug} — {self.get_event_type_display()}"
-
+        return f"{self.invitation.slug} — {self.title or self.get_event_type_display()}"
 
 class Story(models.Model):
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='stories')

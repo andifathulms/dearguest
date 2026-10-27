@@ -17,6 +17,7 @@ import FloatingRSVP from '../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
 import AmbientLayer from '../../motion/AmbientLayer.jsx'
 import { FloralSVG, Rule } from './extras.jsx'
+import { primaryEvent } from '../../utils/events.js'
 
 // The 28 classic themes were one template copied 28 times; this is that
 // template once. Each theme's look lives entirely in its untouched CSS file
@@ -54,7 +55,7 @@ export default function LegacyTheme({ entry, invitation, guestName }) {
   const has = name => extras.includes(name)
   const rules = has('section-rules')
   const couple = invitation.couple || {}
-  const akad = (invitation.events || []).find(e => e.event_type === 'akad')
+  const primary = primaryEvent(invitation.events)
 
   const hero = (
     <HeroSection
@@ -82,7 +83,7 @@ export default function LegacyTheme({ entry, invitation, guestName }) {
 
       <Section rule={rules}><GuestGreeting guestName={guestName} openingText={invitation.opening_text} /></Section>
       <Section rule={rules}><ScriptureSection /></Section>
-      <Section rule={rules}><CountdownTimer targetDate={akad?.datetime} /></Section>
+      <Section rule={rules}><CountdownTimer targetDate={primary?.start} /></Section>
       <Section rule={rules}><EventsSection events={invitation.events} dressCode={invitation.dress_code} /></Section>
       <Section rule={rules}><StorySection stories={invitation.stories} /></Section>
       <Section rule={rules}><ProfileSection couple={couple} /></Section>

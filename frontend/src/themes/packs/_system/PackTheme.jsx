@@ -26,6 +26,7 @@ import ThemeAsset from './ThemeAsset.jsx'
 import Monogram from './Monogram.jsx'
 import Opening from './openings/Opening.jsx'
 import Cover from './layout/Cover.jsx'
+import { primaryEvent } from '../../../utils/events.js'
 
 // Every pack renders through this one layout. The sections are the shared
 // components (same content for every theme); the pack supplies tokens, art,
@@ -50,7 +51,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
   const ctx = useMemo(() => ({ entry, pack, invitation }), [entry, pack, invitation])
   const m = pack.manifest
   const couple = invitation.couple || {}
-  const akad = (invitation.events || []).find(e => e.event_type === 'akad')
+  const primary = primaryEvent(invitation.events)
 
   const events = invitation.events || []
   const has = list => (list || []).length > 0
@@ -60,7 +61,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
   const sections = [
     [true, <GuestGreeting guestName={guestName} openingText={invitation.opening_text} />],
     [Boolean(scriptureFor(invitation) || blessingFor(invitation.copy_variant)), <ScriptureSection />],
-    [Boolean(akad?.datetime), <CountdownTimer targetDate={akad?.datetime} />],
+    [Boolean(primary?.start), <CountdownTimer targetDate={primary?.start} />],
     [has(events), <EventsSection events={events} dressCode={invitation.dress_code} />],
     [has(invitation.stories), <StorySection stories={invitation.stories} />],
     [Boolean(invitation.couple), <ProfileSection couple={couple} />],
@@ -68,7 +69,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
     [has(invitation.bank_accounts) || Boolean(invitation.wishlist_url), <AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} />],
     [true, <RSVPForm slug={invitation.slug} />],
     [true, <WishesWall slug={invitation.slug} />],
-    [events.some(e => e.gmaps_embed_url), <MapsSection events={events} />],
+    [events.some(e => e.maps_url || e.embed_url), <MapsSection events={events} />],
     [Boolean(invitation.livestream_url), <LiveStreamSection url={invitation.livestream_url} />],
   ].filter(([show]) => show).map(([, el]) => el)
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { formatDateOnly } from '../utils/dates.js'
 import api from '../api/client.js'
 import { themeName, themeSwatch } from '../themes/registry.js'
 import './MyInvitations.css'
@@ -85,7 +84,7 @@ export default function MyInvitationsPage() {
                   <div className="mi-card-body">
                     <div className="mi-card-meta">
                       {themeName(it.theme)}
-                      {it.wedding_date ? ` · ${format(new Date(it.wedding_date), 'd MMM yyyy', { locale: id })}` : ''}
+                      {it.wedding_date ? ` · ${formatDateOnly(it.wedding_date, { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}
                       {it.tier && it.tier !== 'free' ? ` · ${it.tier === 'bisnis' ? 'Bisnis' : 'Premium'}` : ''}
                     </div>
                     {statusBadge(it)}

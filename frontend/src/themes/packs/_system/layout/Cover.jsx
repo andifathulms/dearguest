@@ -1,5 +1,4 @@
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { formatDateOnly } from '../../../../utils/dates.js'
 import ThemeAsset from '../ThemeAsset.jsx'
 import Monogram from '../Monogram.jsx'
 import { usePack } from '../ThemeContext.jsx'
@@ -29,7 +28,7 @@ function CoverContent({ invitation, guestName, openButton }) {
   // Spread the typing over ~55 % of the opening, however long the names are.
   const step = `calc(var(--op-dur) * 0.55 / ${Math.max(bride.length + groom.length + 1, 1)})`
   const date = invitation.wedding_date
-    ? format(new Date(invitation.wedding_date), 'EEEE, d MMMM yyyy', { locale: id })
+    ? formatDateOnly(invitation.wedding_date)
     : ''
 
   return (

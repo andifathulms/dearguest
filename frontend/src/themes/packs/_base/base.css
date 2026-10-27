@@ -270,6 +270,18 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 .pk-root .event-address { color: var(--dg-ink-muted); font-size: var(--dg-fs-small); }
 .pk-root .event-maps-link { font-family: var(--dg-font-label); font-size: var(--dg-fs-label); letter-spacing: var(--dg-tracking-label); text-transform: uppercase; color: var(--dg-accent); text-decoration: none; }
 
+/* event additions: local time, per-event dress code, calendar menu, tap-to-load map */
+.pk-root .event-local-time { margin: 0; font-size: var(--dg-fs-small); color: var(--dg-ink-faint); }
+.pk-root .event-dresscode { margin: var(--dg-space-2) 0 0; font-size: var(--dg-fs-small); color: var(--dg-ink-muted); }
+.pk-root .event-dresscode strong { color: var(--dg-ink); font-weight: 500; }
+.pk-root .event-actions { display: grid; justify-items: center; gap: var(--dg-space-2); margin-top: var(--dg-space-3); }
+.pk-root .event-calendar > summary { list-style: none; cursor: pointer; }
+.pk-root .event-calendar > summary::-webkit-details-marker { display: none; }
+.pk-root .event-calendar-menu { display: grid; gap: var(--dg-space-1); margin-top: var(--dg-space-2); padding: var(--dg-space-1); border: 1px solid var(--dg-line); border-radius: var(--dg-radius-card); background: var(--dg-surface-raised); }
+.pk-root .event-calendar-menu a { padding: var(--dg-space-2) var(--dg-space-3); font-size: var(--dg-fs-small); color: var(--dg-ink); text-decoration: none; }
+.pk-root .map-load { display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 3; margin-bottom: var(--dg-space-3); border: 1px dashed var(--dg-line-strong); border-radius: var(--dg-radius-card); background: var(--dg-surface); color: var(--dg-ink); font: inherit; font-family: var(--dg-font-label); font-size: var(--dg-fs-label); letter-spacing: var(--dg-tracking-label); text-transform: uppercase; cursor: pointer; }
+.pk-root .map-open { display: inline-block; margin-top: var(--dg-space-2); }
+
 /* story */
 .pk-root .story-timeline { display: grid; gap: var(--dg-space-5); max-width: 32rem; margin: 0 auto; text-align: left; }
 .pk-root .story-item { display: grid; grid-template-columns: auto 1fr; gap: var(--dg-space-3); }

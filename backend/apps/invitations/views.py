@@ -1,5 +1,6 @@
 from datetime import date
 from django.core.cache import cache
+from django.http import HttpResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -8,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import Invitation, RSVP, Guest, Coupon, MusicPreset
 from .serializers import MusicPresetSerializer
+from . import ics, maps
 from .throttling import client_ip
 from .serializers import (
     InvitationPublicSerializer,
@@ -155,6 +157,23 @@ class WishesListView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.invitation.rsvps.exclude(wishes='').order_by('-submitted_at', '-id')
+
+
+class EventCalendarView(APIView):
+    """One event as an .ics file (iPhone / Outlook "Simpan ke Kalender")."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, slug, pk):
+        invitation, error = _public_or_404(slug, request.user)
+        if error:
+            return error
+        event = invitation.events.filter(pk=pk).first()
+        if not event:
+            return Response({'detail': 'Acara tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        body = ics.event_ics(event, invitation, host=request.get_host().split(':')[0], maps_url=maps.open_url(event))
+        response = HttpResponse(body, content_type='text/calendar; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{invitation.slug}-{event.pk}.ics"'
+        return response
 
 
 class MusicPresetListView(generics.ListAPIView):

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { formatDateOnly } from '../../utils/dates.js'
 import { usePack } from '../../themes/packs/_system/ThemeContext.jsx'
 import ThemeAsset from '../../themes/packs/_system/ThemeAsset.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
@@ -29,7 +28,7 @@ function PackHeroMedia({ heroPhoto }) {
 export default function HeroSection({ brideName, groomName, weddingDate, heroPhoto }) {
   const pack = usePack()
   const formatted = weddingDate
-    ? format(new Date(weddingDate), 'EEEE, d MMMM yyyy', { locale: id })
+    ? formatDateOnly(weddingDate)
     : ''
 
   if (pack) {

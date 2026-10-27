@@ -8,7 +8,8 @@ from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
+from django.db import transaction
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Invitation, Couple, Event, Story, Photo, BankAccount, CoupleProfile, MusicPreset
@@ -250,14 +251,46 @@ class _OwnedChildDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class EventListCreate(_OwnedChildList):
+    """Exactly one event per invitation is primary (the countdown's target):
+    the first event becomes primary, and marking another demotes the old one."""
     model = Event
     related_name = 'events'
     serializer_class = EventWriteSerializer
+
+    def perform_create(self, serializer):
+        inv = self._inv()
+        if not inv:
+            raise PermissionDenied('Undangan tidak ditemukan.')
+        with transaction.atomic():
+            primary = serializer.validated_data.get('is_primary') or not inv.events.filter(is_primary=True).exists()
+            if primary:
+                inv.events.update(is_primary=False)
+            serializer.save(invitation=inv, is_primary=primary)
 
 
 class EventDetail(_OwnedChildDetail):
     model = Event
     serializer_class = EventWriteSerializer
+
+    def perform_update(self, serializer):
+        event = serializer.instance
+        wants = serializer.validated_data.get('is_primary')
+        with transaction.atomic():
+            if wants is True:
+                Event.objects.filter(invitation=event.invitation).exclude(pk=event.pk).update(is_primary=False)
+            elif wants is False and event.is_primary:
+                raise ValidationError({'is_primary': 'Pilih acara utama yang lain terlebih dahulu.'})
+            serializer.save()
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            inv, was_primary = instance.invitation, instance.is_primary
+            instance.delete()
+            if was_primary:
+                successor = inv.events.order_by('order', 'start', 'id').first()
+                if successor:
+                    successor.is_primary = True
+                    successor.save(update_fields=['is_primary'])
 
 
 class StoryListCreate(_OwnedChildList):

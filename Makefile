@@ -20,6 +20,10 @@ check:
 test: check
 	docker compose exec -T backend python manage.py test --noinput
 
+# Frontend unit tests (date formatting, run west of UTC) inside the frontend container.
+test-unit:
+	docker compose exec -T frontend npm run test:unit
+
 # Theme-pack visual suite (Linux, Chromium + WebKit) in Docker; needs the dev stack.
 visual:
 	cd frontend && sh scripts/visual-docker.sh

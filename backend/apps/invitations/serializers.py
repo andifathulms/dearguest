@@ -1,5 +1,9 @@
+from zoneinfo import ZoneInfo
+
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from rest_framework import serializers
+from . import maps
 from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, MusicPreset
 
 
@@ -92,9 +96,21 @@ class CoupleSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    """Public event. start/end are UTC instants; the guest UI shows them in
+    `timezone` (WIB/WITA/WIT). Map URLs are built server-side (maps.py)."""
+    maps_url = serializers.SerializerMethodField()
+    embed_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
-        fields = ['id', 'event_type', 'datetime', 'venue_name', 'address', 'gmaps_url', 'gmaps_embed_url']
+        fields = ['id', 'event_type', 'title', 'start', 'end', 'timezone', 'venue_name', 'address',
+                  'maps_url', 'embed_url', 'dress_code', 'is_primary', 'order']
+
+    def get_maps_url(self, obj):
+        return maps.open_url(obj)
+
+    def get_embed_url(self, obj):
+        return maps.embed_url(obj)
 
 
 class StorySerializer(serializers.ModelSerializer):
@@ -198,7 +214,23 @@ class CoupleWriteSerializer(serializers.ModelSerializer):
 class EventWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['id', 'event_type', 'datetime', 'venue_name', 'address', 'gmaps_url', 'gmaps_embed_url', 'order']
+        fields = ['id', 'event_type', 'title', 'start', 'end', 'timezone', 'venue_name', 'address',
+                  'maps_link', 'dress_code', 'is_primary', 'order']
+
+    def validate(self, attrs):
+        # A time sent without an offset is wall-clock time in the event's own
+        # zone, not the server's. (The editor sends offsets; this is the safety net.)
+        tz = ZoneInfo(attrs.get('timezone') or getattr(self.instance, 'timezone', None) or 'Asia/Jakarta')
+        for field in ('start', 'end'):
+            raw = self.initial_data.get(field) if hasattr(self.initial_data, 'get') else None
+            parsed = parse_datetime(raw) if isinstance(raw, str) else None
+            if parsed is not None and timezone.is_naive(parsed):
+                attrs[field] = timezone.make_aware(parsed, tz)
+        start = attrs.get('start', getattr(self.instance, 'start', None))
+        end = attrs.get('end', getattr(self.instance, 'end', None))
+        if start and end and end <= start:
+            raise serializers.ValidationError({'end': 'Waktu selesai harus setelah waktu mulai.'})
+        return attrs
 
 
 class StoryWriteSerializer(serializers.ModelSerializer):

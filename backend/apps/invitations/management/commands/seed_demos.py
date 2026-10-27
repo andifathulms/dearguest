@@ -2,6 +2,7 @@
 live examples. Idempotent — safe to run repeatedly."""
 import os
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from django.core.files import File
 from django.core.management.base import BaseCommand
 from apps.invitations import themes
@@ -65,14 +66,14 @@ class Command(BaseCommand):
                         photo = Photo(invitation=inv, caption='', order=n)
                         _attach(photo.image, fname, f'{slug}-g{n + 1}.jpg')
             inv.events.all().delete()
-            Event.objects.create(invitation=inv, event_type='akad', datetime=datetime(2026, 12, 12, 8, 0),
+            wib = ZoneInfo('Asia/Jakarta')
+            Event.objects.create(invitation=inv, event_type='akad', start=datetime(2026, 12, 12, 8, 0, tzinfo=wib),
+                                 end=datetime(2026, 12, 12, 10, 0, tzinfo=wib), timezone='Asia/Jakarta',
                                  venue_name='Masjid Agung', address='Jl. Merdeka No. 1, Yogyakarta',
-                                 gmaps_url='https://maps.google.com',
-                                 gmaps_embed_url='https://www.google.com/maps?q=yogyakarta&output=embed', order=0)
-            Event.objects.create(invitation=inv, event_type='resepsi', datetime=datetime(2026, 12, 12, 11, 0),
-                                 venue_name='Gedung Graha', address='Jl. Sudirman No. 45, Yogyakarta',
-                                 gmaps_url='https://maps.google.com',
-                                 gmaps_embed_url='https://www.google.com/maps?q=yogyakarta&output=embed', order=1)
+                                 is_primary=True, order=0)
+            Event.objects.create(invitation=inv, event_type='resepsi', start=datetime(2026, 12, 12, 11, 0, tzinfo=wib),
+                                 timezone='Asia/Jakarta',
+                                 venue_name='Gedung Graha', address='Jl. Sudirman No. 45, Yogyakarta', order=1)
             inv.stories.all().delete()
             Story.objects.create(invitation=inv, title='Pertama Bertemu', description='Dipertemukan di sebuah acara kampus.', date=date(2021, 3, 1), order=0)
             Story.objects.create(invitation=inv, title='Lamaran', description='Bagus melamar Andini di hadapan keluarga.', date=date(2025, 11, 1), order=1)

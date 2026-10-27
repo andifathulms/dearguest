@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { formatDateOnly } from '../../utils/dates.js'
 import { useMotionClock } from '../../motion/MotionClockContext.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 
@@ -27,7 +26,7 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
   const { t } = useCopy()
 
   const dateStr = invitation.wedding_date
-    ? format(new Date(invitation.wedding_date), 'EEEE, d MMMM yyyy', { locale: id })
+    ? formatDateOnly(invitation.wedding_date)
     : ''
 
   // Lock scroll while the gate is showing, and move focus to the open button.

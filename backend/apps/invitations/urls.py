@@ -7,6 +7,7 @@ from .views import (
     GuestListCreateView,
     GuestDetailView,
     CouponValidateView,
+    EventCalendarView,
     MusicPresetListView,
 )
 from .editor_views import (
@@ -32,6 +33,7 @@ urlpatterns = [
     path('invitations/<slug:slug>/rsvp/', RSVPCreateView.as_view()),
     path('invitations/<slug:slug>/rsvps/', RSVPListView.as_view()),
     path('invitations/<slug:slug>/wishes/', WishesListView.as_view()),
+    path('invitations/<slug:slug>/events/<int:pk>/calendar.ics', EventCalendarView.as_view()),
     path('coupons/validate/', CouponValidateView.as_view()),
     path('music-presets/', MusicPresetListView.as_view()),
     path('invitations/<slug:slug>/guests/', GuestListCreateView.as_view()),

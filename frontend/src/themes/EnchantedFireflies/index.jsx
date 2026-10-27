@@ -18,6 +18,7 @@ import LiveStreamSection from '../../components/sections/LiveStreamSection.jsx'
 import MusicPlayer from '../../components/ui/MusicPlayer.jsx'
 import FloatingRSVP from '../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../components/ui/WhatsAppShare.jsx'
+import { primaryEvent } from '../../utils/events.js'
 
 const FireflyScene = lazy(() => import('./FireflyScene.jsx'))
 
@@ -36,7 +37,7 @@ function Section({ children }) {
 
 export default function EnchantedFireflies({ invitation, guestName }) {
   const couple = invitation.couple || {}
-  const akad = (invitation.events || []).find(e => e.event_type === 'akad')
+  const primary = primaryEvent(invitation.events)
   const [quality, setQuality] = useState('high')
 
   return (
@@ -55,7 +56,7 @@ export default function EnchantedFireflies({ invitation, guestName }) {
         />
 
         <Section><GuestGreeting guestName={guestName} openingText={invitation.opening_text} /></Section>
-        <Section><CountdownTimer targetDate={akad?.datetime} /></Section>
+        <Section><CountdownTimer targetDate={primary?.start} /></Section>
         <Section><EventsSection events={invitation.events} dressCode={invitation.dress_code} /></Section>
         <Section><StorySection stories={invitation.stories} /></Section>
         <Section><ProfileSection couple={couple} /></Section>
