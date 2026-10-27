@@ -17,7 +17,9 @@ test('opening: mid-way, finished cover, opened hero', async ({ page }) => {
   await page.goto(`${PAGE}&openingAt=0.5`)
   await expect(page.locator('.pk-opening')).toHaveAttribute('data-pinned', '')
   await settle(page)
-  await expect(page).toHaveScreenshot('opening-mid.png')
+  // 'allow': the intro is already paused at 50 %; the default ('disabled')
+  // would fast-forward the CSS animations to their end state.
+  await expect(page).toHaveScreenshot('opening-mid.png', { animations: 'allow' })
 
   // The real flow: the intro finishes on its own.
   await page.goto(PAGE)
@@ -44,10 +46,16 @@ test('every section', async ({ page }) => {
   expect(count).toBeGreaterThanOrEqual(10)
   for (let i = 0; i < count; i++) {
     const wrap = wraps.nth(i)
-    // Centre it so its in-view reveal fires reliably (tall sections in narrow
-    // WebKit can miss it with a minimal scroll), then wait until fully shown.
+    // Centre it, then wait until its in-view reveal has finished. WebKit
+    // sometimes skips the intersection check after an instant programmatic
+    // scroll, so nudge with real wheel events while waiting (a person
+    // scrolling produces these continuously).
     await wrap.evaluate(el => el.scrollIntoView({ block: 'center' }))
-    await expect(wrap).toHaveCSS('opacity', '1', { timeout: 15_000 })
+    await expect.poll(async () => {
+      await page.mouse.wheel(0, 2)
+      await page.mouse.wheel(0, -2)
+      return wrap.evaluate(el => getComputedStyle(el).opacity)
+    }, { timeout: 15_000, intervals: [250] }).toBe('1')
     const name = await wrap.evaluate(el => el.firstElementChild?.className.split(' ')[0] || 'section')
     await settle(page, '.pk-root')
     await expect(wrap).toHaveScreenshot(`section-${String(i).padStart(2, '0')}-${name}.png`, { stylePath: SECTION_CSS })

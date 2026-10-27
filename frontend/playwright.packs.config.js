@@ -25,6 +25,10 @@ export default defineConfig({
   use: {
     baseURL: process.env.PREVIEW_URL || 'http://frontend:5173',
     deviceScaleFactor: 1,
+    // Render as a guest in Indonesia sees it (event times are formatted in the
+    // device's timezone; the container itself runs in UTC).
+    timezoneId: 'Asia/Jakarta',
+    locale: 'id-ID',
   },
   expect: {
     toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: 'disabled', scale: 'css' },
