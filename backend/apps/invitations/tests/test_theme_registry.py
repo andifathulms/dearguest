@@ -18,13 +18,17 @@ from .base import APITestBase
 REAL = themes.entries()
 
 
-def with_active(*ids):
-    """Patch the registry so the given ids are active (the real one ships with
-    every legacy theme hidden and the first pack still 'coming')."""
+def with_status(status, *ids):
+    """Patch the registry so the given ids have `status`, independent of what
+    the shipped registry currently says."""
     patched = copy.deepcopy(REAL)
     for tid in ids:
-        patched[tid]['status'] = 'active'
+        patched[tid]['status'] = status
     return mock.patch.object(themes, 'entries', return_value=patched)
+
+
+def with_active(*ids):
+    return with_status('active', *ids)
 
 
 class RegistryCopyTests(APITestBase):
@@ -72,7 +76,8 @@ class ThemeValidationTests(APITestBase):
         self.assertEqual(Invitation.objects.get().theme, 'minimal')
 
     def test_create_without_a_theme_uses_the_default_only_if_it_is_active(self):
-        self.assertEqual(self.create().status_code, 400)  # default not active yet
+        with with_status('coming', themes.DEFAULT_THEME):
+            self.assertEqual(self.create().status_code, 400)
         with with_active(themes.DEFAULT_THEME):
             self.assertEqual(self.create().status_code, 201)
 
