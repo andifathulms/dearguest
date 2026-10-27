@@ -6,6 +6,10 @@ from datetime import timedelta
 from .uploads import SafeUploadTo, validate_audio_upload, validate_image_upload
 
 
+# An invitation stays reachable this long after the wedding.
+EXPIRY_DAYS_AFTER_WEDDING = 90
+
+
 def generate_guest_code():
     """Short, URL-safe, unique code used in per-guest links and QR codes."""
     return secrets.token_hex(4)  # 8 hex chars
@@ -81,10 +85,24 @@ class Invitation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        inv = super().from_db(db, field_names, values)
+        inv._loaded_wedding_date = inv.wedding_date  # to spot date changes in save()
+        return inv
+
     def save(self, *args, **kwargs):
-        if not self.expires_at:
-            self.expires_at = self.wedding_date + timedelta(days=90)
+        date_changed = self.wedding_date != getattr(self, '_loaded_wedding_date', self.wedding_date)
+        if not self.expires_at or date_changed:
+            self.expires_at = self.wedding_date + timedelta(days=EXPIRY_DAYS_AFTER_WEDDING)
+        # A hand-set expiry may be extended, but never end before the wedding.
+        self.expires_at = max(self.expires_at, self.wedding_date + timedelta(days=1))
+
+        update_fields = kwargs.get('update_fields')
+        if update_fields is not None and 'wedding_date' in update_fields:
+            kwargs['update_fields'] = {*update_fields, 'expires_at'}
         super().save(*args, **kwargs)
+        self._loaded_wedding_date = self.wedding_date
 
     def __str__(self):
         return self.slug
