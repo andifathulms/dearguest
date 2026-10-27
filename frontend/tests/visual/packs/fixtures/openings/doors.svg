@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+  <g id="glow"><rect width="1080" height="1920" fill="#f6e7c8"/></g>
+  <g id="door-left"><rect width="540" height="1920" fill="#3b2a1a"/></g>
+  <g id="door-right"><rect x="540" width="540" height="1920" fill="#3b2a1a"/></g>
+</svg>

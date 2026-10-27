@@ -26,7 +26,7 @@ export function useOpeningGate() {
 
 // Dev-only test hooks (Playwright):
 //   ?openingAt=0.5          pin the intro at 50 %
-//   ?openingType=lottie&openingSrc=<url>   swap the opening for a fixture
+//   ?openingType=lottie&openingSrc=<url>[&openingPreset=…]   swap the opening for a fixture
 export function devOpeningOverrides() {
   if (!import.meta.env.DEV) return {}
   const q = new URLSearchParams(window.location.search)
@@ -35,5 +35,6 @@ export function devOpeningOverrides() {
     pinnedAt: at === null ? null : Math.min(1, Math.max(0, Number(at) || 0)),
     type: q.get('openingType') || null,
     src: q.get('openingSrc') || null,
+    preset: q.get('openingPreset') || null,
   }
 }

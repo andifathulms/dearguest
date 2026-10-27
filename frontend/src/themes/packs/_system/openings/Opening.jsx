@@ -21,6 +21,7 @@ export default function Opening({ Cover, invitation, guestName }) {
   const dev = devOpeningOverrides()
   const opening = pack.manifest.opening || {}
   const type = dev.type || opening.type || 'none'
+  const preset = dev.preset || opening.preset
   const duration = opening.durationMs || DEFAULT_DURATION
   const pinnedAt = dev.pinnedAt ?? null
   const reduced = useReducedMotion()
@@ -38,8 +39,17 @@ export default function Opening({ Cover, invitation, guestName }) {
     if (!finished && pinnedAt === null) setDone(true)
   }
 
+  // Lottie plays from a URL; layered-svg needs the SVG markup. The dev override
+  // (?openingSrc) is a URL either way, so fetch its text for layered-svg.
   const slot = pack.manifest.slots?.opening
-  const src = dev.src || (slot && (pack.urls[slot.lottie] || pack.svgs[slot.svg]))
+  const [devSvg, setDevSvg] = useState(null)
+  useEffect(() => {
+    if (type !== 'layered-svg' || !dev.src) return
+    fetch(dev.src).then(r => r.text()).then(setDevSvg).catch(() => setDone(true))
+  }, [type, dev.src])
+  const src = type === 'lottie'
+    ? dev.src || (slot && pack.urls[slot.lottie])
+    : devSvg || (slot && pack.svgs[slot.svg])
 
   return (
     <AnimatePresence>
@@ -50,7 +60,7 @@ export default function Opening({ Cover, invitation, guestName }) {
           aria-modal="true"
           aria-label="Pembuka undangan"
           data-opening={type}
-          data-opening-preset={opening.preset}
+          data-opening-preset={preset}
           data-state={finished ? 'done' : 'playing'}
           data-pinned={pinnedAt !== null ? '' : undefined}
           style={{ '--op-dur': `${duration}ms`, '--op-t': `${(pinnedAt ?? 0) * duration}ms` }}
@@ -65,7 +75,7 @@ export default function Opening({ Cover, invitation, guestName }) {
           )}
           {type === 'layered-svg' && src && (
             <Suspense fallback={null}>
-              <LayeredSvgLayer svg={src} preset={opening.preset} duration={duration} pinnedAt={pinnedAt} finished={finished} />
+              <LayeredSvgLayer svg={src} preset={preset} duration={duration} pinnedAt={pinnedAt} finished={finished} />
             </Suspense>
           )}
           <Cover
