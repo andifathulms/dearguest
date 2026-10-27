@@ -1,0 +1,91 @@
+## before-1 vs before-2 (noise)
+72 images, 1 with any difference, worst 359 px
+## before-1 vs after-1
+demo-floral-1-cover.png                       359    0.1247%     5
+demo-teal-1-cover.png                         347    0.1205%     4
+
+72 images, 2 with any difference, worst 359 px
+## after-1 vs after-2 (noise)
+demo-teal-1-cover.png                         347    0.1205%     4
+
+72 images, 1 with any difference, worst 347 px
+## before-1 vs after-2
+demo-floral-1-cover.png                       359    0.1247%     5
+
+72 images, 1 with any difference, worst 359 px
+
+## final run (after all Phase 1 commits, fresh dev server) vs before-1
+demo-arabesque-1-cover.png                      0    0.0000%     0
+demo-arabesque-2-hero.png                       0    0.0000%     0
+demo-aurora-3d-1-cover.png                      0    0.0000%     0
+demo-aurora-3d-2-hero.png                       0    0.0000%     0
+demo-beige-1-cover.png                          0    0.0000%     0
+demo-beige-2-hero.png                           0    0.0000%     0
+demo-biru-1-cover.png                           0    0.0000%     0
+demo-biru-2-hero.png                            0    0.0000%     0
+demo-boho-1-cover.png                           0    0.0000%     0
+demo-boho-2-hero.png                            0    0.0000%     0
+demo-bugis-1-cover.png                          0    0.0000%     0
+demo-bugis-2-hero.png                           0    0.0000%     0
+demo-celestial-3d-1-cover.png                   0    0.0000%     0
+demo-celestial-3d-2-hero.png                    0    0.0000%     0
+demo-clouds-3d-1-cover.png                      0    0.0000%     0
+demo-clouds-3d-2-hero.png                       0    0.0000%     0
+demo-deco-1-cover.png                           0    0.0000%     0
+demo-deco-2-hero.png                            0    0.0000%     0
+demo-emerald-1-cover.png                        0    0.0000%     0
+demo-emerald-2-hero.png                         0    0.0000%     0
+demo-fireflies-3d-1-cover.png                   0    0.0000%     0
+demo-fireflies-3d-2-hero.png                    0    0.0000%     0
+demo-floral-1-cover.png                       359    0.1247%     5
+demo-floral-2-hero.png                          0    0.0000%     0
+demo-gading-1-cover.png                         0    0.0000%     0
+demo-gading-2-hero.png                          0    0.0000%     0
+demo-golden-3d-1-cover.png                      0    0.0000%     0
+demo-golden-3d-2-hero.png                       0    0.0000%     0
+demo-javanese-1-cover.png                       0    0.0000%     0
+demo-javanese-2-hero.png                        0    0.0000%     0
+demo-koral-1-cover.png                          0    0.0000%     0
+demo-koral-2-hero.png                           0    0.0000%     0
+demo-langit-1-cover.png                         0    0.0000%     0
+demo-langit-2-hero.png                          0    0.0000%     0
+demo-lanterns-3d-1-cover.png                    0    0.0000%     0
+demo-lanterns-3d-2-hero.png                     0    0.0000%     0
+demo-lembayung-1-cover.png                      0    0.0000%     0
+demo-lembayung-2-hero.png                       0    0.0000%     0
+demo-marmer-1-cover.png                         0    0.0000%     0
+demo-marmer-2-hero.png                          0    0.0000%     0
+demo-marmerputih-1-cover.png                    0    0.0000%     0
+demo-marmerputih-2-hero.png                     0    0.0000%     0
+demo-marun-1-cover.png                          0    0.0000%     0
+demo-marun-2-hero.png                           0    0.0000%     0
+demo-matahari-1-cover.png                       0    0.0000%     0
+demo-matahari-2-hero.png                        0    0.0000%     0
+demo-mauve-1-cover.png                          0    0.0000%     0
+demo-mauve-2-hero.png                           0    0.0000%     0
+demo-minimalis-1-cover.png                      0    0.0000%     0
+demo-minimalis-2-hero.png                       0    0.0000%     0
+demo-mono-1-cover.png                           0    0.0000%     0
+demo-mono-2-hero.png                            0    0.0000%     0
+demo-navy-1-cover.png                           0    0.0000%     0
+demo-navy-2-hero.png                            0    0.0000%     0
+demo-petals-3d-1-cover.png                      0    0.0000%     0
+demo-petals-3d-2-hero.png                       0    0.0000%     0
+demo-plum-1-cover.png                           0    0.0000%     0
+demo-plum-2-hero.png                            0    0.0000%     0
+demo-rosegold-1-cover.png                       0    0.0000%     0
+demo-rosegold-2-hero.png                        0    0.0000%     0
+demo-rustic-1-cover.png                         0    0.0000%     0
+demo-rustic-2-hero.png                          0    0.0000%     0
+demo-sage-1-cover.png                           0    0.0000%     0
+demo-sage-2-hero.png                            0    0.0000%     0
+demo-snow-3d-1-cover.png                        0    0.0000%     0
+demo-snow-3d-2-hero.png                         0    0.0000%     0
+demo-teal-1-cover.png                           0    0.0000%     0
+demo-teal-2-hero.png                            0    0.0000%     0
+demo-tropis-1-cover.png                         0    0.0000%     0
+demo-tropis-2-hero.png                          0    0.0000%     0
+demo-ungu-1-cover.png                           0    0.0000%     0
+demo-ungu-2-hero.png                            0    0.0000%     0
+
+72 images, 1 with any difference, worst 359 px
