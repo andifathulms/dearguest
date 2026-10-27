@@ -5,6 +5,8 @@ import { defineConfig } from '@playwright/test'
 // Baselines: `npm run test:visual:update`. Check: `npm run test:visual`.
 export default defineConfig({
   testDir: './tests/visual',
+  // Theme packs have their own Linux/Docker suite (playwright.packs.config.js).
+  testIgnore: ['**/packs/**'],
   snapshotDir: './tests/visual/__screenshots__',
   fullyParallel: true,
   // The suite now includes WebGL themes, and at default parallelism a loaded

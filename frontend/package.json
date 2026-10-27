@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:visual": "playwright test",
-    "test:visual:update": "playwright test --update-snapshots"
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:visual:docker": "sh scripts/visual-docker.sh",
+    "test:visual:docker:update": "sh scripts/visual-docker.sh --update-snapshots"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.3",

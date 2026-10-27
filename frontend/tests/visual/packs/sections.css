@@ -1,0 +1,4 @@
+/* Applied only to per-section screenshots: the static film grain is already
+   covered by the cover/opening/hero shots, and over every pixel it makes each
+   baseline PNG several times larger. */
+.pk-texture { display: none !important; }

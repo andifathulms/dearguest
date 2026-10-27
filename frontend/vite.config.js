@@ -25,6 +25,8 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: true,
       port: 5173,
+      // The Docker visual suite reaches the dev server by its compose service name.
+      allowedHosts: ['frontend'],
       proxy: {
         '/api': {
           target: DEV_PROXY_TARGET,

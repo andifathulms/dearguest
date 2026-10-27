@@ -1,0 +1,113 @@
+{
+  "slug": "demo-minimal",
+  "theme": "minimal",
+  "wedding_date": "2026-12-12",
+  "expires_at": "2027-03-12",
+  "opening_text": "Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami.",
+  "closing_text": "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.",
+  "dress_code": "Earth tone / Batik",
+  "photo_filter": "none",
+  "watermark": true,
+  "music_file": null,
+  "hero_photo": "http://fixtures.test/hero.jpg",
+  "livestream_url": "https://www.instagram.com/andini.bagus/live",
+  "wishlist_url": "",
+  "couple": {
+    "bride_name": "Andini",
+    "bride_parents": "Bapak Suryadi & Ibu Lestari",
+    "bride_photo": "http://fixtures.test/bride.jpg",
+    "bride_bio": "Putri pertama yang penuh kasih.",
+    "groom_name": "Bagus",
+    "groom_parents": "Bapak Hartono & Ibu Wulandari",
+    "groom_photo": "http://fixtures.test/groom.jpg",
+    "groom_bio": "Putra kedua yang penuh tanggung jawab."
+  },
+  "events": [
+    {
+      "id": 493,
+      "event_type": "akad",
+      "datetime": "2026-12-12T08:00:00+07:00",
+      "venue_name": "Masjid Agung",
+      "address": "Jl. Merdeka No. 1, Yogyakarta",
+      "gmaps_url": "https://maps.google.com",
+      "gmaps_embed_url": ""
+    },
+    {
+      "id": 494,
+      "event_type": "resepsi",
+      "datetime": "2026-12-12T11:00:00+07:00",
+      "venue_name": "Gedung Graha",
+      "address": "Jl. Sudirman No. 45, Yogyakarta",
+      "gmaps_url": "https://maps.google.com",
+      "gmaps_embed_url": ""
+    }
+  ],
+  "stories": [
+    {
+      "id": 493,
+      "title": "Pertama Bertemu",
+      "description": "Dipertemukan di sebuah acara kampus.",
+      "date": "2021-03-01",
+      "order": 0
+    },
+    {
+      "id": 494,
+      "title": "Lamaran",
+      "description": "Bagus melamar Andini di hadapan keluarga.",
+      "date": "2025-11-01",
+      "order": 1
+    }
+  ],
+  "photos": [
+    {
+      "id": 181,
+      "image": "http://fixtures.test/gallery-1.jpg",
+      "caption": "",
+      "order": 0
+    },
+    {
+      "id": 182,
+      "image": "http://fixtures.test/gallery-2.jpg",
+      "caption": "",
+      "order": 1
+    },
+    {
+      "id": 183,
+      "image": "http://fixtures.test/gallery-3.jpg",
+      "caption": "",
+      "order": 2
+    },
+    {
+      "id": 184,
+      "image": "http://fixtures.test/gallery-4.jpg",
+      "caption": "",
+      "order": 3
+    },
+    {
+      "id": 185,
+      "image": "http://fixtures.test/gallery-5.jpg",
+      "caption": "",
+      "order": 4
+    }
+  ],
+  "bank_accounts": [
+    {
+      "id": 492,
+      "account_type": "bank",
+      "bank_name": "BCA",
+      "account_number": "1234567890",
+      "account_name": "Andini",
+      "qris_image": null,
+      "order": 0
+    },
+    {
+      "id": 493,
+      "account_type": "ewallet",
+      "bank_name": "GoPay",
+      "account_number": "081234567890",
+      "account_name": "Bagus",
+      "qris_image": null,
+      "order": 1
+    }
+  ]
+}
