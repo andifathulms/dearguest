@@ -5,8 +5,32 @@ import ThemeAsset from '../../themes/packs/_system/ThemeAsset.jsx'
 import Monogram from '../../themes/packs/_system/Monogram.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 
-function PersonCard({ name, parents, photo, bio, delay }) {
+// "Bapak Suryadi (Alm.) & Ibu Lestari (Almh.)" from the structured fields,
+// else the couple's own free-text line.
+function parentsLine(couple, person, t) {
+  const father = couple[`${person}_father`]
+  const mother = couple[`${person}_mother`]
+  if (!father && !mother) return couple[`${person}_parents`]
+  const late = (dead, key) => (dead ? ` (${t(key)})` : '')
+  return [
+    father && `Bapak ${father}${late(couple[`${person}_father_deceased`], 'profile.late')}`,
+    mother && `Ibu ${mother}${late(couple[`${person}_mother_deceased`], 'profile.lateFemale')}`,
+  ].filter(Boolean).join(' & ')
+}
+
+function PersonCard({ couple, person, delay }) {
   const pack = usePack()
+  const { t } = useCopy()
+  const name = couple[`${person}_name`]
+  const photo = couple[`${person}_photo`]
+  const bio = couple[`${person}_bio`]
+  const instagram = couple[`${person}_instagram`]
+  const order = couple[`${person}_child_order`]
+  const parents = parentsLine(couple, person, t)
+  // Wording follows who the person is, not a "Putri/Putra" compromise.
+  const childOf = person === 'bride'
+    ? (order ? t('profile.daughterOf', { order }) : t('profile.daughterOfNoOrder'))
+    : (order ? t('profile.sonOf', { order }) : t('profile.sonOfNoOrder'))
   const img = photo && <img src={photo} alt={name} className="profile-photo" loading="lazy" decoding="async" />
   return (
     <motion.div
@@ -26,7 +50,12 @@ function PersonCard({ name, parents, photo, bio, delay }) {
         <img src={photo} alt={name} className="profile-photo" />
       ))}
       <h3 className="profile-name">{name}</h3>
-      {parents && <p className="profile-parents">Putri/Putra dari<br />{parents}</p>}
+      {parents && parents !== '-' && <p className="profile-parents">{childOf}<br />{parents}</p>}
+      {instagram && (
+        <a className="profile-instagram" href={`https://www.instagram.com/${encodeURIComponent(instagram)}/`} target="_blank" rel="noopener noreferrer">
+          @{instagram}
+        </a>
+      )}
       {bio && <p className="profile-bio">{bio}</p>}
     </motion.div>
   )
@@ -40,21 +69,10 @@ export default function ProfileSection({ couple }) {
     <section className="profile-section">
       <SectionTitle>{t('profile.title')}</SectionTitle>
       <div className="profile-grid">
-        <PersonCard
-          name={couple.bride_name}
-          parents={couple.bride_parents}
-          photo={couple.bride_photo}
-          bio={couple.bride_bio}
-          delay={0}
-        />
-        <div className="profile-divider">{pack ? <Monogram couple={couple} /> : '🤍'}</div>
-        <PersonCard
-          name={couple.groom_name}
-          parents={couple.groom_parents}
-          photo={couple.groom_photo}
-          bio={couple.groom_bio}
-          delay={0.2}
-        />
+        <PersonCard couple={couple} person="bride" delay={0} />
+        {/* Packs show the monogram; legacy themes get no ornament (was an emoji). */}
+        <div className="profile-divider" aria-hidden="true">{pack && <Monogram couple={couple} />}</div>
+        <PersonCard couple={couple} person="groom" delay={0.2} />
       </div>
     </section>
   )

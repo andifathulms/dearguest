@@ -325,6 +325,10 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 .pk-root .bank-name { font-family: var(--dg-font-label); font-size: var(--dg-fs-label); letter-spacing: var(--dg-tracking-label); text-transform: uppercase; color: var(--dg-ink-muted); }
 .pk-root .bank-number { font-size: 1.3rem; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
 .pk-root .bank-holder { color: var(--dg-ink-muted); font-size: var(--dg-fs-small); }
+.pk-root .gift-address-recipient { margin: var(--dg-space-2) 0 0; color: var(--dg-ink); font-weight: 500; }
+.pk-root .gift-address-text { margin: var(--dg-space-1) 0; white-space: pre-line; color: var(--dg-ink-muted); }
+.pk-root .gift-address-phone { margin: 0 0 var(--dg-space-2); color: var(--dg-ink-muted); font-size: var(--dg-fs-small); }
+.pk-root .profile-instagram { color: var(--dg-accent); font-size: var(--dg-fs-small); text-decoration: none; border-bottom: 1px solid currentColor; }
 
 /* shared button look: copy, RSVP submit, share, load more */
 .pk-root :is(.bank-copy-btn, .rsvp-submit, .wa-share-btn) {

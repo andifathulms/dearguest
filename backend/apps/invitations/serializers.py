@@ -1,3 +1,4 @@
+import re
 from zoneinfo import ZoneInfo
 
 from django.utils import timezone
@@ -71,6 +72,19 @@ class GuestSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+FAMILY_FIELDS = [
+    f'{person}_{key}' for person in ('bride', 'groom')
+    for key in ('child_order', 'father', 'father_deceased', 'mother', 'mother_deceased', 'instagram')
+]
+
+
+def instagram_handle(value):
+    """'@andini.s', 'instagram.com/andini.s/' or 'https://www.instagram.com/andini.s?igsh=…' -> 'andini.s'."""
+    value = value.strip()
+    match = re.match(r'^(?:https?://)?(?:www\.)?instagram\.com/([^/?#]+)', value, re.I)
+    return (match.group(1) if match else value).lstrip('@').strip()
+
+
 class CoupleSerializer(serializers.ModelSerializer):
     bride_photo = serializers.SerializerMethodField()
     groom_photo = serializers.SerializerMethodField()
@@ -80,6 +94,7 @@ class CoupleSerializer(serializers.ModelSerializer):
         fields = [
             'bride_name', 'bride_parents', 'bride_photo', 'bride_bio',
             'groom_name', 'groom_parents', 'groom_photo', 'groom_bio',
+            *FAMILY_FIELDS,
         ]
 
     def _build_url(self, field):
@@ -188,8 +203,6 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
 
 
 # ===== Editor (authenticated, owner-scoped, writable) serializers =====
-import re
-
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from . import themes
@@ -208,7 +221,17 @@ class CoupleWriteSerializer(serializers.ModelSerializer):
         fields = [
             'bride_name', 'bride_parents', 'bride_photo', 'bride_bio',
             'groom_name', 'groom_parents', 'groom_photo', 'groom_bio',
+            *FAMILY_FIELDS,
         ]
+
+    def to_internal_value(self, data):
+        # Accept '@handle' or a profile URL; store the bare handle.
+        if hasattr(data, 'copy'):
+            data = data.copy()
+            for key in ('bride_instagram', 'groom_instagram'):
+                if isinstance(data.get(key), str):
+                    data[key] = instagram_handle(data[key])
+        return super().to_internal_value(data)
 
 
 class EventWriteSerializer(serializers.ModelSerializer):

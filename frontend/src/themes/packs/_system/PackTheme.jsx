@@ -66,7 +66,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
     [has(invitation.stories), <StorySection stories={invitation.stories} />],
     [Boolean(invitation.couple), <ProfileSection couple={couple} />],
     [has(invitation.photos), <GallerySection photos={invitation.photos} />],
-    [has(invitation.bank_accounts) || Boolean(invitation.wishlist_url), <AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} />],
+    [has(invitation.bank_accounts) || Boolean(invitation.wishlist_url || invitation.gift_address?.trim()), <AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} />],
     [true, <RSVPForm slug={invitation.slug} />],
     [true, <WishesWall slug={invitation.slug} />],
     [events.some(e => e.maps_url || e.embed_url), <MapsSection events={events} />],

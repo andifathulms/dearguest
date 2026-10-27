@@ -34,6 +34,7 @@ function SettingsSection({ inv, reload, notify }) {
     wishlist_url: inv.wishlist_url || '', photo_filter: inv.photo_filter || 'none',
     copy_variant: inv.copy_variant || 'umum', scripture_mode: inv.scripture_mode || 'default',
     scripture_ref: inv.scripture_ref || '', scripture_text: inv.scripture_text || '',
+    gift_recipient: inv.gift_recipient || '', gift_address: inv.gift_address || '', gift_phone: inv.gift_phone || '',
   })
   // Placeholders show what guests see when a field is left empty: the variant's defaults.
   const tv = makeT(f.copy_variant)
@@ -142,6 +143,13 @@ function SettingsSection({ inv, reload, notify }) {
         <label htmlFor="set-wishlist">Link wishlist / gift registry (opsional)</label>
         <input id="set-wishlist" className="ed-input" value={f.wishlist_url} onChange={e => set('wishlist_url', e.target.value)} placeholder="https://tokopedia.link/… atau registry kalian" />
       </div>
+      <div className="ed-field ed-stack">
+        <label htmlFor="set-gift-address">Alamat kirim hadiah (opsional)</label>
+        <p className="ed-hint">Alamat ini akan terlihat oleh semua tamu.</p>
+        <input id="set-gift-recipient" className="ed-input" aria-label="Nama penerima" value={f.gift_recipient} onChange={e => set('gift_recipient', e.target.value)} placeholder="Nama penerima" />
+        <textarea id="set-gift-address" className="ed-textarea" value={f.gift_address} onChange={e => set('gift_address', e.target.value)} placeholder="Jalan, nomor, RT/RW, kelurahan, kota, kode pos" />
+        <input id="set-gift-phone" className="ed-input" aria-label="Nomor HP penerima" value={f.gift_phone} onChange={e => set('gift_phone', e.target.value)} placeholder="Nomor HP penerima (opsional)" />
+      </div>
       {presets.length > 0 && (
         <div className="ed-field">
           <label htmlFor="set-preset">Pilih dari pustaka musik</label>
@@ -163,12 +171,41 @@ function SettingsSection({ inv, reload, notify }) {
 }
 
 /* ---------------- Couple ---------------- */
+const PERSON_KEYS = ['name', 'parents', 'bio', 'child_order', 'father', 'father_deceased', 'mother', 'mother_deceased', 'instagram']
+
+function PersonFields({ person, label, f, set, photo, onPhoto }) {
+  const id = k => `cpl-${person}-${k}`
+  const v = k => f[`${person}_${k}`]
+  const on = k => e => set(`${person}_${k}`, e.target.type === 'checkbox' ? e.target.checked : e.target.value)
+  return (
+    <div>
+      <div className="ed-field"><label htmlFor={id('name')}>Nama {label}</label><input id={id('name')} className="ed-input" value={v('name')} onChange={on('name')} /></div>
+      <div className="ed-field"><label htmlFor={id('order')}>Anak ke- (opsional)</label><input id={id('order')} className="ed-input" value={v('child_order')} onChange={on('child_order')} placeholder="pertama, kedua, bungsu" /></div>
+      <div className="ed-field"><label htmlFor={id('father')}>Nama ayah</label><input id={id('father')} className="ed-input" value={v('father')} onChange={on('father')} placeholder="tanpa &quot;Bapak&quot;" />
+        <label className="ed-check"><input type="checkbox" checked={Boolean(v('father_deceased'))} onChange={on('father_deceased')} /> Sudah wafat (Alm.)</label>
+      </div>
+      <div className="ed-field"><label htmlFor={id('mother')}>Nama ibu</label><input id={id('mother')} className="ed-input" value={v('mother')} onChange={on('mother')} placeholder="tanpa &quot;Ibu&quot;" />
+        <label className="ed-check"><input type="checkbox" checked={Boolean(v('mother_deceased'))} onChange={on('mother_deceased')} /> Sudah wafat (Almh.)</label>
+      </div>
+      {!v('father') && !v('mother') && (
+        <div className="ed-field"><label htmlFor={id('parents')}>Atau tulis bebas</label><input id={id('parents')} className="ed-input" value={v('parents')} onChange={on('parents')} placeholder="Bapak … & Ibu …" /></div>
+      )}
+      <div className="ed-field"><label htmlFor={id('ig')}>Instagram (opsional)</label><input id={id('ig')} className="ed-input" value={v('instagram')} onChange={on('instagram')} placeholder="@username" /></div>
+      <div className="ed-field"><label htmlFor={id('bio')}>Bio (opsional)</label><textarea id={id('bio')} className="ed-textarea" value={v('bio')} onChange={on('bio')} /></div>
+      <div className="ed-field"><label htmlFor={id('photo')}>Foto</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          {photo && <img className="ed-thumb" src={photo} alt={`Foto ${label}`} />}
+          <input id={id('photo')} className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && onPhoto(e.target.files[0])} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CoupleSection({ inv, reload, notify }) {
   const c = inv.couple || {}
-  const [f, setF] = useState({
-    bride_name: c.bride_name || '', bride_parents: c.bride_parents || '', bride_bio: c.bride_bio || '',
-    groom_name: c.groom_name || '', groom_parents: c.groom_parents || '', groom_bio: c.groom_bio || '',
-  })
+  const [f, setF] = useState(() => Object.fromEntries(['bride', 'groom'].flatMap(person =>
+    PERSON_KEYS.map(k => [`${person}_${k}`, c[`${person}_${k}`] ?? (k.endsWith('deceased') ? false : '')]))))
   const [photos, setPhotos] = useState({ bride_photo: null, groom_photo: null })
   const [previews, setPreviews] = useState({})
   const [cropping, setCropping] = useState(null)
@@ -185,7 +222,9 @@ function CoupleSection({ inv, reload, notify }) {
       await api.put(`/my/invitations/${inv.slug}/couple/`, fd)
       notify('Data mempelai tersimpan')
       reload()
-    } catch { notify('Gagal menyimpan') } finally { setSaving(false) }
+    } catch (e) {
+      notify(Object.values(e.response?.data || {}).flat()[0] || 'Gagal menyimpan')
+    } finally { setSaving(false) }
   }
 
   return (
@@ -193,28 +232,8 @@ function CoupleSection({ inv, reload, notify }) {
       <h2>Mempelai</h2>
       <p className="ed-card-sub">Nama, orang tua, bio, dan foto kedua mempelai.</p>
       <div className="ed-row2">
-        <div>
-          <div className="ed-field"><label htmlFor="cpl-bride-name">Nama mempelai wanita</label><input id="cpl-bride-name" className="ed-input" value={f.bride_name} onChange={e => set('bride_name', e.target.value)} /></div>
-          <div className="ed-field"><label htmlFor="cpl-bride-parents">Orang tua</label><input id="cpl-bride-parents" className="ed-input" value={f.bride_parents} onChange={e => set('bride_parents', e.target.value)} placeholder="Putri dari Bapak … & Ibu …" /></div>
-          <div className="ed-field"><label htmlFor="cpl-bride-bio">Bio (opsional)</label><textarea id="cpl-bride-bio" className="ed-textarea" value={f.bride_bio} onChange={e => set('bride_bio', e.target.value)} /></div>
-          <div className="ed-field"><label htmlFor="cpl-bride-photo">Foto</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              {(previews.bride_photo || c.bride_photo) && <img className="ed-thumb" src={previews.bride_photo || c.bride_photo} alt="Foto mempelai wanita" />}
-              <input id="cpl-bride-photo" className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'bride_photo', file: e.target.files[0] })} />
-            </div>
-          </div>
-        </div>
-        <div>
-          <div className="ed-field"><label htmlFor="cpl-groom-name">Nama mempelai pria</label><input id="cpl-groom-name" className="ed-input" value={f.groom_name} onChange={e => set('groom_name', e.target.value)} /></div>
-          <div className="ed-field"><label htmlFor="cpl-groom-parents">Orang tua</label><input id="cpl-groom-parents" className="ed-input" value={f.groom_parents} onChange={e => set('groom_parents', e.target.value)} placeholder="Putra dari Bapak … & Ibu …" /></div>
-          <div className="ed-field"><label htmlFor="cpl-groom-bio">Bio (opsional)</label><textarea id="cpl-groom-bio" className="ed-textarea" value={f.groom_bio} onChange={e => set('groom_bio', e.target.value)} /></div>
-          <div className="ed-field"><label htmlFor="cpl-groom-photo">Foto</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              {(previews.groom_photo || c.groom_photo) && <img className="ed-thumb" src={previews.groom_photo || c.groom_photo} alt="Foto mempelai pria" />}
-              <input id="cpl-groom-photo" className="ed-file" type="file" accept="image/*" onChange={e => e.target.files[0] && setCropping({ field: 'groom_photo', file: e.target.files[0] })} />
-            </div>
-          </div>
-        </div>
+        <PersonFields person="bride" label="mempelai wanita" f={f} set={set} photo={previews.bride_photo || c.bride_photo} onPhoto={file => setCropping({ field: 'bride_photo', file })} />
+        <PersonFields person="groom" label="mempelai pria" f={f} set={set} photo={previews.groom_photo || c.groom_photo} onPhoto={file => setCropping({ field: 'groom_photo', file })} />
       </div>
       <div className="ed-save-row"><button className="ed-btn" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan Mempelai'}</button></div>
 

@@ -56,10 +56,43 @@ function BankCard({ account }) {
   )
 }
 
-export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
+// Optional shipping address for physical gifts (set in the editor; visible to every guest).
+function GiftAddressCard({ recipient, address, phone }) {
   const { t } = useCopy()
+  const [copied, setCopied] = useState(false)
+  const text = [recipient, address, phone].filter(Boolean).join('\n')
+
+  function handleCopy() {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <motion.div
+      className="bank-card gift-address-card"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
+      <p className="bank-name">{t('gift.address.title')}</p>
+      {recipient && <p className="gift-address-recipient">{recipient}</p>}
+      <p className="gift-address-text">{address}</p>
+      {phone && <p className="gift-address-phone">{phone}</p>}
+      <button className="bank-copy-btn" onClick={handleCopy}>
+        {copied ? `${t('gift.copied')} ✓` : t('gift.address.copy')}
+      </button>
+    </motion.div>
+  )
+}
+
+export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
+  const { t, invitation } = useCopy()
   const hasBanks = bankAccounts && bankAccounts.length > 0
-  if (!hasBanks && !wishlistUrl) return null
+  const address = invitation?.gift_address?.trim()
+  if (!hasBanks && !wishlistUrl && !address) return null
   return (
     <section className="amplod-section">
       <SectionTitle>{t('gift.title')}</SectionTitle>
@@ -71,6 +104,11 @@ export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
           {bankAccounts.map(account => (
             <BankCard key={account.id} account={account} />
           ))}
+        </div>
+      )}
+      {address && (
+        <div className="bank-cards">
+          <GiftAddressCard recipient={invitation.gift_recipient} address={address} phone={invitation.gift_phone} />
         </div>
       )}
       {wishlistUrl && (

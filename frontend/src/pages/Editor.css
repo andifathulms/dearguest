@@ -106,6 +106,8 @@
 .ed-btn-sm { padding: 0.5rem 1rem; font-size: 0.8rem; box-shadow: none; }
 .ed-btn-ghost { background: #fff; color: #1c1712; border: 1px solid #e0d8c8; box-shadow: none; }
 .ed-btn-ghost:hover:not(:disabled) { border-color: #b8924e; color: #b8924e; }
+.ed-hint { margin: 0; font-size: 0.8rem; color: #a9772a; }
+.ed-stack > * + * { margin-top: 0.45rem; }
 .ed-add-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
 .ed-check { display: flex; align-items: center; gap: 0.45rem; font-size: 0.86rem; font-weight: 400; min-height: 42px; }
 .ed-btn-danger { background: #fff; color: #c0392b; border: 1px solid #f0ccc6; box-shadow: none; }

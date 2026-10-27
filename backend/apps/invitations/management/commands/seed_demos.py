@@ -49,8 +49,10 @@ class Command(BaseCommand):
             )
             couple, _ = Couple.objects.update_or_create(invitation=inv, defaults=dict(
                 bride_name='Andini', bride_parents='Bapak Suryadi & Ibu Lestari',
+                bride_father='Suryadi', bride_mother='Lestari', bride_child_order='pertama',
                 bride_bio='Putri pertama yang penuh kasih.',
                 groom_name='Bagus', groom_parents='Bapak Hartono & Ibu Wulandari',
+                groom_father='Hartono', groom_mother='Wulandari', groom_child_order='kedua',
                 groom_bio='Putra kedua yang penuh tanggung jawab.',
             ))
             # Tasteful sample photos (idempotent — only attach when missing).

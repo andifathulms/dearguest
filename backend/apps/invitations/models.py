@@ -1,5 +1,6 @@
 import re
 import secrets
+from django.core.exceptions import ValidationError
 from django.db import models
 from datetime import timedelta
 
@@ -109,6 +110,15 @@ class ActivationRequest(Invitation):
         verbose_name_plural = 'Permintaan Aktivasi (pending)'
 
 
+INSTAGRAM_RE = re.compile(r'^[A-Za-z0-9._]{1,30}$')
+
+
+def validate_instagram(value):
+    """Handle only, without '@' or a URL (the serializer strips both)."""
+    if value and not INSTAGRAM_RE.match(value):
+        raise ValidationError('Username Instagram hanya boleh huruf, angka, titik dan garis bawah.')
+
+
 class CoupleProfile(models.Model):
     """Per-account settings. max_invitations is the cap; admin bumps it to 2
     for Bisnis customers after payment (free/Premium = 1).
@@ -134,13 +144,28 @@ class CoupleProfile(models.Model):
 class Couple(models.Model):
     invitation = models.OneToOneField(Invitation, on_delete=models.CASCADE, related_name='couple')
     bride_name = models.CharField(max_length=200)
-    bride_parents = models.CharField(max_length=300)
+    bride_parents = models.CharField(max_length=300, blank=True)
     bride_photo = SafeImageField(upload_to='profiles/', validators=[validate_image_upload], null=True, blank=True)
     bride_bio = models.TextField(blank=True)
     groom_name = models.CharField(max_length=200)
-    groom_parents = models.CharField(max_length=300)
+    groom_parents = models.CharField(max_length=300, blank=True)
     groom_photo = SafeImageField(upload_to='profiles/', validators=[validate_image_upload], null=True, blank=True)
     groom_bio = models.TextField(blank=True)
+
+    # Structured family details. `*_parents` stays as the free-text fallback
+    # for rows that couldn't be split (and for anyone who prefers one line).
+    bride_child_order = models.CharField(max_length=30, blank=True, help_text='mis. pertama, kedua, bungsu')
+    bride_father = models.CharField(max_length=150, blank=True)
+    bride_father_deceased = models.BooleanField(default=False)
+    bride_mother = models.CharField(max_length=150, blank=True)
+    bride_mother_deceased = models.BooleanField(default=False)
+    bride_instagram = models.CharField(max_length=30, blank=True, validators=[validate_instagram])
+    groom_child_order = models.CharField(max_length=30, blank=True, help_text='mis. pertama, kedua, bungsu')
+    groom_father = models.CharField(max_length=150, blank=True)
+    groom_father_deceased = models.BooleanField(default=False)
+    groom_mother = models.CharField(max_length=150, blank=True)
+    groom_mother_deceased = models.BooleanField(default=False)
+    groom_instagram = models.CharField(max_length=30, blank=True, validators=[validate_instagram])
 
     def __str__(self):
         return f"{self.bride_name} & {self.groom_name}"
