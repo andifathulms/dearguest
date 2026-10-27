@@ -2,50 +2,13 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
 import { invitationUrl } from '../utils/publicUrl.js'
+import { selectableThemes, themeName } from '../themes/registry.js'
 import ImageCropper from '../components/ui/ImageCropper.jsx'
 import { compressImage } from '../utils/compressImage.js'
 import './Editor.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
 
-const THEMES = [
-  ['javanese-dark', 'Javanese Gold Night'],
-  ['floral-light', 'Flower Garden'],
-  ['modern-minimalist', 'White Minimalist'],
-  ['luxury-emerald', 'Luxury Emerald'],
-  ['rustic-kraft', 'Rustic Kraft'],
-  ['boho-terracotta', 'Terracotta Dusk'],
-  ['burgundy-gold', 'Burgundy Gold'],
-  ['dusty-blue', 'Dusty Blue'],
-  ['midnight-celestial', 'Celestial Night'],
-  ['sage-botanical', 'Sage Garden'],
-  ['mauve-rose', 'Elegant Mauve'],
-  ['ivory-classic', 'Ivory Classic'],
-  ['tropical-green', 'Tropical Green'],
-  ['lavender-dream', 'Lavender Dream'],
-  ['coral-peach', 'Warm Coral'],
-  ['charcoal-marble', 'Charcoal Marble'],
-  ['islamic-arabesque', 'Golden Arabesque'],
-  ['navy-gold', 'Classic Navy'],
-  ['plum-gold', 'Plum Gold'],
-  ['teal-ocean', 'Ocean Teal'],
-  ['deco-noir', 'Art Deco Noir'],
-  ['sunflower-mustard', 'Golden Sunflower'],
-  ['beige-korean', 'Aesthetic Beige'],
-  ['rose-gold', 'Rose Gold'],
-  ['mono-editorial', 'Editorial Mono'],
-  ['royal-purple', 'Royal Purple'],
-  ['marble-white', 'White Marble'],
-  ['buginese-blue', 'Buginese Blue'],
-  ['celestial-cinematic', 'Celestial 3D'],
-  ['petals-3d', 'Enchanted Petals'],
-  ['aurora-3d', 'Aurora Dream'],
-  ['golden-3d', 'Golden Aura'],
-  ['clouds-3d', 'Ethereal Clouds'],
-  ['lanterns-3d', 'Floating Lanterns'],
-  ['fireflies-3d', 'Enchanted Fireflies'],
-  ['snow-3d', 'Winter Snow'],
-]
 
 /* ---------------- Settings ---------------- */
 function SettingsSection({ inv, reload, notify }) {
@@ -90,7 +53,11 @@ function SettingsSection({ inv, reload, notify }) {
       <div className="ed-field">
         <label htmlFor="set-theme">Tema</label>
         <select id="set-theme" className="ed-select" value={f.theme} onChange={e => set('theme', e.target.value)}>
-          {THEMES.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+          {/* A theme that's since been retired stays selected (and kept on save) but isn't offered to switch back to. */}
+          {!selectableThemes().some(t => t.id === inv.theme) && (
+            <option value={inv.theme}>{themeName(inv.theme)} (tema lama)</option>
+          )}
+          {selectableThemes().map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
         </select>
       </div>
       <div className="ed-field">

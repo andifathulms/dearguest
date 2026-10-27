@@ -2,7 +2,14 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../api/client.js'
-import { FEATURED_THEMES, THEME_CATALOG, CINEMATIC_THEMES } from '../data/themes.js'
+import { catalogThemes, cinematicThemes, selectableThemes } from '../themes/registry.js'
+import ThemePreview from '../themes/ThemePreview.jsx'
+
+// Theme sections read the registry: counts reflect themes a couple can pick
+// today; the grids show pickable + "coming soon" themes.
+const THEME_COUNT = selectableThemes().length
+const FEATURED_THEMES = catalogThemes().filter(t => t.collection !== 'cinematic').slice(0, 6)
+const CINEMATIC_THEMES = cinematicThemes()
 import './LandingPage.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -25,7 +32,7 @@ const Icon = {
 }
 
 const features = [
-  { icon: Icon.palette, title: `${THEME_CATALOG.length} Tema Eksklusif`, desc: 'Dari Javanese emas, floral, dan minimalis hingga zamrud, marun, langit malam, arabesque, art deco, dan rose gold — semua dengan palet premium.' },
+  { icon: Icon.palette, title: `${THEME_COUNT} Tema Eksklusif`, desc: 'Dari Javanese emas, floral, dan minimalis hingga zamrud, marun, langit malam, arabesque, art deco, dan rose gold — semua dengan palet premium.' },
   { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
   { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
   { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
@@ -145,7 +152,7 @@ export default function LandingPage() {
             </a>
           </motion.div>
           <motion.div className="lp-hero-trust" {...fade(0.25)}>
-            <div><strong>{THEME_CATALOG.length}</strong> Tema Eksklusif</div>
+            <div><strong>{THEME_COUNT}</strong> Tema Eksklusif</div>
             <div><strong>1–2</strong> Hari Pengerjaan</div>
             <div><strong>100%</strong> Responsif di HP</div>
           </motion.div>
@@ -157,7 +164,7 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-stats-grid">
             {[
-              { value: `${THEME_CATALOG.length}`, label: 'Tema Eksklusif' },
+              { value: `${THEME_COUNT}`, label: 'Tema Eksklusif' },
               { value: '100%', label: 'Optimal di HP' },
               { value: '24 jam', label: 'Pengerjaan' },
               { value: '0', label: 'Kertas Terbuang' },
@@ -175,6 +182,7 @@ export default function LandingPage() {
       </section>
 
       {/* ===== Cinematic collection (flagship tier) ===== */}
+      {CINEMATIC_THEMES.length > 0 && (
       <section className="lp-section lp-cinematic" id="cinematic">
         <div className="lp-container">
           <div className="lp-section-head">
@@ -192,13 +200,7 @@ export default function LandingPage() {
                 rel="noopener noreferrer"
                 {...fade(i * 0.07)}
               >
-                <div className={`lp-theme-preview lp-cine-preview ${t.preview}`}>
-                  <span className="tp-badge">✦ 3D</span>
-                  <span className="tp-label">The Wedding Of</span>
-                  <div className="tp-names lp-serif">Andini<span className="tp-amp">&amp;</span>Bagus</div>
-                  <div className="tp-rule" />
-                  <span className="tp-date">12 · 12 · 2026</span>
-                </div>
+                <ThemePreview theme={t} className="lp-cine-preview" badge="✦ 3D" />
                 <div className="lp-cine-body">
                   <h3>{t.name}</h3>
                   <p>{t.desc}</p>
@@ -209,41 +211,36 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ===== Themes ===== */}
       <section className="lp-section lp-themes" id="tema">
         <div className="lp-container">
           <div className="lp-section-head">
             <p className="lp-eyebrow">Koleksi Premium</p>
-            <h2>{THEME_CATALOG.length} tema, satu kesan: mewah</h2>
+            <h2>{THEME_COUNT} tema, satu kesan: mewah</h2>
             <p>Setiap tema dirancang dengan tipografi, warna, dan ornamen yang harmonis untuk menonjolkan momen kalian. Berikut beberapa favorit kami.</p>
           </div>
           <div className="lp-theme-grid">
             {FEATURED_THEMES.map((t, i) => (
               <motion.div className="lp-theme-card" key={t.id} {...fade(i * 0.08)}>
-                <div className={`lp-theme-preview ${t.preview}`}>
-                  {t.badge && <span className="tp-badge">{t.badge}</span>}
-                  <span className="tp-label">The Wedding Of</span>
-                  <div className="tp-names lp-serif">
-                    Andini<span className="tp-amp">&amp;</span>Bagus
-                  </div>
-                  <div className="tp-rule" />
-                  <span className="tp-date">12 · 12 · 2026</span>
-                </div>
+                <ThemePreview theme={t} badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
                 <div className="lp-theme-body">
                   <h3>{t.name}</h3>
                   <p>{t.desc}</p>
                   <div className="lp-theme-swatches">
                     {t.colors.map(c => <span key={c} style={{ background: c }} />)}
                   </div>
-                  <a className="lp-theme-demo" href={`/${t.demo}`} target="_blank" rel="noopener noreferrer">Lihat Demo Lengkap ↗</a>
+                  {t.status === 'coming' || !t.demo
+                    ? <span className="lp-theme-soon">Segera hadir</span>
+                    : <a className="lp-theme-demo" href={`/${t.demo}`} target="_blank" rel="noopener noreferrer">Lihat Demo Lengkap ↗</a>}
                 </div>
               </motion.div>
             ))}
           </div>
           <div className="lp-themes-more">
             <Link className="lp-btn lp-btn-primary" to="/tema">
-              Jelajahi Semua {THEME_CATALOG.length} Tema {Icon.palette}
+              Jelajahi Semua {THEME_COUNT} Tema {Icon.palette}
             </Link>
           </div>
         </div>

@@ -650,6 +650,13 @@
 .tp-marble .tp-rule { background: #c2a35e; }
 
 /* "3D" badge on animated theme cards */
+/* Registry-driven previews: pack screenshots, or a mock from the registry colours */
+.lp-theme-preview.tp-shot { padding: 0; }
+.lp-theme-preview .tp-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.tp-registry .tp-label { color: var(--tp-accent); }
+.tp-registry .tp-rule { background: var(--tp-accent); }
+.lp-theme-soon { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; }
+
 .lp-theme-preview .tp-badge {
   position: absolute;
   top: 0.75rem;

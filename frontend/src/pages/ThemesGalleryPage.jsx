@@ -1,12 +1,24 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { THEME_CATALOG, THEME_CATEGORIES } from '../data/themes.js'
+import { catalogThemes, selectableThemes } from '../themes/registry.js'
+import ThemePreview from '../themes/ThemePreview.jsx'
 import './LandingPage.css'
 import './ThemesGalleryPage.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
 const waOrder = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent('Halo, saya ingin memesan undangan digital')}`
+
+const CATALOG = catalogThemes()
+const THEME_COUNT = selectableThemes().length
+
+// Filter chips follow the catalogue: "Semua", then "Cinematic" when that
+// collection is listed, then each category in first-seen order.
+const CATEGORIES = [
+  'Semua',
+  ...(CATALOG.some(t => t.collection === 'cinematic') ? ['Cinematic'] : []),
+  ...new Set(CATALOG.map(t => t.category)),
+]
 
 // 'Cinematic' filters by collection; everything else by category.
 const matchCat = (t, cat) =>
@@ -14,7 +26,7 @@ const matchCat = (t, cat) =>
 
 export default function ThemesGalleryPage() {
   const [category, setCategory] = useState('Semua')
-  const list = THEME_CATALOG.filter(t => matchCat(t, category))
+  const list = CATALOG.filter(t => matchCat(t, category))
 
   return (
     <div className="lp tg-page">
@@ -36,7 +48,7 @@ export default function ThemesGalleryPage() {
         <div className="lp-container">
           <Link to="/" className="tg-back">← Kembali ke beranda</Link>
           <p className="lp-eyebrow">Galeri Tema</p>
-          <h1 className="lp-serif">{THEME_CATALOG.length} Tema Undangan Eksklusif</h1>
+          <h1 className="lp-serif">{THEME_COUNT} Tema Undangan Eksklusif</h1>
           <p className="tg-sub">Temukan gaya yang paling mewakili kalian — dari yang elegan dan mewah hingga lembut dan natural. Klik tema mana pun untuk melihat demo lengkapnya.</p>
         </div>
       </header>
@@ -44,8 +56,8 @@ export default function ThemesGalleryPage() {
       {/* Filter chips */}
       <div className="tg-filter-wrap">
         <div className="lp-container tg-filter">
-          {THEME_CATEGORIES.map(cat => {
-            const count = THEME_CATALOG.filter(t => matchCat(t, cat)).length
+          {CATEGORIES.map(cat => {
+            const count = CATALOG.filter(t => matchCat(t, cat)).length
             return (
               <button
                 key={cat}
@@ -71,15 +83,7 @@ export default function ThemesGalleryPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.4) }}
               >
-                <div className={`lp-theme-preview ${t.preview}`}>
-                  {t.badge && <span className="tp-badge">{t.badge}</span>}
-                  <span className="tp-label">The Wedding Of</span>
-                  <div className="tp-names lp-serif">
-                    Andini<span className="tp-amp">&amp;</span>Bagus
-                  </div>
-                  <div className="tp-rule" />
-                  <span className="tp-date">12 · 12 · 2026</span>
-                </div>
+                <ThemePreview theme={t} badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
                 <div className="lp-theme-body">
                   <div className="tg-card-head">
                     <h3>{t.name}</h3>
@@ -89,7 +93,9 @@ export default function ThemesGalleryPage() {
                   <div className="lp-theme-swatches">
                     {t.colors.map(c => <span key={c} style={{ background: c }} />)}
                   </div>
-                  <a className="lp-theme-demo" href={`/${t.demo}`} target="_blank" rel="noopener noreferrer">Lihat Demo Lengkap ↗</a>
+                  {t.status === 'coming' || !t.demo
+                    ? <span className="lp-theme-soon">Segera hadir</span>
+                    : <a className="lp-theme-demo" href={`/${t.demo}`} target="_blank" rel="noopener noreferrer">Lihat Demo Lengkap ↗</a>}
                 </div>
               </motion.div>
             ))}
