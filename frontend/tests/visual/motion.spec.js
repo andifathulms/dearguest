@@ -240,8 +240,9 @@ test('a failed theme chunk shows a reload prompt, not a blank page', async ({ pa
   await stubApi(page)
   // Themes are lazy chunks; a stale hash after a deploy rejects the import.
   // Suspense does not catch that, so without a boundary the whole invitation
-  // unmounts and the guest gets a white screen.
-  await page.route(/JavaneseDark\/index/, route => route.abort())
+  // unmounts and the guest gets a white screen. Classic themes now load as
+  // their stylesheet chunk (themes/legacy/LegacyTheme.jsx), so fail that.
+  await page.route(/JavaneseDark\/JavaneseDark\.css/, route => route.abort())
 
   await page.goto('/demo-javanese?to=Budi+Santoso', { waitUntil: 'domcontentloaded' })
 
