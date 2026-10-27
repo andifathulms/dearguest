@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -92,14 +94,17 @@ class PasswordResetConfirmView(APIView):
         uid = request.data.get('uid')
         token = request.data.get('token')
         password = request.data.get('password') or ''
-        if len(password) < 6:
-            return Response({'detail': 'Kata sandi minimal 6 karakter.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(pk=force_str(urlsafe_base64_decode(uid)))
         except (User.DoesNotExist, ValueError, TypeError, OverflowError):
             user = None
         if not user or not default_token_generator.check_token(user, token):
             return Response({'detail': 'Tautan reset tidak valid atau sudah kedaluwarsa.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Same validators as registration (length, common, numeric, similarity).
+        try:
+            validate_password(password, user)
+        except DjangoValidationError as exc:
+            return Response({'detail': ' '.join(exc.messages)}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(password)
         user.save()
         return Response({'detail': 'Kata sandi berhasil diperbarui. Silakan masuk.'})

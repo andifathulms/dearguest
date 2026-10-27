@@ -86,12 +86,13 @@ REST_FRAMEWORK = {
     ],
     # Scoped throttling: only views that set `throttle_scope` are limited.
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.ScopedRateThrottle',
+        'apps.invitations.throttling.ClientIPScopedRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
         'register': '10/hour',
         'login': '20/hour',
         'password_reset': '5/hour',
+        'activate': '10/hour',
     },
 }
 
@@ -100,11 +101,19 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
+# Shared cache: rate limits must be counted across all gunicorn workers, which a
+# per-process LocMemCache can't do. Unset REDIS_URL only for running manage.py
+# outside docker (throttles are then per-process).
+REDIS_URL = config('REDIS_URL', default='')
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
+    'default': {'BACKEND': 'django.core.cache.backends.redis.RedisCache', 'LOCATION': REDIS_URL}
+    if REDIS_URL else
+    {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
 }
+
+# Only behind our own nginx may the client IP come from a header (X-Real-IP).
+# See apps.invitations.throttling.client_ip.
+TRUST_PROXY_HEADERS = config('TRUST_PROXY_HEADERS', default=False, cast=bool)
 
 # Email (console backend in dev; configure SMTP via env in production).
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')

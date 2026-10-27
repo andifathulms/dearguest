@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import Invitation, RSVP, Guest, Coupon, MusicPreset
 from .serializers import MusicPresetSerializer
+from .throttling import client_ip
 from .serializers import (
     InvitationPublicSerializer,
     RSVPSerializer,
@@ -82,19 +83,13 @@ class RSVPCreateView(generics.CreateAPIView):
     serializer_class = RSVPCreateSerializer
     permission_classes = [AllowAny]
 
-    def _get_client_ip(self, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            return x_forwarded_for.split(',')[0].strip()
-        return request.META.get('REMOTE_ADDR', '')
-
     def create(self, request, slug=None, *args, **kwargs):
         # Guests can only post to public invitations; no owner exception here.
         invitation, error = _public_or_404(slug)
         if error:
             return error
 
-        ip = self._get_client_ip(request)
+        ip = client_ip(request)
         cache_key = f'rsvp_ip_{ip}_{slug}'
         count = cache.get(cache_key, 0)
         if count >= 5:
@@ -113,7 +108,9 @@ class RSVPCreateView(generics.CreateAPIView):
             guest = Guest.objects.filter(invitation=invitation, code=guest_code).first()
         serializer.save(invitation=invitation, guest=guest)
 
-        cache.set(cache_key, count + 1, timeout=3600)
+        # add() + incr() is atomic in Redis, so concurrent posts can't both slip under the limit.
+        cache.add(cache_key, 0, timeout=3600)
+        cache.incr(cache_key)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

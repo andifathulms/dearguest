@@ -17,6 +17,12 @@ DATABASES = {
     }
 }
 
+# Django is reachable only through nginx in production, which sets X-Real-IP.
+TRUST_PROXY_HEADERS = True
+
+# Throttles need a cache shared by every worker; refuse to start without Redis.
+CACHES = {'default': {'BACKEND': 'django.core.cache.backends.redis.RedisCache', 'LOCATION': config('REDIS_URL')}}
+
 CORS_ALLOWED_ORIGINS = [o for o in config('CORS_ALLOWED_ORIGINS', default='').split(',') if o]
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [o for o in config('CSRF_TRUSTED_ORIGINS', default='').split(',') if o]

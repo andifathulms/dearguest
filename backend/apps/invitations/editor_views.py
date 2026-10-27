@@ -170,6 +170,7 @@ class RequestActivationView(APIView):
 
 class ActivateView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_scope = 'activate'
 
     def post(self, request, slug):
         inv = _owned(request.user, slug)
