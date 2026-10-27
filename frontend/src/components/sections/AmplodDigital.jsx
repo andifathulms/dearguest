@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import PaymentLogo from '../ui/PaymentLogo.jsx'
+import SectionTitle, { useEmoji } from './SectionTitle.jsx'
 
 function typeLabel(account) {
   if (account.account_type === 'ewallet') return 'Nomor E-Wallet'
@@ -54,11 +55,12 @@ function BankCard({ account }) {
 }
 
 export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
+  const gift = useEmoji('🎁 ')
   const hasBanks = bankAccounts && bankAccounts.length > 0
   if (!hasBanks && !wishlistUrl) return null
   return (
     <section className="amplod-section">
-      <h2 className="section-title">Amplop Digital</h2>
+      <SectionTitle>Amplop Digital</SectionTitle>
       <p className="amplod-desc">
         Doa restu Anda merupakan karunia yang berarti. Bagi yang ingin memberikan tanda kasih,
         dapat melalui rekening, e-wallet, atau QRIS berikut:
@@ -73,7 +75,7 @@ export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
       {wishlistUrl && (
         <div className="amplod-wishlist-wrap">
           <a className="amplod-wishlist" href={wishlistUrl} target="_blank" rel="noopener noreferrer">
-            🎁 Lihat Wishlist Kami →
+            {gift}Lihat Wishlist Kami →
           </a>
         </div>
       )}

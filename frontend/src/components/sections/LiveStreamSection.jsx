@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import SectionTitle from './SectionTitle.jsx'
 
 // Convert common YouTube watch links into an embeddable URL; others fall back to a link button.
 function toEmbed(url) {
@@ -29,7 +30,7 @@ export default function LiveStreamSection({ url }) {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
-      <h2 className="section-title">Live Streaming</h2>
+      <SectionTitle>Live Streaming</SectionTitle>
       <p className="amplod-desc">
         Tidak dapat hadir secara langsung? Saksikan momen bahagia kami melalui siaran langsung.
       </p>

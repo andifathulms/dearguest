@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
+import SectionTitle from './SectionTitle.jsx'
 
 export default function StorySection({ stories }) {
   const timelineRef = useRef(null)
@@ -14,7 +15,7 @@ export default function StorySection({ stories }) {
   if (!stories || stories.length === 0) return null
   return (
     <section className="story-section">
-      <h2 className="section-title">Kisah Kami</h2>
+      <SectionTitle>Kisah Kami</SectionTitle>
       <div className="story-timeline" ref={timelineRef}>
         {stories.map((story, index) => (
           <motion.div

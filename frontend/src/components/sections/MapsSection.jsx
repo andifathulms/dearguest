@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import SectionTitle from './SectionTitle.jsx'
 
 export default function MapsSection({ events }) {
   const eventsWithMap = (events || []).filter(e => e.gmaps_embed_url)
@@ -6,7 +7,7 @@ export default function MapsSection({ events }) {
 
   return (
     <section className="maps-section">
-      <h2 className="section-title">Lokasi Acara</h2>
+      <SectionTitle>Lokasi Acara</SectionTitle>
       <div className="maps-grid">
         {eventsWithMap.map(event => (
           <motion.div

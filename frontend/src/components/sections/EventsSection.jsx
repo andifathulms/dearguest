@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
+import SectionTitle from './SectionTitle.jsx'
 
 function gcalUrl(event) {
   const start = new Date(event.datetime)
@@ -50,7 +51,7 @@ export default function EventsSection({ events, dressCode }) {
   if (!events || events.length === 0) return null
   return (
     <section className="events-section">
-      <h2 className="section-title">Rangkaian Acara</h2>
+      <SectionTitle>Rangkaian Acara</SectionTitle>
       <div className="events-grid">
         {events.map(event => (
           <EventCard key={event.id} event={event} />

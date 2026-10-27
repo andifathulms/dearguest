@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../../api/client.js'
+import SectionTitle, { useEmoji } from './SectionTitle.jsx'
 
 export default function RSVPForm({ slug }) {
   const [searchParams] = useSearchParams()
@@ -14,6 +15,7 @@ export default function RSVPForm({ slug }) {
     wishes: '',
   })
   const [submitted, setSubmitted] = useState(false)
+  const heart = useEmoji(' 🤍')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -57,7 +59,7 @@ export default function RSVPForm({ slug }) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <p>Jazakumullah khairan. Konfirmasi Anda telah kami terima 🤍</p>
+          <p>Jazakumullah khairan. Konfirmasi Anda telah kami terima{heart}</p>
         </motion.div>
       </section>
     )
@@ -71,7 +73,7 @@ export default function RSVPForm({ slug }) {
       viewport={{ once: true }}
       transition={{ duration: 0.7 }}
     >
-      <h2 className="section-title">Konfirmasi Kehadiran</h2>
+      <SectionTitle>Konfirmasi Kehadiran</SectionTitle>
       <form className="rsvp-form" onSubmit={handleSubmit}>
         <input
           className="rsvp-input"

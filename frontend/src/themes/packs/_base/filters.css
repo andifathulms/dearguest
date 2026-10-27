@@ -1,0 +1,8 @@
+/* Photo filter presets (invitation.photo_filter → data-photo-filter), applied
+   to every couple photo: cover, hero, profiles, gallery and lightbox. */
+.pk-root[data-photo-filter='soft-warm'] :is(.pk-photo, .profile-photo, .gallery-item img, .lightbox-fig img) {
+  filter: sepia(0.18) saturate(0.92) contrast(0.96) brightness(1.03);
+}
+.pk-root[data-photo-filter='bw'] :is(.pk-photo, .profile-photo, .gallery-item img, .lightbox-fig img) {
+  filter: grayscale(1) contrast(1.06) brightness(1.02);
+}

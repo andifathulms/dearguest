@@ -12,10 +12,34 @@ const FALLBACK_THEME = 'javanese-dark'
 // scene, not just CSS. Each is a separate chunk.
 const ownComponents = import.meta.glob('./*/index.jsx')
 
+// Theme packs: each pack's index.js is its own chunk (tokens, fonts, art).
+const packModules = import.meta.glob('./packs/*/index.js')
+const packModule = entry => packModules[`./packs/${entry.pack.dir}/index.js`]
+
+// Start fetching the pack's primary fonts as soon as its chunk arrives,
+// instead of waiting for the first text that uses them.
+function preloadFonts(pack) {
+  for (const file of pack.manifest.fonts?.preload || []) {
+    const href = pack.urls[file]
+    if (!href || document.head.querySelector(`link[rel="preload"][href="${href}"]`)) continue
+    const link = Object.assign(document.createElement('link'), { rel: 'preload', as: 'font', type: 'font/woff2', href, crossOrigin: 'anonymous' })
+    document.head.appendChild(link)
+  }
+}
+
 // One lazy component per theme id, created once so re-renders don't remount it.
 // Each loads only its own code and CSS.
 const resolved = new Map()
 function themeComponent(entry) {
+  if (!resolved.has(entry.id) && entry.kind === 'pack') {
+    resolved.set(entry.id, lazy(() => Promise.all([
+      import('./packs/_system/PackTheme.jsx'),
+      packModule(entry)(),
+    ]).then(([{ default: PackTheme }, { default: pack }]) => {
+      preloadFonts(pack)
+      return { default: props => <PackTheme entry={entry} pack={pack} {...props} /> }
+    })))
+  }
   if (!resolved.has(entry.id)) {
     const { dir, ownComponent } = entry.legacy
     resolved.set(entry.id, lazy(ownComponent
@@ -29,7 +53,10 @@ function themeComponent(entry) {
 
 function resolveEntry(themeId) {
   const entry = getTheme(themeId)
-  return entry?.kind === 'legacy' ? entry : getTheme(FALLBACK_THEME)
+  if (entry?.kind === 'legacy') return entry
+  // A pack renders once its folder exists ("coming" packs may not have one yet).
+  if (entry?.kind === 'pack' && packModule(entry)) return entry
+  return getTheme(FALLBACK_THEME)
 }
 
 // Every theme is a separate lazy chunk, so a stale hash after a deploy — the
@@ -68,6 +95,17 @@ export default function ThemeRenderer({ invitation, guestName, preview = false }
   const entry = resolveEntry(invitation.theme)
   const Theme = themeComponent(entry)
   const reducedMotion = usePrefersReducedMotion()
+
+  if (entry.kind === 'pack') {
+    // Packs bring their own opening (packs/_system/openings) and motion settings.
+    return (
+      <SilentBoundary fallback={<ThemeUnavailable />}>
+        <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+          <Theme invitation={invitation} guestName={guestName} preview={preview} />
+        </Suspense>
+      </SilentBoundary>
+    )
+  }
 
   // One decision point for the whole invitation: no clock means no motion
   // layer anywhere, and every consumer degrades to its ordinary CSS/Framer

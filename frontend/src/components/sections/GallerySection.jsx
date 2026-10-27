@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
+import SectionTitle from './SectionTitle.jsx'
 
 const container = {
   hidden: {},
@@ -61,7 +62,7 @@ export default function GallerySection({ photos }) {
   if (!photos || photos.length === 0) return null
   return (
     <section className="gallery-section">
-      <h2 className="section-title">Galeri</h2>
+      <SectionTitle>Galeri</SectionTitle>
       <motion.div
         className="gallery-grid"
         ref={gridRef}

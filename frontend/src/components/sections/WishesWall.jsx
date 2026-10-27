@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { id } from 'date-fns/locale'
 import api from '../../api/client.js'
+import SectionTitle, { useEmoji } from './SectionTitle.jsx'
 
 const POLL_MS = 30000
 
@@ -17,6 +18,7 @@ export default function WishesWall({ slug }) {
   const [nextPage, setNextPage] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
+  const heart = useEmoji(' 🤍')
 
   async function fetchLatest() {
     try {
@@ -61,11 +63,11 @@ export default function WishesWall({ slug }) {
 
   return (
     <section className="wishes-section">
-      <h2 className="section-title">Doa &amp; Ucapan</h2>
+      <SectionTitle>Doa &amp; Ucapan</SectionTitle>
       {loading ? (
         <p className="wishes-loading">Memuat ucapan...</p>
       ) : wishes.length === 0 ? (
-        <p className="wishes-empty">Jadilah yang pertama memberikan doa 🤍</p>
+        <p className="wishes-empty">Jadilah yang pertama memberikan doa{heart}</p>
       ) : (
         <motion.div
           className="wishes-list"

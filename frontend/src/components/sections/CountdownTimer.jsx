@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import SectionTitle, { useEmoji } from './SectionTitle.jsx'
 
 function getTimeLeft(targetDate) {
   const now = new Date()
@@ -15,6 +16,7 @@ function getTimeLeft(targetDate) {
 }
 
 export default function CountdownTimer({ targetDate }) {
+  const heart = useEmoji(' 🤍')
   const [timeLeft, setTimeLeft] = useState(targetDate ? getTimeLeft(targetDate) : null)
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function CountdownTimer({ targetDate }) {
   if (!timeLeft) {
     return (
       <section className="countdown-section">
-        <p className="countdown-done">Alhamdulillah, hari bahagia telah tiba 🤍</p>
+        <p className="countdown-done">Alhamdulillah, hari bahagia telah tiba{heart}</p>
       </section>
     )
   }
@@ -50,7 +52,7 @@ export default function CountdownTimer({ targetDate }) {
       viewport={{ once: true }}
       transition={{ duration: 0.7 }}
     >
-      <h2 className="section-title">Menuju Hari Bahagia</h2>
+      <SectionTitle>Menuju Hari Bahagia</SectionTitle>
       <div className="countdown-grid">
         {units.map(({ label, value }) => (
           <div key={label} className="countdown-unit">
