@@ -23,5 +23,8 @@ frontend/blob-report/
 # the repo — the source of truth lives with the design files.
 /exports/
 
+# Locally generated / manually provided TLS certificates (nginx/certs is mounted in prod compose)
+/nginx/certs/
+
 # macOS folder metadata
 .DS_Store

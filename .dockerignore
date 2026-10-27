@@ -1,0 +1,10 @@
+# Only nginx/Dockerfile builds from the repo root. Allow-list what it needs so
+# .env, media uploads and node_modules never enter the build context.
+*
+!frontend
+!nginx
+frontend/node_modules
+frontend/dist
+frontend/test-results
+frontend/tests
+nginx/certs

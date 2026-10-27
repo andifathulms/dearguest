@@ -1,0 +1,84 @@
+# Edge nginx for production. Rendered at container start by the nginx image's
+# envsubst step; only ${DOMAIN} and ${MEDIA_DOMAIN} are substituted
+# (NGINX_ENVSUBST_FILTER), so nginx's own $variables are left alone.
+
+# Uploads that aren't an allowed image/audio type are downloaded, never rendered.
+map $uri $media_disposition {
+    default                                   "attachment";
+    "~*\.(jpe?g|png|webp|mp3|m4a|aac|ogg)$"   "";
+}
+
+# Port 80: Let's Encrypt HTTP-01 challenges only; everything else goes to HTTPS.
+server {
+    listen 80 default_server;
+    server_name ${DOMAIN} ${MEDIA_DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# Optional separate origin for user uploads (MEDIA_URL_ORIGIN on the backend).
+# With MEDIA_DOMAIN unset this server_name is "media.invalid" and never matches.
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${MEDIA_DOMAIN};
+    include /etc/nginx/snippets/tls.conf;
+    include /etc/nginx/snippets/media.conf;
+
+    location / {
+        return 404;
+    }
+}
+
+server {
+    listen 443 ssl default_server;
+    http2 on;
+    server_name ${DOMAIN};
+    include /etc/nginx/snippets/tls.conf;
+    client_max_body_size 20M;
+
+    location /api/ {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+
+    location /admin/ {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+
+    # Per-invitation share pages (Open Graph link previews)
+    location /share/ {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+
+    # Django admin static files (collectstatic)
+    location /static/ {
+        alias /app/staticfiles/;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    include /etc/nginx/snippets/media.conf;
+
+    root /usr/share/nginx/html;
+
+    # Vite output: content-hashed filenames, safe to cache forever.
+    location /assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # The SPA shell must never be cached, or a deploy leaves guests on stale chunk hashes.
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
+    # Client-side routes (/:slug, /dashboard/...) fall back to the SPA shell.
+    location / {
+        try_files $uri /index.html;
+    }
+}

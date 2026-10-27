@@ -37,6 +37,10 @@ CSRF_COOKIE_SECURE = True
 # HTTPS (assumes TLS terminates at nginx/proxy)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
-SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
+# HSTS starts at 1 hour, without preload, until HTTPS is confirmed working on
+# the real domain: browsers remember HSTS, and a preload-list entry takes
+# months to undo. Once the site has run cleanly over HTTPS for a while, raise
+# it in steps via env (86400 → 604800 → 31536000). Only consider preload
+# (SECURE_HSTS_PRELOAD = True, then hstspreload.org) when every subdomain serves HTTPS.
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=3600, cast=int)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
