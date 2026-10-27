@@ -1,0 +1,72 @@
+/* Opening presets for `css` openings (theme.json → opening.preset).
+   Every animated element's delay is relative to the opening start:
+     animation-delay: calc(<its start> - var(--op-t))
+   so the same rules play normally (--op-t: 0), can be pinned at any point
+   (?openingAt → --op-t + paused), and show their final styles once done
+   (animations removed; the elements' resting styles ARE the end state). */
+
+.pk-opening[data-state='done'] *,
+.pk-opening[data-state='done'] *::before,
+.pk-opening[data-state='done'] *::after {
+  animation: none !important;
+}
+.pk-opening[data-pinned] *,
+.pk-opening[data-pinned] *::before,
+.pk-opening[data-pinned] *::after {
+  animation-play-state: paused !important;
+}
+
+/* ---- photo-crossfade-typeon: the photo resolves, then the names type on ---- */
+.pk-opening[data-opening-preset='photo-crossfade-typeon'] .pk-cover-photo {
+  animation: pk-op-photo calc(var(--op-dur) * 0.5) var(--dg-ease) both;
+  animation-delay: calc(0ms - var(--op-t));
+}
+.pk-opening[data-opening-preset='photo-crossfade-typeon'] .pk-cover-plate {
+  animation: pk-op-fade-out calc(var(--op-dur) * 0.5) var(--dg-ease) both;
+  animation-delay: calc(0ms - var(--op-t));
+}
+.pk-opening[data-opening-preset='photo-crossfade-typeon'] .pk-char {
+  animation: pk-op-char calc(var(--op-dur) * 0.12) ease-out both;
+  animation-delay: calc(var(--op-dur) * 0.32 + var(--i) * var(--char-step) - var(--op-t));
+}
+.pk-opening[data-opening-preset='photo-crossfade-typeon'] .pk-op-late {
+  animation: pk-op-rise calc(var(--op-dur) * 0.25) var(--dg-ease) both;
+  animation-delay: calc(var(--op-dur) * 0.72 + var(--late-i, 0) * 80ms - var(--op-t));
+}
+
+/* ---- fade-rise: generic card entrance (framed-card / arch packs) ---- */
+.pk-opening[data-opening-preset='fade-rise'] .pk-cover-card,
+.pk-opening[data-opening-preset='fade-rise'] .pk-op-late {
+  animation: pk-op-rise calc(var(--op-dur) * 0.6) var(--dg-ease) both;
+  animation-delay: calc(var(--late-i, 0) * 90ms - var(--op-t));
+}
+
+/* No `filter` here: it would override the couple's photo filter (filters.css). */
+@keyframes pk-op-photo {
+  from { opacity: 0; transform: scale(1.06); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pk-op-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes pk-op-char {
+  from { opacity: 0; transform: translateY(0.18em); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pk-op-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Lottie / layered-svg render into this layer behind the cover content. */
+.pk-opening-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.pk-opening-layer svg {
+  width: 100%;
+  height: 100%;
+}
