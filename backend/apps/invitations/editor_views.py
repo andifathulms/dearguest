@@ -88,6 +88,20 @@ class MyInvitationDetailView(APIView):
             inv.save(update_fields=['music_preset'])
         return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
 
+    def delete(self, request, slug):
+        inv = _owned(request.user, slug)
+        if not inv:
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        # Live or paid-for invitations can only be removed by staff in the admin,
+        # so a mis-click can't wipe RSVPs or an order the couple paid for.
+        if inv.is_active or inv.tier != 'free':
+            return Response(
+                {'detail': 'Undangan yang sudah aktif atau dibayar tidak bisa dihapus. Hubungi admin.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+        inv.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class MusicPresetSelectView(APIView):
     """Owner picks (or clears) a preset background track."""
@@ -110,11 +124,16 @@ class MusicPresetSelectView(APIView):
         return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
 
     def delete(self, request, slug):
+        """Remove all background music: the chosen preset and any uploaded track."""
         inv = _owned(request.user, slug)
         if not inv:
             return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
-        inv.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        inv.music_preset = None
+        if inv.music_file:
+            inv.music_file.delete(save=False)
+        inv.music_file = None
+        inv.save(update_fields=['music_preset', 'music_file'])
+        return Response(EditorInvitationSerializer(inv, context={'request': request}).data)
 
 
 class RequestActivationView(APIView):
