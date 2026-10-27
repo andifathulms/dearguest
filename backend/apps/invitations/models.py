@@ -3,6 +3,7 @@ import secrets
 from django.db import models
 from datetime import timedelta
 
+from .themes import DEFAULT_THEME, validate_registered_theme
 from .uploads import SafeFileField, SafeImageField, validate_audio_upload, validate_image_upload
 
 
@@ -16,44 +17,6 @@ def generate_guest_code():
 
 
 class Invitation(models.Model):
-    THEME_CHOICES = [
-        ('javanese-dark', 'Javanese Gold Night'),
-        ('floral-light', 'Flower Garden'),
-        ('modern-minimalist', 'White Minimalist'),
-        ('luxury-emerald', 'Luxury Emerald'),
-        ('rustic-kraft', 'Rustic Kraft'),
-        ('boho-terracotta', 'Terracotta Dusk'),
-        ('burgundy-gold', 'Burgundy Gold'),
-        ('dusty-blue', 'Dusty Blue'),
-        ('midnight-celestial', 'Celestial Night'),
-        ('sage-botanical', 'Sage Garden'),
-        ('mauve-rose', 'Elegant Mauve'),
-        ('ivory-classic', 'Ivory Classic'),
-        ('tropical-green', 'Tropical Green'),
-        ('lavender-dream', 'Lavender Dream'),
-        ('coral-peach', 'Warm Coral'),
-        ('charcoal-marble', 'Charcoal Marble'),
-        ('islamic-arabesque', 'Golden Arabesque'),
-        ('navy-gold', 'Classic Navy'),
-        ('plum-gold', 'Plum Gold'),
-        ('teal-ocean', 'Ocean Teal'),
-        ('deco-noir', 'Art Deco Noir'),
-        ('sunflower-mustard', 'Golden Sunflower'),
-        ('beige-korean', 'Aesthetic Beige'),
-        ('rose-gold', 'Rose Gold'),
-        ('mono-editorial', 'Editorial Mono'),
-        ('royal-purple', 'Royal Purple'),
-        ('marble-white', 'White Marble'),
-        ('buginese-blue', 'Buginese Blue'),
-        ('celestial-cinematic', 'Celestial 3D'),
-        ('petals-3d', 'Enchanted Petals'),
-        ('aurora-3d', 'Aurora Dream'),
-        ('golden-3d', 'Golden Aura'),
-        ('clouds-3d', 'Ethereal Clouds'),
-        ('lanterns-3d', 'Floating Lanterns'),
-        ('fireflies-3d', 'Enchanted Fireflies'),
-        ('snow-3d', 'Winter Snow'),
-    ]
     TIER_CHOICES = [
         ('free', 'Gratis'),
         ('premium', 'Premium'),
@@ -61,7 +24,9 @@ class Invitation(models.Model):
     ]
     slug = models.SlugField(unique=True, max_length=100)
     tier = models.CharField(max_length=10, choices=TIER_CHOICES, default='free')  # paid tiers remove the watermark
-    theme = models.CharField(max_length=30, choices=THEME_CHOICES, default='javanese-dark')
+    # Ids come from the theme registry (shared/themes.json), not field choices, so
+    # adding or retiring a theme needs no migration.
+    theme = models.CharField(max_length=30, default=DEFAULT_THEME, validators=[validate_registered_theme])
     is_active = models.BooleanField(default=False)
     wedding_date = models.DateField()
     expires_at = models.DateField(null=True, blank=True)

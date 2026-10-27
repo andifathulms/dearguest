@@ -1,8 +1,12 @@
 import secrets
 from urllib.parse import quote
 
+from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.utils.html import format_html
+
+from . import themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset,
@@ -34,8 +38,31 @@ class BankAccountInline(admin.TabularInline):
     extra = 1
 
 
+class InvitationAdminForm(forms.ModelForm):
+    """Theme is a registry dropdown; like the editor, only active themes can be newly
+    chosen, while an invitation already on a hidden theme can keep it."""
+    theme = forms.ChoiceField(choices=())
+
+    class Meta:
+        model = Invitation
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['theme'].choices = themes.choices()
+
+    def clean_theme(self):
+        value = self.cleaned_data['theme']
+        current = self.instance.theme if self.instance.pk else None
+        try:
+            return themes.validate_theme_choice(value, current=current)
+        except ValidationError as exc:
+            raise forms.ValidationError(exc.messages)
+
+
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
+    form = InvitationAdminForm
     list_display = ['slug', 'theme', 'tier', 'is_active', 'activation_requested', 'activation_code', 'wedding_date']
     list_filter = ['is_active', 'activation_requested', 'tier', 'theme']
     list_editable = ['tier', 'is_active', 'activation_code']
@@ -71,6 +98,7 @@ class RSVPAdmin(admin.ModelAdmin):
 @admin.register(ActivationRequest)
 class ActivationRequestAdmin(admin.ModelAdmin):
     """Inbox of couples who requested activation but aren't live yet."""
+    form = InvitationAdminForm
     list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
     list_editable = ['tier', 'activation_code', 'is_active']
     readonly_fields = ['activation_requested_at']

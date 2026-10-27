@@ -4,6 +4,7 @@ import os
 from datetime import date, datetime
 from django.core.files import File
 from django.core.management.base import BaseCommand
+from apps.invitations import themes
 from apps.invitations.models import Invitation, Couple, Event, Story, BankAccount, Photo
 
 ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'seed_assets')
@@ -16,51 +17,22 @@ def _attach(field, fname, savename):
         with open(src, 'rb') as fh:
             field.save(savename, File(fh), save=True)
 
-THEMES = [
-    ('javanese-dark', 'demo-javanese'),
-    ('floral-light', 'demo-floral'),
-    ('modern-minimalist', 'demo-minimalis'),
-    ('luxury-emerald', 'demo-emerald'),
-    ('rustic-kraft', 'demo-rustic'),
-    ('boho-terracotta', 'demo-boho'),
-    ('burgundy-gold', 'demo-marun'),
-    ('dusty-blue', 'demo-biru'),
-    ('midnight-celestial', 'demo-langit'),
-    ('sage-botanical', 'demo-sage'),
-    ('mauve-rose', 'demo-mauve'),
-    ('ivory-classic', 'demo-gading'),
-    ('tropical-green', 'demo-tropis'),
-    ('lavender-dream', 'demo-lembayung'),
-    ('coral-peach', 'demo-koral'),
-    ('charcoal-marble', 'demo-marmer'),
-    ('islamic-arabesque', 'demo-arabesque'),
-    ('navy-gold', 'demo-navy'),
-    ('plum-gold', 'demo-plum'),
-    ('teal-ocean', 'demo-teal'),
-    ('deco-noir', 'demo-deco'),
-    ('sunflower-mustard', 'demo-matahari'),
-    ('beige-korean', 'demo-beige'),
-    ('rose-gold', 'demo-rosegold'),
-    ('mono-editorial', 'demo-mono'),
-    ('royal-purple', 'demo-ungu'),
-    ('marble-white', 'demo-marmerputih'),
-    ('buginese-blue', 'demo-bugis'),
-    ('celestial-cinematic', 'demo-celestial-3d'),
-    ('petals-3d', 'demo-petals-3d'),
-    ('aurora-3d', 'demo-aurora-3d'),
-    ('golden-3d', 'demo-golden-3d'),
-    ('clouds-3d', 'demo-clouds-3d'),
-    ('lanterns-3d', 'demo-lanterns-3d'),
-    ('fireflies-3d', 'demo-fireflies-3d'),
-    ('snow-3d', 'demo-snow-3d'),
-]
+def demo_themes():
+    """(theme id, demo slug) for every registry entry with a demo. Packs that are
+    still "coming" have nothing to render yet, so they get no demo."""
+    return [
+        (t['id'], t['demoSlug'])
+        for t in themes.entries().values()
+        if t.get('demoSlug') and not (t['kind'] == 'pack' and t['status'] == 'coming')
+    ]
 
 
 class Command(BaseCommand):
     help = 'Create/update a public demo invitation for each theme.'
 
     def handle(self, *args, **options):
-        for theme, slug in THEMES:
+        demos = demo_themes()
+        for theme, slug in demos:
             inv, _ = Invitation.objects.update_or_create(
                 slug=slug,
                 defaults=dict(
@@ -108,4 +80,4 @@ class Command(BaseCommand):
             BankAccount.objects.create(invitation=inv, account_type='bank', bank_name='BCA', account_number='1234567890', account_name='Andini', order=0)
             BankAccount.objects.create(invitation=inv, account_type='ewallet', bank_name='GoPay', account_number='081234567890', account_name='Bagus', order=1)
             self.stdout.write(f'  demo ready: /{slug} ({theme})')
-        self.stdout.write(self.style.SUCCESS(f'All {len(THEMES)} demo invitations seeded.'))
+        self.stdout.write(self.style.SUCCESS(f'All {len(demos)} demo invitations seeded.'))

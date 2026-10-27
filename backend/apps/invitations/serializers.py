@@ -172,6 +172,17 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
 # ===== Editor (authenticated, owner-scoped, writable) serializers =====
 import re
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+
+from . import themes
+
+
+def _theme_choice(value, current=None):
+    try:
+        return themes.validate_theme_choice(value, current=current)
+    except DjangoValidationError as exc:
+        raise serializers.ValidationError(exc.messages)
+
 
 class CoupleWriteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -216,11 +227,24 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['slug', 'is_active', 'watermark', 'expires_at']
 
+    def validate_theme(self, value):
+        # A couple keeps a theme that has since been hidden, but can't switch to one.
+        return _theme_choice(value, current=getattr(self.instance, 'theme', None))
+
 
 class InvitationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
         fields = ['slug', 'theme', 'wedding_date']
+
+    def validate_theme(self, value):
+        return _theme_choice(value)
+
+    def validate(self, attrs):
+        # An omitted theme falls back to the model default, which must also be pickable.
+        if 'theme' not in attrs:
+            attrs['theme'] = _theme_choice(themes.DEFAULT_THEME)
+        return attrs
 
     def validate_slug(self, value):
         value = value.strip().lower()
