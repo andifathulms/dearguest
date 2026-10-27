@@ -1,13 +1,16 @@
 import { motion } from 'framer-motion'
 import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
+import { eventLabel } from '../../copy/copy.js'
 
 export default function MapsSection({ events }) {
+  const { t } = useCopy()
   const eventsWithMap = (events || []).filter(e => e.gmaps_embed_url)
   if (eventsWithMap.length === 0) return null
 
   return (
     <section className="maps-section">
-      <SectionTitle>Lokasi Acara</SectionTitle>
+      <SectionTitle>{t('maps.title')}</SectionTitle>
       <div className="maps-grid">
         {eventsWithMap.map(event => (
           <motion.div
@@ -19,7 +22,7 @@ export default function MapsSection({ events }) {
             transition={{ duration: 0.6 }}
           >
             <h3 className="map-event-label">
-              {event.event_type === 'akad' ? 'Akad Nikah' : 'Resepsi'}
+              {eventLabel(event, t)}
             </h3>
             <p className="map-venue">{event.venue_name}</p>
             <iframe
@@ -28,7 +31,7 @@ export default function MapsSection({ events }) {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title={`Peta ${event.venue_name}`}
+              title={t('maps.frameTitle', { venue: event.venue_name })}
             />
           </motion.div>
         ))}

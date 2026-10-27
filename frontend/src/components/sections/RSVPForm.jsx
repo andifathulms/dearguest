@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../../api/client.js'
-import SectionTitle, { useEmoji } from './SectionTitle.jsx'
+import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 export default function RSVPForm({ slug }) {
   const [searchParams] = useSearchParams()
@@ -15,7 +16,7 @@ export default function RSVPForm({ slug }) {
     wishes: '',
   })
   const [submitted, setSubmitted] = useState(false)
-  const heart = useEmoji(' 🤍')
+  const { t } = useCopy()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -31,7 +32,7 @@ export default function RSVPForm({ slug }) {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.guest_name.trim()) {
-      setError('Nama wajib diisi.')
+      setError(t('rsvp.nameRequired'))
       return
     }
     setLoading(true)
@@ -44,7 +45,7 @@ export default function RSVPForm({ slug }) {
       })
       setSubmitted(true)
     } catch (err) {
-      const msg = err.response?.data?.detail || 'Gagal mengirim. Coba lagi.'
+      const msg = err.response?.data?.detail || t('rsvp.failed')
       setError(msg)
     } finally {
       setLoading(false)
@@ -59,7 +60,7 @@ export default function RSVPForm({ slug }) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <p>Jazakumullah khairan. Konfirmasi Anda telah kami terima{heart}</p>
+          <p>{t('rsvp.thanks')}</p>
         </motion.div>
       </section>
     )
@@ -73,12 +74,12 @@ export default function RSVPForm({ slug }) {
       viewport={{ once: true }}
       transition={{ duration: 0.7 }}
     >
-      <SectionTitle>Konfirmasi Kehadiran</SectionTitle>
+      <SectionTitle>{t('rsvp.title')}</SectionTitle>
       <form className="rsvp-form" onSubmit={handleSubmit}>
         <input
           className="rsvp-input"
           name="guest_name"
-          placeholder="Nama Lengkap *"
+          placeholder={t('rsvp.name')}
           aria-label="Nama lengkap"
           value={form.guest_name}
           onChange={handleChange}
@@ -87,7 +88,7 @@ export default function RSVPForm({ slug }) {
         <input
           className="rsvp-input"
           name="whatsapp"
-          placeholder="Nomor WhatsApp (opsional)"
+          placeholder={t('rsvp.whatsapp')}
           aria-label="Nomor WhatsApp"
           value={form.whatsapp}
           onChange={handleChange}
@@ -98,19 +99,19 @@ export default function RSVPForm({ slug }) {
             className={`rsvp-toggle-btn ${form.attending ? 'active' : ''}`}
             onClick={() => setAttending(true)}
           >
-            Hadir
+            {t('rsvp.attending')}
           </button>
           <button
             type="button"
             className={`rsvp-toggle-btn ${!form.attending ? 'active' : ''}`}
             onClick={() => setAttending(false)}
           >
-            Tidak Hadir
+            {t('rsvp.notAttending')}
           </button>
         </div>
         {form.attending && (
           <div className="rsvp-pax">
-            <label className="rsvp-pax-label">Jumlah Tamu</label>
+            <label className="rsvp-pax-label">{t('rsvp.pax')}</label>
             <input
               className="rsvp-input"
               type="number"
@@ -126,7 +127,7 @@ export default function RSVPForm({ slug }) {
         <textarea
           className="rsvp-textarea"
           name="wishes"
-          placeholder="Doa & ucapan untuk kedua mempelai..."
+          placeholder={t('rsvp.wishes')}
           aria-label="Doa dan ucapan"
           rows="4"
           value={form.wishes}
@@ -134,7 +135,7 @@ export default function RSVPForm({ slug }) {
         />
         {error && <p className="rsvp-error">{error}</p>}
         <button className="rsvp-submit" type="submit" disabled={loading}>
-          {loading ? 'Mengirim...' : 'Kirim Konfirmasi'}
+          {loading ? t('rsvp.sending') : t('rsvp.submit')}
         </button>
       </form>
     </motion.section>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
 import { publicOrigin } from '../utils/publicUrl.js'
 import { selectableThemes } from '../themes/registry.js'
+import { variantOptions } from '../copy/copy.js'
 import './Auth.css'
 
 // Themes a couple can pick right now (registry status "active").
@@ -17,6 +18,7 @@ export default function OnboardingPage() {
   const [slug, setSlug] = useState('')
   const [theme, setTheme] = useState(THEMES[0]?.id || '')
   const [weddingDate, setWeddingDate] = useState('')
+  const [variant, setVariant] = useState('')
   const [check, setCheck] = useState(null) // {valid, available}
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -44,9 +46,10 @@ export default function OnboardingPage() {
     setError('')
     if (!slug || !check?.available) { setError('Pilih alamat undangan yang tersedia.'); return }
     if (!weddingDate) { setError('Isi tanggal pernikahan.'); return }
+    if (!variant) { setError('Pilih gaya bahasa undangan.'); return }
     setLoading(true)
     try {
-      await api.post('/my/invitations/', { slug, theme, wedding_date: weddingDate })
+      await api.post('/my/invitations/', { slug, theme, wedding_date: weddingDate, copy_variant: variant })
       navigate(`/dashboard/${slug}/edit`)
     } catch (err) {
       setError(err.response?.data?.detail || err.response?.data?.slug?.[0] || 'Gagal membuat undangan. Coba lagi.')
@@ -107,6 +110,19 @@ export default function OnboardingPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="auth-field">
+            <span className="auth-label" id="onb-variant-label">Gaya bahasa undangan</span>
+            <div className="onb-variants" role="radiogroup" aria-labelledby="onb-variant-label">
+              {variantOptions().map(v => (
+                <button type="button" key={v.id} role="radio" aria-checked={variant === v.id}
+                  className={`onb-variant ${variant === v.id ? 'active' : ''}`} onClick={() => setVariant(v.id)}>
+                  {v.label}
+                </button>
+              ))}
+            </div>
+            <p className="auth-hint">Menentukan salam, ayat, dan istilah acara. Bisa diubah nanti di editor.</p>
           </div>
 
           <div className="auth-field">

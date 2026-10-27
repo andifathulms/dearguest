@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { usePack } from '../ThemeContext.jsx'
 import { useOpeningGate, devOpeningOverrides } from './useOpeningGate.js'
+import { useCopy } from '../../../../copy/CopyContext.jsx'
 
 // Player-backed openings load only when a pack uses them.
 const LottieLayer = lazy(() => import('./LottieLayer.jsx'))
@@ -18,6 +19,7 @@ const DEFAULT_DURATION = 1600
 // shows the end state at once. The open button (end state) opens the invitation.
 export default function Opening({ Cover, invitation, guestName }) {
   const { pack } = usePack()
+  const { t } = useCopy()
   const dev = devOpeningOverrides()
   const opening = pack.manifest.opening || {}
   const type = dev.type || opening.type || 'none'
@@ -58,7 +60,7 @@ export default function Opening({ Cover, invitation, guestName }) {
           className="pk-opening"
           role="dialog"
           aria-modal="true"
-          aria-label="Pembuka undangan"
+          aria-label={t('cover.aria')}
           data-opening={type}
           data-opening-preset={preset}
           data-state={finished ? 'done' : 'playing'}
@@ -83,7 +85,7 @@ export default function Opening({ Cover, invitation, guestName }) {
             guestName={guestName}
             openButton={(
               <button className="pk-open-btn cover-open-btn" type="button" onClick={open} ref={buttonRef}>
-                Buka Undangan
+                {t('cover.open')}
               </button>
             )}
           />

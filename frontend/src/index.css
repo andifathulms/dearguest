@@ -246,3 +246,18 @@ button.inv-status-link {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* Scripture block (all legacy themes; packs restyle it with tokens). */
+.scripture-section { max-width: 40rem; margin: 0 auto; padding: 3.5rem 1.5rem; text-align: center; }
+.scripture-section--credit { padding: 0 1.5rem 1.5rem; }
+.scripture-arabic {
+  margin: 0 0 1.2rem; font-size: 1.6rem; line-height: 2.2; color: var(--text-primary);
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', serif;
+}
+.scripture-text {
+  margin: 0 auto; font-family: var(--font-serif, Georgia, serif); font-style: italic;
+  font-size: 1.05rem; line-height: 1.8; color: var(--text-primary);
+}
+.scripture-ref { margin: 1rem 0 0; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+.scripture-source { margin: 0.75rem 0 0; font-size: 0.7rem; opacity: 0.7; color: var(--text-muted); }
+.scripture-source a { color: inherit; }

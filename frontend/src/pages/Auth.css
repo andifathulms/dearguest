@@ -97,3 +97,11 @@
   color: #a89a86; padding: 0.3rem 0.4rem;
 }
 .auth-pass-toggle:hover { color: var(--gold, #c9a84c); }
+
+/* Onboarding: copy variant chips */
+.onb-variants { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem; }
+.onb-variant {
+  padding: 0.55rem 1rem; border: 1px solid #ddd3c4; border-radius: 999px; background: #fff;
+  color: #4a4036; font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+.onb-variant.active { border-color: #b8924e; background: #fbf5ea; color: #2f2820; font-weight: 600; }

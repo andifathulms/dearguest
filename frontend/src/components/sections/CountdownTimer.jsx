@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import SectionTitle, { useEmoji } from './SectionTitle.jsx'
+import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 function getTimeLeft(targetDate) {
   const now = new Date()
@@ -16,7 +17,7 @@ function getTimeLeft(targetDate) {
 }
 
 export default function CountdownTimer({ targetDate }) {
-  const heart = useEmoji(' 🤍')
+  const { t } = useCopy()
   const [timeLeft, setTimeLeft] = useState(targetDate ? getTimeLeft(targetDate) : null)
 
   useEffect(() => {
@@ -32,16 +33,16 @@ export default function CountdownTimer({ targetDate }) {
   if (!timeLeft) {
     return (
       <section className="countdown-section">
-        <p className="countdown-done">Alhamdulillah, hari bahagia telah tiba{heart}</p>
+        <p className="countdown-done">{t('countdown.passed')}</p>
       </section>
     )
   }
 
   const units = [
-    { label: 'Hari', value: timeLeft.days },
-    { label: 'Jam', value: timeLeft.hours },
-    { label: 'Menit', value: timeLeft.minutes },
-    { label: 'Detik', value: timeLeft.seconds },
+    { label: t('countdown.days'), value: timeLeft.days },
+    { label: t('countdown.hours'), value: timeLeft.hours },
+    { label: t('countdown.minutes'), value: timeLeft.minutes },
+    { label: t('countdown.seconds'), value: timeLeft.seconds },
   ]
 
   return (
@@ -52,7 +53,7 @@ export default function CountdownTimer({ targetDate }) {
       viewport={{ once: true }}
       transition={{ duration: 0.7 }}
     >
-      <SectionTitle>Menuju Hari Bahagia</SectionTitle>
+      <SectionTitle>{t('countdown.title')}</SectionTitle>
       <div className="countdown-grid">
         {units.map(({ label, value }) => (
           <div key={label} className="countdown-unit">

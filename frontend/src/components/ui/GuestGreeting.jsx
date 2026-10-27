@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 export default function GuestGreeting({ guestName, openingText }) {
+  const { t } = useCopy()
   return (
     <motion.section
       className="greeting-section"
@@ -10,7 +12,7 @@ export default function GuestGreeting({ guestName, openingText }) {
     >
       {guestName && (
         <p className="greeting-to">
-          Kepada Yth. <strong>{guestName}</strong>
+          {t('greeting.to')} <strong>{guestName}</strong>
         </p>
       )}
       {openingText && <p className="greeting-text">{openingText}</p>}

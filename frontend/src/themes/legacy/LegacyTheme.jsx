@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import HeroSection from '../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../components/ui/GuestGreeting.jsx'
+import ScriptureSection from '../../components/sections/ScriptureSection.jsx'
 import CountdownTimer from '../../components/sections/CountdownTimer.jsx'
 import EventsSection from '../../components/sections/EventsSection.jsx'
 import StorySection from '../../components/sections/StorySection.jsx'
@@ -80,6 +81,7 @@ export default function LegacyTheme({ entry, invitation, guestName }) {
       ) : hero}
 
       <Section rule={rules}><GuestGreeting guestName={guestName} openingText={invitation.opening_text} /></Section>
+      <Section rule={rules}><ScriptureSection /></Section>
       <Section rule={rules}><CountdownTimer targetDate={akad?.datetime} /></Section>
       <Section rule={rules}><EventsSection events={invitation.events} dressCode={invitation.dress_code} /></Section>
       <Section rule={rules}><StorySection stories={invitation.stories} /></Section>

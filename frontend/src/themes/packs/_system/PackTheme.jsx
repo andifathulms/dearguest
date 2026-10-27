@@ -6,6 +6,8 @@ import '../_base/filters.css'
 import '../_base/openings.css'
 import HeroSection from '../../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../../components/ui/GuestGreeting.jsx'
+import ScriptureSection from '../../../components/sections/ScriptureSection.jsx'
+import { blessingFor, scriptureFor } from '../../../copy/copy.js'
 import CountdownTimer from '../../../components/sections/CountdownTimer.jsx'
 import EventsSection from '../../../components/sections/EventsSection.jsx'
 import StorySection from '../../../components/sections/StorySection.jsx'
@@ -57,6 +59,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
   // dividers fall between real sections only.
   const sections = [
     [true, <GuestGreeting guestName={guestName} openingText={invitation.opening_text} />],
+    [Boolean(scriptureFor(invitation) || blessingFor(invitation.copy_variant)), <ScriptureSection />],
     [Boolean(akad?.datetime), <CountdownTimer targetDate={akad?.datetime} />],
     [has(events), <EventsSection events={events} dressCode={invitation.dress_code} />],
     [has(invitation.stories), <StorySection stories={invitation.stories} />],

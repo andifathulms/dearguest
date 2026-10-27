@@ -236,6 +236,15 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 .pk-root .greeting-to { margin: 0 0 var(--dg-space-3); color: var(--dg-ink-muted); }
 .pk-root .greeting-text { max-width: 34rem; margin: 0 auto; font-family: var(--dg-font-display); font-size: 1.2rem; font-style: italic; }
 
+/* scripture */
+.pk-root .scripture-section { max-width: 36rem; margin-inline: auto; padding: var(--dg-section-pad-y) var(--dg-gutter); text-align: center; }
+.pk-root .scripture-section--credit { padding-block: 0 var(--dg-space-4); }
+.pk-root .scripture-arabic { margin: 0 0 var(--dg-space-4); font-size: 1.6rem; line-height: 2.2; color: var(--dg-ink); font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', serif; }
+.pk-root .scripture-text { margin: 0 auto; font-family: var(--dg-font-display); font-style: italic; font-size: 1.2rem; line-height: 1.6; color: var(--dg-ink); }
+.pk-root .scripture-ref { margin: var(--dg-space-4) 0 0; font-family: var(--dg-font-label); font-size: var(--dg-fs-label); letter-spacing: var(--dg-tracking-label); text-transform: uppercase; color: var(--dg-accent); }
+.pk-root .scripture-source { margin: var(--dg-space-2) 0 0; font-size: var(--dg-fs-small); color: var(--dg-ink-faint); }
+.pk-root .scripture-source a { color: inherit; }
+
 /* countdown */
 .pk-root .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dg-space-2); max-width: 26rem; margin: 0 auto; }
 .pk-root .countdown-unit { display: grid; gap: var(--dg-space-1); padding: var(--dg-space-3) 0; border-top: 1px solid var(--dg-line); }

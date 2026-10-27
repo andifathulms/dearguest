@@ -4,8 +4,10 @@ import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
 import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 export default function StorySection({ stories }) {
+  const { t } = useCopy()
   const timelineRef = useRef(null)
   // Themes with a motion clock scrub the spine to scroll position; everything
   // else keeps the plain static spine. The Framer entrances below are
@@ -15,7 +17,7 @@ export default function StorySection({ stories }) {
   if (!stories || stories.length === 0) return null
   return (
     <section className="story-section">
-      <SectionTitle>Kisah Kami</SectionTitle>
+      <SectionTitle>{t('story.title')}</SectionTitle>
       <div className="story-timeline" ref={timelineRef}>
         {stories.map((story, index) => (
           <motion.div

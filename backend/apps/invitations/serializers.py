@@ -147,6 +147,8 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
             'slug', 'theme', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'photo_filter', 'watermark', 'music_file',
             'hero_photo', 'livestream_url', 'wishlist_url',
+            'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
+            'gift_recipient', 'gift_address', 'gift_phone',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
 
@@ -223,6 +225,8 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = [
             'slug', 'theme', 'wedding_date', 'opening_text', 'closing_text', 'dress_code', 'photo_filter',
+            'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
+            'gift_recipient', 'gift_address', 'gift_phone', 'wishes_require_approval', 'wish_blocklist',
             'music_file', 'hero_photo', 'livestream_url', 'wishlist_url', 'is_active', 'watermark', 'expires_at',
         ]
         read_only_fields = ['slug', 'is_active', 'watermark', 'expires_at']
@@ -231,11 +235,18 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
         # A couple keeps a theme that has since been hidden, but can't switch to one.
         return _theme_choice(value, current=getattr(self.instance, 'theme', None))
 
+    def validate(self, attrs):
+        mode = attrs.get('scripture_mode', getattr(self.instance, 'scripture_mode', 'default'))
+        ref = attrs.get('scripture_ref', getattr(self.instance, 'scripture_ref', ''))
+        if mode == 'custom' and not (ref or '').strip():
+            raise serializers.ValidationError({'scripture_ref': 'Isi sumber ayat (mis. "Kejadian 2:24").'})
+        return attrs
+
 
 class InvitationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
-        fields = ['slug', 'theme', 'wedding_date']
+        fields = ['slug', 'theme', 'wedding_date', 'copy_variant']
 
     def validate_theme(self, value):
         return _theme_choice(value)
@@ -293,6 +304,8 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'theme', 'tier', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'photo_filter', 'watermark', 'is_active',
+            'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
+            'gift_recipient', 'gift_address', 'gift_phone', 'wishes_require_approval', 'wish_blocklist',
             'activation_requested', 'has_activation_code',
             'music_file', 'music_preset', 'hero_photo', 'livestream_url', 'wishlist_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import api from '../api/client.js'
 import { invitationUrl, shareUrl } from '../utils/publicUrl.js'
+import { makeT } from '../copy/copy.js'
 
 const ic = {
   link: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></svg>,
@@ -17,7 +18,8 @@ function waNumber(n) {
   return d
 }
 
-export default function GuestManager({ slug, brideName, groomName }) {
+export default function GuestManager({ slug, brideName, groomName, variant }) {
+  const t = makeT(variant)
   const [guests, setGuests] = useState([])
   const [stats, setStats] = useState({ total: 0, checked_in: 0 })
   const [bulk, setBulk] = useState('')
@@ -34,7 +36,8 @@ export default function GuestManager({ slug, brideName, groomName }) {
   function inviteText(g) {
     // Use the share URL so the WhatsApp message renders a rich link preview.
     const link = shareUrl(slug, `?to=${encodeURIComponent(g.name)}&g=${g.code}`)
-    return `Assalamualaikum Wr. Wb.\n\nKepada Yth. ${g.name},\nDengan penuh kebahagiaan, kami mengundang Anda ke pernikahan ${brideName} & ${groomName}.\n\nBuka undangan digital kami di:\n${link}\n\nMerupakan suatu kehormatan apabila Anda berkenan hadir. Terima kasih 🤍`
+    // Wording follows the couple's copy variant (shared/copy/copy.json).
+    return t('invite.text', { greeting: t('share.greeting'), guest: g.name, bride: brideName, groom: groomName, url: link })
   }
 
   function showToast(msg) {

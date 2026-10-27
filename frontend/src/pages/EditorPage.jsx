@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
 import { invitationUrl } from '../utils/publicUrl.js'
 import { getTheme, selectableThemes, themeName } from '../themes/registry.js'
+import { makeT, variantOptions, variantMeta } from '../copy/copy.js'
+import scriptureData from '../copy/scripture.json'
 
 // Packs that offer photo filters declare them in their theme.json (tiny files,
 // bundled eagerly so the editor can decide without loading a pack).
@@ -29,7 +31,12 @@ function SettingsSection({ inv, reload, notify }) {
     opening_text: inv.opening_text || '', closing_text: inv.closing_text || '',
     dress_code: inv.dress_code || '', livestream_url: inv.livestream_url || '',
     wishlist_url: inv.wishlist_url || '', photo_filter: inv.photo_filter || 'none',
+    copy_variant: inv.copy_variant || 'umum', scripture_mode: inv.scripture_mode || 'default',
+    scripture_ref: inv.scripture_ref || '', scripture_text: inv.scripture_text || '',
   })
+  // Placeholders show what guests see when a field is left empty: the variant's defaults.
+  const tv = makeT(f.copy_variant)
+  const defaultVerse = scriptureData.entries.find(e => e.id === variantMeta(f.copy_variant)._scripture)
   const [music, setMusic] = useState(null)
   const [heroPhoto, setHeroPhoto] = useState(null)
   const [presets, setPresets] = useState([])
@@ -85,13 +92,39 @@ function SettingsSection({ inv, reload, notify }) {
         <input id="set-date" className="ed-input" type="date" value={f.wedding_date} onChange={e => set('wedding_date', e.target.value)} />
       </div>
       <div className="ed-field">
-        <label htmlFor="set-opening">Teks pembuka</label>
-        <textarea id="set-opening" className="ed-textarea" value={f.opening_text} onChange={e => set('opening_text', e.target.value)} placeholder="Kata sambutan untuk tamu…" />
+        <label htmlFor="set-variant">Gaya bahasa undangan</label>
+        <select id="set-variant" className="ed-select" value={f.copy_variant} onChange={e => set('copy_variant', e.target.value)}>
+          {variantOptions().map(v => <option key={v.id} value={v.id}>{v.label}</option>)}
+        </select>
       </div>
       <div className="ed-field">
-        <label htmlFor="set-closing">Teks penutup</label>
-        <textarea id="set-closing" className="ed-textarea" value={f.closing_text} onChange={e => set('closing_text', e.target.value)} placeholder="Ucapan terima kasih…" />
+        <label htmlFor="set-opening">Teks pembuka (kosongkan untuk memakai teks bawaan)</label>
+        <textarea id="set-opening" className="ed-textarea" value={f.opening_text} onChange={e => set('opening_text', e.target.value)} placeholder={tv('greeting.default')} />
       </div>
+      <div className="ed-field">
+        <label htmlFor="set-closing">Teks penutup (kosongkan untuk memakai teks bawaan)</label>
+        <textarea id="set-closing" className="ed-textarea" value={f.closing_text} onChange={e => set('closing_text', e.target.value)} placeholder={tv('closing.default')} />
+      </div>
+      <div className="ed-field">
+        <label htmlFor="set-scripture">Ayat / kutipan</label>
+        <select id="set-scripture" className="ed-select" value={f.scripture_mode} onChange={e => set('scripture_mode', e.target.value)}>
+          <option value="default" disabled={!defaultVerse}>{defaultVerse ? `Bawaan: ${defaultVerse.ref}` : 'Bawaan (tidak ada untuk gaya ini)'}</option>
+          <option value="custom">Tulis sendiri</option>
+          <option value="none">Tanpa ayat</option>
+        </select>
+      </div>
+      {f.scripture_mode === 'custom' && (
+        <>
+          <div className="ed-field">
+            <label htmlFor="set-scripture-ref">Sumber (mis. "Kolose 3:14")</label>
+            <input id="set-scripture-ref" className="ed-input" value={f.scripture_ref} onChange={e => set('scripture_ref', e.target.value)} />
+          </div>
+          <div className="ed-field">
+            <label htmlFor="set-scripture-text">Teks ayat / kutipan</label>
+            <textarea id="set-scripture-text" className="ed-textarea" value={f.scripture_text} onChange={e => set('scripture_text', e.target.value)} />
+          </div>
+        </>
+      )}
       <div className="ed-field">
         <label htmlFor="set-hero">Foto hero (tampil penuh di awal undangan) {inv.hero_photo && <a href={inv.hero_photo} target="_blank" rel="noopener noreferrer" style={{ color: '#b8924e' }}>(foto saat ini)</a>}</label>
         <input id="set-hero" className="ed-file" type="file" accept="image/*" onChange={e => setHeroPhoto(e.target.files[0] || null)} />

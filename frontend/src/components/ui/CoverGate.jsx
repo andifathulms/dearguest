@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { useMotionClock } from '../../motion/MotionClockContext.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 /**
  * Full-screen "Buka Undangan" opening gate shown over every theme.
@@ -23,6 +24,7 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
   const openBtnRef = useRef(null)
   const cardRef = useRef(null)
   const couple = invitation.couple || {}
+  const { t } = useCopy()
 
   const dateStr = invitation.wedding_date
     ? format(new Date(invitation.wedding_date), 'EEEE, d MMMM yyyy', { locale: id })
@@ -75,14 +77,14 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
         <path d="M4 5h16v14H4z" />
         <path d="M4 7l8 6 8-6" />
       </svg>
-      <span>Buka Undangan</span>
+      <span>{t('cover.open')}</span>
     </button>
   )
 
   // Identical markup on both paths — only who animates it differs.
   const cardContent = (
     <>
-      <p className="cover-label">The Wedding Of</p>
+      <p className="cover-label">{t('cover.label')}</p>
 
       <h1 className="cover-names">
         <span className="cover-name-bride">{couple.bride_name}</span>
@@ -95,8 +97,8 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
       <div className="cover-divider" aria-hidden="true" />
 
       <div className="cover-guest">
-        <p className="cover-guest-to">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-        <p className="cover-guest-name">{guestName || 'Tamu Undangan'}</p>
+        <p className="cover-guest-to">{t('cover.to')}</p>
+        <p className="cover-guest-name">{guestName || t('cover.guestFallback')}</p>
       </div>
 
       {openButton}
@@ -110,7 +112,7 @@ export default function CoverGate({ invitation, guestName, themeClass }) {
           className={`cover-gate ${themeClass}${useBackdrop ? ' cover-gate--backdrop' : ''}`}
           role="dialog"
           aria-modal="true"
-          aria-label="Pembuka undangan"
+          aria-label={t('cover.aria')}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, y: -30, transition: { duration: 0.8, ease: 'easeInOut' } }}
         >

@@ -3,6 +3,7 @@ import secrets
 from django.db import models
 from datetime import timedelta
 
+from .copy import DEFAULT_VARIANT, validate_variant
 from .themes import DEFAULT_THEME, validate_registered_theme
 from .uploads import SafeFileField, SafeImageField, validate_audio_upload, validate_image_upload
 
@@ -24,6 +25,12 @@ class Invitation(models.Model):
         ('soft-warm', 'Hangat lembut'),
         ('bw', 'Hitam putih'),
     ]
+    # Scripture block: the variant's default verse, the couple's own, or none.
+    SCRIPTURE_MODES = [
+        ('default', 'Ayat bawaan'),
+        ('custom', 'Ayat pilihan sendiri'),
+        ('none', 'Tanpa ayat'),
+    ]
     TIER_CHOICES = [
         ('free', 'Gratis'),
         ('premium', 'Premium'),
@@ -41,6 +48,19 @@ class Invitation(models.Model):
     closing_text = models.TextField(blank=True)
     dress_code = models.CharField(max_length=200, blank=True)
     photo_filter = models.CharField(max_length=12, choices=PHOTO_FILTER_CHOICES, default='none')
+    # Copy variant (shared/copy/copy.json: islam, kristen, katolik, umum, ...). Ids
+    # are data, like themes, so a new variant needs no migration.
+    copy_variant = models.CharField(max_length=20, default=DEFAULT_VARIANT, validators=[validate_variant])
+    scripture_mode = models.CharField(max_length=10, choices=SCRIPTURE_MODES, default='default')
+    scripture_ref = models.CharField(max_length=120, blank=True)
+    scripture_text = models.TextField(blank=True)
+    # Optional address for physical gifts (shown publicly).
+    gift_recipient = models.CharField(max_length=200, blank=True)
+    gift_address = models.TextField(blank=True)
+    gift_phone = models.CharField(max_length=20, blank=True)
+    # Wish moderation: hold every wish for approval, and/or hold those matching a term.
+    wishes_require_approval = models.BooleanField(default=False)
+    wish_blocklist = models.TextField(blank=True, help_text='Satu kata/frasa per baris.')
     hero_photo = SafeImageField(upload_to='hero/', validators=[validate_image_upload], null=True, blank=True)  # full-bleed hero background
     watermark = models.BooleanField(default=True)
     music_file = SafeFileField(upload_to='music/', validators=[validate_audio_upload], null=True, blank=True)

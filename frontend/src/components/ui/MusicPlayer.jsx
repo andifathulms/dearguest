@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 function MusicNoteIcon() {
   return (
@@ -21,6 +22,7 @@ function MutedIcon() {
 }
 
 export default function MusicPlayer({ musicUrl }) {
+  const { t } = useCopy()
   const audioRef = useRef(null)
   const [unmuted, setUnmuted] = useState(false)
 
@@ -59,7 +61,7 @@ export default function MusicPlayer({ musicUrl }) {
       <button
         className={`music-btn ${unmuted ? 'music-playing' : ''}`}
         onClick={toggle}
-        aria-label={unmuted ? 'Matikan musik' : 'Nyalakan musik'}
+        aria-label={unmuted ? t('music.off') : t('music.on')}
       >
         {unmuted ? <MusicNoteIcon /> : <MutedIcon />}
       </button>

@@ -3,6 +3,7 @@ import SectionTitle from './SectionTitle.jsx'
 import { usePack } from '../../themes/packs/_system/ThemeContext.jsx'
 import ThemeAsset from '../../themes/packs/_system/ThemeAsset.jsx'
 import Monogram from '../../themes/packs/_system/Monogram.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 function PersonCard({ name, parents, photo, bio, delay }) {
   const pack = usePack()
@@ -33,10 +34,11 @@ function PersonCard({ name, parents, photo, bio, delay }) {
 
 export default function ProfileSection({ couple }) {
   const pack = usePack()
+  const { t } = useCopy()
   if (!couple) return null
   return (
     <section className="profile-section">
-      <SectionTitle>Mempelai</SectionTitle>
+      <SectionTitle>{t('profile.title')}</SectionTitle>
       <div className="profile-grid">
         <PersonCard
           name={couple.bride_name}

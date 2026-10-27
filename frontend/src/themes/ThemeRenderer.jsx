@@ -1,8 +1,10 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import CoverGate from '../components/ui/CoverGate.jsx'
 import SilentBoundary from '../components/ui/SilentBoundary.jsx'
 import { MotionClockProvider } from '../motion/MotionClockContext.jsx'
 import { getTheme } from './registry.js'
+import { CopyProvider } from '../copy/CopyContext.jsx'
+import { withDefaultTexts } from '../copy/copy.js'
 import LegacyTheme, { loadLegacyTheme } from './legacy/LegacyTheme.jsx'
 
 // Unknown or not-yet-renderable ids fall back to this legacy theme, as before.
@@ -98,7 +100,18 @@ function usePrefersReducedMotion() {
   return reduced
 }
 
-export default function ThemeRenderer({ invitation, guestName, preview = false }) {
+export default function ThemeRenderer({ invitation: raw, guestName, preview = false }) {
+  // Greeting/closing fall back to the couple's variant defaults; every theme
+  // family (legacy, WebGL, packs) reads copy from the provider below.
+  const invitation = useMemo(() => withDefaultTexts(raw), [raw])
+  return (
+    <CopyProvider invitation={invitation}>
+      <ThemeBody invitation={invitation} guestName={guestName} preview={preview} />
+    </CopyProvider>
+  )
+}
+
+function ThemeBody({ invitation, guestName, preview }) {
   const entry = resolveEntry(invitation.theme)
   const Theme = themeComponent(entry)
   const reducedMotion = usePrefersReducedMotion()

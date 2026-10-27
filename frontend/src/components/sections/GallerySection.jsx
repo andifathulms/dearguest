@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
 import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 const container = {
   hidden: {},
@@ -18,6 +19,7 @@ const item = {
 }
 
 function Lightbox({ photos, index, setIndex }) {
+  const { t } = useCopy()
   const open = index !== null
   const go = step => setIndex(i => (i + step + photos.length) % photos.length)
 
@@ -37,22 +39,23 @@ function Lightbox({ photos, index, setIndex }) {
   const photo = photos[index]
   return (
     <div className="lightbox" onClick={() => setIndex(null)}>
-      <button className="lightbox-close" onClick={() => setIndex(null)} aria-label="Tutup">×</button>
+      <button className="lightbox-close" onClick={() => setIndex(null)} aria-label={t('gallery.close')}>×</button>
       {photos.length > 1 && (
-        <button className="lightbox-nav prev" onClick={e => { e.stopPropagation(); go(-1) }} aria-label="Sebelumnya">‹</button>
+        <button className="lightbox-nav prev" onClick={e => { e.stopPropagation(); go(-1) }} aria-label={t('gallery.prev')}>‹</button>
       )}
       <figure className="lightbox-fig" onClick={e => e.stopPropagation()}>
-        <img src={photo.image} alt={photo.caption || 'Foto'} />
+        <img src={photo.image} alt={photo.caption || t('gallery.photo')} />
         {photo.caption && <figcaption>{photo.caption}</figcaption>}
       </figure>
       {photos.length > 1 && (
-        <button className="lightbox-nav next" onClick={e => { e.stopPropagation(); go(1) }} aria-label="Berikutnya">›</button>
+        <button className="lightbox-nav next" onClick={e => { e.stopPropagation(); go(1) }} aria-label={t('gallery.next')}>›</button>
       )}
     </div>
   )
 }
 
 export default function GallerySection({ photos }) {
+  const { t } = useCopy()
   const [index, setIndex] = useState(null)
   const gridRef = useRef(null)
   // Slow ken-burns drift on themes with a motion clock. Drives the <img>
@@ -62,7 +65,7 @@ export default function GallerySection({ photos }) {
   if (!photos || photos.length === 0) return null
   return (
     <section className="gallery-section">
-      <SectionTitle>Galeri</SectionTitle>
+      <SectionTitle>{t('gallery.title')}</SectionTitle>
       <motion.div
         className="gallery-grid"
         ref={gridRef}
@@ -75,7 +78,7 @@ export default function GallerySection({ photos }) {
           <motion.div key={photo.id} className="gallery-item" variants={item}>
             <img
               src={photo.image}
-              alt={photo.caption || 'Foto'}
+              alt={photo.caption || t('gallery.photo')}
               loading="lazy"
               style={{ cursor: 'zoom-in' }}
               onClick={() => setIndex(i)}

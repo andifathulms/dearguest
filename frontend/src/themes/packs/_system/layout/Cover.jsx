@@ -3,6 +3,7 @@ import { id } from 'date-fns/locale'
 import ThemeAsset from '../ThemeAsset.jsx'
 import Monogram from '../Monogram.jsx'
 import { usePack } from '../ThemeContext.jsx'
+import { useCopy } from '../../../../copy/CopyContext.jsx'
 
 // A name split into per-letter spans so `css` openings can type it on.
 // The visible text stays a single readable string for assistive tech.
@@ -21,6 +22,7 @@ function TypedName({ text, offset, step }) {
 // What every cover says, whatever the layout: monogram, names, date, the
 // guest's name from ?to= on its own line, and the open button.
 function CoverContent({ invitation, guestName, openButton }) {
+  const { t } = useCopy()
   const couple = invitation.couple || {}
   const bride = couple.bride_name || ''
   const groom = couple.groom_name || ''
@@ -33,7 +35,7 @@ function CoverContent({ invitation, guestName, openButton }) {
   return (
     <div className="pk-cover-content">
       <Monogram couple={couple} className="pk-op-late" />
-      <p className="cover-label pk-op-late" style={{ '--late-i': 0 }}>The Wedding Of</p>
+      <p className="cover-label pk-op-late" style={{ '--late-i': 0 }}>{t('cover.label')}</p>
       <h1 className="cover-names">
         <TypedName text={bride} offset={0} step={step} />
         <span className="cover-amp"><TypedName text="&" offset={bride.length} step={step} /></span>
@@ -41,8 +43,8 @@ function CoverContent({ invitation, guestName, openButton }) {
       </h1>
       {date && <p className="cover-date pk-op-late" style={{ '--late-i': 1 }}>{date}</p>}
       <div className="cover-guest pk-op-late" style={{ '--late-i': 2 }}>
-        <p className="cover-guest-to">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-        <p className="cover-guest-name">{guestName || 'Tamu Undangan'}</p>
+        <p className="cover-guest-to">{t('cover.to')}</p>
+        <p className="cover-guest-name">{guestName || t('cover.guestFallback')}</p>
       </div>
       <div className="pk-op-late" style={{ '--late-i': 3 }}>{openButton}</div>
     </div>

@@ -3,6 +3,8 @@ import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { usePack } from '../../themes/packs/_system/ThemeContext.jsx'
 import ThemeAsset from '../../themes/packs/_system/ThemeAsset.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
+import { blessingFor } from '../../copy/copy.js'
 
 // In a theme pack the photo is a real <img fetchpriority="high"> (the hero is
 // the LCP element) with the pack's art slots around it. Legacy themes keep
@@ -52,6 +54,10 @@ export default function HeroSection({ brideName, groomName, weddingDate, heroPho
 }
 
 function HeroContent({ brideName, groomName, formatted }) {
+  const { t, variant } = useCopy()
+  // The blessing line is the variant's (islam: the Bismillah, verbatim from
+  // Tanzil); other variants have none.
+  const blessing = blessingFor(variant)
   return (
     <>
       <motion.div
@@ -60,8 +66,8 @@ function HeroContent({ brideName, groomName, formatted }) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: 'easeOut' }}
       >
-        <p className="hero-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
-        <p className="hero-label">We Are Getting Married</p>
+        {blessing && <p className="hero-bismillah" lang="ar" dir="rtl">{blessing.arabic}</p>}
+        <p className="hero-label">{t('hero.label')}</p>
         <span className="hero-ornament" aria-hidden="true" />
         <motion.h1
           className="hero-names"

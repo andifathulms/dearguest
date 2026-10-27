@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import PaymentLogo from '../ui/PaymentLogo.jsx'
-import SectionTitle, { useEmoji } from './SectionTitle.jsx'
+import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
-function typeLabel(account) {
-  if (account.account_type === 'ewallet') return 'Nomor E-Wallet'
-  if (account.account_type === 'qris') return 'Scan QRIS'
-  return 'Nomor Rekening'
+function typeLabel(account, t) {
+  if (account.account_type === 'ewallet') return t('gift.typeEwallet')
+  if (account.account_type === 'qris') return t('gift.typeQris')
+  return t('gift.typeBank')
 }
 
 function BankCard({ account }) {
+  const { t } = useCopy()
   const [copied, setCopied] = useState(false)
   const isQris = account.account_type === 'qris'
 
@@ -29,7 +31,7 @@ function BankCard({ account }) {
       transition={{ duration: 0.5 }}
     >
       <div className="bank-logo-wrap"><PaymentLogo name={account.bank_name} /></div>
-      <p className="bank-name">{account.bank_name || typeLabel(account)}</p>
+      <p className="bank-name">{account.bank_name || typeLabel(account, t)}</p>
 
       {isQris ? (
         account.qris_image && (
@@ -43,11 +45,11 @@ function BankCard({ account }) {
         <p className="bank-number">{account.account_number}</p>
       )}
 
-      <p className="bank-holder">a.n. {account.account_name}</p>
+      <p className="bank-holder">{t('gift.holder')} {account.account_name}</p>
 
       {!isQris && account.account_number && (
         <button className="bank-copy-btn" onClick={handleCopy}>
-          {copied ? 'Tersalin ✓' : 'Salin Nomor'}
+          {copied ? `${t('gift.copied')} ✓` : t('gift.copy')}
         </button>
       )}
     </motion.div>
@@ -55,15 +57,14 @@ function BankCard({ account }) {
 }
 
 export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
-  const gift = useEmoji('🎁 ')
+  const { t } = useCopy()
   const hasBanks = bankAccounts && bankAccounts.length > 0
   if (!hasBanks && !wishlistUrl) return null
   return (
     <section className="amplod-section">
-      <SectionTitle>Amplop Digital</SectionTitle>
+      <SectionTitle>{t('gift.title')}</SectionTitle>
       <p className="amplod-desc">
-        Doa restu Anda merupakan karunia yang berarti. Bagi yang ingin memberikan tanda kasih,
-        dapat melalui rekening, e-wallet, atau QRIS berikut:
+        {t('gift.intro')}
       </p>
       {hasBanks && (
         <div className="bank-cards">
@@ -75,7 +76,7 @@ export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
       {wishlistUrl && (
         <div className="amplod-wishlist-wrap">
           <a className="amplod-wishlist" href={wishlistUrl} target="_blank" rel="noopener noreferrer">
-            {gift}Lihat Wishlist Kami →
+            {t('gift.wishlist')} →
           </a>
         </div>
       )}

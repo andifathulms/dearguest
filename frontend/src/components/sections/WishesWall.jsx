@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { id } from 'date-fns/locale'
 import api from '../../api/client.js'
-import SectionTitle, { useEmoji } from './SectionTitle.jsx'
+import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 const POLL_MS = 30000
 
@@ -18,7 +19,7 @@ export default function WishesWall({ slug }) {
   const [nextPage, setNextPage] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const heart = useEmoji(' 🤍')
+  const { t } = useCopy()
 
   async function fetchLatest() {
     try {
@@ -63,11 +64,11 @@ export default function WishesWall({ slug }) {
 
   return (
     <section className="wishes-section">
-      <SectionTitle>Doa &amp; Ucapan</SectionTitle>
+      <SectionTitle>{t('wishes.title')}</SectionTitle>
       {loading ? (
-        <p className="wishes-loading">Memuat ucapan...</p>
+        <p className="wishes-loading">{t('wishes.loading')}</p>
       ) : wishes.length === 0 ? (
-        <p className="wishes-empty">Jadilah yang pertama memberikan doa{heart}</p>
+        <p className="wishes-empty">{t('wishes.empty')}</p>
       ) : (
         <motion.div
           className="wishes-list"
@@ -103,7 +104,7 @@ export default function WishesWall({ slug }) {
         // Reuses the themed secondary-button style every theme already ships.
         <div className="wa-share">
           <button type="button" className="wa-share-btn" onClick={loadMore} disabled={loadingMore}>
-            {loadingMore ? 'Memuat…' : 'Lihat ucapan lainnya'}
+            {loadingMore ? t('wishes.loading') : t('wishes.more')}
           </button>
         </div>
       )}

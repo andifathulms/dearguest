@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import SectionTitle from './SectionTitle.jsx'
+import { useCopy } from '../../copy/CopyContext.jsx'
 
 // Convert common YouTube watch links into an embeddable URL; others fall back to a link button.
 function toEmbed(url) {
@@ -19,6 +20,7 @@ function toEmbed(url) {
 }
 
 export default function LiveStreamSection({ url }) {
+  const { t } = useCopy()
   if (!url) return null
   const embed = toEmbed(url)
 
@@ -30,9 +32,9 @@ export default function LiveStreamSection({ url }) {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
-      <SectionTitle>Live Streaming</SectionTitle>
+      <SectionTitle>{t('livestream.title')}</SectionTitle>
       <p className="amplod-desc">
-        Tidak dapat hadir secara langsung? Saksikan momen bahagia kami melalui siaran langsung.
+        {t('livestream.intro')}
       </p>
       {embed ? (
         <div className="maps-grid">
@@ -43,14 +45,14 @@ export default function LiveStreamSection({ url }) {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               loading="lazy"
-              title="Live streaming pernikahan"
+              title={t('livestream.title')}
             />
           </div>
         </div>
       ) : (
         <div className="wa-share">
           <a className="wa-share-btn" href={url} target="_blank" rel="noopener noreferrer">
-            Tonton Live Streaming →
+            {t('livestream.watch')} →
           </a>
         </div>
       )}

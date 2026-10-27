@@ -41,6 +41,7 @@ export default function DashboardRSVP() {
   const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [couple, setCouple] = useState({ bride_name: '', groom_name: '' })
+  const [variant, setVariant] = useState('umum')
   const [tab, setTab] = useState('rsvp')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -61,7 +62,7 @@ export default function DashboardRSVP() {
         }
       })
     api.get(`/invitations/${slug}/`)
-      .then(res => setCouple(res.data.couple || { bride_name: '', groom_name: '' }))
+      .then(res => { setCouple(res.data.couple || { bride_name: '', groom_name: '' }); setVariant(res.data.copy_variant || 'umum') })
       .catch(() => {})
   }, [slug, navigate])
 
@@ -98,7 +99,7 @@ export default function DashboardRSVP() {
         </div>
 
         {tab === 'guests' ? (
-          <GuestManager slug={slug} brideName={couple.bride_name} groomName={couple.groom_name} />
+          <GuestManager slug={slug} brideName={couple.bride_name} groomName={couple.groom_name} variant={variant} />
         ) : (
           <>
             <div className="dr-stats">

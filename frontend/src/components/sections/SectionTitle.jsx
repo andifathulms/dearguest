@@ -12,8 +12,3 @@ export default function SectionTitle({ children }) {
     </>
   )
 }
-
-// Emoji are part of the legacy look; packs set their own ornaments instead.
-export function useEmoji(emoji) {
-  return usePack() ? '' : emoji
-}
