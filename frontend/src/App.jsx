@@ -17,7 +17,7 @@ const InvitationPage = lazy(() => import('./pages/InvitationPage.jsx'))
 
 function Loading() {
   return (
-    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', color: '#8a7f74', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', color: '#8a7f74', fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
       Memuat…
     </div>
   )

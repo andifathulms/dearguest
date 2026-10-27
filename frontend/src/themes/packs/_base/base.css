@@ -327,6 +327,9 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 .pk-root .rsvp-submit { background: var(--dg-ink); color: var(--dg-bg); width: 100%; }
 .pk-root .wa-share { padding: var(--dg-space-4) var(--dg-gutter); text-align: center; }
 
+/* index.css sets the payment pills in Inter; packs use their own body face. */
+.pk-root .pay-logo { font-family: var(--dg-font-body); }
+
 /* RSVP */
 .pk-root .rsvp-form { display: grid; gap: var(--dg-space-3); max-width: 28rem; margin: 0 auto; text-align: left; }
 .pk-root :is(.rsvp-input, .rsvp-textarea) {

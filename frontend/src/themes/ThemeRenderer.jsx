@@ -16,11 +16,16 @@ const ownComponents = import.meta.glob('./*/index.jsx')
 const packModules = import.meta.glob('./packs/*/index.js')
 const packModule = entry => packModules[`./packs/${entry.pack.dir}/index.js`]
 
-// Start fetching the pack's primary fonts as soon as its chunk arrives,
-// instead of waiting for the first text that uses them.
-function preloadFonts(pack) {
-  for (const file of pack.manifest.fonts?.preload || []) {
-    const href = pack.urls[file]
+// Each pack's manifest and hashed font URLs are known up front (a few hundred
+// bytes of JSON and strings, no font data), so the primary fonts can start
+// downloading in parallel with the pack's chunk instead of after it.
+const packManifests = import.meta.glob('./packs/*/theme.json', { eager: true, import: 'default' })
+const packFontUrls = import.meta.glob('./packs/*/fonts/*.woff2', { eager: true, query: '?url', import: 'default' })
+
+function preloadFonts(entry) {
+  const { dir } = entry.pack
+  for (const file of packManifests[`./packs/${dir}/theme.json`]?.fonts?.preload || []) {
+    const href = packFontUrls[`./packs/${dir}/${file}`]
     if (!href || document.head.querySelector(`link[rel="preload"][href="${href}"]`)) continue
     const link = Object.assign(document.createElement('link'), { rel: 'preload', as: 'font', type: 'font/woff2', href, crossOrigin: 'anonymous' })
     document.head.appendChild(link)
@@ -32,13 +37,15 @@ function preloadFonts(pack) {
 const resolved = new Map()
 function themeComponent(entry) {
   if (!resolved.has(entry.id) && entry.kind === 'pack') {
-    resolved.set(entry.id, lazy(() => Promise.all([
-      import('./packs/_system/PackTheme.jsx'),
-      packModule(entry)(),
-    ]).then(([{ default: PackTheme }, { default: pack }]) => {
-      preloadFonts(pack)
-      return { default: props => <PackTheme entry={entry} pack={pack} {...props} /> }
-    })))
+    resolved.set(entry.id, lazy(() => {
+      preloadFonts(entry)
+      return Promise.all([
+        import('./packs/_system/PackTheme.jsx'),
+        packModule(entry)(),
+      ]).then(([{ default: PackTheme }, { default: pack }]) => ({
+        default: props => <PackTheme entry={entry} pack={pack} {...props} />,
+      }))
+    }))
   }
   if (!resolved.has(entry.id)) {
     const { dir, ownComponent } = entry.legacy

@@ -2,6 +2,14 @@
 # envsubst step; only ${DOMAIN} and ${MEDIA_DOMAIN} are substituted
 # (NGINX_ENVSUBST_FILTER), so nginx's own $variables are left alone.
 
+# Compress text responses (JS, CSS, JSON, SVG): roughly 3x smaller on mobile data.
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_comp_level 6;
+gzip_proxied any;
+gzip_types text/css application/javascript application/json image/svg+xml text/plain;
+
 # Uploads that aren't an allowed image/audio type are downloaded, never rendered.
 map $uri $media_disposition {
     default                                   "attachment";

@@ -213,7 +213,9 @@ body.cover-open {
   padding: 2rem;
   background: radial-gradient(ellipse at center, #faf6f1, #f0e7da);
   color: #6b5f50;
-  font-family: 'Inter', sans-serif;
+  /* System fonts: this screen shows before any theme loads, and a web font
+     here would download on every invitation whatever its theme. */
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 .inv-loader { display: flex; gap: 0.5rem; margin-bottom: 1.4rem; }
 .inv-loader span {
@@ -227,10 +229,10 @@ body.cover-open {
   0%, 80%, 100% { transform: scale(0.5); opacity: 0.4; }
   40% { transform: scale(1); opacity: 1; }
 }
-.inv-status-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; letter-spacing: 0.02em; }
+.inv-status-text { font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 1.1rem; letter-spacing: 0.02em; }
 .inv-status-mark { color: #c4847a; margin-bottom: 1.2rem; }
 .inv-status-mark svg { width: 44px; height: 44px; }
-.inv-status-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 1.4rem; color: #3d342b; }
+.inv-status-title { font-family: Georgia, 'Times New Roman', serif; font-size: 1.4rem; margin-bottom: 1.4rem; color: #3d342b; }
 .inv-status-link {
   font-size: 0.82rem; letter-spacing: 0.04em; text-decoration: none;
   color: #b8924e; border-bottom: 1px solid currentColor; padding-bottom: 2px;
