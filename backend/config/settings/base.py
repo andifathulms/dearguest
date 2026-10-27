@@ -69,7 +69,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = '/media/'
+# User uploads can be served from their own origin (e.g. https://media.example.com)
+# so an uploaded file can never run script on the app's origin. Unset = same origin.
+MEDIA_URL_ORIGIN = config('MEDIA_URL_ORIGIN', default='').rstrip('/')
+MEDIA_URL = f'{MEDIA_URL_ORIGIN}/media/'
 MEDIA_ROOT = config('MEDIA_ROOT', default=str(BASE_DIR / 'media'))
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

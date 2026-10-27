@@ -3,6 +3,8 @@ import secrets
 from django.db import models
 from datetime import timedelta
 
+from .uploads import SafeUploadTo, validate_audio_upload, validate_image_upload
+
 
 def generate_guest_code():
     """Short, URL-safe, unique code used in per-guest links and QR codes."""
@@ -62,9 +64,9 @@ class Invitation(models.Model):
     opening_text = models.TextField(blank=True)
     closing_text = models.TextField(blank=True)
     dress_code = models.CharField(max_length=200, blank=True)
-    hero_photo = models.ImageField(upload_to='hero/', null=True, blank=True)  # full-bleed hero background
+    hero_photo = models.ImageField(upload_to=SafeUploadTo('hero/', 'hero_photo'), validators=[validate_image_upload], null=True, blank=True)  # full-bleed hero background
     watermark = models.BooleanField(default=True)
-    music_file = models.FileField(upload_to='music/', null=True, blank=True)
+    music_file = models.FileField(upload_to=SafeUploadTo('music/', 'music_file'), validators=[validate_audio_upload], null=True, blank=True)
     music_preset = models.ForeignKey('MusicPreset', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     livestream_url = models.URLField(blank=True)  # YouTube/Instagram/Zoom link for remote guests
     wishlist_url = models.URLField(blank=True)  # gift registry / wishlist link
@@ -122,11 +124,11 @@ class Couple(models.Model):
     invitation = models.OneToOneField(Invitation, on_delete=models.CASCADE, related_name='couple')
     bride_name = models.CharField(max_length=200)
     bride_parents = models.CharField(max_length=300)
-    bride_photo = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    bride_photo = models.ImageField(upload_to=SafeUploadTo('profiles/', 'bride_photo'), validators=[validate_image_upload], null=True, blank=True)
     bride_bio = models.TextField(blank=True)
     groom_name = models.CharField(max_length=200)
     groom_parents = models.CharField(max_length=300)
-    groom_photo = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    groom_photo = models.ImageField(upload_to=SafeUploadTo('profiles/', 'groom_photo'), validators=[validate_image_upload], null=True, blank=True)
     groom_bio = models.TextField(blank=True)
 
     def __str__(self):
@@ -167,7 +169,7 @@ class Story(models.Model):
 
 class Photo(models.Model):
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='photos')
-    image = models.ImageField(upload_to='gallery/')
+    image = models.ImageField(upload_to=SafeUploadTo('gallery/', 'image'), validators=[validate_image_upload])
     caption = models.CharField(max_length=300, blank=True)
     order = models.PositiveIntegerField(default=0)
 
@@ -189,7 +191,7 @@ class BankAccount(models.Model):
     bank_name = models.CharField(max_length=100)  # bank name, e-wallet name (GoPay/OVO/DANA), or "QRIS"
     account_number = models.CharField(max_length=50, blank=True)  # phone for e-wallet; empty for QRIS
     account_name = models.CharField(max_length=200)
-    qris_image = models.ImageField(upload_to='qris/', null=True, blank=True)  # scannable QRIS image
+    qris_image = models.ImageField(upload_to=SafeUploadTo('qris/', 'qris_image'), validators=[validate_image_upload], null=True, blank=True)  # scannable QRIS image
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -219,7 +221,7 @@ class RSVP(models.Model):
 class MusicPreset(models.Model):
     """Royalty-free background tracks (uploaded by admin) couples can pick from."""
     title = models.CharField(max_length=120)
-    audio = models.FileField(upload_to='music_presets/')
+    audio = models.FileField(upload_to=SafeUploadTo('music_presets/', 'audio'), validators=[validate_audio_upload])
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
