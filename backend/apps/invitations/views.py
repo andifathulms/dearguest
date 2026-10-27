@@ -2,6 +2,7 @@ from datetime import date
 from django.core.cache import cache
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.views import APIView
@@ -42,6 +43,28 @@ def _get_invitation_or_error(slug):
     return invitation, None
 
 
+def is_public(invitation):
+    """Live and not past its expiry: guests may see it."""
+    return invitation.is_active and date.today() <= invitation.expires_at
+
+
+def _public_or_404(slug, user=None):
+    """Invitation for guest-facing endpoints. Drafts and expired invitations
+    look exactly like missing ones (404), except to their owner or staff, so
+    the editor's live preview still works."""
+    invitation = Invitation.objects.filter(slug=slug).first()
+    if invitation and (is_public(invitation) or (
+        user is not None and user.is_authenticated
+        and (user.is_staff or invitation.couple_user_id == user.id)
+    )):
+        return invitation, None
+    return None, Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class WishesPagination(PageNumberPagination):
+    page_size = 20
+
+
 class InvitationDetailView(generics.RetrieveAPIView):
     serializer_class = InvitationPublicSerializer
     permission_classes = [AllowAny]
@@ -66,7 +89,8 @@ class RSVPCreateView(generics.CreateAPIView):
         return request.META.get('REMOTE_ADDR', '')
 
     def create(self, request, slug=None, *args, **kwargs):
-        invitation, error = _get_invitation_or_error(slug)
+        # Guests can only post to public invitations; no owner exception here.
+        invitation, error = _public_or_404(slug)
         if error:
             return error
 
@@ -124,11 +148,16 @@ class RSVPListView(generics.ListAPIView):
 class WishesListView(generics.ListAPIView):
     serializer_class = WishSerializer
     permission_classes = [AllowAny]
+    pagination_class = WishesPagination
+
+    def list(self, request, *args, **kwargs):
+        self.invitation, error = _public_or_404(self.kwargs['slug'], request.user)
+        if error:
+            return error
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
-        return RSVP.objects.filter(
-            invitation__slug=self.kwargs['slug'],
-        ).exclude(wishes='')
+        return self.invitation.rsvps.exclude(wishes='').order_by('-submitted_at', '-id')
 
 
 class MusicPresetListView(generics.ListAPIView):

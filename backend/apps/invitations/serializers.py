@@ -38,7 +38,7 @@ class RSVPCreateSerializer(serializers.ModelSerializer):
 class WishSerializer(serializers.ModelSerializer):
     class Meta:
         model = RSVP
-        fields = ['guest_name', 'wishes', 'submitted_at']
+        fields = ['id', 'guest_name', 'wishes', 'submitted_at']
 
 
 class GuestSerializer(serializers.ModelSerializer):

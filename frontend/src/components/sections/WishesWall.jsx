@@ -4,14 +4,25 @@ import { formatDistanceToNow } from 'date-fns'
 import { id } from 'date-fns/locale'
 import api from '../../api/client.js'
 
+const POLL_MS = 30000
+
+// Newest first; a poll of page 1 is merged in front of what's already loaded.
+function mergeNewest(fresh, current) {
+  const seen = new Set(fresh.map(w => w.id))
+  return [...fresh, ...current.filter(w => !seen.has(w.id))]
+}
+
 export default function WishesWall({ slug }) {
   const [wishes, setWishes] = useState([])
+  const [nextPage, setNextPage] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
 
-  async function fetchWishes() {
+  async function fetchLatest() {
     try {
       const res = await api.get(`/invitations/${slug}/wishes/`)
-      setWishes((res.data || []).slice(0, 20))
+      setWishes(current => mergeNewest(res.data.results || [], current))
+      setNextPage(page => page ?? (res.data.next ? 2 : null))
     } catch {
       // silent
     } finally {
@@ -19,11 +30,34 @@ export default function WishesWall({ slug }) {
     }
   }
 
+  async function loadMore() {
+    if (!nextPage) return
+    setLoadingMore(true)
+    try {
+      const res = await api.get(`/invitations/${slug}/wishes/?page=${nextPage}`)
+      setWishes(current => mergeNewest(current, res.data.results || []))
+      setNextPage(res.data.next ? nextPage + 1 : null)
+    } catch {
+      // silent
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
   useEffect(() => {
-    fetchWishes()
-    const interval = setInterval(fetchWishes, 30000)
-    return () => clearInterval(interval)
-  }, [slug])
+    // Poll only while the tab is visible; catch up as soon as it comes back.
+    let interval = null
+    const start = () => { if (!interval) interval = setInterval(fetchLatest, POLL_MS) }
+    const stop = () => { clearInterval(interval); interval = null }
+    function onVisibility() {
+      if (document.hidden) stop()
+      else { fetchLatest(); start() }
+    }
+    fetchLatest()
+    if (!document.hidden) start()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => { stop(); document.removeEventListener('visibilitychange', onVisibility) }
+  }, [slug]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <section className="wishes-section">
@@ -46,7 +80,7 @@ export default function WishesWall({ slug }) {
           <AnimatePresence>
             {wishes.map((wish, i) => (
               <motion.div
-                key={`${wish.guest_name}-${wish.submitted_at}`}
+                key={wish.id}
                 className="wish-card"
                 variants={{
                   hidden: { opacity: 0, y: 20 },
@@ -62,6 +96,14 @@ export default function WishesWall({ slug }) {
             ))}
           </AnimatePresence>
         </motion.div>
+      )}
+      {nextPage && (
+        // Reuses the themed secondary-button style every theme already ships.
+        <div className="wa-share">
+          <button type="button" className="wa-share-btn" onClick={loadMore} disabled={loadingMore}>
+            {loadingMore ? 'Memuat…' : 'Lihat ucapan lainnya'}
+          </button>
+        </div>
       )}
     </section>
   )
