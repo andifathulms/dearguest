@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from sync_themes import CANONICAL, COPIES, ROOT, render_copy  # noqa: E402
+from sync_themes import CANONICAL, FILES, ROOT, render_copy  # noqa: E402
 
 THEMES_DIR = ROOT / 'frontend' / 'src' / 'themes'
 PACKS_DIR = THEMES_DIR / 'packs'
@@ -65,13 +65,52 @@ def err(msg):
 
 
 def check_copies():
-    expected = render_copy()
-    for path in COPIES:
-        rel = path.relative_to(ROOT)
-        if not path.exists():
-            err(f'{rel} is missing — run `make themes`')
-        elif path.read_text(encoding='utf-8') != expected:
-            err(f'{rel} differs from shared/themes.json — run `make themes`')
+    for canonical, copies in FILES.items():
+        expected = render_copy(canonical)
+        for path in copies:
+            rel = path.relative_to(ROOT)
+            if not path.exists():
+                err(f'{rel} is missing — run `make sync`')
+            elif path.read_text(encoding='utf-8') != expected:
+                err(f'{rel} differs from {canonical.relative_to(ROOT)} — run `make sync`')
+
+
+# Keys every variant must define itself (no base fallback): they're the
+# religion-specific lines.
+VARIANT_KEYS = ['_label', '_blessing', '_scripture', '_defaultEvents', 'greeting.default', 'closing.default',
+                'countdown.passed', 'share.greeting']
+EVENT_TYPES = ['akad', 'pemberkatan', 'sakramen', 'resepsi', 'adat', 'ngunduh_mantu', 'lainnya']
+
+
+def check_copy():
+    copy = json.loads((ROOT / 'shared' / 'copy' / 'copy.json').read_text(encoding='utf-8'))
+    scripture = json.loads((ROOT / 'shared' / 'copy' / 'scripture.json').read_text(encoding='utf-8'))
+    ids = {e['id'] for e in scripture['entries']}
+    for e in scripture['entries']:
+        if e.get('verified') is not True and e.get('verified') is not False:
+            err(f'scripture {e["id"]}: "verified" must be true or false')
+        if not e.get('source'):
+            err(f'scripture {e["id"]}: source missing')
+    for locale, data in copy['locales'].items():
+        base, variants = data['base'], data['variants']
+        if list(variants) != copy['variantsOrder']:
+            err(f'copy {locale}: variants {list(variants)} differ from variantsOrder')
+        for t in EVENT_TYPES:
+            if f'events.type.{t}' not in base:
+                err(f'copy {locale}: base is missing events.type.{t}')
+        for name, v in variants.items():
+            for key in VARIANT_KEYS:
+                if key not in v:
+                    err(f'copy {locale}/{name}: missing variant key {key}')
+            for key in v:
+                if not key.startswith('_') and key not in base and key not in ('greeting.default', 'closing.default'):
+                    err(f'copy {locale}/{name}: key {key} is not in base (typo?)')
+            for ref in (v.get('_blessing'), v.get('_scripture')):
+                if ref and ref not in ids:
+                    err(f'copy {locale}/{name}: scripture id {ref!r} not in scripture.json')
+            for t in v.get('_defaultEvents', []):
+                if t not in EVENT_TYPES:
+                    err(f'copy {locale}/{name}: unknown default event type {t!r}')
 
 
 def check_entries(themes):
@@ -160,6 +199,7 @@ def main():
     data = json.loads(CANONICAL.read_text(encoding='utf-8'))
     check_copies()
     check_entries(data.get('themes', []))
+    check_copy()
     if errors:
         print('Theme registry check FAILED:')
         for e in errors:

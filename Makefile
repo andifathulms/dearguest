@@ -1,12 +1,18 @@
 # DearGuest developer shortcuts. Requires the dev stack (`docker compose up -d`).
 
-.PHONY: themes check test visual visual-update
+.PHONY: sync themes check test test-unit visual visual-update scripture
 
-# Regenerate the backend/frontend copies of shared/themes.json.
-themes:
+# Regenerate the backend/frontend copies of shared/ data (themes, copy, scripture).
+sync:
 	python3 scripts/sync_themes.py
 
-# Registry consistency + theme-pack token contract.
+themes: sync
+
+# Rebuild shared/copy/scripture.json from Tanzil + SABDA (needs network). Then `make sync`.
+scripture:
+	python3 scripts/build_scripture.py
+
+# Registry + copy consistency, theme-pack token contract.
 check:
 	python3 scripts/check_themes.py
 
