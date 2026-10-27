@@ -85,6 +85,18 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
     }
   }
 
+  // "untuk N orang": empty = the invitation-wide limit (10). Enforced by the server.
+  async function setMaxPax(g, value) {
+    const max_pax = value === '' ? null : Number(value)
+    if (max_pax === g.max_pax) return
+    try {
+      await api.patch(`/invitations/${slug}/guests/${g.id}/`, { max_pax })
+      await load()
+    } catch {
+      showToast('Jumlah orang harus 1–10')
+    }
+  }
+
   async function remove(g) {
     if (!window.confirm(`Hapus ${g.name} dari daftar tamu?`)) return
     try {
@@ -166,6 +178,14 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
                   {g.checked_in ? ' · check-in ✓' : ''}
                 </div>
               </div>
+              <label className="gm-pax" title="Berapa orang yang diundang dengan link ini">
+                untuk
+                <select value={g.max_pax ?? ''} onChange={e => setMaxPax(g, e.target.value)} aria-label={`Jumlah orang untuk ${g.name}`}>
+                  <option value="">maks. 10</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
+                orang
+              </label>
               <div className="gm-row-actions">
                 <button className="gm-btn" onClick={() => copyLink(g)}>{ic.link} Link</button>
                 <button className="gm-btn gm-btn-wa" onClick={() => sendWa(g)}>{ic.wa} Kirim</button>

@@ -1,5 +1,6 @@
 from datetime import date
 from django.core.cache import cache
+from django.db import IntegrityError, transaction
 from django.http import HttpResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -7,9 +8,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.views import APIView
-from .models import Invitation, RSVP, Guest, Coupon, MusicPreset
+from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, normalise_whatsapp
 from .serializers import MusicPresetSerializer
-from . import ics, maps
+from . import csv_export, ics, maps, moderation
 from .throttling import client_ip
 from .serializers import (
     InvitationPublicSerializer,
@@ -102,18 +103,69 @@ class RSVPCreateView(generics.CreateAPIView):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
         # Link to a pre-registered guest if they came via a personal link (?g=code).
         guest = None
         guest_code = (request.data.get('guest_code') or '').strip()
         if guest_code:
             guest = Guest.objects.filter(invitation=invitation, code=guest_code).first()
-        serializer.save(invitation=invitation, guest=guest)
+
+        limit = (guest.max_pax if guest else None) or MAX_PAX
+        if data['attending'] and data.get('pax', 1) > limit:
+            return Response({'pax': [f'Undangan ini untuk {limit} orang.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                rsvp, updated = self._upsert(invitation, guest, data)
+        except IntegrityError:   # a concurrent first answer won the race; update it instead
+            with transaction.atomic():
+                rsvp, updated = self._upsert(invitation, guest, data)
 
         # add() + incr() is atomic in Redis, so concurrent posts can't both slip under the limit.
         cache.add(cache_key, 0, timeout=3600)
         cache.incr(cache_key)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        body = {**RSVPCreateSerializer(rsvp).data, 'updated': updated, 'wish_status': rsvp.wish_status}
+        return Response(body, status=status.HTTP_200_OK if updated else status.HTTP_201_CREATED)
+
+    @staticmethod
+    def _upsert(invitation, guest, data):
+        """One answer per guest: by guest code, else by WhatsApp number."""
+        rows = RSVP.objects.select_for_update().filter(invitation=invitation)
+        if guest:
+            existing = rows.filter(guest=guest).first()
+        else:
+            norm = normalise_whatsapp(data.get('whatsapp', ''))
+            existing = rows.filter(guest__isnull=True, whatsapp_norm=norm).first() if norm else None
+        wishes = data.get('wishes', '')
+        if existing:
+            if not wishes.strip():
+                # A guest re-answering (e.g. now not attending) usually leaves the
+                # wish box empty; that keeps the earlier wish rather than erasing it.
+                data = {k: v for k, v in data.items() if k != 'wishes'}
+            elif wishes != existing.wishes:   # unchanged text keeps its moderation state
+                existing.wish_status = moderation.status_for(invitation, wishes)
+            for field, value in data.items():
+                setattr(existing, field, value)
+            existing.save()
+            return existing, True
+        rsvp = RSVP.objects.create(invitation=invitation, guest=guest, wish_status=moderation.status_for(invitation, wishes), **data)
+        return rsvp, False
+
+
+class PublicGuestView(APIView):
+    """What the RSVP form needs from a personal link (?g=code): the name and
+    how many people the invitation is for. Nothing else about the guest list."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, slug, code):
+        invitation, error = _public_or_404(slug, request.user)
+        if error:
+            return error
+        guest = invitation.guests.filter(code=code).first()
+        if not guest:
+            return Response({'detail': 'Tamu tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'name': guest.name, 'max_pax': guest.max_pax or MAX_PAX})
 
 
 class RSVPListView(generics.ListAPIView):
@@ -121,7 +173,7 @@ class RSVPListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return RSVP.objects.filter(invitation__slug=self.kwargs['slug'])
+        return RSVP.objects.filter(invitation__slug=self.kwargs['slug']).select_related('guest')
 
     def list(self, request, slug=None, *args, **kwargs):
         try:
@@ -140,8 +192,22 @@ class RSVPListView(generics.ListAPIView):
             'total_hadir': attending.count(),
             'total_tidak_hadir': queryset.filter(attending=False).count(),
             'total_pax': sum(r.pax for r in attending),
+            'wishes_pending': queryset.filter(wish_status='pending').exclude(wishes='').count(),
         }
         return Response({'rsvps': serializer.data, 'stats': stats})
+
+
+class RSVPCsvView(APIView):
+    """Owner-only spreadsheet of the answers (see csv_export.py)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, slug):
+        invitation, error = _owner_or_error(request, slug)
+        if error:
+            return error
+        response = HttpResponse(csv_export.rsvps_csv(invitation), content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="rsvp-{invitation.slug}.csv"'
+        return response
 
 
 class WishesListView(generics.ListAPIView):
@@ -156,7 +222,7 @@ class WishesListView(generics.ListAPIView):
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.invitation.rsvps.exclude(wishes='').order_by('-submitted_at', '-id')
+        return self.invitation.rsvps.exclude(wishes='').filter(wish_status='visible').order_by('-submitted_at', '-id')
 
 
 class EventCalendarView(APIView):

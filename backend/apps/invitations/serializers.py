@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from rest_framework import serializers
 from . import maps
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, MusicPreset
+from .models import MAX_PAX, Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, MusicPreset
 
 
 class MusicPresetSerializer(serializers.ModelSerializer):
@@ -23,10 +23,14 @@ class MusicPresetSerializer(serializers.ModelSerializer):
 
 
 class RSVPSerializer(serializers.ModelSerializer):
+    guest_code = serializers.CharField(source='guest.code', default='', read_only=True)
+    guest_group = serializers.CharField(source='guest.group', default='', read_only=True)
+
     class Meta:
         model = RSVP
-        fields = ['id', 'guest_name', 'whatsapp', 'attending', 'pax', 'wishes', 'submitted_at']
-        read_only_fields = ['submitted_at']
+        fields = ['id', 'guest_name', 'whatsapp', 'attending', 'pax', 'wishes', 'wish_status',
+                  'guest_code', 'guest_group', 'submitted_at', 'updated_at']
+        read_only_fields = ['submitted_at', 'updated_at', 'wish_status']
 
 
 class RSVPCreateSerializer(serializers.ModelSerializer):
@@ -35,8 +39,8 @@ class RSVPCreateSerializer(serializers.ModelSerializer):
         fields = ['guest_name', 'whatsapp', 'attending', 'pax', 'wishes']
 
     def validate_pax(self, value):
-        if value < 1 or value > 10:
-            raise serializers.ValidationError("Jumlah tamu harus antara 1 dan 10.")
+        if value < 1 or value > MAX_PAX:
+            raise serializers.ValidationError(f"Jumlah tamu harus antara 1 dan {MAX_PAX}.")
         return value
 
 
@@ -46,15 +50,28 @@ class WishSerializer(serializers.ModelSerializer):
         fields = ['id', 'guest_name', 'wishes', 'submitted_at']
 
 
+class OwnerWishSerializer(serializers.ModelSerializer):
+    """The couple's moderation view of a wish; only the status is writable."""
+    class Meta:
+        model = RSVP
+        fields = ['id', 'guest_name', 'wishes', 'wish_status', 'submitted_at', 'updated_at']
+        read_only_fields = ['guest_name', 'wishes', 'submitted_at', 'updated_at']
+
+
 class GuestSerializer(serializers.ModelSerializer):
     responded = serializers.SerializerMethodField()
     attending = serializers.SerializerMethodField()
 
     class Meta:
         model = Guest
-        fields = ['id', 'name', 'whatsapp', 'group', 'code', 'checked_in', 'checked_in_at',
+        fields = ['id', 'name', 'whatsapp', 'group', 'max_pax', 'code', 'checked_in', 'checked_in_at',
                   'responded', 'attending', 'created_at']
         read_only_fields = ['code', 'checked_in_at', 'created_at']
+
+    def validate_max_pax(self, value):
+        if value is not None and not 1 <= value <= MAX_PAX:
+            raise serializers.ValidationError(f'Antara 1 dan {MAX_PAX} orang.')
+        return value
 
     def get_responded(self, obj):
         return obj.rsvps.exists()

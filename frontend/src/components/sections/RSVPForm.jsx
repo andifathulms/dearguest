@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../../api/client.js'
@@ -15,10 +15,22 @@ export default function RSVPForm({ slug }) {
     pax: 1,
     wishes: '',
   })
-  const [submitted, setSubmitted] = useState(false)
+  const [result, setResult] = useState(null)   // { updated, wish_status } once sent
   const { t } = useCopy()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  // A personal link (?g=code) may cap how many people the invitation is for.
+  const [maxPax, setMaxPax] = useState(10)
+
+  useEffect(() => {
+    if (!guestCode) return
+    api.get(`/invitations/${slug}/guest/${encodeURIComponent(guestCode)}/`)
+      .then(({ data }) => {
+        setMaxPax(data.max_pax)
+        setForm(f => ({ ...f, guest_name: f.guest_name || data.name, pax: Math.min(f.pax, data.max_pax) }))
+      })
+      .catch(() => { /* unknown code: the form still works without it */ })
+  }, [slug, guestCode])
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -38,29 +50,31 @@ export default function RSVPForm({ slug }) {
     setLoading(true)
     setError('')
     try {
-      await api.post(`/invitations/${slug}/rsvp/`, {
+      const { data } = await api.post(`/invitations/${slug}/rsvp/`, {
         ...form,
         pax: form.attending ? parseInt(form.pax, 10) : 1,
         guest_code: guestCode,
       })
-      setSubmitted(true)
+      setResult(data)
     } catch (err) {
-      const msg = err.response?.data?.detail || t('rsvp.failed')
-      setError(msg)
+      const data = err.response?.data || {}
+      setError(data.detail || data.pax?.[0] || t('rsvp.failed'))
     } finally {
       setLoading(false)
     }
   }
 
-  if (submitted) {
+  if (result) {
     return (
       <section className="rsvp-section">
         <motion.div
           className="rsvp-success"
+          role="status"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <p>{t('rsvp.thanks')}</p>
+          <p>{t(result.updated ? 'rsvp.updated' : 'rsvp.thanks')}</p>
+          {result.wish_status === 'pending' && <p className="rsvp-pending">{t('wishes.pending')}</p>}
         </motion.div>
       </section>
     )
@@ -117,11 +131,12 @@ export default function RSVPForm({ slug }) {
               type="number"
               name="pax"
               min="1"
-              max="10"
+              max={maxPax}
               aria-label="Jumlah tamu"
               value={form.pax}
               onChange={handleChange}
             />
+            {maxPax < 10 && <p className="rsvp-pax-limit">{t('rsvp.paxLimit', { max: maxPax })}</p>}
           </div>
         )}
         <textarea

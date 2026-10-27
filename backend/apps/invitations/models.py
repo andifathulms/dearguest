@@ -262,18 +262,46 @@ class BankAccount(models.Model):
         return f"{self.bank_name} — {self.account_name}"
 
 
+def normalise_whatsapp(value):
+    """'0812-3456 789', '+62 812…', '62812…', '812…' -> '62812…'; '' if it can't be a number."""
+    digits = re.sub(r'\D', '', value or '')
+    if digits.startswith('0'):
+        digits = '62' + digits[1:]
+    elif digits.startswith('8'):
+        digits = '62' + digits
+    return digits if 9 <= len(digits) <= 15 else ''
+
+
 class RSVP(models.Model):
+    """One answer per guest: a second submission with the same guest code (or,
+    without a code, the same WhatsApp number) updates this row."""
+    WISH_STATUSES = [('visible', 'Tampil'), ('pending', 'Menunggu persetujuan'), ('hidden', 'Disembunyikan')]
+
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='rsvps')
     guest = models.ForeignKey('Guest', on_delete=models.SET_NULL, null=True, blank=True, related_name='rsvps')
     guest_name = models.CharField(max_length=200)
     whatsapp = models.CharField(max_length=20, blank=True)
+    whatsapp_norm = models.CharField(max_length=20, blank=True, db_index=True, editable=False)
     attending = models.BooleanField()
     pax = models.PositiveIntegerField(default=1)
     wishes = models.TextField(blank=True)
+    wish_status = models.CharField(max_length=10, choices=WISH_STATUSES, default='visible')
     submitted_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-submitted_at']
+        constraints = [
+            models.UniqueConstraint(fields=['invitation', 'guest'], condition=models.Q(guest__isnull=False),
+                                    name='one_rsvp_per_guest'),
+            models.UniqueConstraint(fields=['invitation', 'whatsapp_norm'],
+                                    condition=models.Q(guest__isnull=True) & ~models.Q(whatsapp_norm=''),
+                                    name='one_rsvp_per_whatsapp'),
+        ]
+
+    def save(self, *args, **kwargs):
+        self.whatsapp_norm = normalise_whatsapp(self.whatsapp)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.guest_name} — {self.invitation.slug}"
@@ -316,12 +344,17 @@ class Coupon(models.Model):
         return f"{self.code} (-{self.discount_percent}%)"
 
 
+MAX_PAX = 10  # per RSVP when the guest has no own limit
+
+
 class Guest(models.Model):
     """Pre-registered guest list for per-guest invitation links, QR codes, and check-in."""
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='guests')
     name = models.CharField(max_length=200)
     whatsapp = models.CharField(max_length=20, blank=True)
     group = models.CharField(max_length=100, blank=True)  # e.g. Keluarga, Teman Kantor
+    # How many people this invitation is for; null means the invitation-wide limit.
+    max_pax = models.PositiveSmallIntegerField(null=True, blank=True)
     code = models.CharField(max_length=12, unique=True, blank=True)
     checked_in = models.BooleanField(default=False)
     checked_in_at = models.DateTimeField(null=True, blank=True)

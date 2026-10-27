@@ -29,3 +29,32 @@
 .dr-no { color: #e07070; font-weight: 500; }
 .dr-empty { padding: 3rem; text-align: center; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
 .dr-center { min-height: 100vh; display: grid; place-items: center; color: var(--muted); font-family: 'Inter', sans-serif; }
+
+.dr-updated { display: block; margin-top: 0.2rem; color: var(--muted); font-size: 0.7rem; }
+
+/* ===== Wish moderation ===== */
+.wm-settings { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 1rem; margin-bottom: 1.5rem; }
+.wm-switch, .wm-blocklist { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.25rem; font-size: 0.85rem; }
+.wm-switch { display: flex; gap: 0.75rem; align-items: flex-start; cursor: pointer; }
+.wm-switch input { margin-top: 0.2rem; width: 18px; height: 18px; accent-color: var(--ink); }
+.wm-switch small, .wm-blocklist small { display: block; color: var(--muted); font-size: 0.75rem; margin-top: 0.2rem; }
+.wm-blocklist small { display: inline; }
+.wm-blocklist textarea { display: block; width: 100%; margin: 0.5rem 0; padding: 0.5rem 0.65rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; resize: vertical; box-sizing: border-box; }
+.wm-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+.wm-filter { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0.4rem 0.85rem; font: inherit; font-size: 0.8rem; cursor: pointer; min-height: 36px; }
+.wm-filter.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.wm-filter span { margin-left: 0.4rem; opacity: 0.7; }
+.wm-message { font-size: 0.8rem; color: var(--ok); margin: 0 0 0.75rem; }
+.wm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.wm-item { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.25rem; }
+.wm-item.wm-pending { border-color: #e5c27a; }
+.wm-item.wm-hidden { opacity: 0.65; }
+.wm-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.wm-head .dr-time { margin-left: auto; }
+.wm-badge { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 999px; background: #f0ece4; color: var(--muted); }
+.wm-badge-pending { background: #fbf0d9; color: #8a6514; }
+.wm-badge-visible { background: #e3f1e7; color: var(--ok); }
+.wm-text { margin: 0.6rem 0 0.8rem; font-size: 0.88rem; color: var(--ink-soft); white-space: pre-wrap; word-break: break-word; }
+.wm-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.wm-delete { margin-left: auto; color: #c0504d; }
+@media (max-width: 640px) { .wm-settings { grid-template-columns: 1fr; } }

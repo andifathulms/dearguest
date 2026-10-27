@@ -12,7 +12,7 @@ from django.db import transaction
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Invitation, Couple, Event, Story, Photo, BankAccount, CoupleProfile, MusicPreset
+from .models import Invitation, Couple, Event, Story, Photo, BankAccount, CoupleProfile, MusicPreset, RSVP
 from .serializers import (
     EditorInvitationSerializer,
     InvitationListSerializer,
@@ -23,6 +23,7 @@ from .serializers import (
     StoryWriteSerializer,
     PhotoWriteSerializer,
     BankAccountWriteSerializer,
+    OwnerWishSerializer,
 )
 
 
@@ -324,3 +325,38 @@ class BankAccountListCreate(_OwnedChildList):
 class BankAccountDetail(_OwnedChildDetail):
     model = BankAccount
     serializer_class = BankAccountWriteSerializer
+
+
+class MyWishList(generics.ListAPIView):
+    """Every wish on the invitation with its moderation status (newest first)."""
+    serializer_class = OwnerWishSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+
+    def get_queryset(self):
+        inv = _owned(self.request.user, self.kwargs['slug'])
+        if not inv:
+            return RSVP.objects.none()
+        return inv.rsvps.exclude(wishes='').order_by('-submitted_at', '-id')
+
+
+class MyWishDetail(generics.UpdateAPIView, generics.DestroyAPIView):
+    """PATCH {wish_status: visible|hidden} to approve, hide or unhide a wish.
+    DELETE removes the wish text only; the guest's attendance answer stays."""
+    serializer_class = OwnerWishSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['patch', 'delete']
+
+    def get_queryset(self):
+        inv = _owned(self.request.user, self.kwargs['slug'])
+        return inv.rsvps.exclude(wishes='') if inv else RSVP.objects.none()
+
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('wish_status') not in (None, 'visible', 'hidden'):
+            raise ValidationError({'wish_status': 'Pilih tampil atau sembunyikan.'})
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        instance.wishes = ''
+        instance.wish_status = 'visible'
+        instance.save(update_fields=['wishes', 'wish_status', 'updated_at'])

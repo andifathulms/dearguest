@@ -107,6 +107,8 @@
 .gm-row-name { font-size: 0.9rem; font-weight: 500; }
 .gm-row-meta { font-size: 0.72rem; color: #aaa; margin-top: 0.15rem; }
 .gm-row-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.gm-pax { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+.gm-pax select { min-height: 32px; padding: 0.2rem 0.4rem; border: 1px solid var(--line); border-radius: 8px; background: #fff; font: inherit; color: var(--ink); }
 .gm-check {
   display: inline-flex; align-items: center; gap: 0.4rem;
   font-size: 0.76rem; cursor: pointer; color: #888; user-select: none;

@@ -380,6 +380,8 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 .pk-root .rsvp-toggle-btn.active { background: var(--dg-ink); border-color: var(--dg-ink); color: var(--dg-bg); }
 .pk-root .rsvp-pax { display: grid; grid-template-columns: 1fr 6rem; align-items: center; gap: var(--dg-space-3); }
 .pk-root .rsvp-pax-label { color: var(--dg-ink-muted); }
+.pk-root .rsvp-pax-limit { margin: var(--dg-space-1) 0 0; color: var(--dg-ink-muted); font-size: var(--dg-fs-small); }
+.pk-root .rsvp-pending { margin: var(--dg-space-2) 0 0; font-family: var(--dg-font-body); font-size: var(--dg-fs-small); color: var(--dg-ink-muted); }
 .pk-root .rsvp-error { margin: 0; color: #a33a2a; font-size: var(--dg-fs-small); }
 .pk-root .rsvp-success { padding: var(--dg-space-5) var(--dg-space-4); border: 1px solid var(--dg-line); border-radius: var(--dg-radius-card); font-family: var(--dg-font-display); font-size: 1.25rem; }
 

@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import api from '../api/client.js'
 import GuestManager from '../components/GuestManager.jsx'
+import WishModeration from '../components/WishModeration.jsx'
 import './Dashboard.css'
 import './DashboardRSVP.css'
 
@@ -16,22 +17,14 @@ function StatCard({ label, value, color }) {
   )
 }
 
-function exportCSV(rsvps) {
-  const headers = ['Nama', 'WhatsApp', 'Hadir', 'Jumlah Tamu', 'Ucapan', 'Waktu']
-  const rows = rsvps.map(r => [
-    r.guest_name,
-    r.whatsapp || '-',
-    r.attending ? 'Ya' : 'Tidak',
-    r.attending ? r.pax : 0,
-    (r.wishes || '').replace(/,/g, ';'),
-    format(new Date(r.submitted_at), 'dd/MM/yyyy HH:mm'),
-  ])
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
+// The server builds the CSV (quoting, BOM, formula guard, event timezone);
+// fetched with the JWT header, then saved as a file.
+async function downloadCSV(slug) {
+  const res = await api.get(`/invitations/${slug}/rsvps.csv`, { responseType: 'blob' })
+  const url = URL.createObjectURL(res.data)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'rsvp-export.csv'
+  a.download = `rsvp-${slug}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -46,11 +39,12 @@ export default function DashboardRSVP() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const loadRsvps = () => api.get(`/invitations/${slug}/rsvps/`).then(res => { setData(res.data); setLoading(false) })
+
   useEffect(() => {
     const token = localStorage.getItem('access_token')
     if (!token) { navigate('/dashboard'); return }
-    api.get(`/invitations/${slug}/rsvps/`)
-      .then(res => { setData(res.data); setLoading(false) })
+    loadRsvps()
       .catch(err => {
         if (err.response?.status === 401 || err.response?.status === 403) {
           localStorage.removeItem('access_token')
@@ -64,7 +58,7 @@ export default function DashboardRSVP() {
     api.get(`/invitations/${slug}/`)
       .then(res => { setCouple(res.data.couple || { bride_name: '', groom_name: '' }); setVariant(res.data.copy_variant || 'umum') })
       .catch(() => {})
-  }, [slug, navigate])
+  }, [slug, navigate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleLogout() {
     localStorage.removeItem('access_token')
@@ -83,7 +77,7 @@ export default function DashboardRSVP() {
         <h1>Dashboard<small>{slug}</small></h1>
         <div className="dr-bar-actions">
           <a className="ui-btn ui-btn-ghost" href={`/dashboard/${slug}/edit`}>Edit Undangan</a>
-          <button className="ui-btn ui-btn-ghost" onClick={() => exportCSV(rsvps)}>Export CSV</button>
+          <button className="ui-btn ui-btn-ghost" onClick={() => downloadCSV(slug).catch(() => setError('Gagal mengunduh CSV.'))}>Export CSV</button>
           <button className="ui-btn ui-btn-dark" onClick={handleLogout}>Keluar</button>
         </div>
       </div>
@@ -93,6 +87,9 @@ export default function DashboardRSVP() {
           <button className={`dash-tab ${tab === 'rsvp' ? 'active' : ''}`} onClick={() => setTab('rsvp')}>
             Konfirmasi RSVP<span className="dash-tab-count">{rsvps.length}</span>
           </button>
+          <button className={`dash-tab ${tab === 'wishes' ? 'active' : ''}`} onClick={() => setTab('wishes')}>
+            Ucapan{stats.wishes_pending > 0 && <span className="dash-tab-count">{stats.wishes_pending}</span>}
+          </button>
           <button className={`dash-tab ${tab === 'guests' ? 'active' : ''}`} onClick={() => setTab('guests')}>
             Daftar Tamu &amp; QR
           </button>
@@ -100,6 +97,8 @@ export default function DashboardRSVP() {
 
         {tab === 'guests' ? (
           <GuestManager slug={slug} brideName={couple.bride_name} groomName={couple.groom_name} variant={variant} />
+        ) : tab === 'wishes' ? (
+          <WishModeration slug={slug} onChange={loadRsvps} />
         ) : (
           <>
             <div className="dr-stats">
@@ -127,7 +126,12 @@ export default function DashboardRSVP() {
                         <td className={r.attending ? 'dr-yes' : 'dr-no'}>{r.attending ? 'Ya' : 'Tidak'}</td>
                         <td style={{ textAlign: 'center' }}>{r.attending ? r.pax : '—'}</td>
                         <td className="dr-wishes">{r.wishes || <span style={{ color: '#ccc' }}>—</span>}</td>
-                        <td className="dr-time">{format(new Date(r.submitted_at), 'dd MMM yyyy HH:mm', { locale: id })}</td>
+                        <td className="dr-time">
+                          {format(new Date(r.submitted_at), 'dd MMM yyyy HH:mm', { locale: id })}
+                          {r.updated_at && new Date(r.updated_at) - new Date(r.submitted_at) > 60000 && (
+                            <small className="dr-updated">diperbarui {format(new Date(r.updated_at), 'dd MMM HH:mm', { locale: id })}</small>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
