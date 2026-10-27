@@ -76,6 +76,10 @@ def write_renditions(storage, name, img):
             break
         small = _fit(img, max_width=width)
         target = str(stem.with_name(f'{stem.stem}-w{width}.webp'))
+        # Names derive from the (unique) original, so an existing file here is a
+        # stale rendition of this same image: replace it rather than suffixing.
+        if storage.exists(target):
+            storage.delete(target)
         variants[str(width)] = storage.save(target, ContentFile(_encode(small, 'WEBP')))
     return variants
 

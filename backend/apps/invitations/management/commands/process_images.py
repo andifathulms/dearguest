@@ -13,6 +13,8 @@ from apps.invitations.uploads import SafeImageField
 
 def image_fields():
     for model in apps.get_app_config('invitations').get_models():
+        if model._meta.proxy:   # e.g. ActivationRequest: same rows as Invitation
+            continue
         for field in model._meta.get_fields():
             if isinstance(field, SafeImageField):
                 yield model, field
@@ -27,9 +29,13 @@ class Command(BaseCommand):
     def handle(self, *args, apply=False, **options):
         totals = {'images': 0, 'missing_file': 0, 'with_exif': 0, 'unprocessed': 0, 'processed_now': 0, 'failed': 0}
         done = set(ProcessedImage.objects.values_list('name', flat=True))
+        seen = set()
         for model, field in image_fields():
             for obj in model.objects.exclude(**{field.name: ''}).exclude(**{f'{field.name}__isnull': True}):
                 f = getattr(obj, field.name)
+                if f.name in seen:   # one file referenced by two rows
+                    continue
+                seen.add(f.name)
                 totals['images'] += 1
                 if not f.storage.exists(f.name):
                     totals['missing_file'] += 1

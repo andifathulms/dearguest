@@ -145,3 +145,13 @@ class BackfillCommandTests(APITestBase):
         self.assertEqual((img.size, len(img.getexif())), ((800, 1200), 0))
         self.assertEqual(sorted(ProcessedImage.objects.get(name=self.photo.image.name).variants), ['480'])   # 800px wide once upright
         self.assertIn('unprocessed 0', self.run_cmd())
+
+    def test_a_file_shared_by_two_rows_is_processed_once(self):
+        # ActivationRequest is a proxy of Invitation: the same hero row twice.
+        name = default_storage.save('hero/lama.jpg', ContentFile(jpeg_with_exif()))
+        type(self.inv).objects.filter(pk=self.inv.pk).update(hero_photo=name)
+        out = self.run_cmd('--apply')
+        self.assertIn('images 2', out)            # the gallery photo + the hero, once each
+        self.assertIn('processed_now 2', out)
+        rendition = ProcessedImage.objects.get(name=name).variants['480']
+        self.assertEqual(rendition, 'hero/lama-w480.webp')   # no collision suffix
