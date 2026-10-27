@@ -145,7 +145,7 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = [
             'slug', 'theme', 'wedding_date', 'expires_at',
-            'opening_text', 'closing_text', 'dress_code', 'watermark', 'music_file',
+            'opening_text', 'closing_text', 'dress_code', 'photo_filter', 'watermark', 'music_file',
             'hero_photo', 'livestream_url', 'wishlist_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
@@ -222,7 +222,7 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
         fields = [
-            'slug', 'theme', 'wedding_date', 'opening_text', 'closing_text', 'dress_code',
+            'slug', 'theme', 'wedding_date', 'opening_text', 'closing_text', 'dress_code', 'photo_filter',
             'music_file', 'hero_photo', 'livestream_url', 'wishlist_url', 'is_active', 'watermark', 'expires_at',
         ]
         read_only_fields = ['slug', 'is_active', 'watermark', 'expires_at']
@@ -292,7 +292,7 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = [
             'slug', 'theme', 'tier', 'wedding_date', 'expires_at',
-            'opening_text', 'closing_text', 'dress_code', 'watermark', 'is_active',
+            'opening_text', 'closing_text', 'dress_code', 'photo_filter', 'watermark', 'is_active',
             'activation_requested', 'has_activation_code',
             'music_file', 'music_preset', 'hero_photo', 'livestream_url', 'wishlist_url',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',

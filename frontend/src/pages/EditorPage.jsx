@@ -2,7 +2,19 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
 import { invitationUrl } from '../utils/publicUrl.js'
-import { selectableThemes, themeName } from '../themes/registry.js'
+import { getTheme, selectableThemes, themeName } from '../themes/registry.js'
+
+// Packs that offer photo filters declare them in their theme.json (tiny files,
+// bundled eagerly so the editor can decide without loading a pack).
+const PACK_MANIFESTS = Object.fromEntries(
+  Object.entries(import.meta.glob('../themes/packs/*/theme.json', { eager: true, import: 'default' }))
+    .map(([path, manifest]) => [path.split('/').at(-2), manifest]),
+)
+const FILTER_LABELS = { none: 'Asli', 'soft-warm': 'Hangat lembut', bw: 'Hitam putih' }
+const photoFiltersFor = themeId => {
+  const entry = getTheme(themeId)
+  return entry?.kind === 'pack' ? PACK_MANIFESTS[entry.pack.dir]?.photoFilters || [] : []
+}
 import ImageCropper from '../components/ui/ImageCropper.jsx'
 import { compressImage } from '../utils/compressImage.js'
 import './Editor.css'
@@ -16,7 +28,7 @@ function SettingsSection({ inv, reload, notify }) {
     theme: inv.theme, wedding_date: inv.wedding_date || '',
     opening_text: inv.opening_text || '', closing_text: inv.closing_text || '',
     dress_code: inv.dress_code || '', livestream_url: inv.livestream_url || '',
-    wishlist_url: inv.wishlist_url || '',
+    wishlist_url: inv.wishlist_url || '', photo_filter: inv.photo_filter || 'none',
   })
   const [music, setMusic] = useState(null)
   const [heroPhoto, setHeroPhoto] = useState(null)
@@ -60,6 +72,14 @@ function SettingsSection({ inv, reload, notify }) {
           {selectableThemes().map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
         </select>
       </div>
+      {photoFiltersFor(f.theme).length > 0 && (
+        <div className="ed-field">
+          <label htmlFor="set-filter">Filter foto (berlaku untuk semua foto)</label>
+          <select id="set-filter" className="ed-select" value={f.photo_filter} onChange={e => set('photo_filter', e.target.value)}>
+            {photoFiltersFor(f.theme).map(v => <option key={v} value={v}>{FILTER_LABELS[v] || v}</option>)}
+          </select>
+        </div>
+      )}
       <div className="ed-field">
         <label htmlFor="set-date">Tanggal pernikahan</label>
         <input id="set-date" className="ed-input" type="date" value={f.wedding_date} onChange={e => set('wedding_date', e.target.value)} />

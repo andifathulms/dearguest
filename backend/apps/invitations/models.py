@@ -17,6 +17,13 @@ def generate_guest_code():
 
 
 class Invitation(models.Model):
+    # Photo treatment a pack can offer (theme.json → photoFilters); applied to
+    # every couple photo on the invitation.
+    PHOTO_FILTER_CHOICES = [
+        ('none', 'Asli'),
+        ('soft-warm', 'Hangat lembut'),
+        ('bw', 'Hitam putih'),
+    ]
     TIER_CHOICES = [
         ('free', 'Gratis'),
         ('premium', 'Premium'),
@@ -33,6 +40,7 @@ class Invitation(models.Model):
     opening_text = models.TextField(blank=True)
     closing_text = models.TextField(blank=True)
     dress_code = models.CharField(max_length=200, blank=True)
+    photo_filter = models.CharField(max_length=12, choices=PHOTO_FILTER_CHOICES, default='none')
     hero_photo = SafeImageField(upload_to='hero/', validators=[validate_image_upload], null=True, blank=True)  # full-bleed hero background
     watermark = models.BooleanField(default=True)
     music_file = SafeFileField(upload_to='music/', validators=[validate_audio_upload], null=True, blank=True)
