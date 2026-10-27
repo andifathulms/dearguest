@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from rest_framework import serializers
 from . import maps
-from .models import MAX_PAX, Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, MusicPreset
+from .models import MAX_PAX, Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, MusicPreset, ProcessedImage
 
 
 class MusicPresetSerializer(serializers.ModelSerializer):
@@ -102,17 +102,47 @@ def instagram_handle(value):
     return (match.group(1) if match else value).lstrip('@').strip()
 
 
+def image_meta(serializer, f):
+    """{width, height, srcset, fallback} for a processed image (images.py), so
+    the client can send srcset/sizes and reserve the box; None if unprocessed.
+    The URL field next to it keeps its old shape."""
+    if not f:
+        return None
+    request = serializer.context.get('request')
+    known = serializer.context.get('processed_images')
+    p = known.get(f.name) if known is not None else ProcessedImage.objects.filter(name=f.name).first()
+    if not p:
+        return None
+
+    def url(name):
+        u = f.storage.url(name)
+        return request.build_absolute_uri(u) if request else u
+
+    fallback = url(f.name)
+    parts = [f'{url(n)} {w}w' for w, n in sorted(p.variants.items(), key=lambda kv: int(kv[0]))]
+    parts.append(f'{fallback} {p.width}w')
+    return {'width': p.width, 'height': p.height, 'srcset': ', '.join(parts), 'fallback': fallback}
+
+
 class CoupleSerializer(serializers.ModelSerializer):
     bride_photo = serializers.SerializerMethodField()
     groom_photo = serializers.SerializerMethodField()
+    bride_photo_meta = serializers.SerializerMethodField()
+    groom_photo_meta = serializers.SerializerMethodField()
 
     class Meta:
         model = Couple
         fields = [
-            'bride_name', 'bride_parents', 'bride_photo', 'bride_bio',
-            'groom_name', 'groom_parents', 'groom_photo', 'groom_bio',
+            'bride_name', 'bride_parents', 'bride_photo', 'bride_photo_meta', 'bride_bio',
+            'groom_name', 'groom_parents', 'groom_photo', 'groom_photo_meta', 'groom_bio',
             *FAMILY_FIELDS,
         ]
+
+    def get_bride_photo_meta(self, obj):
+        return image_meta(self, obj.bride_photo)
+
+    def get_groom_photo_meta(self, obj):
+        return image_meta(self, obj.groom_photo)
 
     def _build_url(self, field):
         request = self.context.get('request')
@@ -153,10 +183,14 @@ class StorySerializer(serializers.ModelSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    image_meta = serializers.SerializerMethodField()
 
     class Meta:
         model = Photo
-        fields = ['id', 'image', 'caption', 'order']
+        fields = ['id', 'image', 'image_meta', 'caption', 'order']
+
+    def get_image_meta(self, obj):
+        return image_meta(self, obj.image)
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -187,6 +221,7 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
     bank_accounts = BankAccountSerializer(many=True, read_only=True)
     music_file = serializers.SerializerMethodField()
     hero_photo = serializers.SerializerMethodField()
+    hero_photo_meta = serializers.SerializerMethodField()
     watermark = serializers.SerializerMethodField()
 
     class Meta:
@@ -194,17 +229,29 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'theme', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'photo_filter', 'watermark', 'music_file',
-            'hero_photo', 'livestream_url', 'wishlist_url',
+            'hero_photo', 'hero_photo_meta', 'livestream_url', 'wishlist_url',
             'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
             'gift_recipient', 'gift_address', 'gift_phone',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
         ]
+
+    def to_representation(self, obj):
+        # One query for every image's renditions (nested serializers share this context).
+        names = [f.name for f in (obj.hero_photo, *(p.image for p in obj.photos.all())) if f]
+        couple = getattr(obj, 'couple', None)
+        if couple:
+            names += [f.name for f in (couple.bride_photo, couple.groom_photo) if f]
+        self.context['processed_images'] = {p.name: p for p in ProcessedImage.objects.filter(name__in=names)}
+        return super().to_representation(obj)
 
     def get_hero_photo(self, obj):
         request = self.context.get('request')
         if obj.hero_photo and request:
             return request.build_absolute_uri(obj.hero_photo.url)
         return None
+
+    def get_hero_photo_meta(self, obj):
+        return image_meta(self, obj.hero_photo)
 
     def get_watermark(self, obj):
         # Watermark is shown only on the free tier; paid tiers remove it.

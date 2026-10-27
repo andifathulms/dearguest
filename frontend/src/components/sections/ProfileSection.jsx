@@ -4,6 +4,7 @@ import { usePack } from '../../themes/packs/_system/ThemeContext.jsx'
 import ThemeAsset from '../../themes/packs/_system/ThemeAsset.jsx'
 import Monogram from '../../themes/packs/_system/Monogram.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
+import ResponsiveImg from '../ui/ResponsiveImg.jsx'
 
 // "Bapak Suryadi (Alm.) & Ibu Lestari (Almh.)" from the structured fields,
 // else the couple's own free-text line.
@@ -31,7 +32,8 @@ function PersonCard({ couple, person, delay }) {
   const childOf = person === 'bride'
     ? (order ? t('profile.daughterOf', { order }) : t('profile.daughterOfNoOrder'))
     : (order ? t('profile.sonOf', { order }) : t('profile.sonOfNoOrder'))
-  const img = photo && <img src={photo} alt={name} className="profile-photo" loading="lazy" decoding="async" />
+  const meta = couple[`${person}_photo_meta`]
+  const img = photo && <ResponsiveImg src={photo} meta={meta} sizes="(min-width: 640px) 280px, 60vw" alt={name} className="profile-photo" loading="lazy" decoding="async" />
   return (
     <motion.div
       className="profile-card"
@@ -47,7 +49,7 @@ function PersonCard({ couple, person, delay }) {
           <ThemeAsset slot="photo-ring" className="pk-photo-ring" />
         </div>
       ) : (
-        <img src={photo} alt={name} className="profile-photo" />
+        <ResponsiveImg src={photo} meta={meta} sizes="(min-width: 640px) 280px, 60vw" alt={name} className="profile-photo" />
       ))}
       <h3 className="profile-name">{name}</h3>
       {parents && parents !== '-' && <p className="profile-parents">{childOf}<br />{parents}</p>}

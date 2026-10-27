@@ -110,6 +110,19 @@ class ActivationRequest(Invitation):
         verbose_name_plural = 'Permintaan Aktivasi (pending)'
 
 
+class ProcessedImage(models.Model):
+    """Renditions of one stored image (images.py), keyed by its storage name.
+    `variants` maps a width ("480") to the WebP rendition's storage name."""
+    name = models.CharField(max_length=255, primary_key=True)
+    width = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()
+    variants = models.JSONField(default=dict)
+    processed_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
 INSTAGRAM_RE = re.compile(r'^[A-Za-z0-9._]{1,30}$')
 
 
@@ -252,7 +265,7 @@ class BankAccount(models.Model):
     bank_name = models.CharField(max_length=100)  # bank name, e-wallet name (GoPay/OVO/DANA), or "QRIS"
     account_number = models.CharField(max_length=50, blank=True)  # phone for e-wallet; empty for QRIS
     account_name = models.CharField(max_length=200)
-    qris_image = SafeImageField(upload_to='qris/', validators=[validate_image_upload], null=True, blank=True)  # scannable QRIS image
+    qris_image = SafeImageField(upload_to='qris/', responsive=False, validators=[validate_image_upload], null=True, blank=True)  # scannable QRIS image
     order = models.PositiveIntegerField(default=0)
 
     class Meta:

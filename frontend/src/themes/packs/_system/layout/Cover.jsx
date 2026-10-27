@@ -53,11 +53,12 @@ function CoverContent({ invitation, guestName, openButton }) {
 // full-bleed: the couple's photo fills the screen; a plate fades away as it resolves.
 function FullBleedCover(props) {
   const photo = props.invitation.hero_photo
+  const meta = props.invitation.hero_photo_meta
   return (
     <div className="pk-cover pk-cover--full-bleed">
       <ThemeAsset slot="cover-bg" className="pk-cover-bg" />
       {photo && (
-        <img className="pk-cover-photo pk-photo" src={photo} alt="" fetchpriority="high" decoding="async" width="1080" height="1920" />
+        <img className="pk-cover-photo pk-photo" srcSet={meta?.srcset} sizes="100vw" src={meta?.fallback || photo} alt="" fetchpriority="high" decoding="async" width="1080" height="1920" />
       )}
       <div className="pk-cover-plate" aria-hidden="true" />
       <div className="pk-cover-scrim" aria-hidden="true" />

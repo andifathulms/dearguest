@@ -9,10 +9,11 @@ import { blessingFor } from '../../copy/copy.js'
 // the LCP element) with the pack's art slots around it. Legacy themes keep
 // the inline background image their CSS was written for.
 function PackHeroMedia({ heroPhoto }) {
+  const meta = useCopy().invitation?.hero_photo_meta
   return (
     <>
       {heroPhoto && (
-        <img className="pk-hero-img pk-photo" src={heroPhoto} alt="" fetchpriority="high" decoding="async" width="1080" height="1920" />
+        <img className="pk-hero-img pk-photo" srcSet={meta?.srcset} sizes="100vw" src={meta?.fallback || heroPhoto} alt="" fetchpriority="high" decoding="async" width="1080" height="1920" />
       )}
       <ThemeAsset slot="parallax-back" className="pk-parallax pk-parallax-back" />
       <ThemeAsset slot="parallax-mid" className="pk-parallax pk-parallax-mid" />
