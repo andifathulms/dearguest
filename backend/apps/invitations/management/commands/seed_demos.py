@@ -2,6 +2,7 @@
 live examples. Idempotent — safe to run repeatedly."""
 import os
 from datetime import date, datetime
+from decimal import Decimal
 from zoneinfo import ZoneInfo
 from django.core.files import File
 from django.core.management.base import BaseCommand
@@ -26,6 +27,14 @@ def demo_themes():
         for t in themes.entries().values()
         if t.get('demoSlug') and not (t['kind'] == 'pack' and t['status'] == 'coming')
     ]
+
+
+# Real venues, so the demo map shows the place rather than a whole city.
+# Coordinates from OpenStreetMap (Nominatim), October 2026.
+VENUE_PINS = {
+    'kauman': dict(maps_link='-7.803820, 110.362392', lat=Decimal('-7.803820'), lng=Decimal('110.362392')),
+    'ambarrukmo': dict(maps_link='-7.782146, 110.402654', lat=Decimal('-7.782146'), lng=Decimal('110.402654')),
+}
 
 
 class Command(BaseCommand):
@@ -71,11 +80,13 @@ class Command(BaseCommand):
             wib = ZoneInfo('Asia/Jakarta')
             Event.objects.create(invitation=inv, event_type='akad', start=datetime(2026, 12, 12, 8, 0, tzinfo=wib),
                                  end=datetime(2026, 12, 12, 10, 0, tzinfo=wib), timezone='Asia/Jakarta',
-                                 venue_name='Masjid Agung', address='Jl. Merdeka No. 1, Yogyakarta',
-                                 is_primary=True, order=0)
+                                 venue_name='Masjid Gedhe Kauman', address='Jl. Kauman, Ngupasan, Gondomanan, Kota Yogyakarta',
+                                 **VENUE_PINS['kauman'], is_primary=True, order=0)
             Event.objects.create(invitation=inv, event_type='resepsi', start=datetime(2026, 12, 12, 11, 0, tzinfo=wib),
                                  timezone='Asia/Jakarta',
-                                 venue_name='Gedung Graha', address='Jl. Sudirman No. 45, Yogyakarta', order=1)
+                                 venue_name='Royal Ambarrukmo Yogyakarta',
+                                 address='Jl. Laksda Adisucipto No. 81, Caturtunggal, Depok, Sleman',
+                                 **VENUE_PINS['ambarrukmo'], order=1)
             inv.stories.all().delete()
             Story.objects.create(invitation=inv, title='Pertama Bertemu', description='Dipertemukan di sebuah acara kampus.', date=date(2021, 3, 1), order=0)
             Story.objects.create(invitation=inv, title='Lamaran', description='Bagus melamar Andini di hadapan keluarga.', date=date(2025, 11, 1), order=1)

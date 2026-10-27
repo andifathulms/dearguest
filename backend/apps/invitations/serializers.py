@@ -253,6 +253,12 @@ class EventWriteSerializer(serializers.ModelSerializer):
         end = attrs.get('end', getattr(self.instance, 'end', None))
         if start and end and end <= start:
             raise serializers.ValidationError({'end': 'Waktu selesai harus setelah waktu mulai.'})
+        # A share link or "lat, lng" -> cleaned link + coordinates (maps.py).
+        if 'maps_link' in attrs:
+            try:
+                attrs['maps_link'], attrs['lat'], attrs['lng'] = maps.normalise_maps_input(attrs['maps_link'])
+            except maps.MapsInputError as exc:
+                raise serializers.ValidationError({'maps_link': str(exc)})
         return attrs
 
 
