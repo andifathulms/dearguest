@@ -44,6 +44,7 @@ services:
     environment:
       - VITE_API_URL=http://localhost:8010/api
       - VITE_ADMIN_WHATSAPP_NUMBER=${ADMIN_WHATSAPP_NUMBER:-628123456789}
+      - DEV_PROXY_TARGET=http://backend:8000
 
 volumes:
   postgres_data:

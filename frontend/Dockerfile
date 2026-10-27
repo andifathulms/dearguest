@@ -9,6 +9,9 @@ WORKDIR /app
 COPY package*.json .
 RUN npm install
 COPY . .
+# Public site origin baked into share links / QR codes; the build fails without it.
+ARG VITE_PUBLIC_ORIGIN
+ENV VITE_PUBLIC_ORIGIN=$VITE_PUBLIC_ORIGIN
 RUN npm run build
 
 FROM nginx:alpine AS production

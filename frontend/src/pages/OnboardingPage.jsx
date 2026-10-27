@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
+import { publicOrigin } from '../utils/publicUrl.js'
 import './Auth.css'
 
 const THEMES = [
@@ -88,8 +89,6 @@ export default function OnboardingPage() {
     }
   }
 
-  const origin = window.location.origin
-
   return (
     <div className="auth">
       <div className="auth-card auth-wide">
@@ -105,7 +104,7 @@ export default function OnboardingPage() {
           <div className="auth-field">
             <label className="auth-label" htmlFor="onb-slug">Alamat undangan</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.82rem', color: '#a89a86' }}>{origin}/</span>
+              <span style={{ fontSize: '0.82rem', color: '#a89a86' }}>{publicOrigin}/</span>
               <input
                 className="auth-input"
                 id="onb-slug"

@@ -65,9 +65,4 @@ api.interceptors.response.use(
   },
 )
 
-// Shareable URL with an Open Graph preview, served by the backend /share page
-// (same host as the API). qs may include ?to=&g= for personalization.
-const SHARE_ORIGIN = API_BASE.replace(/\/api\/?$/, '')
-export const shareUrl = (slug, qs = '') => `${SHARE_ORIGIN}/share/${slug}${qs}`
-
 export default api

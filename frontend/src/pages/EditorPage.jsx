@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
+import { invitationUrl } from '../utils/publicUrl.js'
 import ImageCropper from '../components/ui/ImageCropper.jsx'
 import { compressImage } from '../utils/compressImage.js'
 import './Editor.css'
@@ -632,7 +633,7 @@ export default function EditorPage() {
     localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); navigate('/dashboard')
   }
   function copyLink() {
-    navigator.clipboard.writeText(`${window.location.origin}/${inv.slug}`).then(() => notify('Link undangan disalin'))
+    navigator.clipboard.writeText(invitationUrl(inv.slug)).then(() => notify('Link undangan disalin'))
   }
 
   if (status === 'loading') return <div className="ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Memuat editor…</p></div>

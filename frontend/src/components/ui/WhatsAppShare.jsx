@@ -1,4 +1,4 @@
-import { shareUrl } from '../../api/client.js'
+import { shareUrl } from '../../utils/publicUrl.js'
 
 export default function WhatsAppShare({ slug, brideName, groomName }) {
   const url = shareUrl(slug)

@@ -31,6 +31,8 @@ services:
     build:
       context: ./frontend
       target: production
+      args:
+        VITE_PUBLIC_ORIGIN: ${VITE_PUBLIC_ORIGIN:?Set VITE_PUBLIC_ORIGIN in .env (e.g. https://dearguest.id)}
     depends_on:
       - backend
 
