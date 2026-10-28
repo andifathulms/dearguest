@@ -3,7 +3,8 @@ import { formatDateOnly } from '../../utils/dates.js'
 import { usePack } from '../../themes/packs/_system/ThemeContext.jsx'
 import ThemeAsset from '../../themes/packs/_system/ThemeAsset.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
-import { blessingFor } from '../../copy/copy.js'
+import { blessingFor, scriptureFor } from '../../copy/copy.js'
+import { QuranCredit } from './ScriptureSection.jsx'
 
 // In a theme pack the photo is a real <img fetchpriority="high"> (the hero is
 // the LCP element) with the pack's art slots around it. Legacy themes keep
@@ -54,10 +55,12 @@ export default function HeroSection({ brideName, groomName, weddingDate, heroPho
 }
 
 function HeroContent({ brideName, groomName, formatted }) {
-  const { t, variant } = useCopy()
+  const { t, variant, invitation } = useCopy()
   // The blessing line is the variant's (islam: the Bismillah, verbatim from
-  // Tanzil); other variants have none.
+  // Tanzil); other variants have none. Its Tanzil credit goes right under it,
+  // unless a verse section further down already carries the credit.
   const blessing = blessingFor(variant)
+  const creditHere = blessing && !scriptureFor(invitation)
   return (
     <>
       <motion.div
@@ -67,6 +70,7 @@ function HeroContent({ brideName, groomName, formatted }) {
         transition={{ duration: 1, ease: 'easeOut' }}
       >
         {blessing && <p className="hero-bismillah" lang="ar" dir="rtl">{blessing.arabic}</p>}
+        {creditHere && <QuranCredit t={t} className="hero-quran-credit" />}
         <p className="hero-label">{t('hero.label')}</p>
         <span className="hero-ornament" aria-hidden="true" />
         <motion.h1

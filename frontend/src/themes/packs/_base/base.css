@@ -238,7 +238,8 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 
 /* scripture */
 .pk-root .scripture-section { max-width: 36rem; margin-inline: auto; padding: var(--dg-section-pad-y) var(--dg-gutter); text-align: center; }
-.pk-root .scripture-section--credit { padding-block: 0 var(--dg-space-4); }
+.pk-root .hero-quran-credit { margin: 0; font-size: var(--dg-fs-small); opacity: 0.7; }
+.pk-root .hero-quran-credit a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; }
 .pk-root .scripture-arabic { margin: 0 0 var(--dg-space-4); font-size: 1.6rem; line-height: 2.2; color: var(--dg-ink); font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', serif; }
 .pk-root .scripture-text { margin: 0 auto; font-family: var(--dg-font-display); font-style: italic; font-size: 1.2rem; line-height: 1.6; color: var(--dg-ink); }
 .pk-root .scripture-ref { margin: var(--dg-space-4) 0 0; font-family: var(--dg-font-label); font-size: var(--dg-fs-label); letter-spacing: var(--dg-tracking-label); text-transform: uppercase; color: var(--dg-accent); }
@@ -279,7 +280,8 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 .pk-root .event-calendar > summary::-webkit-details-marker { display: none; }
 .pk-root .event-calendar-menu { display: grid; gap: var(--dg-space-1); margin-top: var(--dg-space-2); padding: var(--dg-space-1); border: 1px solid var(--dg-line); border-radius: var(--dg-radius-card); background: var(--dg-surface-raised); }
 .pk-root .event-calendar-menu a { padding: var(--dg-space-2) var(--dg-space-3); font-size: var(--dg-fs-small); color: var(--dg-ink); text-decoration: none; }
-.pk-root .map-load { display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 3; margin-bottom: var(--dg-space-3); border: 1px dashed var(--dg-line-strong); border-radius: var(--dg-radius-card); background: var(--dg-surface); color: var(--dg-ink); font: inherit; font-family: var(--dg-font-label); font-size: var(--dg-fs-label); letter-spacing: var(--dg-tracking-label); text-transform: uppercase; cursor: pointer; }
+.pk-root .map-load { display: inline-flex; align-items: center; justify-content: center; gap: var(--dg-space-2); min-height: 44px; margin-bottom: var(--dg-space-3); padding: var(--dg-space-2) var(--dg-space-4); border: 1px solid var(--dg-line-strong); border-radius: 999px; background: transparent; color: var(--dg-ink); font: inherit; font-family: var(--dg-font-label); font-size: var(--dg-fs-label); letter-spacing: var(--dg-tracking-label); text-transform: uppercase; cursor: pointer; }
+.pk-root .map-load svg { width: 14px; height: 14px; flex: none; }
 .pk-root .map-open { display: inline-block; margin-top: var(--dg-space-2); }
 
 /* story */

@@ -7,15 +7,12 @@ import { blessingFor, scriptureFor } from '../../copy/copy.js'
 export default function ScriptureSection() {
   const { t, invitation, variant } = useCopy()
   const scripture = scriptureFor(invitation)
+  // No verse: nothing here. (With only the hero Bismillah, the Tanzil credit
+  // sits under it in HeroSection instead.)
+  if (!scripture) return null
   // Tanzil's terms: wherever Quran text appears, credit and link tanzil.net.
-  const quranShown = scripture?.quran || Boolean(blessingFor(variant))
-  const attribution = quranShown && (
-    <p className="scripture-source">
-      <a href="https://tanzil.net" target="_blank" rel="noopener noreferrer">{t('scripture.quranAttribution')}</a>
-    </p>
-  )
-
-  if (!scripture) return attribution ? <section className="scripture-section scripture-section--credit">{attribution}</section> : null
+  const quranShown = scripture.quran || Boolean(blessingFor(variant))
+  const attribution = quranShown && <QuranCredit t={t} className="scripture-source" />
   return (
     <section className="scripture-section">
       {scripture.arabic && <p className="scripture-arabic" lang="ar" dir="rtl">{scripture.arabic}</p>}
@@ -23,5 +20,13 @@ export default function ScriptureSection() {
       {scripture.ref && <p className="scripture-ref">{scripture.ref}</p>}
       {attribution}
     </section>
+  )
+}
+
+export function QuranCredit({ t, className }) {
+  return (
+    <p className={className}>
+      <a href="https://tanzil.net" target="_blank" rel="noopener noreferrer">{t('scripture.quranAttribution')}</a>
+    </p>
   )
 }
