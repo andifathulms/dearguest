@@ -1,0 +1,29 @@
+{
+  "_generated": "GENERATED from shared/crawlers.txt by scripts/sync_themes.py \u2014 do not edit by hand.",
+  "patterns": [
+    "WhatsApp",
+    "facebookexternalhit",
+    "Facebot",
+    "facebookcatalog",
+    "TelegramBot",
+    "Twitterbot",
+    "Slackbot",
+    "LinkedInBot",
+    "Discordbot",
+    "Pinterest",
+    "SkypeUriPreview",
+    "Iframely",
+    "Embedly",
+    "redditbot",
+    "Applebot",
+    "bingbot",
+    "Googlebot",
+    "Google-InspectionTool",
+    "LINE",
+    "Line/",
+    "KakaoTalk",
+    "Viber",
+    "Snapchat",
+    "vkShare"
+  ]
+}

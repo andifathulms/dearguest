@@ -29,5 +29,10 @@
     "divider": { "svg": "assets/divider.svg", "width": 140, "height": 16 }
   },
   "copyVariants": ["islam", "kristen", "katolik", "umum"],
-  "eventTypes": ["akad", "pemberkatan", "sakramen", "resepsi", "adat", "ngunduh_mantu", "lainnya"]
+  "eventTypes": ["akad", "pemberkatan", "sakramen", "resepsi", "adat", "ngunduh_mantu", "lainnya"],
+  "og": {
+    "template": "assets/og-template.jpg", "box": [390, 110, 850, 520],
+    "ink": "#f4e8da", "accent": "#c9a55c", "shadow": true,
+    "fonts": { "names": "fonts/script-400.woff2", "label": "fonts/label-600.woff2", "text": "fonts/body-400.woff2" }
+  }
 }

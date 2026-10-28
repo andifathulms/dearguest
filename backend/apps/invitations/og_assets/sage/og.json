@@ -1,0 +1,12 @@
+{
+  "box": [
+    320,
+    60,
+    880,
+    460
+  ],
+  "ink": "#3d4741",
+  "accent": "#5e7a6e",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/sage/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

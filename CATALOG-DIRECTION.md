@@ -45,7 +45,8 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
    - tokens sampled from the paintings;
    - three OFL fonts not used by another pack;
    - ornaments drawn in code;
-   - `overrides.css`, under 150 lines.
+   - `overrides.css`, under 150 lines;
+   - an `"og"` block for the link preview: the build writes `assets/og-template.jpg` (1200×630 from the desktop cover); set `box` to its calm area, `ink`/`accent` from the tokens, `shadow: true` for light text on dark art, and the three font roles. Check the result with `scripts/crawl_check.py`, or by rendering a long name pair.
 5. **Registry:** a commercial name, a category, and a demo slug named after the theme. Then `make themes` and `seed_demos`.
 6. **Tests:**
    - a `packs/<id>.spec.js` copied from another pack's spec;

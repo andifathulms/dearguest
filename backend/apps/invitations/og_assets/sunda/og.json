@@ -1,0 +1,12 @@
+{
+  "box": [
+    340,
+    70,
+    860,
+    500
+  ],
+  "ink": "#26304f",
+  "accent": "#8a683a",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/sunda/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

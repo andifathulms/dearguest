@@ -106,5 +106,10 @@
     "adat",
     "ngunduh_mantu",
     "lainnya"
-  ]
+  ],
+  "og": {
+    "template": "assets/og-template.jpg", "box": [380, 70, 840, 540],
+    "ink": "#f6ebd3", "accent": "#d4b060", "shadow": true,
+    "fonts": { "names": "fonts/script-400.woff2", "label": "fonts/label-600.woff2", "text": "fonts/body-400.woff2" }
+  }
 }

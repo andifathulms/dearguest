@@ -1,0 +1,12 @@
+{
+  "box": [
+    380,
+    70,
+    840,
+    540
+  ],
+  "ink": "#f6ebd3",
+  "accent": "#d4b060",
+  "shadow": true,
+  "_generated": "GENERATED from frontend/src/themes/packs/bugis/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

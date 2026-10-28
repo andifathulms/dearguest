@@ -253,6 +253,31 @@ def synth_texture(size, rgb, grain, weave, mottle, seed=7):
     return Image.fromarray(tile.astype(np.uint8))
 
 
+OG_SIZE = (1200, 630)
+
+
+def make_og_template(src, out):
+    """The base of the pack's WhatsApp/Facebook link preview (og.py draws the
+    names on it): the desktop cover painting, centre-cropped to 1200x630. Its
+    calm centre is where the text goes (theme.json -> og.box)."""
+    master = src / 'cover-bg-desktop.jpg'
+    if not master.exists():
+        return []
+    img = Image.open(master).convert('RGB')
+    w, h = img.size
+    target = OG_SIZE[0] / OG_SIZE[1]
+    if w / h > target:   # too wide: trim the sides equally
+        cw = round(h * target)
+        img = img.crop(((w - cw) // 2, 0, (w - cw) // 2 + cw, h))
+    else:                # too tall: trim top and bottom equally
+        ch = round(w / target)
+        img = img.crop((0, (h - ch) // 2, w, (h - ch) // 2 + ch))
+    img = img.resize(OG_SIZE, Image.LANCZOS)
+    p = out / 'og-template.jpg'
+    img.save(p, 'JPEG', quality=84, optimize=True, progressive=True)
+    return [p]
+
+
 def build(pack):
     cfg = PACKS[pack]
     src = ROOT / 'design' / 'packs' / pack / 'masters'
@@ -334,6 +359,8 @@ def build(pack):
         tile.save(p, 'WEBP', quality=q, method=6)
         written.append(p)
 
+    written += make_og_template(src, out)
+
     if 'texture_synth' in cfg:
         p = out / 'texture.webp'
         synth_texture(**cfg['texture_synth']).save(p, 'WEBP', quality=72, method=6)
@@ -345,4 +372,11 @@ def build(pack):
 
 
 if __name__ == '__main__':
-    build(sys.argv[1] if len(sys.argv) > 1 else 'floral')
+    args = sys.argv[1:]
+    if args[:1] == ['--og-only']:   # just the link-preview bases, for the given (or all) packs
+        for pack in args[1:] or list(PACKS):
+            for p in make_og_template(ROOT / 'design' / 'packs' / pack / 'masters',
+                                      ROOT / 'frontend' / 'src' / 'themes' / 'packs' / pack / 'assets'):
+                print(f'{p.relative_to(ROOT)}  {p.stat().st_size // 1024} KB')
+    else:
+        build(args[0] if args else 'floral')

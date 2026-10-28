@@ -1,0 +1,12 @@
+{
+  "box": [
+    370,
+    70,
+    830,
+    550
+  ],
+  "ink": "#f3e6cc",
+  "accent": "#d2ae5e",
+  "shadow": true,
+  "_generated": "GENERATED from frontend/src/themes/packs/minang/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

@@ -16,6 +16,19 @@ map $uri $media_disposition {
     "~*\.(jpe?g|png|webp|mp3|m4a|aac|ogg)$"   "";
 }
 
+# Link-preview crawlers ($og_crawler, generated from shared/crawlers.txt by
+# scripts/sync_themes.py) asking for an invitation link get Django's tag page;
+# people get the SPA.
+include /etc/nginx/snippets/og-crawlers.conf;
+map $uri $invitation_path {
+    default                                   0;
+    "~^/[-\w]+(/[A-Za-z0-9]{4,12})?/?$"       1;
+}
+map "$og_crawler$invitation_path" $og_proxy {
+    default 0;
+    "11"    1;
+}
+
 # Port 80: Let's Encrypt HTTP-01 challenges only; everything else goes to HTTPS.
 server {
     listen 80 default_server;
@@ -64,6 +77,12 @@ server {
         include /etc/nginx/snippets/proxy.conf;
     }
 
+    # Link-preview images, rendered by Django; content-hashed URLs, so Django
+    # sends an immutable Cache-Control.
+    location /og/ {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+
     # Django admin static files (collectstatic)
     location /static/ {
         alias /app/staticfiles/;
@@ -85,8 +104,21 @@ server {
         add_header Cache-Control "no-cache";
     }
 
-    # Client-side routes (/:slug, /dashboard/...) fall back to the SPA shell.
+    # Client-side routes (/:slug, /dashboard/...) fall back to the SPA shell;
+    # prerendered pages (dist/<path>/index.html) are served as they are.
     location / {
-        try_files $uri /index.html;
+        try_files $uri $uri/index.html @spa;
+    }
+
+    location @spa {
+        error_page 418 = @og;
+        if ($og_proxy) {
+            return 418;
+        }
+        rewrite ^ /index.html last;
+    }
+
+    location @og {
+        include /etc/nginx/snippets/proxy.conf;
     }
 }

@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from sync_themes import CANONICAL, FILES, ROOT, render_copy  # noqa: E402
+from sync_themes import CANONICAL, FILES, OG_ROLES, ROOT, render_copy, render_crawlers, render_og  # noqa: E402
 
 THEMES_DIR = ROOT / 'frontend' / 'src' / 'themes'
 PACKS_DIR = THEMES_DIR / 'packs'
@@ -62,6 +62,36 @@ errors = []
 
 def err(msg):
     errors.append(msg)
+
+
+def check_generated():
+    """Crawler-list and og_assets copies match what `make sync` would write."""
+    for path, text in render_crawlers().items():
+        if not path.exists() or path.read_text(encoding='utf-8') != text:
+            err(f'{path.relative_to(ROOT)} is out of date — run `make sync`')
+    for path, data in render_og().items():
+        if not path.exists() or path.read_bytes() != data:
+            err(f'{path.relative_to(ROOT)} is out of date — run `make sync`')
+
+
+def check_og(t, d, manifest):
+    """Every live pack has a complete link-preview layout (og.py)."""
+    og = manifest.get('og')
+    if not og:
+        err(f'{t["id"]}: theme.json has no "og" block (link-preview layout)')
+        return
+    for key in ('template', 'box', 'ink', 'accent', 'fonts'):
+        if key not in og:
+            err(f'{t["id"]}: og.{key} missing')
+    if og.get('template') and not (d / og['template']).exists():
+        err(f'{t["id"]}: og template {og["template"]} not found (scripts/build_pack_art.py --og-only)')
+    for role in OG_ROLES:
+        f = (og.get('fonts') or {}).get(role)
+        if not f or not (d / f).exists():
+            err(f'{t["id"]}: og font for "{role}" missing')
+    box = og.get('box') or []
+    if len(box) != 4 or not (0 <= box[0] < box[2] <= 1200 and 0 <= box[1] < box[3] <= 630):
+        err(f'{t["id"]}: og.box must be [x0, y0, x1, y1] inside 1200x630')
 
 
 def check_copies():
@@ -139,8 +169,9 @@ def check_entries(themes):
             if demo in seen_demos:
                 err(f'{tid}: demoSlug {demo} used twice')
             seen_demos.add(demo)
-
-        elif t.get('kind') == 'pack' and t.get('status') != 'coming':
+        # (This used to sit under `elif` after the demo check, so every pack
+        # with a demo -- i.e. every live pack -- went unvalidated.)
+        if t.get('kind') == 'pack' and t.get('status') != 'coming':
             check_pack(t)
 
 
@@ -165,6 +196,8 @@ def check_pack(t):
         manifest = json.loads((d / 'theme.json').read_text(encoding='utf-8'))
         if manifest.get('layoutVariant') not in LAYOUTS:
             err(f'{t["id"]}: theme.json layoutVariant must be one of {sorted(LAYOUTS)}')
+        if t.get('status') == 'active':
+            check_og(t, d, manifest)
         if (manifest.get('opening') or {}).get('type') not in OPENINGS:
             err(f'{t["id"]}: theme.json opening.type must be one of {sorted(OPENINGS)}')
         if manifest.get('hero', 'photo') not in HEROES:
@@ -187,6 +220,7 @@ def check_pack(t):
 def main():
     data = json.loads(CANONICAL.read_text(encoding='utf-8'))
     check_copies()
+    check_generated()
     check_entries(data.get('themes', []))
     check_copy()
     if errors:

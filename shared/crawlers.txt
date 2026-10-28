@@ -1,0 +1,28 @@
+# Link-preview crawlers: user-agent substrings, case-insensitive, one per line.
+# They get server-rendered Open Graph HTML for invitation links instead of the
+# SPA (nginx in production, Vite's proxy in dev), and their fetches are never
+# counted as a guest opening the invitation. Run `make sync` after editing.
+WhatsApp
+facebookexternalhit
+Facebot
+facebookcatalog
+TelegramBot
+Twitterbot
+Slackbot
+LinkedInBot
+Discordbot
+Pinterest
+SkypeUriPreview
+Iframely
+Embedly
+redditbot
+Applebot
+bingbot
+Googlebot
+Google-InspectionTool
+LINE
+Line/
+KakaoTalk
+Viber
+Snapchat
+vkShare

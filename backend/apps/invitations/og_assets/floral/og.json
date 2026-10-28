@@ -1,0 +1,12 @@
+{
+  "box": [
+    390,
+    110,
+    850,
+    520
+  ],
+  "ink": "#f4e8da",
+  "accent": "#c9a55c",
+  "shadow": true,
+  "_generated": "GENERATED from frontend/src/themes/packs/floral/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

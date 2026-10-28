@@ -101,6 +101,12 @@
         "share.button": "Bagikan via WhatsApp",
         "share.text": "{greeting}, kami mengundang Anda ke pernikahan {bride} & {groom}. Lihat undangan kami di: {url}",
         "share.greeting": "Halo",
+        "og.label": "Undangan Pernikahan",
+        "og.to": "Kepada Yth.",
+        "og.title": "Undangan Pernikahan {bride} & {groom}",
+        "og.titleGuest": "Untuk {guest} · Undangan Pernikahan {bride} & {groom}",
+        "og.description": "{greeting}, dengan penuh sukacita kami mengundang Anda ke pernikahan kami pada {date}.",
+        "og.descriptionNoDate": "{greeting}, dengan penuh sukacita kami mengundang Anda ke pernikahan kami.",
         "invite.text": "{greeting}\n\nKepada Yth. {guest},\nDengan penuh kebahagiaan, kami mengundang Anda ke pernikahan {bride} & {groom}.\n\nBuka undangan digital kami di:\n{url}\n\nMerupakan suatu kehormatan apabila Anda berkenan hadir. Terima kasih.",
 
         "music.on": "Nyalakan musik",
