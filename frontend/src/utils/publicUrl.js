@@ -14,6 +14,10 @@ export const publicUrl = path => `${PUBLIC_ORIGIN}${path}`
 // The invitation itself, e.g. for QR codes and "copy link".
 export const invitationUrl = (slug, qs = '') => publicUrl(`/${slug}${qs}`)
 
+// A guest's personal link: the name comes from the couple's guest list, and
+// crawlers get a personalised preview. Used for "copy link", QR and WhatsApp.
+export const guestUrl = (slug, code) => publicUrl(`/${slug}/${code}`)
+
 // The /share page: same invitation, but with server-rendered Open Graph tags
 // so WhatsApp shows a rich preview. qs may include ?to=&g= for personalization.
 export const shareUrl = (slug, qs = '') => publicUrl(`/share/${slug}${qs}`)

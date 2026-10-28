@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import api from '../api/client.js'
-import { invitationUrl, shareUrl } from '../utils/publicUrl.js'
+import { guestUrl } from '../utils/publicUrl.js'
 import { makeT } from '../copy/copy.js'
 
 const ic = {
@@ -31,11 +31,11 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
   const qrRef = useRef(null)
 
   function guestLink(g) {
-    return invitationUrl(slug, `?to=${encodeURIComponent(g.name)}&g=${g.code}`)
+    return guestUrl(slug, g.code)
   }
   function inviteText(g) {
     // Use the share URL so the WhatsApp message renders a rich link preview.
-    const link = shareUrl(slug, `?to=${encodeURIComponent(g.name)}&g=${g.code}`)
+    const link = guestUrl(slug, g.code)
     // Wording follows the couple's copy variant (shared/copy/copy.json).
     return t('invite.text', { greeting: t('share.greeting'), guest: g.name, bride: brideName, groom: groomName, url: link })
   }

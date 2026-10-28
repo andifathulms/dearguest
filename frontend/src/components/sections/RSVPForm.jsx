@@ -4,10 +4,12 @@ import { motion } from 'framer-motion'
 import api from '../../api/client.js'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
+import { useGuest } from '../../copy/GuestContext.jsx'
 
 export default function RSVPForm({ slug }) {
   const [searchParams] = useSearchParams()
-  const guestCode = searchParams.get('g') || ''
+  // A personal link's guest (from the couple's list), resolved by InvitationPage.
+  const guest = useGuest()
   const [form, setForm] = useState({
     guest_name: searchParams.get('to') || '',
     whatsapp: '',
@@ -19,18 +21,14 @@ export default function RSVPForm({ slug }) {
   const { t } = useCopy()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  // A personal link (?g=code) may cap how many people the invitation is for.
-  const [maxPax, setMaxPax] = useState(10)
+  // A personal link may cap how many people the invitation is for.
+  const maxPax = guest?.maxPax || 10
+  const guestCode = guest?.code || ''
 
   useEffect(() => {
-    if (!guestCode) return
-    api.get(`/invitations/${slug}/guest/${encodeURIComponent(guestCode)}/`)
-      .then(({ data }) => {
-        setMaxPax(data.max_pax)
-        setForm(f => ({ ...f, guest_name: f.guest_name || data.name, pax: Math.min(f.pax, data.max_pax) }))
-      })
-      .catch(() => { /* unknown code: the form still works without it */ })
-  }, [slug, guestCode])
+    if (!guest) return
+    setForm(f => ({ ...f, guest_name: guest.name, pax: Math.min(f.pax, guest.maxPax) }))
+  }, [guest])
 
   function handleChange(e) {
     const { name, value } = e.target

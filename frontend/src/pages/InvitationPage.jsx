@@ -1,18 +1,36 @@
 import { useState, useEffect } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import api from '../api/client.js'
 import ThemeRenderer from '../themes/ThemeRenderer.jsx'
+import { GuestProvider } from '../copy/GuestContext.jsx'
 
 export default function InvitationPage() {
-  const { slug } = useParams()
+  const { slug, code: pathCode } = useParams()
   const [searchParams] = useSearchParams()
-  const guestName = searchParams.get('to') || ''
+  const navigate = useNavigate()
+  // Personal links: /<slug>/<code>, or the legacy ?to=&g=<code>.
+  const legacyCode = searchParams.get('g') || ''
+  const code = pathCode || legacyCode
   // Owner draft preview: fetch via the authenticated editor endpoint.
   const preview = searchParams.get('preview') === '1'
 
   const [invitation, setInvitation] = useState(null)
+  const [guest, setGuest] = useState(null)
   const [status, setStatus] = useState('loading')
   const [errorMessage, setErrorMessage] = useState('')
+
+  // A legacy ?g= link becomes the clean /<slug>/<code> (same page, no reload).
+  useEffect(() => {
+    if (!pathCode && legacyCode) navigate(`/${slug}/${encodeURIComponent(legacyCode)}`, { replace: true })
+  }, [slug, pathCode, legacyCode, navigate])
+
+  // The guest's name comes from the couple's list, never from the URL.
+  useEffect(() => {
+    if (!code) { setGuest(null); return }
+    api.get(`/invitations/${slug}/guest/${encodeURIComponent(code)}/`)
+      .then(({ data }) => setGuest({ code: data.code, name: data.name, maxPax: data.max_pax }))
+      .catch(() => setGuest(null))   // unknown code: a general invitation
+  }, [slug, code])
 
   useEffect(() => {
     api.get(preview ? `/my/invitations/${slug}/` : `/invitations/${slug}/`)
@@ -59,5 +77,11 @@ export default function InvitationPage() {
     )
   }
 
-  return <ThemeRenderer invitation={invitation} guestName={guestName} preview={preview} />
+  // A ?to= name still shows on the cover of a general link (never on previews).
+  const guestName = guest?.name || (pathCode ? '' : searchParams.get('to') || '')
+  return (
+    <GuestProvider value={guest}>
+      <ThemeRenderer invitation={invitation} guestName={guestName} preview={preview} />
+    </GuestProvider>
+  )
 }

@@ -93,6 +93,7 @@ REST_FRAMEWORK = {
         'login': '20/hour',
         'password_reset': '5/hour',
         'activate': '10/hour',
+        'guest_lookup': '60/hour',
     },
 }
 

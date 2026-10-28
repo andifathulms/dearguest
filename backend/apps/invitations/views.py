@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.views import APIView
-from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, normalise_whatsapp
+from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
 from . import csv_export, ics, maps, moderation
 from .throttling import client_ip
@@ -109,7 +109,7 @@ class RSVPCreateView(generics.CreateAPIView):
         guest = None
         guest_code = (request.data.get('guest_code') or '').strip()
         if guest_code:
-            guest = Guest.objects.filter(invitation=invitation, code=guest_code).first()
+            guest = find_guest(invitation, guest_code)
 
         limit = (guest.max_pax if guest else None) or MAX_PAX
         if data['attending'] and data.get('pax', 1) > limit:
@@ -153,19 +153,29 @@ class RSVPCreateView(generics.CreateAPIView):
         return rsvp, False
 
 
+GUEST_LOOKUPS_PER_SLUG_PER_HOUR = 600
+
+
 class PublicGuestView(APIView):
-    """What the RSVP form needs from a personal link (?g=code): the name and
-    how many people the invitation is for. Nothing else about the guest list."""
+    """What a personal link (/<slug>/<code>, legacy ?g=) needs: the guest's
+    name from the couple's list and how many people the invitation is for.
+    Nothing else about the guest list. Rate-limited per IP (DRF scope) and per
+    invitation, so codes can't be enumerated to harvest guests' names."""
     permission_classes = [AllowAny]
+    throttle_scope = 'guest_lookup'
 
     def get(self, request, slug, code):
+        key = f'guest_lookup_{slug}'
+        cache.add(key, 0, timeout=3600)
+        if cache.incr(key) > GUEST_LOOKUPS_PER_SLUG_PER_HOUR:
+            return Response({'detail': 'Terlalu banyak permintaan.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         invitation, error = _public_or_404(slug, request.user)
         if error:
             return error
-        guest = invitation.guests.filter(code=code).first()
+        guest = find_guest(invitation, code)
         if not guest:
-            return Response({'detail': 'Tamu tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
-        return Response({'name': guest.name, 'max_pax': guest.max_pax or MAX_PAX})
+            return Response({'detail': 'Tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'code': guest.code, 'name': guest.name, 'max_pax': guest.max_pax or MAX_PAX})
 
 
 class RSVPListView(generics.ListAPIView):

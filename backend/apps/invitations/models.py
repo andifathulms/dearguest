@@ -13,9 +13,26 @@ from .uploads import SafeFileField, SafeImageField, validate_audio_upload, valid
 EXPIRY_DAYS_AFTER_WEDDING = 90
 
 
+# Guest codes go into links people read aloud, type and scan: no 0/O, 1/l/I.
+GUEST_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
+GUEST_CODE_LENGTH = 6   # 31^6 ~ 887 million per invitation
+
+
 def generate_guest_code():
-    """Short, URL-safe, unique code used in per-guest links and QR codes."""
-    return secrets.token_hex(4)  # 8 hex chars
+    """Short code for /<slug>/<code> links and QR codes. Unique per invitation
+    (Guest.save retries on a clash); not derived from anything guessable."""
+    return ''.join(secrets.choice(GUEST_CODE_ALPHABET) for _ in range(GUEST_CODE_LENGTH))
+
+
+def find_guest(invitation, code):
+    """The invitation's guest with this code, or None. New codes are upper
+    case; links are often retyped in lower case, and codes made before
+    October 2026 are lower-case hex, so try the code as given, then upper."""
+    code = (code or '').strip()
+    if not code or len(code) > 12:
+        return None
+    guests = invitation.guests
+    return guests.filter(code=code).first() or guests.filter(code=code.upper()).first()
 
 
 class Invitation(models.Model):
@@ -368,18 +385,23 @@ class Guest(models.Model):
     group = models.CharField(max_length=100, blank=True)  # e.g. Keluarga, Teman Kantor
     # How many people this invitation is for; null means the invitation-wide limit.
     max_pax = models.PositiveSmallIntegerField(null=True, blank=True)
-    code = models.CharField(max_length=12, unique=True, blank=True)
+    # Unique per invitation (the link carries the slug). Pre-Oct-2026 codes are
+    # 8 lower-case hex chars and keep working; new ones use GUEST_CODE_ALPHABET.
+    code = models.CharField(max_length=12, blank=True)
     checked_in = models.BooleanField(default=False)
     checked_in_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['name']
+        constraints = [
+            models.UniqueConstraint(fields=['invitation', 'code'], name='guest_code_unique_per_invitation'),
+        ]
 
     def save(self, *args, **kwargs):
         if not self.code:
             code = generate_guest_code()
-            while Guest.objects.filter(code=code).exists():
+            while Guest.objects.filter(invitation_id=self.invitation_id, code=code).exists():
                 code = generate_guest_code()
             self.code = code
         super().save(*args, **kwargs)

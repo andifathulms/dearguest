@@ -38,6 +38,7 @@ export default function App() {
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/dashboard/:slug" element={<DashboardRSVP />} />
           <Route path="/dashboard/:slug/edit" element={<EditorPage />} />
+          <Route path="/:slug/:code" element={<InvitationPage />} />
           <Route path="/:slug" element={<InvitationPage />} />
         </Routes>
       </Suspense>

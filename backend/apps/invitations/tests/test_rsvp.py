@@ -93,7 +93,8 @@ class PaxLimitTests(RsvpBase):
     def test_public_guest_lookup_returns_only_name_and_limit(self):
         guest = Guest.objects.create(invitation=self.inv, name='Budi', max_pax=2, whatsapp='0812', group='Kantor')
         res = self.client.get(f'/api/invitations/{self.inv.slug}/guest/{guest.code}/')
-        self.assertEqual(res.data, {'name': 'Budi', 'max_pax': 2})
+        # The canonical code (for the clean URL), name and limit; no number, no group.
+        self.assertEqual(res.data, {'code': guest.code, 'name': 'Budi', 'max_pax': 2})
         other = self.make_invitation(slug='lain', active=True)
         self.assertEqual(self.client.get(f'/api/invitations/{other.slug}/guest/{guest.code}/').status_code, 404)
 
