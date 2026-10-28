@@ -1,0 +1,33 @@
+{
+  "id": "sage",
+  "layoutVariant": "painted",
+  "hero": "framed",
+  "gallery": "editorial",
+  "opening": { "type": "css", "preset": "painted-bloom", "durationMs": 2000 },
+  "fonts": { "preload": ["fonts/script-400.woff2", "fonts/display-400.woff2", "fonts/body-300.woff2"] },
+  "photoFilters": ["none", "soft-warm", "bw"],
+  "slots": {
+    "cover-bg": {
+      "src": "assets/cover-bg.webp", "avif": "assets/cover-bg.avif", "fallback": "assets/cover-bg.jpg",
+      "width": 1080, "height": 1935, "priority": true,
+      "desktop": { "src": "assets/cover-bg-desktop.webp", "avif": "assets/cover-bg-desktop.avif" }
+    },
+    "hero-bg": {
+      "src": "assets/cover-bg-desktop.webp", "avif": "assets/cover-bg-desktop.avif", "fallback": "assets/cover-bg-desktop.jpg",
+      "width": 1920, "height": 1072
+    },
+    "hero-top": { "src": "assets/hero-top.webp", "avif": "assets/hero-top.avif", "width": 1080, "height": 1084, "priority": true },
+    "hero-bottom": { "src": "assets/hero-bottom.webp", "avif": "assets/hero-bottom.avif", "width": 1080, "height": 774 },
+    "photo-ring": { "src": "assets/photo-ring.webp", "avif": "assets/photo-ring.avif", "width": 880, "height": 1092 },
+    "corner-tl": { "src": "assets/corner-tl.webp", "avif": "assets/corner-tl.avif", "width": 720, "height": 720, "mirror": true },
+    "particles": {
+      "frames": ["assets/petal-1.webp", "assets/petal-2.webp", "assets/petal-3.webp", "assets/petal-4.webp", "assets/petal-5.webp", "assets/petal-6.webp"],
+      "count": 7, "size": 20
+    },
+    "monogram-frame": { "component": "slots/MonogramFrame.jsx" },
+    "heading-ornament": { "svg": "assets/heading.svg", "width": 96, "height": 16 },
+    "divider": { "svg": "assets/divider.svg", "width": 140, "height": 16 }
+  },
+  "copyVariants": ["islam", "kristen", "katolik", "umum"],
+  "eventTypes": ["akad", "pemberkatan", "sakramen", "resepsi", "adat", "ngunduh_mantu", "lainnya"]
+}

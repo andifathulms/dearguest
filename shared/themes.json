@@ -65,6 +65,37 @@
       }
     },
     {
+      "id": "sage",
+      "name": "Taman Sage",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/sage.webp",
+      "demoSlug": "demo-taman-sage",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Daun eucalyptus, zaitun, mawar putih, dan baby's breath dalam cat air yang ringan di atas kertas putih.",
+        "category": "Floral & Lembut",
+        "colors": [
+          "#fcfcf9",
+          "#5e7a6e",
+          "#e8c4b8"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fcfcf9,#9caf98 55%,#5e7a6e)",
+        "card": {
+          "bg": "#fcfcf9",
+          "fg": "#3d4741",
+          "accent": "#5e7a6e"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "sage"
+      }
+    },
+    {
       "id": "floral",
       "name": "Floral",
       "collection": "signature",

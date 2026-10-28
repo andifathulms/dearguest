@@ -1,0 +1,61 @@
+/* Taman Sage — tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page white is sampled from the paintings so art and page meet without a seam. */
+.pk-root[data-pack='sage'] {
+  /* colour */
+  --dg-bg: #fcfcf9;
+  --dg-bg-alt: rgba(126, 150, 143, 0.06);
+  --dg-surface: rgba(255, 255, 255, 0.8);
+  --dg-surface-raised: #ffffff;
+  --dg-ink: #3d4741;
+  --dg-ink-muted: #66726b;
+  --dg-ink-faint: #97a19a;
+  --dg-accent: #5e7a6e;   /* sage, deep enough for labels on white */
+  --dg-on-accent: #ffffff;
+  --dg-line: rgba(94, 122, 110, 0.18);
+  --dg-line-strong: rgba(94, 122, 110, 0.4);
+  --dg-scrim: linear-gradient(180deg, rgba(40, 52, 46, 0.18) 0%, rgba(40, 52, 46, 0) 25%, rgba(40, 52, 46, 0.4) 60%, rgba(40, 52, 46, 0.78) 100%);
+  --dg-focus: #5e7a6e;
+
+  /* type */
+  --dg-font-display: 'DG Sage Display', 'Marcellus', Georgia, serif;
+  --dg-font-body: 'DG Sage Body', 'Jost', system-ui, sans-serif;
+  --dg-font-label: 'DG Sage Label', 'Jost', system-ui, sans-serif;
+  --dg-font-script: 'DG Sage Script', 'Allura', cursive;
+  --dg-fs-names: clamp(3.4rem, 16vw, 6rem);
+  --dg-fs-title: clamp(1.7rem, 6.6vw, 2.4rem);
+  --dg-fs-subtitle: 1.45rem;
+  --dg-fs-body: 1.02rem;
+  --dg-fs-small: 0.92rem;
+  --dg-fs-label: 0.7rem;
+  --dg-lh-tight: 1.05;
+  --dg-lh-body: 1.75;
+  --dg-tracking-label: 0.28em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 16px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 14px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4.25rem, 14vw, 7.5rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(61, 71, 65, 0.06);
+  --dg-shadow-float: 0 6px 18px rgba(61, 71, 65, 0.16);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2000ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}
