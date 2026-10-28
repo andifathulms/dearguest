@@ -28,3 +28,6 @@ frontend/blob-report/
 
 # macOS folder metadata
 .DS_Store
+
+# Inbox for new theme art (see PROMPT-*-ASSETS.md); masters move to design/packs/<pack>/masters/
+/assets/

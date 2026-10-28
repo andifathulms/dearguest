@@ -23,6 +23,7 @@ import FloatingRSVP from '../../../components/ui/FloatingRSVP.jsx'
 import WhatsAppShare from '../../../components/ui/WhatsAppShare.jsx'
 import { PackContext } from './ThemeContext.jsx'
 import ThemeAsset from './ThemeAsset.jsx'
+import Particles from './Particles.jsx'
 import Monogram from './Monogram.jsx'
 import Opening from './openings/Opening.jsx'
 import Cover from './layout/Cover.jsx'
@@ -84,6 +85,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
           data-photo-filter={invitation.photo_filter || 'none'}
         >
           <ThemeAsset slot="texture" className="pk-texture" />
+          <Particles />
           {!preview && <Opening Cover={Cover} invitation={invitation} guestName={guestName} />}
 
           <HeroSection
@@ -105,6 +107,8 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
           {invitation.closing_text && (
             <PackSection>
               <section className="pk-closing">
+                <ThemeAsset slot="corner-tl" className="pk-corner pk-corner-tl" />
+                <ThemeAsset slot="corner-br" className="pk-corner pk-corner-br" />
                 <Monogram couple={couple} />
                 <p>{invitation.closing_text}</p>
               </section>

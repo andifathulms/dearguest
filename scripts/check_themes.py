@@ -52,9 +52,10 @@ REQUIRED_TOKENS = [
 SLOTS = {
     'cover-bg', 'cover-frame', 'corner-tl', 'corner-br', 'monogram-frame', 'heading-ornament',
     'divider', 'photo-mask', 'photo-ring', 'hero-overlay', 'parallax-back', 'parallax-mid',
-    'parallax-front', 'particles', 'opening', 'gift-card', 'og-template', 'texture',
+    'parallax-front', 'particles', 'opening', 'gift-card', 'og-template', 'texture', 'hero-bg', 'hero-top', 'hero-bottom',
 }
-LAYOUTS = {'framed-card', 'full-bleed', 'arch'}
+LAYOUTS = {'framed-card', 'full-bleed', 'arch', 'painted'}
+HEROES = {'photo', 'framed'}
 OPENINGS = {'none', 'css', 'lottie', 'layered-svg'}
 
 errors = []
@@ -185,12 +186,19 @@ def check_pack(t):
             err(f'{t["id"]}: theme.json layoutVariant must be one of {sorted(LAYOUTS)}')
         if (manifest.get('opening') or {}).get('type') not in OPENINGS:
             err(f'{t["id"]}: theme.json opening.type must be one of {sorted(OPENINGS)}')
+        if manifest.get('hero', 'photo') not in HEROES:
+            err(f'{t["id"]}: theme.json hero must be one of {sorted(HEROES)}')
         for slot, spec in (manifest.get('slots') or {}).items():
             if slot not in SLOTS:
                 err(f'{t["id"]}: unknown slot "{slot}"')
-            for key in ('src', 'svg', 'fallback'):
-                if isinstance(spec, dict) and spec.get(key) and not (d / spec[key]).exists():
-                    err(f'{t["id"]}: slot {slot} {key} file {spec[key]} not found')
+            if not isinstance(spec, dict):
+                continue
+            files = [(key, spec.get(key)) for key in ('src', 'svg', 'fallback', 'avif')]
+            files += [(f'desktop.{key}', (spec.get('desktop') or {}).get(key)) for key in ('src', 'avif')]
+            files += [('frames', f) for f in spec.get('frames', [])]
+            for key, path in files:
+                if path and not (d / path).exists():
+                    err(f'{t["id"]}: slot {slot} {key} file {path} not found')
             if isinstance(spec, dict) and spec.get('component') and not (d / spec['component']).exists():
                 err(f'{t["id"]}: slot {slot} component {spec["component"]} not found')
 

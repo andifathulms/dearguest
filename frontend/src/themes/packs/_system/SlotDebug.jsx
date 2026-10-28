@@ -14,7 +14,7 @@ const NOMINAL = {
   'cover-bg': [390, 844], texture: [256, 256], 'cover-frame': [340, 520],
   'corner-tl': [180, 180], 'corner-br': [180, 180], 'monogram-frame': [120, 120],
   'heading-ornament': [120, 24], divider: [320, 24], 'photo-mask': [200, 250],
-  'photo-ring': [220, 275], 'hero-overlay': [390, 844], 'parallax-back': [390, 844],
+  'photo-ring': [220, 275], 'hero-overlay': [390, 844], 'hero-bg': [390, 844], 'hero-top': [390, 336], 'hero-bottom': [390, 314], 'parallax-back': [390, 844],
   'parallax-mid': [390, 844], 'parallax-front': [390, 844], particles: [32, 32],
   opening: [390, 844], 'gift-card': [320, 200], 'og-template': [1200, 630],
 }

@@ -41,6 +41,20 @@
   animation-delay: calc(var(--late-i, 0) * 90ms - var(--op-t));
 }
 
+/* ---- painted-bloom: the painting settles in, the names write on, the rest rises (painted packs) ---- */
+.pk-opening[data-opening-preset='painted-bloom'] .pk-cover-bg {
+  animation: pk-op-photo calc(var(--op-dur) * 0.55) var(--dg-ease) both;
+  animation-delay: calc(0ms - var(--op-t));
+}
+.pk-opening[data-opening-preset='painted-bloom'] .pk-char {
+  animation: pk-op-char calc(var(--op-dur) * 0.16) ease-out both;
+  animation-delay: calc(var(--op-dur) * 0.3 + var(--i) * var(--char-step) * 0.7 - var(--op-t));
+}
+.pk-opening[data-opening-preset='painted-bloom'] .pk-op-late {
+  animation: pk-op-rise calc(var(--op-dur) * 0.25) var(--dg-ease) both;
+  animation-delay: calc(var(--op-dur) * 0.68 + var(--late-i, 0) * 90ms - var(--op-t));
+}
+
 /* No `filter` here: it would override the couple's photo filter (filters.css). */
 @keyframes pk-op-photo {
   from { opacity: 0; transform: scale(1.06); }

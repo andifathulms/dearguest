@@ -87,6 +87,20 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
 .pk-slot-mirrored { transform: rotate(180deg); }
 .pk-parallax { position: absolute; inset: 0; z-index: 2; }
 .pk-parallax img { width: 100%; height: 100%; object-fit: cover; }
+/* corners also frame the closing section */
+.pk-root .pk-closing { position: relative; isolation: isolate; }
+.pk-root .pk-closing > :not(.pk-corner) { position: relative; z-index: 8; }
+
+/* falling sprites (slots.particles): above the cover, never clickable */
+.pk-particles { position: fixed; inset: 0; z-index: 1050; overflow: hidden; pointer-events: none; }
+.pk-particle { position: absolute; top: -10vh; height: auto; opacity: 0.92; animation: pk-fall linear infinite; will-change: transform; }
+@keyframes pk-fall {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(var(--sway), 60vh, 0) rotate(calc(var(--spin) / 2)); }
+  100% { transform: translate3d(0, 122vh, 0) rotate(var(--spin)); }
+}
+@media (prefers-reduced-motion: reduce) { .pk-particles { display: none; } }
+
 .pk-heading-ornament { margin: calc(-1 * var(--dg-space-3)) auto var(--dg-space-5); }
 .pk-divider { padding-block: var(--dg-space-2); }
 

@@ -102,7 +102,19 @@ function ArchCover(props) {
   )
 }
 
-const COVERS = { 'full-bleed': FullBleedCover, 'framed-card': FramedCardCover, arch: ArchCover }
+// painted: the pack's painting is the cover; the text sits in its calm centre.
+function PaintedCover(props) {
+  return (
+    <div className="pk-cover pk-cover--painted">
+      <ThemeAsset slot="cover-bg" className="pk-cover-bg" />
+      <ThemeAsset slot="corner-tl" className="pk-corner pk-corner-tl" />
+      <ThemeAsset slot="corner-br" className="pk-corner pk-corner-br" />
+      <CoverContent {...props} />
+    </div>
+  )
+}
+
+const COVERS = { 'full-bleed': FullBleedCover, 'framed-card': FramedCardCover, arch: ArchCover, painted: PaintedCover }
 
 export default function Cover(props) {
   const { pack } = usePack()

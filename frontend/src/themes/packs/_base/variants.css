@@ -25,6 +25,24 @@
 .pk-cover-arch { border-radius: 50% 50% var(--dg-radius-card) var(--dg-radius-card) / 30% 30% var(--dg-radius-card) var(--dg-radius-card); overflow: hidden; }
 .pk-root[data-layout='arch'] .pk-photo-frame .profile-photo { border-radius: 999px 999px var(--dg-radius-photo) var(--dg-radius-photo); }
 
+/* ---- painted: the pack's painting is the cover; text in its calm centre ---- */
+.pk-cover--painted { color: var(--dg-ink); }
+.pk-cover--painted .pk-cover-content { width: 100%; max-width: 30rem; }
+
+/* ---- hero "framed" (theme.json → hero): painted hero, photo in the ring ---- */
+.pk-root .pk-hero--framed { place-items: center; }
+.pk-hero-bg { position: absolute; inset: 0; z-index: 0; }
+.pk-hero-bg img { width: 100%; height: 100%; object-fit: cover; }
+.pk-root .pk-hero--framed .hero-content { justify-items: center; }
+.pk-hero-band { position: absolute; inset-inline: 0; z-index: 1; pointer-events: none; }
+.pk-hero-band--top { top: 0; }
+.pk-hero-band--bottom { bottom: 0; }
+.pk-hero-band img { width: 100%; height: auto; }
+/* bands on portrait screens, the wide painting on landscape ones */
+@media (max-aspect-ratio: 1/1) { .pk-hero--framed[data-bands] .pk-hero-bg { display: none; } }
+@media (min-aspect-ratio: 1/1) { .pk-hero--framed[data-bands] .pk-hero-band { display: none; } }
+.pk-hero-portrait { margin-inline: auto; }
+
 /* ---- gallery: editorial (mixed sizes, not uniform tiles) ---- */
 .pk-root[data-gallery='editorial'] .gallery-grid {
   grid-template-columns: repeat(6, 1fr);

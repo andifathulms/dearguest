@@ -1,6 +1,8 @@
 import { usePack } from './ThemeContext.jsx'
 import { SlotFrame } from './SlotDebug.jsx'
 
+const DESKTOP = '(min-aspect-ratio: 1/1)'
+
 // Renders one asset slot from the active pack's theme.json (docs/theme-packs.md §4).
 // Outside a pack, or for a slot the pack doesn't fill, it renders nothing and
 // reserves no space, so layouts are identical with or without art.
@@ -53,6 +55,9 @@ export default function ThemeAsset({ slot, className = '' }) {
   } else {
     body = (
       <picture className={cls} aria-hidden="true">
+        {/* An optional landscape painting for wide screens ("desktop": {src, avif}). */}
+        {spec.desktop?.avif && <source media={DESKTOP} type="image/avif" srcSet={pack.urls[spec.desktop.avif]} />}
+        {spec.desktop && <source media={DESKTOP} srcSet={pack.urls[spec.desktop.src]} />}
         {spec.avif && <source type="image/avif" srcSet={pack.urls[spec.avif]} />}
         {spec.fallback && <source type="image/webp" srcSet={pack.urls[spec.src]} />}
         <img

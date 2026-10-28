@@ -27,11 +27,40 @@ function PackHeroMedia({ heroPhoto }) {
   )
 }
 
+// The hero photo inside the pack's photo ring (same frame as the profile photos).
+function FramedPortrait({ heroPhoto }) {
+  const meta = useCopy().invitation?.hero_photo_meta
+  return (
+    <div className="pk-photo-frame pk-hero-portrait">
+      <img className="profile-photo pk-photo" srcSet={meta?.srcset} sizes="(min-width: 640px) 320px, 60vw" src={meta?.fallback || heroPhoto} alt="" fetchpriority="high" decoding="async" />
+      <ThemeAsset slot="photo-ring" className="pk-photo-ring" />
+    </div>
+  )
+}
+
 export default function HeroSection({ brideName, groomName, weddingDate, heroPhoto }) {
   const pack = usePack()
   const formatted = weddingDate
     ? formatDateOnly(weddingDate)
     : ''
+
+  // "hero": "framed" (theme.json): the pack's painting is the hero and the
+  // couple's photo sits in its photo ring, above the names. With hero-top /
+  // hero-bottom bands (portrait screens), the flowers are pinned to the edges
+  // and the section grows to fit, so they never cover the names; hero-bg is
+  // the painting for wide screens (or for every screen without bands).
+  if (pack?.pack.manifest.hero === 'framed') {
+    const bands = Boolean(pack.pack.manifest.slots?.['hero-top'])
+    return (
+      <section className="hero-section pk-hero pk-hero--framed" data-bands={bands || undefined}>
+        <ThemeAsset slot="hero-bg" className="pk-hero-bg" />
+        <ThemeAsset slot="hero-top" className="pk-hero-band pk-hero-band--top" />
+        <ThemeAsset slot="hero-bottom" className="pk-hero-band pk-hero-band--bottom" />
+        <HeroContent brideName={brideName} groomName={groomName} formatted={formatted}
+          portrait={heroPhoto && <FramedPortrait heroPhoto={heroPhoto} />} />
+      </section>
+    )
+  }
 
   if (pack) {
     return (
@@ -54,7 +83,7 @@ export default function HeroSection({ brideName, groomName, weddingDate, heroPho
   )
 }
 
-function HeroContent({ brideName, groomName, formatted }) {
+function HeroContent({ brideName, groomName, formatted, portrait }) {
   const { t, variant, invitation } = useCopy()
   // The blessing line is the variant's (islam: the Bismillah, verbatim from
   // Tanzil); other variants have none. Its Tanzil credit goes right under it,
@@ -69,6 +98,7 @@ function HeroContent({ brideName, groomName, formatted }) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: 'easeOut' }}
       >
+        {portrait}
         {blessing && <p className="hero-bismillah" lang="ar" dir="rtl">{blessing.arabic}</p>}
         {creditHere && <QuranCredit t={t} className="hero-quran-credit" />}
         <p className="hero-label">{t('hero.label')}</p>
