@@ -70,25 +70,25 @@
       "name": "Floral",
       "collection": "signature",
       "kind": "pack",
-      "status": "coming",
+      "status": "active",
       "tier": "premium",
-      "previewImage": null,
-      "demoSlug": null,
-      "demoTemporary": false,
+      "previewImage": "/theme-previews/floral.webp",
+      "demoSlug": "demo-merah-anggur",
+      "demoTemporary": true,
       "catalog": {
-        "desc": "Rangkaian peony dan mawar cat air yang dilukis tangan, di atas kertas lembut.",
+        "desc": "Peony, anggrek bulan, dan melati yang dilukis tangan di atas beludru merah anggur, dengan huruf emas.",
         "category": "Floral & Lembut",
         "colors": [
-          "#fbf6f1",
-          "#b9786c",
-          "#e8cfc5"
+          "#43121d",
+          "#f4e8da",
+          "#c9a55c"
         ],
         "previewClass": null,
-        "swatch": "linear-gradient(135deg,#fbf6f1,#b9786c)",
+        "swatch": "linear-gradient(135deg,#43121d,#7a2a3a 55%,#c9a55c)",
         "card": {
-          "bg": "#fbf6f1",
-          "fg": "#3a2622",
-          "accent": "#b9786c"
+          "bg": "#43121d",
+          "fg": "#f4e8da",
+          "accent": "#c9a55c"
         },
         "badge": null
       },

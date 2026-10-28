@@ -1,0 +1,120 @@
+/* Floral — what tokens can't express (cap: 150 lines). See DESIGN.md. */
+
+/* The page is the same wine velvet the paintings sit on. */
+.pk-root[data-pack='floral'] {
+  background: var(--dg-bg) url('./assets/texture.webp') repeat;
+  background-size: 256px 256px;
+  font-feature-settings: 'kern', 'liga';
+}
+
+/* Names in script; labels in spaced gold capitals, as on printed invitations. */
+.pk-root[data-pack='floral'] :is(.cover-names, .hero-names) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-shadow: 0 2px 18px rgba(20, 3, 8, 0.55);
+}
+.pk-root[data-pack='floral'] :is(.cover-amp, .hero-ampersand) {
+  font-family: var(--dg-font-display);
+  font-style: italic;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='floral'] :is(.cover-label, .hero-label, .cover-guest-to, .countdown-label, .event-date, .story-date) {
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='floral'] .section-title {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 11vw, 3.6rem);
+  line-height: 1.15;
+}
+
+/* Cover: text in the painting's calm centre; no monogram competing with the flowers. */
+.pk-root[data-pack='floral'] .pk-cover--painted { place-items: center; }
+/* The painting's calm zone is ~31–74 % of the height: keep the block compact and a little low. */
+.pk-root[data-pack='floral'] .pk-cover--painted .pk-cover-content { gap: 0.45rem; padding-block: 9vh 2vh; }
+.pk-root[data-pack='floral'] .pk-cover--painted .cover-names { font-size: clamp(2.9rem, 13.5vw, 5.4rem); }
+.pk-root[data-pack='floral'] .pk-cover .pk-monogram { display: none; }
+.pk-root[data-pack='floral'] .cover-names { margin: 0.2rem 0 0.4rem; }
+.pk-root[data-pack='floral'] .cover-guest-name {
+  font-family: var(--dg-font-display);
+  font-style: italic;
+  font-size: clamp(1.45rem, 6vw, 1.85rem);
+}
+.pk-root[data-pack='floral'] .cover-guest { margin-top: 0.3rem; }
+.pk-root[data-pack='floral'] .pk-cover .pk-open-btn { margin-top: 0.6rem; }
+
+/* Gold pill buttons. */
+.pk-root[data-pack='floral'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn) {
+  border: 0;
+  background: linear-gradient(180deg, #d7b770, var(--dg-accent));
+  color: var(--dg-on-accent);
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  box-shadow: var(--dg-shadow-float);
+}
+.pk-root[data-pack='floral'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn):hover { background: #e2c27e; color: var(--dg-on-accent); }
+.pk-root[data-pack='floral'] :is(.bank-copy-btn, .map-load, .rsvp-toggle-btn) { border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='floral'] .rsvp-toggle-btn.active { background: var(--dg-accent); border-color: var(--dg-accent); color: var(--dg-on-accent); }
+
+/* Photo frames are ovals sized to the painted wreath (photo-ring.webp): the
+   photo fills the wreath's opening and the ring extends past it on each side
+   by the measured margins. Shared by the hero portrait and the profiles. */
+.pk-root[data-pack='floral'] .pk-photo-frame { width: min(58vw, 260px, 100%); aspect-ratio: 0.842; margin: 9% auto 14%; }
+.pk-root[data-pack='floral'] .pk-photo-frame .profile-photo {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 93%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 93%, transparent 100%);
+}
+.pk-root[data-pack='floral'] .pk-photo-ring { inset: -14.7% -12.4% -19.8% -16.3%; }
+.pk-root[data-pack='floral'] .pk-photo-ring img { width: 100%; height: 100%; }
+
+/* Hero: the painting with the couple's portrait in the wreath, names below. */
+/* Phones: content sits between the painted bands (their flowers end at ~0.59 and
+   start at ~0.72 of the screen width from the top/bottom; see build_pack_art.py). */
+.pk-root[data-pack='floral'] .pk-hero--framed { padding-block: 9rem 8rem; }
+@media (max-aspect-ratio: 1/1) {
+  .pk-root[data-pack='floral'] .pk-hero--framed[data-bands] { padding-block: 50vw 70vw; }
+}
+.pk-root[data-pack='floral'] .pk-hero--framed .hero-scroll-cue { display: none; }
+.pk-root[data-pack='floral'] .pk-hero--framed .hero-content { gap: 0.6rem; }
+.pk-root[data-pack='floral'] .pk-hero-portrait { width: min(54vw, 250px); margin: 7% auto 12%; }
+.pk-root[data-pack='floral'] .hero-ornament { display: none; }
+.pk-root[data-pack='floral'] .hero-bismillah { font-size: 1.2rem; color: var(--dg-accent); }
+
+/* Greeting and closing read like the inside of a card. */
+.pk-root[data-pack='floral'] :is(.greeting-text, .pk-closing p) {
+  font-family: var(--dg-font-display);
+  font-style: italic;
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+  line-height: 1.55;
+}
+.pk-root[data-pack='floral'] .scripture-text { color: var(--dg-ink); }
+
+/* Cards: translucent over the velvet, gold hairline. */
+.pk-root[data-pack='floral'] :is(.event-card, .bank-card, .wish-card, .rsvp-success) {
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-card);
+  box-shadow: var(--dg-shadow-card);
+}
+.pk-root[data-pack='floral'] .event-type { font-family: var(--dg-font-script); font-weight: 400; font-size: 2.3rem; color: var(--dg-ink); }
+.pk-root[data-pack='floral'] .countdown-unit {
+  border: 1px solid var(--dg-line-strong);
+  border-radius: 12px;
+  background: var(--dg-surface);
+}
+.pk-root[data-pack='floral'] .countdown-value { font-family: var(--dg-font-display); color: var(--dg-ink); }
+.pk-root[data-pack='floral'] :is(.rsvp-input, .rsvp-textarea) {
+  background: rgba(20, 3, 8, 0.25);
+  border-color: var(--dg-line-strong);
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='floral'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
+.pk-root[data-pack='floral'] :is(.profile-name, .map-event-label) { font-family: var(--dg-font-script); font-weight: 400; font-size: clamp(2.4rem, 10vw, 3rem); }
+
+/* Closing: the corner spray frames the last words. */
+.pk-root[data-pack='floral'] .pk-closing { padding-block: clamp(9rem, 40vw, 13rem); overflow: hidden; }
+.pk-root[data-pack='floral'] .pk-closing .pk-corner { width: min(52vw, 240px); }

@@ -1,0 +1,61 @@
+/* Floral — Merah Anggur: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   Colours are sampled from the paintings so the art and the page meet without a seam. */
+.pk-root[data-pack='floral'] {
+  /* colour */
+  --dg-bg: #43121d;
+  --dg-bg-alt: rgba(20, 3, 8, 0.18);
+  --dg-surface: rgba(255, 238, 222, 0.045);
+  --dg-surface-raised: rgba(255, 238, 222, 0.08);
+  --dg-ink: #f4e8da;
+  --dg-ink-muted: #dcc4b3;
+  --dg-ink-faint: #a98a7c;
+  --dg-accent: #c9a55c;
+  --dg-on-accent: #2e0711;
+  --dg-line: rgba(201, 165, 92, 0.22);
+  --dg-line-strong: rgba(201, 165, 92, 0.5);
+  --dg-scrim: linear-gradient(180deg, rgba(46, 7, 17, 0.25) 0%, rgba(46, 7, 17, 0) 25%, rgba(46, 7, 17, 0.45) 55%, rgba(46, 7, 17, 0.85) 100%);
+  --dg-focus: #e2c27e;
+
+  /* type */
+  --dg-font-display: 'DG Floral Display', 'Cormorant Garamond', Georgia, serif;
+  --dg-font-body: 'DG Floral Body', 'EB Garamond', Georgia, serif;
+  --dg-font-label: 'DG Floral Label', 'Cormorant Garamond', Georgia, serif;
+  --dg-font-script: 'DG Floral Script', 'Pinyon Script', cursive;
+  --dg-fs-names: clamp(3.4rem, 17vw, 6rem);
+  --dg-fs-title: clamp(2.1rem, 8vw, 3rem);
+  --dg-fs-subtitle: 1.6rem;
+  --dg-fs-body: 1.075rem;
+  --dg-fs-small: 0.95rem;
+  --dg-fs-label: 0.72rem;
+  --dg-lh-tight: 1.05;
+  --dg-lh-body: 1.65;
+  --dg-tracking-label: 0.28em;
+  --dg-weight-display: 500;
+
+  /* shape */
+  --dg-radius-card: 14px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 12px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(20, 3, 8, 0.35);
+  --dg-shadow-float: 0 6px 20px rgba(20, 3, 8, 0.45);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}
