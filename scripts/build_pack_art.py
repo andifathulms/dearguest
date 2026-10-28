@@ -52,6 +52,27 @@ PACKS = {
         'sprites': ('petals-sheet.jpg', (55, 12, 21), 'petal', 96, (22, 58), (24, 10, 2, 3, 4, 4)),
         'texture': ('texture.jpg', 512, 70),
     },
+    'javanese': {
+        # Cut-outs on flat teal (#1E8C8C asked; ~#248788 delivered): far from every colour in
+        # the art, so no hole filling is needed -- and it would be wrong here, because the
+        # melati strings form closed loops that must stay open.
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: garland strings hang to ~48 % at the sides (centre clear from ~35 %);
+        # kembar mayang rise from ~67 % at the sides (centre clear down to ~88 %).
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.52, 'bottom', 0.22, 1080),
+            ('hero-bottom', 'hero.jpg', 0.62, 1.0, 'top', 0.2, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (36, 135, 136), 880, (24, 60), 3, False),
+            ('corner-tl', 'corner-tl.jpg', (30, 128, 128), 720, (24, 60), 3, False),
+        ],
+        'sprites': ('petals-sheet.jpg', (39, 135, 137), 'petal', 96, (24, 60), (2, 3, 4, 4, 3, 2), False),
+        'texture': ('texture.jpg', 512, 70),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -144,8 +165,9 @@ def build(pack):
         written += save_all(img, out, name, ('avif', 'webp'))
 
     if 'sprites' in cfg:
-        master, bg, prefix, size, ramp, closes = cfg['sprites']
-        sheet = key(Image.open(src / master), bg, ramp, 6, fill=True)
+        master, bg, prefix, size, ramp, closes, *rest = cfg['sprites']
+        fill = rest[0] if rest else True
+        sheet = key(Image.open(src / master), bg, ramp, 6, fill=True)   # only to find the sprites' boxes
         lab, n = ndi.label(np.asarray(sheet.getchannel('A')) > 40)
         boxes = [b for b in ndi.find_objects(lab) if (b[0].stop - b[0].start) * (b[1].stop - b[1].start) > 2000]
         boxes.sort(key=lambda b: (round(b[0].start / (sheet.height / 4)), b[1].start))   # reading order
@@ -156,7 +178,7 @@ def build(pack):
             # not become see-through.
             pad = 40
             crop = (max(0, xs.start - pad), max(0, ys.start - pad), min(raw.width, xs.stop + pad), min(raw.height, ys.stop + pad))
-            sprite = trim(key(raw.crop(crop), bg, ramp, closes[i - 1], fill=True))
+            sprite = trim(key(raw.crop(crop), bg, ramp, closes[i - 1], fill=fill))
             sprite.thumbnail((size, size), Image.LANCZOS)
             written += save_all(sprite, out, f'{prefix}-{i}', ('webp',))
 

@@ -102,14 +102,23 @@ export async function settle(page, scope = 'body') {
 // always enough to make WebKit re-check).
 export async function waitRevealed(page, wrap) {
   await wrap.evaluate(el => el.scrollIntoView({ block: 'center' }))
+  let attempt = 0
   await expect.poll(async () => {
-    const pending = await wrap.evaluate(el => {
+    // Each attempt lands the hidden part at a slightly different height, so a
+    // missed in-view check isn't repeated at exactly the same spot.
+    const shift = ((attempt++ % 3) - 1) * 90
+    const pending = await wrap.evaluate((el, shift) => {
       const parts = [el, ...el.querySelectorAll('[style*="opacity"]')]
       const hidden = parts.find(n => Number(getComputedStyle(n).opacity) < 1)
-      if (hidden && hidden !== el) hidden.scrollIntoView({ block: 'center' })
+      // Scroll the page only: scrollIntoView would also scroll a scrollable
+      // ancestor (the wishes list), leaving it nudged in some runs.
+      if (hidden && hidden !== el) {
+        const r = hidden.getBoundingClientRect()
+        window.scrollTo(0, window.scrollY + r.top + r.height / 2 - innerHeight / 2 + shift)
+      }
       // On failure the message names what stayed hidden.
       return hidden ? `${hidden.tagName}.${hidden.className} opacity ${getComputedStyle(hidden).opacity}` : 0
-    })
+    }, shift)
     // From the corner, so the wheel scrolls the page, not a scrollable list under the pointer.
     await page.mouse.move(0, 0)
     await page.mouse.wheel(0, 60)
