@@ -112,7 +112,7 @@ export async function waitRevealed(page, wrap) {
       const hidden = parts.find(n => Number(getComputedStyle(n).opacity) < 1)
       // Scroll the page only: scrollIntoView would also scroll a scrollable
       // ancestor (the wishes list), leaving it nudged in some runs.
-      if (hidden && hidden !== el) {
+      if (hidden) {   // the wrapper itself too: WebKit sometimes misses its in-view check
         const r = hidden.getBoundingClientRect()
         window.scrollTo(0, window.scrollY + r.top + r.height / 2 - innerHeight / 2 + shift)
       }
