@@ -96,6 +96,37 @@
       }
     },
     {
+      "id": "bugis",
+      "name": "Bugis",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/bugis.webp",
+      "demoSlug": "demo-lamming-sabbe",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Lamming berukir emas, walasuji, sutra sabbe, dan bosara di atas sutra hijau zamrud.",
+        "category": "Adat",
+        "colors": [
+          "#12503a",
+          "#f6ebd3",
+          "#d4b060"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#12503a,#9e1b2c 60%,#d4b060)",
+        "card": {
+          "bg": "#12503a",
+          "fg": "#f6ebd3",
+          "accent": "#d4b060"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "bugis"
+      }
+    },
+    {
       "id": "floral",
       "name": "Floral",
       "collection": "signature",

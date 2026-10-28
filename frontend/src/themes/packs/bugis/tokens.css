@@ -1,0 +1,62 @@
+/* Bugis — Lamming Sabbe: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page emerald is sampled from the paintings (lighter than the #0F3B2E asked for)
+   so art and page meet without a seam. */
+.pk-root[data-pack='bugis'] {
+  /* colour */
+  --dg-bg: #12503a;
+  --dg-bg-alt: rgba(6, 30, 21, 0.2);
+  --dg-surface: rgba(246, 235, 211, 0.05);
+  --dg-surface-raised: rgba(246, 235, 211, 0.09);
+  --dg-ink: #f6ebd3;
+  --dg-ink-muted: #dccba6;
+  --dg-ink-faint: #a9a07c;
+  --dg-accent: #d4b060;
+  --dg-on-accent: #0e2e22;
+  --dg-line: rgba(212, 176, 96, 0.24);
+  --dg-line-strong: rgba(212, 176, 96, 0.52);
+  --dg-scrim: linear-gradient(180deg, rgba(6, 30, 21, 0.25) 0%, rgba(6, 30, 21, 0) 25%, rgba(6, 30, 21, 0.45) 55%, rgba(6, 30, 21, 0.85) 100%);
+  --dg-focus: #e6c77a;
+
+  /* type */
+  --dg-font-display: 'DG Bugis Display', 'Playfair Display', Georgia, serif;
+  --dg-font-body: 'DG Bugis Body', 'Lora', Georgia, serif;
+  --dg-font-label: 'DG Bugis Label', 'Lora', Georgia, serif;
+  --dg-font-script: 'DG Bugis Script', 'Italianno', cursive;
+  --dg-fs-names: clamp(3.8rem, 18vw, 6.5rem);
+  --dg-fs-title: clamp(1.7rem, 6.6vw, 2.4rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1.05rem;
+  --dg-fs-small: 0.94rem;
+  --dg-fs-label: 0.7rem;
+  --dg-lh-tight: 1.02;
+  --dg-lh-body: 1.7;
+  --dg-tracking-label: 0.26em;
+  --dg-weight-display: 500;
+
+  /* shape */
+  --dg-radius-card: 10px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 8px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(4, 22, 15, 0.35);
+  --dg-shadow-float: 0 6px 20px rgba(4, 22, 15, 0.45);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}
