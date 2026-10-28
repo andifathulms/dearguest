@@ -1,0 +1,62 @@
+/* Sunda — Siger Mega Mendung: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page ivory is sampled from the paintings so art and page meet without a seam;
+   the ink is the mega mendung indigo. */
+.pk-root[data-pack='sunda'] {
+  /* colour */
+  --dg-bg: #fdf5ea;
+  --dg-bg-alt: rgba(43, 53, 87, 0.04);
+  --dg-surface: rgba(255, 252, 246, 0.72);
+  --dg-surface-raised: #fffcf6;
+  --dg-ink: #26304f;
+  --dg-ink-muted: #4f5a7a;
+  --dg-ink-faint: #8a8fa3;
+  --dg-accent: #8a683a;   /* siger gold, deep enough to read on ivory */
+  --dg-on-accent: #fdf5ea;
+  --dg-line: rgba(43, 53, 87, 0.16);
+  --dg-line-strong: rgba(43, 53, 87, 0.38);
+  --dg-scrim: linear-gradient(180deg, rgba(38, 48, 79, 0.2) 0%, rgba(38, 48, 79, 0) 25%, rgba(38, 48, 79, 0.45) 60%, rgba(38, 48, 79, 0.8) 100%);
+  --dg-focus: #2b3557;
+
+  /* type */
+  --dg-font-display: 'DG Sunda Display', 'Forum', Georgia, serif;
+  --dg-font-body: 'DG Sunda Body', 'Spectral', Georgia, serif;
+  --dg-font-label: 'DG Sunda Display', 'Forum', Georgia, serif;
+  --dg-font-script: 'DG Sunda Script', 'Parisienne', cursive;
+  --dg-fs-names: clamp(3rem, 14vw, 5.2rem);
+  --dg-fs-title: clamp(1.6rem, 6.4vw, 2.3rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1rem;
+  --dg-fs-small: 0.94rem;
+  --dg-fs-label: 0.72rem;
+  --dg-lh-tight: 1.08;
+  --dg-lh-body: 1.75;
+  --dg-tracking-label: 0.24em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 12px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 10px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(38, 48, 79, 0.08);
+  --dg-shadow-float: 0 6px 20px rgba(38, 48, 79, 0.18);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

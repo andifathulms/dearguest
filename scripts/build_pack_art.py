@@ -138,6 +138,30 @@ PACKS = {
         # visibly at 256 px; a generated lacquer (no weave) matches the paintings.
         'texture_synth': {'size': 512, 'rgb': (20, 12, 10), 'grain': 1.4, 'weave': 0, 'mottle': 1.6},
     },
+    'sunda': {
+        # Cut-outs on magenta (#D01C8B asked; ~#CA1885 delivered): the mega mendung clouds
+        # are indigo, so blue can't be keyed or despilled. Magenta despill instead.
+        # No hole filling: the ring's opening and the melati loops must stay open.
+        'despill': 'magenta',
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: centre clear ~37-80 % (the middle melati swag ends ~37 %); the side
+        # melati strings reach ~43 %, the side bamboo rises from ~55 %.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.48, 'bottom', 0.1, 1080),
+            ('hero-bottom', 'hero.jpg', 0.53, 1.0, 'top', 0.12, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (200, 24, 134), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (205, 23, 133), 720, (26, 64), 2, False),
+        ],
+        # the sheet's lower 45 % is a painted mist, not flat magenta: the sprites end ~55 %
+        'sprites': ('petals-sheet.jpg', (203, 31, 133), 'petal', 96, (26, 64), (2, 3, 2, 3, 2, 2), False),
+        'sprites_crop': (0, 0, 1, 0.57),
+        'texture': ('texture.jpg', 512, 70),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -166,7 +190,9 @@ def resize_w(img, width):
 def key(img, bg, ramp, close, fill=False, despill=False):
     """RGBA cut-out of `img` from a flat background colour `bg`. `despill`
     (blue-screen art): cap blue at max(red, green), removing the background's
-    tint from translucent watercolour. Only for palettes with no true blues."""
+    tint from translucent watercolour. Only for palettes with no true blues.
+    `despill='magenta'`: in the soft edge, where both red and blue exceed green,
+    pull them down by the excess (for palettes with indigo, where blue can't be capped)."""
     a = np.asarray(img.convert('RGB')).astype(np.float32)
     bg = np.array(bg, np.float32)
     dist = np.sqrt(((a - bg) ** 2).sum(2))
@@ -182,7 +208,11 @@ def key(img, bg, ramp, close, fill=False, despill=False):
     # Unmix: observed = alpha*fg + (1-alpha)*bg  ->  fg = (observed - (1-alpha)*bg) / alpha
     safe = np.maximum(alpha, 1e-3)[..., None]
     fg = np.clip((a - (1 - alpha[..., None]) * bg) / safe, 0, 255)
-    if despill:
+    if despill == 'magenta':   # edges only: the art's own pinks are solid, so they keep their colour
+        excess = np.maximum(np.minimum(fg[..., 0], fg[..., 2]) - fg[..., 1], 0) * (alpha < 0.995)
+        fg[..., 0] -= excess
+        fg[..., 2] -= excess
+    elif despill:
         fg[..., 2] = np.minimum(fg[..., 2], np.maximum(fg[..., 0], fg[..., 1]))
     fg = np.where(alpha[..., None] > 0.02, fg, 0)
     rgba = np.dstack([fg, alpha * 255]).astype(np.uint8)
@@ -255,7 +285,11 @@ def build(pack):
     if 'sprites' in cfg:
         master, bg, prefix, size, ramp, closes, *rest = cfg['sprites']
         fill = rest[0] if rest else True
-        sheet = key(Image.open(src / master), bg, ramp, 6, fill=True)   # only to find the sprites' boxes
+        raw = Image.open(src / master)
+        if 'sprites_crop' in cfg:   # (x0, y0, x1, y1) fractions: keep only the flat-background part
+            x0, y0, x1, y1 = cfg['sprites_crop']
+            raw = raw.crop((round(x0 * raw.width), round(y0 * raw.height), round(x1 * raw.width), round(y1 * raw.height)))
+        sheet = key(raw, bg, ramp, 6, fill=True)   # only to find the sprites' boxes
         # The sheet is painted as a 3x2 grid: one sprite per cell, even when a
         # sprite is several separate pieces (rice grains). Rows and columns are
         # split at the widest empty gaps between pieces (not at fixed thirds:
@@ -283,7 +317,6 @@ def build(pack):
             y0, y1, x0, x1 = cells.get(cell, (b[0].start, b[0].stop, b[1].start, b[1].stop))
             cells[cell] = (min(y0, b[0].start), max(y1, b[0].stop), min(x0, b[1].start), max(x1, b[1].stop))
         boxes = [(slice(y0, y1), slice(x0, x1)) for _, (y0, y1, x0, x1) in sorted(cells.items())]
-        raw = Image.open(src / master)
         for i, (ys, xs) in enumerate(boxes, 1):
             # Re-key each sprite alone: a petal is one solid shape, and its darkest
             # streaks can reach its edge (so they aren't enclosed holes) yet must

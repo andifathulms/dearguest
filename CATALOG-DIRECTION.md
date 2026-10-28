@@ -12,13 +12,13 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 
 | Category | Promise | Live | Next candidates |
 |---|---|---|---|
-| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis) | **Siger Mega Mendung (Sunda), prompt ready**; Batak (ulos, gorga); Bali (kamboja, candi bentar); Palembang (songket limar, gold); Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
-| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour) | Rustic (kraft paper, pampas, dried flowers); Lavender (lilac wisteria, pastel); Tropis (monstera, frangipani); Navy Bloom (deep navy with white flowers) |
+| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda) | Batak (ulos, gorga); Bali (kamboja, candi bentar); Palembang (songket limar, gold); Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
+| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour) | **Pampas Kraft (Rustic: kraft paper, pampas, dried flowers), prompt ready**; Lavender (lilac wisteria, pastel); Tropis (monstera, frangipani); Navy Bloom (deep navy with white flowers) |
 | *(later)* **Modern & Minimalis** | clean, editorial, photo-led | none yet | a painted-minimal pack: line-art florals or an arch, so it still has assets |
 
-**Suggested order.** Sunda next, then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
-1. Sunda
-2. Rustic
+**Suggested order.** Rustic next (Sunda is live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
+1. Sunda (live)
+2. Rustic (prompt ready: `PROMPT-RUSTIC-ASSETS.md`)
 3. Batak
 4. Lavender
 5. Bali
@@ -38,7 +38,8 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
    - move the images to `design/packs/<id>/masters/` and rename them by content;
    - measure the empty zones and the photo-frame opening, and add a recipe;
    - run `python3 scripts/build_pack_art.py <id>`;
-   - check the cut-outs over a light and a dark background.
+   - check the cut-outs over a light and a dark background;
+   - on a magenta key, use `'despill': 'magenta'` (edges only, so the art's own pinks survive). If part of the sprite sheet isn't flat, cut it off with `sprites_crop`.
 4. **Pack:**
    - `theme.json` (`painted` cover, `framed` hero);
    - tokens sampled from the paintings;

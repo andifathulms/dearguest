@@ -97,6 +97,37 @@
       }
     },
     {
+      "id": "sunda",
+      "name": "Siger Mega Mendung",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/sunda.webp",
+      "demoSlug": "demo-siger-mega-mendung",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Siger emas, awan mega mendung, ronce melati, dan rumpun bambu di atas kertas gading, dengan nila dan emas.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#fdf5ea",
+          "#26304f",
+          "#c2a15a"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fdf5ea,#3b4872 60%,#c2a15a)",
+        "card": {
+          "bg": "#fdf5ea",
+          "fg": "#26304f",
+          "accent": "#8a683a"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "sunda"
+      }
+    },
+    {
       "id": "floral",
       "name": "Merah Anggur",
       "collection": "signature",
