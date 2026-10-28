@@ -39,25 +39,25 @@
       "name": "Javanese",
       "collection": "signature",
       "kind": "pack",
-      "status": "coming",
+      "status": "active",
       "tier": "premium",
-      "previewImage": null,
-      "demoSlug": null,
-      "demoTemporary": false,
+      "previewImage": "/theme-previews/javanese.webp",
+      "demoSlug": "demo-gebyok-sogan",
+      "demoTemporary": true,
       "catalog": {
-        "desc": "Adat Jawa dengan gebyok, batik parang, dan ronce melati — dilukis khusus.",
+        "desc": "Gebyok jati berukir, ronce melati, dan kembang setaman di atas kertas gading, dengan warna sogan dan emas.",
         "category": "Adat",
         "colors": [
-          "#20170c",
-          "#c9a84c",
-          "#f3ead2"
+          "#fcefdc",
+          "#3b2416",
+          "#9c7429"
         ],
         "previewClass": null,
-        "swatch": "linear-gradient(135deg,#20170c,#c9a84c)",
+        "swatch": "linear-gradient(135deg,#fcefdc,#6b4426 60%,#9c7429)",
         "card": {
-          "bg": "#20170c",
-          "fg": "#c9a84c",
-          "accent": "#f3ead2"
+          "bg": "#fcefdc",
+          "fg": "#3b2416",
+          "accent": "#9c7429"
         },
         "badge": null
       },
