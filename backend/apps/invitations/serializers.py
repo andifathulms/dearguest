@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from rest_framework import serializers
-from . import maps
+from . import entitlements, maps
 from .models import MAX_PAX, Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest, MusicPreset, ProcessedImage
 
 
@@ -65,7 +65,7 @@ class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
         fields = ['id', 'name', 'whatsapp', 'group', 'max_pax', 'code', 'checked_in', 'checked_in_at',
-                  'responded', 'attending', 'created_at']
+                  'sent_at', 'responded', 'attending', 'created_at']
         read_only_fields = ['code', 'checked_in_at', 'created_at']
 
     def validate_max_pax(self, value):
@@ -344,6 +344,10 @@ class BankAccountWriteSerializer(serializers.ModelSerializer):
         fields = ['id', 'account_type', 'bank_name', 'account_number', 'account_name', 'qris_image', 'order']
 
 
+WA_TEMPLATE_KEYS = ('formal', 'casual', 'group')
+WA_TEMPLATE_MAX = 2000
+
+
 class InvitationSettingsSerializer(serializers.ModelSerializer):
     """Settings a couple may edit themselves. is_active and watermark stay admin-controlled (paywall)."""
     class Meta:
@@ -353,12 +357,30 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
             'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
             'gift_recipient', 'gift_address', 'gift_phone', 'wishes_require_approval', 'wish_blocklist',
             'music_file', 'hero_photo', 'livestream_url', 'wishlist_url', 'is_active', 'watermark', 'expires_at',
+            'wa_templates',
         ]
         read_only_fields = ['slug', 'is_active', 'watermark', 'expires_at']
 
     def validate_theme(self, value):
         # A couple keeps a theme that has since been hidden, but can't switch to one.
         return _theme_choice(value, current=getattr(self.instance, 'theme', None))
+
+    def validate_wa_templates(self, value):
+        if not isinstance(value, dict):
+            raise serializers.ValidationError('Format template tidak valid.')
+        unknown = set(value) - set(WA_TEMPLATE_KEYS) - {'active'}
+        if unknown:
+            raise serializers.ValidationError(f'Kunci tidak dikenal: {", ".join(sorted(unknown))}.')
+        if value.get('active', 'formal') not in ('formal', 'casual'):
+            raise serializers.ValidationError('Pilih template formal atau santai.')
+        for key in WA_TEMPLATE_KEYS:
+            text = value.get(key)
+            if text is None:
+                continue
+            if not isinstance(text, str) or len(text) > WA_TEMPLATE_MAX:
+                raise serializers.ValidationError({key: f'Maksimal {WA_TEMPLATE_MAX} karakter.'})
+        # Blank means "use the default again".
+        return {k: v for k, v in value.items() if v not in (None, '')}
 
     def validate(self, attrs):
         mode = attrs.get('scripture_mode', getattr(self.instance, 'scripture_mode', 'default'))
@@ -423,6 +445,7 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
     photos = PhotoWriteSerializer(many=True, read_only=True)
     bank_accounts = BankAccountWriteSerializer(many=True, read_only=True)
     has_activation_code = serializers.SerializerMethodField()
+    features = serializers.SerializerMethodField()
 
     class Meta:
         model = Invitation
@@ -433,8 +456,11 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
             'gift_recipient', 'gift_address', 'gift_phone', 'wishes_require_approval', 'wish_blocklist',
             'activation_requested', 'has_activation_code',
             'music_file', 'music_preset', 'hero_photo', 'livestream_url', 'wishlist_url',
-            'couple', 'events', 'stories', 'photos', 'bank_accounts',
+            'couple', 'events', 'stories', 'photos', 'bank_accounts', 'wa_templates', 'features',
         ]
+
+    def get_features(self, obj):
+        return entitlements.features(obj)
 
     def get_has_activation_code(self, obj):
         # Signal that admin issued a code (without exposing the code itself).

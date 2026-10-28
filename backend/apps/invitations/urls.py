@@ -8,6 +8,7 @@ from .views import (
     WishesListView,
     GuestListCreateView,
     GuestDetailView,
+    GuestImportView,
     CouponValidateView,
     EventCalendarView,
     MusicPresetListView,
@@ -43,6 +44,7 @@ urlpatterns = [
     path('coupons/validate/', CouponValidateView.as_view()),
     path('music-presets/', MusicPresetListView.as_view()),
     path('invitations/<slug:slug>/guests/', GuestListCreateView.as_view()),
+    path('invitations/<slug:slug>/guests/import/', GuestImportView.as_view()),
     path('invitations/<slug:slug>/guests/<int:pk>/', GuestDetailView.as_view()),
 
     # ===== Editor (authenticated, owner-scoped, multi-invitation) =====

@@ -79,6 +79,10 @@ class Invitation(models.Model):
     # Wish moderation: hold every wish for approval, and/or hold those matching a term.
     wishes_require_approval = models.BooleanField(default=False)
     wish_blocklist = models.TextField(blank=True, help_text='Satu kata/frasa per baris.')
+    # The couple's own WhatsApp messages: {"active": "formal"|"casual", "formal",
+    # "casual", "group"}. A missing key means the copy variant's default
+    # (blast.* in shared/copy/copy.json), so defaults can improve later.
+    wa_templates = models.JSONField(default=dict, blank=True)
     hero_photo = SafeImageField(upload_to='hero/', validators=[validate_image_upload], null=True, blank=True)  # full-bleed hero background
     watermark = models.BooleanField(default=True)
     music_file = SafeFileField(upload_to='music/', validators=[validate_audio_upload], null=True, blank=True)
@@ -390,6 +394,9 @@ class Guest(models.Model):
     code = models.CharField(max_length=12, blank=True)
     checked_in = models.BooleanField(default=False)
     checked_in_at = models.DateTimeField(null=True, blank=True)
+    # Marked by the couple's send queue when they come back from WhatsApp; we
+    # can't see whether WhatsApp actually delivered it.
+    sent_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

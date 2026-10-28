@@ -33,8 +33,6 @@ export default function DashboardRSVP() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const [data, setData] = useState(null)
-  const [couple, setCouple] = useState({ bride_name: '', groom_name: '' })
-  const [variant, setVariant] = useState('umum')
   const [tab, setTab] = useState('rsvp')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -55,9 +53,6 @@ export default function DashboardRSVP() {
           setLoading(false)
         }
       })
-    api.get(`/invitations/${slug}/`)
-      .then(res => { setCouple(res.data.couple || { bride_name: '', groom_name: '' }); setVariant(res.data.copy_variant || 'umum') })
-      .catch(() => {})
   }, [slug, navigate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleLogout() {
@@ -77,6 +72,7 @@ export default function DashboardRSVP() {
         <h1>Dashboard<small>{slug}</small></h1>
         <div className="dr-bar-actions">
           <a className="ui-btn ui-btn-ghost" href={`/dashboard/${slug}/edit`}>Edit Undangan</a>
+          <a className="ui-btn ui-btn-ghost" href={`/dashboard/${slug}/kirim`}>Kirim Undangan</a>
           <button className="ui-btn ui-btn-ghost" onClick={() => downloadCSV(slug).catch(() => setError('Gagal mengunduh CSV.'))}>Export CSV</button>
           <button className="ui-btn ui-btn-dark" onClick={handleLogout}>Keluar</button>
         </div>
@@ -96,7 +92,7 @@ export default function DashboardRSVP() {
         </div>
 
         {tab === 'guests' ? (
-          <GuestManager slug={slug} brideName={couple.bride_name} groomName={couple.groom_name} variant={variant} />
+          <GuestManager slug={slug} />
         ) : tab === 'wishes' ? (
           <WishModeration slug={slug} onChange={loadRsvps} />
         ) : (

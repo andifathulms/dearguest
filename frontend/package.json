@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test:visual": "sh scripts/visual-docker.sh",
     "test:visual:update": "sh scripts/visual-docker.sh --update-snapshots=changed",
-    "test:unit": "TZ=America/Los_Angeles node --test src/utils/"
+    "test:unit": "TZ=America/Los_Angeles node --test src/utils/*.test.js"
   },
   "dependencies": {
     "axios": "^1.7.0",

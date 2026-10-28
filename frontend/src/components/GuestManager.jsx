@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { QRCodeCanvas } from 'qrcode.react'
 import api from '../api/client.js'
 import { guestUrl } from '../utils/publicUrl.js'
-import { makeT } from '../copy/copy.js'
+import { waLink } from '../utils/whatsapp.js'
+import GuestImport from './GuestImport.jsx'
+import useWaMessages from './useWaMessages.js'
+import '../pages/SendQueue.css'
 
 const ic = {
   link: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></svg>,
@@ -11,15 +15,8 @@ const ic = {
   trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" /></svg>,
 }
 
-function waNumber(n) {
-  if (!n) return ''
-  let d = n.replace(/\D/g, '')
-  if (d.startsWith('0')) d = '62' + d.slice(1)
-  return d
-}
-
-export default function GuestManager({ slug, brideName, groomName, variant }) {
-  const t = makeT(variant)
+export default function GuestManager({ slug }) {
+  const wa = useWaMessages(slug)
   const [guests, setGuests] = useState([])
   const [stats, setStats] = useState({ total: 0, checked_in: 0 })
   const [bulk, setBulk] = useState('')
@@ -32,12 +29,6 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
 
   function guestLink(g) {
     return guestUrl(slug, g.code)
-  }
-  function inviteText(g) {
-    // Use the share URL so the WhatsApp message renders a rich link preview.
-    const link = guestUrl(slug, g.code)
-    // Wording follows the couple's copy variant (shared/copy/copy.json).
-    return t('invite.text', { greeting: t('share.greeting'), guest: g.name, bride: brideName, groom: groomName, url: link })
   }
 
   function showToast(msg) {
@@ -111,10 +102,12 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
     navigator.clipboard.writeText(guestLink(g)).then(() => showToast('Link disalin'))
   }
 
+  // The couple's chosen template (formal or santai), as in the send queue.
   function sendWa(g) {
-    const num = waNumber(g.whatsapp)
-    const url = `https://wa.me/${num}?text=${encodeURIComponent(inviteText(g))}`
-    window.open(url, '_blank', 'noopener')
+    window.open(waLink(g.whatsapp, wa.messageFor(g)), '_blank', 'noopener')
+    if (!g.sent_at) {
+      api.patch(`/invitations/${slug}/guests/${g.id}/`, { sent_at: new Date().toISOString() }).then(load).catch(() => {})
+    }
   }
 
   function downloadQr() {
@@ -130,6 +123,13 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
 
   return (
     <div>
+      <div className="gm-send-all">
+        <p>{guests.filter(g => g.sent_at).length} dari {guests.length} tamu sudah dikirimi undangan.</p>
+        <Link className="gm-btn gm-btn-wa" to={`/dashboard/${slug}/kirim`}>{ic.wa} Kirim ke tamu satu per satu</Link>
+      </div>
+
+      <GuestImport slug={slug} existing={guests} onDone={load} />
+
       {/* Add guests */}
       <div className="gm-add">
         <h3>Tambah Tamu</h3>
@@ -176,6 +176,7 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
                     ? (g.attending ? ' · RSVP: Hadir ✓' : ' · RSVP: Tidak hadir')
                     : ' · belum RSVP'}
                   {g.checked_in ? ' · check-in ✓' : ''}
+                  {g.sent_at && <span className="gm-tag-sent"> · terkirim</span>}
                 </div>
               </div>
               <label className="gm-pax" title="Berapa orang yang diundang dengan link ini">
@@ -188,7 +189,7 @@ export default function GuestManager({ slug, brideName, groomName, variant }) {
               </label>
               <div className="gm-row-actions">
                 <button className="gm-btn" onClick={() => copyLink(g)}>{ic.link} Link</button>
-                <button className="gm-btn gm-btn-wa" onClick={() => sendWa(g)}>{ic.wa} Kirim</button>
+                <button className="gm-btn gm-btn-wa" onClick={() => sendWa(g)} disabled={!wa.ready}>{ic.wa} Kirim</button>
                 <button className="gm-btn" onClick={() => setQrGuest(g)}>{ic.qr} QR</button>
                 <button className="gm-btn" onClick={() => remove(g)} aria-label="Hapus">{ic.trash}</button>
               </div>

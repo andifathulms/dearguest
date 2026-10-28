@@ -99,6 +99,10 @@
         "og.titleGuest": "Untuk {guest} · Undangan Pernikahan {bride} & {groom}",
         "og.description": "{greeting}, dengan penuh sukacita kami mengundang Anda ke pernikahan kami pada {date}.",
         "og.descriptionNoDate": "{greeting}, dengan penuh sukacita kami mengundang Anda ke pernikahan kami.",
+        "blast.salam": "Dengan hormat,",
+        "blast.formal": "{salam}\n\nKepada Yth.\n{nama}\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n{pasangan}\n{acara}: {tanggal}\n\nInformasi lengkap dan konfirmasi kehadiran ada di undangan berikut:\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\nTerima kasih.\nKami yang berbahagia,\n{pasangan}",
+        "blast.casual": "{greeting} {nama}!\n\nKami mau berbagi kabar bahagia: kami akan menikah 🤍\n{pasangan}\n{acara}: {tanggal}\n\nUndangan lengkapnya ada di sini, sekalian isi konfirmasi kehadirannya ya:\n{link}\n\nDitunggu kehadiran dan doanya. Terima kasih!",
+        "blast.group": "{salam}\n\nDengan penuh sukacita kami mengundang Bapak/Ibu/Saudara/i untuk hadir di pernikahan kami:\n\n{pasangan}\n{acara}: {tanggal}\n\nUndangan lengkap:\n{link}\n\nMohon maaf kami hanya dapat mengundang melalui pesan ini. Terima kasih atas doa dan kehadirannya.\n\n{pasangan}",
         "invite.text": "{greeting}\n\nKepada Yth. {guest},\nDengan penuh kebahagiaan, kami mengundang Anda ke pernikahan {bride} & {groom}.\n\nBuka undangan digital kami di:\n{url}\n\nMerupakan suatu kehormatan apabila Anda berkenan hadir. Terima kasih.",
         "music.on": "Nyalakan musik",
         "music.off": "Matikan musik",
@@ -120,6 +124,7 @@
           "rsvp.thanks": "Jazakumullah khairan. Konfirmasi Anda telah kami terima.",
           "rsvp.updated": "Jawaban diperbarui. Jazakumullah khairan.",
           "share.greeting": "Assalamualaikum",
+          "blast.salam": "Assalamualaikum Wr. Wb.",
           "invite.text": "Assalamualaikum Wr. Wb.\n\nKepada Yth. {guest},\nDengan penuh kebahagiaan, kami mengundang Anda ke pernikahan {bride} & {groom}.\n\nBuka undangan digital kami di:\n{url}\n\nMerupakan suatu kehormatan apabila Anda berkenan hadir. Terima kasih."
         },
         "kristen": {
@@ -135,7 +140,8 @@
           "countdown.passed": "Puji Tuhan, hari bahagia telah tiba",
           "rsvp.thanks": "Terima kasih, Tuhan memberkati. Konfirmasi Anda telah kami terima.",
           "rsvp.updated": "Jawaban diperbarui. Tuhan memberkati.",
-          "share.greeting": "Salam sejahtera"
+          "share.greeting": "Salam sejahtera",
+          "blast.salam": "Salam sejahtera"
         },
         "katolik": {
           "_label": "Katolik",
@@ -150,7 +156,8 @@
           "countdown.passed": "Syukur kepada Tuhan, hari bahagia telah tiba",
           "rsvp.thanks": "Terima kasih, Tuhan memberkati. Konfirmasi Anda telah kami terima.",
           "rsvp.updated": "Jawaban diperbarui. Tuhan memberkati.",
-          "share.greeting": "Salam damai"
+          "share.greeting": "Salam damai",
+          "blast.salam": "Salam damai"
         },
         "umum": {
           "_label": "Umum",

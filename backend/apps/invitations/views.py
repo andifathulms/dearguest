@@ -10,7 +10,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
-from . import csv_export, ics, maps, moderation
+from . import csv_export, guest_import, ics, maps, moderation
+from .entitlements import has_feature
 from .throttling import client_ip
 from .serializers import (
     InvitationPublicSerializer,
@@ -303,13 +304,36 @@ class GuestListCreateView(generics.ListCreateAPIView):
                 names = [n.strip() for n in names_raw.splitlines() if n.strip()]
             else:
                 names = [str(n).strip() for n in names_raw if str(n).strip()]
-            created = [Guest.objects.create(invitation=invitation, name=n) for n in names]
+            group = str(request.data.get('group') or '').strip()[:100]
+            created = [Guest.objects.create(invitation=invitation, name=n[:200], group=group) for n in names]
             return Response(GuestSerializer(created, many=True).data, status=status.HTTP_201_CREATED)
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         guest = serializer.save(invitation=invitation)
         return Response(GuestSerializer(guest).data, status=status.HTTP_201_CREATED)
+
+
+class GuestImportView(APIView):
+    """POST {rows: [{name, whatsapp, group, max_pax}]} from the dashboard's
+    paste/CSV import. Rows that are blank, have an invalid number, or repeat a
+    number or name already on the list are skipped and reported."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        invitation, error = _owner_or_error(request, slug)
+        if error:
+            return error
+        if not has_feature(invitation, 'guest_import'):
+            return Response({'detail': 'Fitur impor tamu tidak tersedia untuk paket ini.'}, status=status.HTTP_403_FORBIDDEN)
+        rows = request.data.get('rows')
+        if not isinstance(rows, list) or not rows:
+            return Response({'detail': 'Tidak ada baris untuk diimpor.'}, status=status.HTTP_400_BAD_REQUEST)
+        if len(rows) > guest_import.MAX_ROWS:
+            return Response({'detail': f'Maksimal {guest_import.MAX_ROWS} tamu sekali impor.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        created, skipped = guest_import.import_guests(invitation, rows)
+        return Response({'created': len(created), 'skipped': skipped}, status=status.HTTP_201_CREATED)
 
 
 class GuestDetailView(generics.RetrieveUpdateDestroyAPIView):

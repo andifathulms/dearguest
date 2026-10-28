@@ -13,6 +13,7 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage.jsx'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage.jsx'))
 const MyInvitationsPage = lazy(() => import('./pages/MyInvitationsPage.jsx'))
 const EditorPage = lazy(() => import('./pages/EditorPage.jsx'))
+const SendQueuePage = lazy(() => import('./pages/SendQueuePage.jsx'))
 const InvitationPage = lazy(() => import('./pages/InvitationPage.jsx'))
 
 function Loading() {
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/dashboard/:slug" element={<DashboardRSVP />} />
           <Route path="/dashboard/:slug/edit" element={<EditorPage />} />
+          <Route path="/dashboard/:slug/kirim" element={<SendQueuePage />} />
           <Route path="/:slug/:code" element={<InvitationPage />} />
           <Route path="/:slug" element={<InvitationPage />} />
         </Routes>
