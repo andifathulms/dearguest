@@ -67,4 +67,7 @@ test('no horizontal scroll, no emoji', async ({ page }) => {
   const text = await page.locator('.pk-root').innerText()
   expect(text).not.toMatch(/\p{Extended_Pictographic}/u)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+  // The floating RSVP button clears the bottom safe area.
+  const rsvp = await page.locator('.floating-rsvp').boundingBox()
+  expect(rsvp.y + rsvp.height).toBeLessThanOrEqual(page.viewportSize().height - 16)
 })

@@ -1,23 +1,16 @@
-import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { formatDateOnly } from '../../utils/dates.js'
-import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 
 export default function StorySection({ stories }) {
   const { t } = useCopy()
-  const timelineRef = useRef(null)
-  // Themes with a motion clock scrub the spine to scroll position; everything
-  // else keeps the plain static spine. The Framer entrances below are
-  // untouched either way — the driver only adds the draw-on.
-  useMotionTarget('story', timelineRef)
 
   if (!stories || stories.length === 0) return null
   return (
     <section className="story-section">
       <SectionTitle>{t('story.title')}</SectionTitle>
-      <div className="story-timeline" ref={timelineRef}>
+      <div className="story-timeline">
         {stories.map((story, index) => (
           <motion.div
             key={story.id}

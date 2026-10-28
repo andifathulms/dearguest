@@ -40,17 +40,27 @@ class RegistryCopyTests(APITestBase):
     def test_every_entry_is_well_formed(self):
         for t in REAL.values():
             with self.subTest(theme=t['id']):
-                self.assertIn(t['kind'], {'pack', 'legacy'})
+                self.assertEqual(t['kind'], 'pack')
                 self.assertIn(t['status'], {'active', 'hidden', 'coming'})
                 self.assertLessEqual(len(t['id']), Invitation._meta.get_field('theme').max_length)
 
-    def test_all_existing_themes_are_registered_legacy(self):
-        legacy = [t for t in REAL.values() if t['kind'] == 'legacy']
-        self.assertEqual(len(legacy), 36)
-        self.assertTrue(all(t['status'] == 'hidden' for t in legacy))
+    def test_the_default_theme_is_registered_and_active(self):
+        self.assertEqual(REAL[themes.DEFAULT_THEME]['status'], 'active')
 
 
-class ThemeValidationTests(APITestBase):
+class HiddenThemeBase(APITestBase):
+    """The shipped registry has no hidden themes; these tests hide two real
+    packs to exercise the rules for invitations left on a retired theme."""
+    HIDDEN, OTHER_HIDDEN, ACTIVE = 'floral', 'bugis', 'sage'
+
+    def setUp(self):
+        super().setUp()
+        patcher = with_status('hidden', self.HIDDEN, self.OTHER_HIDDEN)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+
+class ThemeValidationTests(HiddenThemeBase):
     def setUp(self):
         super().setUp()
         self.owner = self.make_user()
@@ -62,7 +72,7 @@ class ThemeValidationTests(APITestBase):
         }, format='json')
 
     def test_create_with_a_hidden_theme_is_refused(self):
-        res = self.create(theme='navy-gold')
+        res = self.create(theme=self.HIDDEN)
         self.assertEqual(res.status_code, 400)
         self.assertIn('theme', res.data)
 
@@ -70,10 +80,9 @@ class ThemeValidationTests(APITestBase):
         self.assertEqual(self.create(theme='does-not-exist').status_code, 400)
 
     def test_create_with_an_active_theme_works(self):
-        with with_active('minimal'):
-            res = self.create(theme='minimal')
+        res = self.create(theme=self.ACTIVE)
         self.assertEqual(res.status_code, 201, res.data)
-        self.assertEqual(Invitation.objects.get().theme, 'minimal')
+        self.assertEqual(Invitation.objects.get().theme, self.ACTIVE)
 
     def test_create_without_a_theme_uses_the_default_only_if_it_is_active(self):
         with with_status('coming', themes.DEFAULT_THEME):
@@ -82,42 +91,41 @@ class ThemeValidationTests(APITestBase):
             self.assertEqual(self.create().status_code, 201)
 
     def test_existing_hidden_theme_is_kept_and_editable(self):
-        inv = self.make_invitation(owner=self.owner, active=False, theme='navy-gold')
-        res = self.client.patch(f'/api/my/invitations/{inv.slug}/', {'theme': 'navy-gold', 'opening_text': 'Halo'}, format='json')
+        inv = self.make_invitation(owner=self.owner, active=False, theme=self.HIDDEN)
+        res = self.client.patch(f'/api/my/invitations/{inv.slug}/', {'theme': self.HIDDEN, 'opening_text': 'Halo'}, format='json')
         self.assertEqual(res.status_code, 200, res.data)
         inv.refresh_from_db()
-        self.assertEqual((inv.theme, inv.opening_text), ('navy-gold', 'Halo'))
+        self.assertEqual((inv.theme, inv.opening_text), (self.HIDDEN, 'Halo'))
 
     def test_switching_to_another_hidden_theme_is_refused(self):
-        inv = self.make_invitation(owner=self.owner, active=False, theme='navy-gold')
-        res = self.client.patch(f'/api/my/invitations/{inv.slug}/', {'theme': 'plum-gold'}, format='json')
+        inv = self.make_invitation(owner=self.owner, active=False, theme=self.HIDDEN)
+        res = self.client.patch(f'/api/my/invitations/{inv.slug}/', {'theme': self.OTHER_HIDDEN}, format='json')
         self.assertEqual(res.status_code, 400)
         inv.refresh_from_db()
-        self.assertEqual(inv.theme, 'navy-gold')
+        self.assertEqual(inv.theme, self.HIDDEN)
 
     def test_switching_to_an_active_theme_works(self):
-        inv = self.make_invitation(owner=self.owner, active=False, theme='navy-gold')
-        with with_active('minimal'):
-            res = self.client.patch(f'/api/my/invitations/{inv.slug}/', {'theme': 'minimal'}, format='json')
+        inv = self.make_invitation(owner=self.owner, active=False, theme=self.HIDDEN)
+        res = self.client.patch(f'/api/my/invitations/{inv.slug}/', {'theme': self.ACTIVE}, format='json')
         self.assertEqual(res.status_code, 200, res.data)
 
     def test_hidden_theme_invitation_still_renders_publicly(self):
-        inv = self.make_invitation(active=True, theme='buginese-blue')
+        inv = self.make_invitation(active=True, theme=self.HIDDEN)
         res = self.client.get(f'/api/invitations/{inv.slug}/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.data['theme'], 'buginese-blue')
+        self.assertEqual(res.data['theme'], self.HIDDEN)
 
     def test_model_rejects_unregistered_ids(self):
-        inv = self.make_invitation(theme='navy-gold')
+        inv = self.make_invitation(theme=self.HIDDEN)
         inv.theme = 'nope'
         with self.assertRaises(ValidationError):
             inv.full_clean()
 
 
-class AdminFormTests(APITestBase):
+class AdminFormTests(HiddenThemeBase):
     def form(self, instance=None, **data):
         inv_data = {
-            'slug': 'admin-made', 'tier': 'free', 'theme': 'navy-gold', 'wedding_date': '2026-12-12',
+            'slug': 'admin-made', 'tier': 'free', 'theme': self.HIDDEN, 'wedding_date': '2026-12-12',
             'watermark': True, **data,
         }
         return InvitationAdminForm(data=inv_data, instance=instance)
@@ -128,7 +136,7 @@ class AdminFormTests(APITestBase):
         self.assertIn('theme', form.errors)
 
     def test_admin_can_keep_an_existing_hidden_theme(self):
-        inv = self.make_invitation(slug='admin-made', theme='navy-gold')
+        inv = self.make_invitation(slug='admin-made', theme=self.HIDDEN)
         form = self.form(instance=inv)
         self.assertNotIn('theme', form.errors)
 
@@ -140,3 +148,29 @@ class SeedFromRegistryTests(APITestBase):
             if t.get('demoSlug') and not (t['kind'] == 'pack' and t['status'] == 'coming'):
                 with self.subTest(theme=t['id']):
                     self.assertEqual(Invitation.objects.get(slug=t['demoSlug']).theme, t['id'])
+
+    def test_seed_removes_stale_ownerless_demos_only(self):
+        stale = self.make_invitation(slug='demo-old-theme', theme='sage')
+        owned = self.make_invitation(slug='demo-a-real-couple', theme='sage', owner=self.make_user())
+        call_command('seed_demos', stdout=io.StringIO())
+        self.assertFalse(Invitation.objects.filter(pk=stale.pk).exists())
+        self.assertTrue(Invitation.objects.filter(pk=owned.pk).exists())
+
+
+from .migration_base import MigrationTestCase  # noqa: E402
+
+
+class RemovedThemesMigrationTests(MigrationTestCase):
+    migrate_from = '0039_processed_images'
+    migrate_to = '0040_remap_removed_themes'
+
+    CASES = {'a': 'luxury-emerald', 'b': 'minimal', 'c': 'javanese-dark', 'd': 'golden-3d', 'e': 'floral'}
+
+    def setUpBeforeMigration(self, apps):
+        for slug, theme in self.CASES.items():
+            self.make_old_invitation(apps, slug=slug, theme=theme)
+
+    def test_removed_themes_move_to_the_closest_pack_and_packs_stay(self):
+        Invitation = self.apps.get_model('invitations', 'Invitation')
+        got = dict(Invitation.objects.values_list('slug', 'theme'))
+        self.assertEqual(got, {'a': 'bugis', 'b': 'sage', 'c': 'javanese', 'd': 'minang', 'e': 'floral'})

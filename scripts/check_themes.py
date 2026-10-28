@@ -4,7 +4,6 @@
 Checks:
   * backend and frontend copies match shared/themes.json exactly
   * every entry has the required fields and allowed values; ids and demo slugs unique
-  * legacy entries point at a CSS file (and a component, for WebGL themes) that exists
   * every pack that isn't "coming" has theme.json, DESIGN.md, tokens.css and index.js,
     defines every required token, keeps overrides.css under the line cap, and
     references only slot names and asset files that exist
@@ -23,7 +22,7 @@ THEMES_DIR = ROOT / 'frontend' / 'src' / 'themes'
 PACKS_DIR = THEMES_DIR / 'packs'
 OVERRIDES_MAX_LINES = 150
 
-KINDS = {'pack', 'legacy'}
+KINDS = {'pack'}
 STATUSES = {'active', 'hidden', 'coming'}
 TIERS = {'free', 'premium', 'cinematic'}
 REQUIRED_FIELDS = ['id', 'name', 'collection', 'kind', 'status', 'tier', 'previewImage', 'demoSlug', 'catalog']
@@ -141,26 +140,8 @@ def check_entries(themes):
                 err(f'{tid}: demoSlug {demo} used twice')
             seen_demos.add(demo)
 
-        if t.get('kind') == 'legacy':
-            check_legacy(t)
         elif t.get('kind') == 'pack' and t.get('status') != 'coming':
             check_pack(t)
-
-
-def check_legacy(t):
-    leg = t.get('legacy') or {}
-    d = leg.get('dir')
-    if not d:
-        err(f'{t["id"]}: legacy.dir missing')
-        return
-    if not (THEMES_DIR / d / f'{d}.css').exists():
-        err(f'{t["id"]}: legacy CSS {d}/{d}.css not found')
-    if leg.get('ownComponent') and not (THEMES_DIR / d / 'index.jsx').exists():
-        err(f'{t["id"]}: ownComponent but {d}/index.jsx not found')
-    if not leg.get('ownComponent') and not leg.get('rootClass'):
-        err(f'{t["id"]}: classic legacy theme needs legacy.rootClass')
-    if not leg.get('coverClass'):
-        err(f'{t["id"]}: legacy.coverClass missing')
 
 
 def css_tokens(path):

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { useMotionTarget } from '../../motion/MotionClockContext.jsx'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 import ResponsiveImg, { preloadImage } from '../ui/ResponsiveImg.jsx'
@@ -118,11 +117,7 @@ function Lightbox({ photos, index, setIndex, returnFocus }) {
 export default function GallerySection({ photos }) {
   const { t } = useCopy()
   const [index, setIndex] = useState(null)
-  const gridRef = useRef(null)
   const opener = useRef(null)
-  // Slow ken-burns drift on themes with a motion clock. Drives the <img>
-  // transform only, so the Framer entrance on the wrapper is unaffected.
-  useMotionTarget('gallery', gridRef)
 
   if (!photos || photos.length === 0) return null
   return (
@@ -130,7 +125,6 @@ export default function GallerySection({ photos }) {
       <SectionTitle>{t('gallery.title')}</SectionTitle>
       <motion.div
         className="gallery-grid"
-        ref={gridRef}
         variants={container}
         initial="hidden"
         whileInView="show"

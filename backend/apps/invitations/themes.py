@@ -7,7 +7,7 @@ from pathlib import Path
 from django.core.exceptions import ValidationError
 
 REGISTRY_PATH = Path(__file__).resolve().parent / 'theme_registry.json'
-DEFAULT_THEME = 'minimal'
+DEFAULT_THEME = 'sage'
 
 
 @lru_cache(maxsize=1)
@@ -40,8 +40,7 @@ def choices(include_hidden=True):
 
 
 def validate_registered_theme(value):
-    """Model-level check: the id must exist in the registry (any status), so an
-    invitation on a hidden legacy theme stays valid."""
+    """Model-level check: the id must exist in the registry (any status)."""
     if not get(value):
         raise ValidationError(f'Tema "{value}" tidak dikenal.')
 

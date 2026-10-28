@@ -1,4 +1,4 @@
-// Phase 2 (market fit) states of the Minimal pack — Linux baselines, run in
+// Phase 2 (market fit) states, on the Taman Sage pack — Linux baselines, run in
 // Docker (`make visual`): religion copy variants, event timezones seen from
 // another zone, tap-to-load maps, the lightbox, RSVP update + guest limit,
 // structured parents with Alm./Almh. + Instagram, and the gift address card.

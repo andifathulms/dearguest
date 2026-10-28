@@ -42,6 +42,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         demos = demo_themes()
+        # Demos of themes that no longer exist: seeded, ownerless, unlinked.
+        stale = (Invitation.objects.filter(slug__startswith='demo-', couple_user__isnull=True)
+                 .exclude(slug__in=[slug for _, slug in demos]))
+        removed = stale.count()
+        stale.delete()
+        if removed:
+            self.stdout.write(f'  removed {removed} stale demo invitation(s)')
         for theme, slug in demos:
             inv, _ = Invitation.objects.update_or_create(
                 slug=slug,

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-// The contract every opening keeps, identical to the legacy CoverGate:
+// The contract every opening keeps:
 // - the page is scroll-locked (body.cover-open) until the guest opens it;
 // - the open button gets focus;
 // - opening dispatches `invitation:open` synchronously inside the click, which

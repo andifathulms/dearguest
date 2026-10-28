@@ -29,16 +29,12 @@ test('live preview follows theme and photo-filter changes', async ({ page }) => 
   await edit(() => page.selectOption('#set-filter', 'bw'))
   await expect(preview.locator('.pk-root')).toHaveAttribute('data-photo-filter', 'bw')
   expect(state.photo_filter).toBe('bw')
-  await expect(preview.locator('.pk-hero-img')).toHaveCSS('filter', /grayscale\(1\)/)
+  await expect(preview.locator('.pk-hero-portrait .profile-photo')).toHaveCSS('filter', /grayscale\(1\)/)
 
-  // Theme: switch to a legacy theme (listed because the dev server sets
-  // VITE_SHOW_HIDDEN_THEMES=1) and back. The filter control follows the pack.
-  await edit(async () => {
-    await page.selectOption('#set-theme', 'navy-gold')
-    await expect(page.locator('#set-filter')).toHaveCount(0)
-  })
-  await expect(preview.locator('.navy-gold.lx-root')).toBeVisible()
+  // Theme: switch to another pack and back; the preview re-renders each time.
+  await edit(() => page.selectOption('#set-theme', 'floral'))
+  await expect(preview.locator('.pk-root')).toHaveAttribute('data-pack', 'floral')
 
-  await edit(() => page.selectOption('#set-theme', 'minimal'))
-  await expect(preview.locator('.pk-root')).toHaveAttribute('data-pack', 'minimal')
+  await edit(() => page.selectOption('#set-theme', 'sage'))
+  await expect(preview.locator('.pk-root')).toHaveAttribute('data-pack', 'sage')
 })

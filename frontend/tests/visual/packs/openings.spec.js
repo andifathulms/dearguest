@@ -1,4 +1,4 @@
-// Opening types beyond Minimal's own `css` intro, driven by fixture files
+// Opening types beyond the packs' own `css` intros, driven by fixture files
 // through the dev overrides ?openingType / ?openingSrc / ?openingPreset.
 import { test, expect } from '@playwright/test'
 import { NOW, SLUG, stubInvitation } from './stub.js'

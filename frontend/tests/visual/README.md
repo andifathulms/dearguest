@@ -1,26 +1,25 @@
-# Visual regression — invitation themes
+# Visual regression: theme packs
 
-Screenshots the cover gate and opened hero of all 6 demo themes and compares
-them against committed baselines, so a CSS change that breaks a theme fails CI
-instead of shipping silently.
+Every pack (`src/themes/packs/<id>`) has a spec in `packs/<id>.spec.js` that screenshots its
+cover, hero and every section. Shared specs cover features rather than packs, on the Taman Sage
+fixture:
+- `market-fit.spec.js`: religion copy variants, event time zones, maps, lightbox, RSVP, profiles, gift;
+- `openings.spec.js`: Lottie and layered-SVG openings;
+- `editor-preview.spec.js`: the editor's live preview.
 
-## Prerequisites
-- Stack running: `docker compose up -d`
-- Demos seeded: `docker compose exec backend python manage.py seed_demos`
-- Browser installed once: `npx playwright install chromium`
+The API is stubbed (`packs/stub.js` plus `packs/fixtures/`), so no database is needed.
 
-## Run
+Baselines are Linux, Chromium and WebKit at 360, 390 and 1440 px, and run in the official Playwright
+image on the dev compose network:
+
 ```bash
-cd frontend
-npm run test:visual          # compare against baselines (fails on visual diff)
-npm run test:visual:update   # re-generate baselines after an intentional change
+docker compose up -d                       # the frontend dev server must be running
+make visual                                # compare against the baselines
+cd frontend && sh scripts/visual-docker.sh <spec>.js --update-snapshots=changed   # after an intended change
 ```
-On failure, Playwright writes a side-by-side diff under `test-results/`.
 
-## Notes
-- Baselines are **platform-specific** (suffixed `-darwin` here). CI should run
-  in a matching environment — e.g. the official `mcr.microsoft.com/playwright`
-  Linux image — and regenerate baselines there (commit the `-linux` set).
-- Animations are frozen (`animations: 'disabled'`) and a small diff ratio is
-  tolerated, so shimmer/petals/sun motion don't cause flaky diffs.
-- Point at another origin with `PREVIEW_URL=… npm run test:visual`.
+Put the spec file **before** `--update-snapshots`. That flag takes an optional mode, and would
+swallow a following file name as its mode.
+
+Leave the machine idle while the suite runs. A theme folder appearing mid-run makes the dev server
+reload pages, and heavy CPU load starves WebKit's in-view checks; both cause false failures.

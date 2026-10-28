@@ -50,9 +50,9 @@ class VariantApiTests(APITestBase):
 
     def create(self, **body):
         from .test_theme_registry import with_active
-        with with_active('minimal'):
+        with with_active('sage'):
             return self.client.post('/api/my/invitations/', {
-                'slug': 'andini-bagus', 'theme': 'minimal',
+                'slug': 'andini-bagus', 'theme': 'sage',
                 'wedding_date': (date.today() + timedelta(days=90)).isoformat(), **body,
             }, format='json')
 

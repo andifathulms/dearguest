@@ -8,7 +8,7 @@ class PhotoFilterTests(APITestBase):
     def setUp(self):
         super().setUp()
         self.owner = self.make_user()
-        self.inv = self.make_invitation(owner=self.owner, theme='minimal')
+        self.inv = self.make_invitation(owner=self.owner, theme='sage')
         self.login(self.owner)
 
     def test_defaults_to_none_and_is_public(self):

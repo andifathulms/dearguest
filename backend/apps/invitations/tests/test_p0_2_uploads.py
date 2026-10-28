@@ -151,5 +151,6 @@ class ProgrammaticSaveTests(APITestBase):
 
     def test_seed_demos_runs(self):
         call_command('seed_demos', stdout=io.StringIO())
-        inv = Invitation.objects.get(slug='demo-javanese')
+        from apps.invitations import themes
+        inv = Invitation.objects.get(slug=themes.get(themes.DEFAULT_THEME)['demoSlug'])
         self.assertTrue(inv.hero_photo.name.endswith('.jpg'), inv.hero_photo.name)

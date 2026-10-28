@@ -1,4 +1,68 @@
-# CLAUDE.md — Undangan Digital Platform
+# CLAUDE.md — DearGuest (Undangan Digital Platform)
+
+## Read first: how this repo works now (October 2026)
+
+The original build spec further down is **historical**. The app has since moved on: theme packs replace
+the three CSS themes, events have time zones, there are religion copy variants, and so on. Where they
+disagree, this section, the reports (`THEMEPACK-REPORT.md`, `MARKETFIT-REPORT.md`) and the code win.
+
+### Themes = painted packs only
+- Every theme is a pack in `frontend/src/themes/packs/<id>/`, listed in `shared/themes.json`. Run
+  `make themes` after editing it.
+- Each pack has real painted art. Image-less CSS themes were removed (migration `0040`).
+- Catalogue direction, naming rule, categories and the next themes to build: **`CATALOG-DIRECTION.md`**.
+- System docs: `docs/theme-packs.md` (slots, layouts, the `painted` cover, the `framed` hero, particles).
+
+### The art workflow: what the user means by…
+
+**"I placed the images in the assets folder"** (or "build it"): the user generated a theme's paintings
+in Gemini from the latest `PROMPT-<THEME>-ASSETS.md` and dropped them into `assets/` at the repo root.
+That folder is a git-ignored inbox. Then:
+1. Identify the theme from the newest `PROMPT-*-ASSETS.md` that has no pack yet.
+2. **Move** the images to `design/packs/<id>/masters/` so `assets/` is empty again, and rename them by
+   content: `cover-bg-portrait`, `cover-bg-desktop`, `hero`, `photo-ring`, `corner-tl`, `petals-sheet`,
+   `texture`. Gemini's file names are meaningless.
+3. Measure the art: background colours, the calm zones for text, and the photo-ring opening.
+4. Add a recipe to `scripts/build_pack_art.py`, then run `python3 scripts/build_pack_art.py <id>`.
+   Check the cut-outs over a light and a dark background. If `texture` is missing or tiles badly, use
+   `texture_synth`.
+5. Build the pack:
+   - `theme.json`: `painted` layout, `framed` hero;
+   - `tokens.css`, with colours sampled from the paintings;
+   - three OFL fonts that no other pack uses;
+   - code-drawn ornaments;
+   - `overrides.css`, at most 150 lines;
+   - `DESIGN.md`, with cultural notes for a reviewer.
+6. Registry entry: a **commercial name** (the look, not the ethnic group, e.g. "Gonjong Songket", not
+   "Minang"), a category, a demo slug, and a preview image. Then `make themes`, `make check` and
+   `seed_demos`.
+7. Visual spec `frontend/tests/visual/packs/<id>.spec.js`. Write the baselines with
+   `sh scripts/visual-docker.sh <id>.spec.js --update-snapshots=missing` (the spec file **before** the
+   flag). Then verify the full suite **twice, with the machine idle**.
+8. Show the user screenshots (cover, hero, full page, desktop), fix what looks wrong, and commit on a
+   feature branch. Don't merge or push unless asked.
+
+**"Give me another prompt"**: write `PROMPT-<THEME>-ASSETS.md` for the next theme in
+`CATALOG-DIRECTION.md`, using the same structure as the existing prompt files:
+- a style brief (Prompt 0), then Prompts 1–7;
+- exact percentage empty zones for text;
+- a separate hero painting with art only in the top and bottom bands;
+- cut-outs on one flat key colour that appears nowhere in the palette (cobalt `#2340C8` by default,
+  magenta `#D01C8B` if the palette has blue);
+- the texture prompt marked optional;
+- no people, no text, no religious symbols;
+- a note for a cultural reviewer.
+
+### Standing rules
+- Don't commit `docker-compose.yml` (the user's local port remap: web 5190, api 8020, db 5440), or
+  `RECON.md`, `PHASE0-REPORT.md`, `PROMPT-ASSET-MOTION.md`.
+- Never write religious text from memory (see `shared/copy/SOURCES.md`).
+- Commit messages end with the Co-Authored-By line used in the history.
+- The disk on the dev Mac runs low. Ask before pruning Docker volumes; other caches are OK.
+
+---
+
+# Original build spec (historical)
 
 You are building a digital wedding invitation SaaS platform for the Indonesian market. Read this file fully before writing any code. Follow every instruction here exactly.
 

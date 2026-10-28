@@ -1,18 +1,11 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import CoverGate from '../components/ui/CoverGate.jsx'
+import { lazy, Suspense, useMemo } from 'react'
 import SilentBoundary from '../components/ui/SilentBoundary.jsx'
-import { MotionClockProvider } from '../motion/MotionClockContext.jsx'
 import { getTheme } from './registry.js'
 import { CopyProvider } from '../copy/CopyContext.jsx'
 import { withDefaultTexts } from '../copy/copy.js'
-import LegacyTheme, { loadLegacyTheme } from './legacy/LegacyTheme.jsx'
 
-// Unknown or not-yet-renderable ids fall back to this legacy theme, as before.
-const FALLBACK_THEME = 'javanese-dark'
-
-// The WebGL ("cinematic") themes keep their own components: they differ by
-// scene, not just CSS. Each is a separate chunk.
-const ownComponents = import.meta.glob('./*/index.jsx')
+// Unknown or not-yet-renderable ids fall back to this pack.
+const FALLBACK_THEME = 'sage'
 
 // Theme packs: each pack's index.js is its own chunk (tokens, fonts, art).
 const packModules = import.meta.glob('./packs/*/index.js')
@@ -35,10 +28,10 @@ function preloadFonts(entry) {
 }
 
 // One lazy component per theme id, created once so re-renders don't remount it.
-// Each loads only its own code and CSS.
+// Each loads only its own pack chunk (tokens, fonts, art).
 const resolved = new Map()
 function themeComponent(entry) {
-  if (!resolved.has(entry.id) && entry.kind === 'pack') {
+  if (!resolved.has(entry.id)) {
     resolved.set(entry.id, lazy(() => {
       preloadFonts(entry)
       return Promise.all([
@@ -49,22 +42,13 @@ function themeComponent(entry) {
       }))
     }))
   }
-  if (!resolved.has(entry.id)) {
-    const { dir, ownComponent } = entry.legacy
-    resolved.set(entry.id, lazy(ownComponent
-      ? ownComponents[`./${dir}/index.jsx`]
-      : () => loadLegacyTheme(entry).then(() => ({
-        default: props => <LegacyTheme entry={entry} {...props} />,
-      }))))
-  }
   return resolved.get(entry.id)
 }
 
 function resolveEntry(themeId) {
   const entry = getTheme(themeId)
-  if (entry?.kind === 'legacy') return entry
   // A pack renders once its folder exists ("coming" packs may not have one yet).
-  if (entry?.kind === 'pack' && packModule(entry)) return entry
+  if (entry && packModule(entry)) return entry
   return getTheme(FALLBACK_THEME)
 }
 
@@ -88,21 +72,9 @@ function ThemeUnavailable() {
   )
 }
 
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const sync = () => setReduced(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
-  return reduced
-}
-
 export default function ThemeRenderer({ invitation: raw, guestName, preview = false }) {
-  // Greeting/closing fall back to the couple's variant defaults; every theme
-  // family (legacy, WebGL, packs) reads copy from the provider below.
+  // Greeting/closing fall back to the couple's variant defaults; the pack reads
+  // copy from the provider below.
   const invitation = useMemo(() => withDefaultTexts(raw), [raw])
   return (
     <CopyProvider invitation={invitation}>
@@ -114,41 +86,12 @@ export default function ThemeRenderer({ invitation: raw, guestName, preview = fa
 function ThemeBody({ invitation, guestName, preview }) {
   const entry = resolveEntry(invitation.theme)
   const Theme = themeComponent(entry)
-  const reducedMotion = usePrefersReducedMotion()
-
-  if (entry.kind === 'pack') {
-    // Packs bring their own opening (packs/_system/openings) and motion settings.
-    return (
-      <SilentBoundary fallback={<ThemeUnavailable />}>
-        <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
-          <Theme invitation={invitation} guestName={guestName} preview={preview} />
-        </Suspense>
-      </SilentBoundary>
-    )
-  }
-
-  // One decision point for the whole invitation: no clock means no motion
-  // layer anywhere, and every consumer degrades to its ordinary CSS/Framer
-  // behaviour on its own. Which themes get a clock is declared in the registry.
-  const motionConfig = reducedMotion ? null : entry.legacy.motionClock
-
+  // Packs bring their own opening (packs/_system/openings) and motion settings.
   return (
-    <MotionClockProvider config={motionConfig}>
-      {/* Editor preview renders the content directly, skipping the cover gate.
-          The cover sits outside the theme root, so the registry names the class
-          that styles it (the WebGL themes borrow a classic theme's cover). */}
-      {!preview && (
-        <CoverGate
-          invitation={invitation}
-          guestName={guestName}
-          themeClass={entry.legacy.coverClass}
-        />
-      )}
-      <SilentBoundary fallback={<ThemeUnavailable />}>
-        <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
-          <Theme invitation={invitation} guestName={guestName} />
-        </Suspense>
-      </SilentBoundary>
-    </MotionClockProvider>
+    <SilentBoundary fallback={<ThemeUnavailable />}>
+      <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+        <Theme invitation={invitation} guestName={guestName} preview={preview} />
+      </Suspense>
+    </SilentBoundary>
   )
 }

@@ -11,7 +11,7 @@ const readJson = name => JSON.parse(fs.readFileSync(fixture(name), 'utf8'))
 // catch the dev server's own source module /src/api/client.js.)
 const isApi = url => url.pathname.startsWith('/api/')
 
-export const SLUG = 'demo-minimal'
+export const SLUG = 'demo-taman-sage'
 // Fixed "now" for the countdown and "x hari yang lalu" on wishes.
 export const NOW = new Date('2026-12-03T10:00:00+07:00')
 

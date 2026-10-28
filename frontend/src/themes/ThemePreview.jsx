@@ -1,6 +1,5 @@
-// Preview tile for a registry theme card (landing, /tema). Legacy themes keep
-// their hand-made `tp-*` CSS preview; packs show their screenshot once they have
-// one, and fall back to a mock drawn from the registry colours.
+// Preview tile for a registry theme card (landing, /tema): the pack's
+// screenshot once it has one, else a mock drawn from the registry colours.
 export default function ThemePreview({ theme, className = '', badge }) {
   const label = badge ?? theme.badge
   if (theme.previewImage) {
@@ -11,11 +10,11 @@ export default function ThemePreview({ theme, className = '', badge }) {
       </div>
     )
   }
-  const style = theme.preview ? undefined : { background: theme.card.bg, color: theme.card.fg, '--tp-accent': theme.card.accent }
+  const style = { background: theme.card.bg, color: theme.card.fg, '--tp-accent': theme.card.accent }
   return (
-    <div className={`lp-theme-preview ${theme.preview || 'tp-registry'} ${className}`} style={style}>
+    <div className={`lp-theme-preview tp-registry ${className}`} style={style}>
       {label && <span className="tp-badge">{label}</span>}
-      <span className="tp-label">The Wedding Of</span>
+      <span className="tp-label">Undangan Pernikahan</span>
       <div className="tp-names lp-serif">
         Andini<span className="tp-amp">&amp;</span>Bagus
       </div>

@@ -6,7 +6,7 @@ import registry from './registry.json'
 const ENTRIES = registry.themes
 const BY_ID = Object.fromEntries(ENTRIES.map(t => [t.id, t]))
 
-// Dev-only: list hidden themes in pickers/galleries (e.g. to test legacy themes).
+// Dev-only: list hidden themes in pickers/galleries (e.g. to test a retired pack).
 const SHOW_HIDDEN = import.meta.env.DEV && import.meta.env.VITE_SHOW_HIDDEN_THEMES === '1'
 
 export const getTheme = id => BY_ID[id] || null
@@ -39,8 +39,6 @@ export const selectableThemes = () => ENTRIES.filter(visible).map(toCard)
 
 // Themes shown to buyers (landing, /tema): pickable ones plus "coming soon".
 export const catalogThemes = () => ENTRIES.filter(t => visible(t) || t.status === 'coming').map(toCard)
-
-export const cinematicThemes = () => catalogThemes().filter(t => t.collection === 'cinematic')
 
 // Display name / swatch for any registered theme, including hidden ones an
 // existing invitation still uses.
