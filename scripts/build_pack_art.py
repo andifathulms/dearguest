@@ -117,6 +117,27 @@ PACKS = {
         # Gemini wouldn't paint this one; generated to match the paintings' silk.
         'texture_synth': {'size': 512, 'rgb': (18, 80, 57), 'grain': 2.2, 'weave': 1.6, 'mottle': 3.0},
     },
+    'minang': {
+        # Cut-outs on cobalt (~#2242B8, even this time: no crop needed); no blues -> despill.
+        'despill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: centre clear ~30-84 %; the side drapes reach ~40 %, the runner starts ~81 %.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.46, 'bottom', 0.16, 1080),
+            ('hero-bottom', 'hero.jpg', 0.74, 1.0, 'top', 0.22, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (34, 66, 184), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (34, 66, 185), 720, (26, 64), 2, False),
+        ],
+        'sprites': ('petals-sheet.jpg', (39, 71, 187), 'petal', 96, (26, 64), (2, 3, 3, 3, 2, 2), False),
+        # The painted lacquer (texture.jpg) has strong vertical grain that tiles
+        # visibly at 256 px; a generated lacquer (no weave) matches the paintings.
+        'texture_synth': {'size': 512, 'rgb': (20, 12, 10), 'grain': 1.4, 'weave': 0, 'mottle': 1.6},
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}

@@ -1,0 +1,107 @@
+/* Minang — Gonjong Songket: what tokens can't express (cap: 150 lines). See DESIGN.md. */
+
+/* The page is the same black lacquer the paintings are on. */
+.pk-root[data-pack='minang'] {
+  background: var(--dg-bg) url('./assets/texture.webp') repeat;
+  background-size: 256px 256px;
+  font-feature-settings: 'kern', 'liga';
+}
+
+/* Names and section titles in script; labels in spaced gold capitals. */
+.pk-root[data-pack='minang'] :is(.cover-names, .hero-names, .section-title) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}
+.pk-root[data-pack='minang'] .section-title { font-size: clamp(2.9rem, 12vw, 3.9rem); line-height: 1.1; }
+.pk-root[data-pack='minang'] :is(.cover-amp, .hero-ampersand) { font-family: var(--dg-font-display); font-style: italic; color: var(--dg-accent); }
+.pk-root[data-pack='minang'] :is(.cover-label, .hero-label, .cover-guest-to, .countdown-label, .event-date, .story-date) {
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  color: var(--dg-accent);
+}
+
+/* Cover: under the gonjong roofline. The calm zone is ~38–81 % of the height, so the block sits low. */
+.pk-root[data-pack='minang'] .pk-cover--painted { place-items: center; }
+.pk-root[data-pack='minang'] .pk-cover--painted .pk-cover-content { width: min(86vw, 26rem); gap: 0.35rem; padding-block: 21vh 0; }
+.pk-root[data-pack='minang'] .pk-cover--painted .cover-names { font-size: clamp(2.9rem, 13.5vw, 5rem); margin: 0; }
+.pk-root[data-pack='minang'] .pk-cover .pk-monogram { display: none; }
+.pk-root[data-pack='minang'] .cover-guest { margin-top: 0.3rem; }
+.pk-root[data-pack='minang'] .cover-guest-to { letter-spacing: 0.06em; font-size: 0.6rem; }
+.pk-root[data-pack='minang'] .cover-guest-name { font-family: var(--dg-font-body); font-style: italic; font-size: clamp(1.3rem, 5.4vw, 1.65rem); }
+.pk-root[data-pack='minang'] .pk-cover .pk-open-btn { margin-top: 0.6rem; }
+
+/* Burnished-gold pill buttons, edged in Minang red. */
+.pk-root[data-pack='minang'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn) {
+  border: 1px solid #9b1c1c;
+  background: linear-gradient(180deg, #e6c77a, #c9a24a);
+  color: var(--dg-on-accent);
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  box-shadow: var(--dg-shadow-float);
+}
+.pk-root[data-pack='minang'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn):hover { background: #f0d48c; color: var(--dg-on-accent); }
+.pk-root[data-pack='minang'] :is(.bank-copy-btn, .map-load, .rsvp-toggle-btn) { border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='minang'] .rsvp-toggle-btn.active { background: var(--dg-accent); border-color: var(--dg-accent); color: var(--dg-on-accent); }
+
+/* Photo frames are ovals inside the carved gold frame (photo-ring.webp). Its
+   opening is x 23.7–76.1 %, y 21.5–77.3 % of the art, so the ring extends past the
+   photo by 45.2 % (left), 45.6 % (right), 38.5 % (top), 40.7 % (bottom); --w is the photo width. */
+.pk-root[data-pack='minang'] .pk-photo-frame {
+  --w: min(40vw, 180px);
+  width: var(--w);
+  aspect-ratio: 0.756;
+  margin: calc(var(--w) * 0.52) auto calc(var(--w) * 0.56);
+}
+.pk-root[data-pack='minang'] .pk-photo-frame .profile-photo {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+}
+.pk-root[data-pack='minang'] .pk-photo-ring { inset: -38.5% -45.6% -40.7% -45.2%; }
+.pk-root[data-pack='minang'] .pk-photo-ring img { width: 100%; height: 100%; }
+
+/* Hero. Phones: content between the bands (centre clear from ~0.54 W below the
+   top; the songket runner starts ~0.34 W above the bottom). */
+.pk-root[data-pack='minang'] .pk-hero--framed { padding-block: 8rem 7rem; }
+@media (max-aspect-ratio: 1/1) {
+  .pk-root[data-pack='minang'] .pk-hero--framed[data-bands] { padding-block: 50vw 38vw; }
+}
+.pk-root[data-pack='minang'] .pk-hero--framed .hero-content { gap: 0.5rem; }
+.pk-root[data-pack='minang'] .pk-hero-portrait { --w: min(34vw, 160px); }
+.pk-root[data-pack='minang'] :is(.hero-ornament, .pk-hero--framed .hero-scroll-cue) { display: none; }
+.pk-root[data-pack='minang'] .hero-bismillah { font-size: 1.2rem; color: var(--dg-accent); }
+
+/* Greeting, verse and closing in Libre Baskerville italic. */
+.pk-root[data-pack='minang'] :is(.greeting-text, .pk-closing p, .scripture-text) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  font-size: clamp(1.15rem, 4.6vw, 1.4rem);
+  line-height: 1.6;
+  color: var(--dg-ink);
+}
+
+/* Cards: translucent over the lacquer, gold hairline. */
+.pk-root[data-pack='minang'] :is(.event-card, .bank-card, .wish-card, .rsvp-success) {
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-card);
+  box-shadow: var(--dg-shadow-card);
+}
+.pk-root[data-pack='minang'] :is(.event-type, .profile-name, .map-event-label) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 11vw, 3.3rem);
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='minang'] .countdown-unit { border: 1px solid var(--dg-line-strong); border-radius: var(--dg-radius-card); background: var(--dg-surface); }
+.pk-root[data-pack='minang'] .countdown-value { font-family: var(--dg-font-display); color: var(--dg-ink); }
+.pk-root[data-pack='minang'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(0, 0, 0, 0.3); border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='minang'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
+
+/* Closing: the carved gonjong brackets frame the last words, as a lintel (the
+   songket swags must hang down, so the second corner is mirrored, not rotated). */
+.pk-root[data-pack='minang'] .pk-closing { padding-block: clamp(12rem, 52vw, 16rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
+.pk-root[data-pack='minang'] .pk-closing .pk-corner { width: min(50vw, 230px); }
+.pk-root[data-pack='minang'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }

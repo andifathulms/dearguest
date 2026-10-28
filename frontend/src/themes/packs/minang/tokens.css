@@ -1,0 +1,61 @@
+/* Minang — Gonjong Songket: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page black is sampled from the paintings so art and page meet without a seam. */
+.pk-root[data-pack='minang'] {
+  /* colour */
+  --dg-bg: #140c0a;
+  --dg-bg-alt: rgba(155, 28, 28, 0.06);
+  --dg-surface: rgba(243, 230, 204, 0.05);
+  --dg-surface-raised: rgba(243, 230, 204, 0.09);
+  --dg-ink: #f3e6cc;
+  --dg-ink-muted: #d8c39e;
+  --dg-ink-faint: #9c8a6c;
+  --dg-accent: #d2ae5e;
+  --dg-on-accent: #1a0f0c;
+  --dg-line: rgba(210, 174, 94, 0.24);
+  --dg-line-strong: rgba(210, 174, 94, 0.52);
+  --dg-scrim: linear-gradient(180deg, rgba(10, 6, 5, 0.25) 0%, rgba(10, 6, 5, 0) 25%, rgba(10, 6, 5, 0.45) 55%, rgba(10, 6, 5, 0.85) 100%);
+  --dg-focus: #e6c77a;
+
+  /* type */
+  --dg-font-display: 'DG Minang Display', 'Gilda Display', Georgia, serif;
+  --dg-font-body: 'DG Minang Body', 'Libre Baskerville', Georgia, serif;
+  --dg-font-label: 'DG Minang Label', 'Libre Baskerville', Georgia, serif;
+  --dg-font-script: 'DG Minang Script', 'Great Vibes', cursive;
+  --dg-fs-names: clamp(3.2rem, 15vw, 5.6rem);
+  --dg-fs-title: clamp(1.7rem, 6.6vw, 2.4rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1rem;
+  --dg-fs-small: 0.94rem;
+  --dg-fs-label: 0.66rem;
+  --dg-lh-tight: 1.02;
+  --dg-lh-body: 1.75;
+  --dg-tracking-label: 0.26em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 10px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 8px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --dg-shadow-float: 0 6px 20px rgba(0, 0, 0, 0.45);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

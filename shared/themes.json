@@ -127,6 +127,37 @@
       }
     },
     {
+      "id": "minang",
+      "name": "Gonjong Songket",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/minang.webp",
+      "demoSlug": "demo-gonjong-songket",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Atap gonjong emas, ukiran kaluak paku, songket merah, dan carano di atas pernis hitam.",
+        "category": "Adat",
+        "colors": [
+          "#140c0a",
+          "#9b1c1c",
+          "#d2ae5e"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#140c0a,#9b1c1c 60%,#d2ae5e)",
+        "card": {
+          "bg": "#140c0a",
+          "fg": "#f3e6cc",
+          "accent": "#d2ae5e"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "minang"
+      }
+    },
+    {
       "id": "floral",
       "name": "Floral",
       "collection": "signature",
