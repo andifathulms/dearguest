@@ -8,6 +8,7 @@
     "preset": "painted-bloom",
     "durationMs": 2200
   },
+  "motion": { "exit": "doors", "signature": ["shimmer", "breathe"] },
   "fonts": {
     "preload": [
       "fonts/script-400.woff2",

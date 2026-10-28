@@ -1,21 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 import ResponsiveImg, { preloadImage } from '../ui/ResponsiveImg.jsx'
+import { photoReveal } from '../../themes/packs/_system/motion.js'
 
 const container = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.08,
+      staggerChildren: 0.12,
     },
   },
-}
-
-const item = {
-  hidden: { opacity: 0, scale: 0.9 },
-  show: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
 }
 
 const SWIPE_PX = 50
@@ -116,6 +112,8 @@ function Lightbox({ photos, index, setIndex, returnFocus }) {
 
 export default function GallerySection({ photos }) {
   const { t } = useCopy()
+  // Each photo unveils from its centre while settling from a slight zoom.
+  const item = photoReveal(useReducedMotion())
   const [index, setIndex] = useState(null)
   const opener = useRef(null)
 

@@ -32,7 +32,9 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
    - exact empty zones for text;
    - a separate hero painting with art only in the top and bottom bands;
    - cut-outs on one flat key colour that appears nowhere in the palette (cobalt by default, magenta if the palette has blue);
-   - the texture is optional, because Gemini often refuses plain surfaces and the build can generate one.
+   - the texture is optional, because Gemini often refuses plain surfaces and the build can generate one;
+   - an optional Prompt 8 for depth layers (`parallax-back` / `parallax-front` cut-outs), which move with the hero's scroll at no code cost;
+   - a suggested `motion` for the pack (exit + signature), chosen from the composition.
 2. **Assets** go into `assets/` (git-ignored). File names don't matter.
 3. **Build:**
    - move the images to `design/packs/<id>/masters/` and rename them by content;
@@ -41,7 +43,9 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
    - check the cut-outs over a light and a dark background;
    - on a magenta key, use `'despill': 'magenta'` (edges only, so the art's own pinks survive). If part of the sprite sheet isn't flat, cut it off with `sprites_crop`.
 4. **Pack:**
-   - `theme.json` (`painted` cover, `framed` hero);
+   - `theme.json` (`painted` cover, `framed` hero, and a `motion` block: `make check` fails without it). Choose them from `docs/theme-packs.md` §9:
+     - `exit` from how the cover is composed: doors, curtain, part or bloom;
+     - one or two `signature` loops that fit the art: drift, sway, shimmer or breathe;
    - tokens sampled from the paintings;
    - three OFL fonts not used by another pack;
    - ornaments drawn in code;

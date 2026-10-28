@@ -1,45 +1,58 @@
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { formatDateOnly } from '../../utils/dates.js'
 import { usePack } from '../../themes/packs/_system/ThemeContext.jsx'
 import ThemeAsset from '../../themes/packs/_system/ThemeAsset.jsx'
+import { ParallaxLayer, useHeroScroll } from '../../themes/packs/_system/HeroMotion.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 import { blessingFor, scriptureFor } from '../../copy/copy.js'
 import { QuranCredit } from './ScriptureSection.jsx'
 
 // In a theme pack the photo is a real <img fetchpriority="high"> (the hero is
-// the LCP element) with the pack's art slots around it. Legacy themes keep
+// the LCP element) with the pack's art slots around it; the photo and the
+// depth layers move with the hero's scroll (HeroMotion.jsx). Legacy themes keep
 // the inline background image their CSS was written for.
-function PackHeroMedia({ heroPhoto }) {
+function PackHeroMedia({ heroPhoto, m }) {
   const meta = useCopy().invitation?.hero_photo_meta
   return (
     <>
       {heroPhoto && (
-        <img className="pk-hero-img pk-photo" srcSet={meta?.srcset} sizes="100vw" src={meta?.fallback || heroPhoto} alt="" fetchpriority="high" decoding="async" width="1080" height="1920" />
+        <motion.img className="pk-hero-img pk-photo" style={m.bg} srcSet={meta?.srcset} sizes="100vw" src={meta?.fallback || heroPhoto} alt="" fetchpriority="high" decoding="async" width="1080" height="1920" />
       )}
-      <ThemeAsset slot="parallax-back" className="pk-parallax pk-parallax-back" />
-      <ThemeAsset slot="parallax-mid" className="pk-parallax pk-parallax-mid" />
+      <ParallaxLayer slot="parallax-back" motionState={m} />
+      <ParallaxLayer slot="parallax-mid" motionState={m} />
       <div className="pk-hero-scrim" aria-hidden="true" />
       <ThemeAsset slot="hero-overlay" className="pk-hero-overlay" />
-      <ThemeAsset slot="parallax-front" className="pk-parallax pk-parallax-front" />
+      <ParallaxLayer slot="parallax-front" motionState={m} />
       <ThemeAsset slot="corner-tl" className="pk-corner pk-corner-tl" />
       <ThemeAsset slot="corner-br" className="pk-corner pk-corner-br" />
     </>
   )
 }
 
-// The hero photo inside the pack's photo ring (same frame as the profile photos).
-function FramedPortrait({ heroPhoto }) {
+// The hero photo inside the pack's photo ring (same frame as the profile photos);
+// it tilts back as the hero scrolls away.
+function FramedPortrait({ heroPhoto, style }) {
   const meta = useCopy().invitation?.hero_photo_meta
   return (
-    <div className="pk-photo-frame pk-hero-portrait">
+    <motion.div className="pk-photo-frame pk-hero-portrait" style={style}>
       <img className="profile-photo pk-photo" srcSet={meta?.srcset} sizes="(min-width: 640px) 320px, 60vw" src={meta?.fallback || heroPhoto} alt="" fetchpriority="high" decoding="async" />
       <ThemeAsset slot="photo-ring" className="pk-photo-ring" />
-    </div>
+    </motion.div>
   )
+}
+
+// The url of a raster slot's main file, as a CSS url() (the shimmer signature masks its sheen with it).
+function maskOf(pack, slot) {
+  const spec = pack.pack.manifest.slots?.[slot]
+  const url = spec && pack.pack.urls[spec.src]
+  return url ? `url(${url})` : undefined
 }
 
 export default function HeroSection({ brideName, groomName, weddingDate, heroPhoto }) {
   const pack = usePack()
+  const ref = useRef(null)
+  const m = useHeroScroll(ref)
   const formatted = weddingDate
     ? formatDateOnly(weddingDate)
     : ''
@@ -48,24 +61,29 @@ export default function HeroSection({ brideName, groomName, weddingDate, heroPho
   // couple's photo sits in its photo ring, above the names. With hero-top /
   // hero-bottom bands (portrait screens), the flowers are pinned to the edges
   // and the section grows to fit, so they never cover the names; hero-bg is
-  // the painting for wide screens (or for every screen without bands).
+  // the painting for wide screens (or for every screen without bands). Each
+  // layer is a positioned wrapper that moves with the scroll (HeroMotion.jsx).
   if (pack?.pack.manifest.hero === 'framed') {
     const bands = Boolean(pack.pack.manifest.slots?.['hero-top'])
+    const masks = { '--pk-band-mask': maskOf(pack, 'hero-top'), '--pk-ring-mask': maskOf(pack, 'photo-ring') }
     return (
-      <section className="hero-section pk-hero pk-hero--framed" data-bands={bands || undefined}>
-        <ThemeAsset slot="hero-bg" className="pk-hero-bg" />
-        <ThemeAsset slot="hero-top" className="pk-hero-band pk-hero-band--top" />
-        <ThemeAsset slot="hero-bottom" className="pk-hero-band pk-hero-band--bottom" />
+      <section ref={ref} className="hero-section pk-hero pk-hero--framed" data-bands={bands || undefined} style={masks}>
+        <motion.div className="pk-hero-bg" style={m.bg}><ThemeAsset slot="hero-bg" /></motion.div>
+        <ParallaxLayer slot="parallax-back" motionState={m} />
+        <ParallaxLayer slot="parallax-mid" motionState={m} />
+        {bands && <motion.div className="pk-hero-band pk-hero-band--top" style={m.top}><ThemeAsset slot="hero-top" /></motion.div>}
+        {bands && <motion.div className="pk-hero-band pk-hero-band--bottom" style={m.bottom}><ThemeAsset slot="hero-bottom" /></motion.div>}
+        <ParallaxLayer slot="parallax-front" motionState={m} />
         <HeroContent brideName={brideName} groomName={groomName} formatted={formatted}
-          portrait={heroPhoto && <FramedPortrait heroPhoto={heroPhoto} />} />
+          portrait={heroPhoto && <FramedPortrait heroPhoto={heroPhoto} style={m.portrait} />} />
       </section>
     )
   }
 
   if (pack) {
     return (
-      <section className={`hero-section pk-hero${heroPhoto ? ' pk-hero--photo' : ''}`}>
-        <PackHeroMedia heroPhoto={heroPhoto} />
+      <section ref={ref} className={`hero-section pk-hero${heroPhoto ? ' pk-hero--photo' : ''}`}>
+        <PackHeroMedia heroPhoto={heroPhoto} m={m} />
         <HeroContent brideName={brideName} groomName={groomName} formatted={formatted} />
       </section>
     )
@@ -73,6 +91,7 @@ export default function HeroSection({ brideName, groomName, weddingDate, heroPho
 
   return (
     <section
+      ref={ref}
       className={`hero-section ${heroPhoto ? 'has-photo' : ''}`}
       style={heroPhoto ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
     >

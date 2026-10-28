@@ -1,0 +1,76 @@
+/* Shared motion for every pack (docs/theme-packs.md §9; JS side in _system/motion.js,
+   HeroMotion.jsx, Particles.jsx, openings/CoverExit.jsx).
+
+   Every effect here rests at the element's normal style: the visual suite
+   disables animations for screenshots, and a guest who prefers reduced motion
+   gets no loops at all. */
+
+/* ---- hero layers: positioned wrappers that move with the scroll ---- */
+.pk-root .pk-hero-bg > .pk-slot,
+.pk-root .pk-parallax > .pk-slot { display: block; width: 100%; height: 100%; }
+.pk-root .pk-hero-band > .pk-slot { display: block; }
+.pk-root .pk-hero .pk-parallax-back { z-index: 1; }
+.pk-root .pk-hero .pk-parallax-mid { z-index: 2; }
+.pk-root .pk-hero .pk-parallax-front { z-index: 4; }
+/* the portrait's tilt is 3D; the perspective lives here so the portrait itself is transform: none at rest */
+.pk-root .pk-hero--framed .hero-content { perspective: 900px; }
+
+/* ---- gallery: the photo settles from a slight zoom as its frame unveils ---- */
+.pk-root .gallery-item img { scale: var(--pk-zoom, 1); }
+
+/* ---- falling sprites: the wind layer leans with the scroll ---- */
+.pk-particles-wind { position: absolute; inset: 0; }
+
+/* ---- cover exit (theme.json → motion.exit) ---- */
+.pk-opening.pk-opening-exit { background: transparent; pointer-events: none; }
+.pk-exit-piece { position: absolute; inset: 0; background: var(--dg-bg); backface-visibility: hidden; will-change: transform, opacity; }
+/* split exits: the words fade before the pieces move, so they never tear */
+.pk-opening-exit:is([data-exit='doors'], [data-exit='curtain'], [data-exit='part']) .pk-cover-content {
+  animation: pk-exit-text 0.3s ease-out forwards;
+}
+@keyframes pk-exit-text { to { opacity: 0; transform: translateY(-6px); } }
+
+/* ---- signatures (theme.json → motion.signature → data-signature) ---- */
+@media (prefers-reduced-motion: no-preference) {
+  /* drift: the painted bands float sideways, slowly and in opposite directions (clouds, mist) */
+  .pk-root[data-signature~='drift'] .pk-hero-band--top img { transform-origin: 50% 0; animation: pk-drift 17s ease-in-out infinite alternate; }
+  .pk-root[data-signature~='drift'] .pk-hero-band--bottom img { transform-origin: 50% 100%; animation: pk-drift 21s ease-in-out infinite alternate-reverse; }
+  .pk-root[data-signature~='drift'] .pk-hero-bg img { animation: pk-drift-soft 26s ease-in-out infinite alternate; }
+
+  /* sway: the hanging corner art over the closing moves in a breeze (melati, leaves, tassels) */
+  .pk-root[data-signature~='sway'] .pk-closing .pk-corner img { transform-origin: 0 0; animation: pk-sway 6.5s ease-in-out infinite alternate; }
+  .pk-root[data-signature~='sway'] .pk-closing .pk-corner-br img { animation-delay: -3.2s; }
+
+  /* shimmer: a light sweeps across the gold of the top band and the photo frame */
+  .pk-root[data-signature~='shimmer'] :is(.pk-hero-band--top, .pk-hero-portrait .pk-photo-ring)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent 38%, rgba(255, 244, 210, 0.7) 50%, transparent 62%) no-repeat;
+    background-size: 300% 100%;
+    mix-blend-mode: screen;
+    -webkit-mask: var(--pk-band-mask) 50% 0 / 100% auto no-repeat;
+    mask: var(--pk-band-mask) 50% 0 / 100% auto no-repeat;
+    opacity: 0;
+    animation: pk-sheen 8s ease-in-out 1.2s infinite;
+  }
+  .pk-root[data-signature~='shimmer'] .pk-hero-portrait .pk-photo-ring::after {
+    -webkit-mask: var(--pk-ring-mask) 0 0 / 100% 100% no-repeat;
+    mask: var(--pk-ring-mask) 0 0 / 100% 100% no-repeat;
+    animation-delay: 2.4s;
+  }
+
+  /* breathe: the framed portrait floats, barely */
+  .pk-root[data-signature~='breathe'] .pk-hero-portrait > * { animation: pk-breathe 5.5s ease-in-out infinite alternate; }
+}
+
+@keyframes pk-drift { from { transform: scale(1.06) translateX(-2.4%); } to { transform: scale(1.06) translateX(2.4%); } }
+@keyframes pk-drift-soft { from { transform: scale(1.04) translateX(-1.5%); } to { transform: scale(1.04) translateX(1.5%); } }
+@keyframes pk-sway { from { transform: rotate(-1.2deg) scale(1.04); } to { transform: rotate(1.3deg) scale(1.04); } }
+@keyframes pk-sheen {
+  0% { opacity: 1; background-position: 100% 0; }
+  35% { opacity: 1; background-position: 0% 0; }
+  36%, 100% { opacity: 0; background-position: 0% 0; }
+}
+@keyframes pk-breathe { from { transform: translateY(0); } to { transform: translateY(-7px); } }
