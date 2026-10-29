@@ -10,7 +10,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db import transaction
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Invitation, Couple, Event, Story, Photo, BankAccount, CoupleProfile, MusicPreset, RSVP
@@ -221,7 +221,17 @@ class MyCoupleView(APIView):
         return Response(serializer.data)
 
 
-class _OwnedChildList(generics.ListCreateAPIView):
+class _OwnInvitationOnly:
+    """Answer 404 before anything else (listing, validating an upload) when
+    the invitation isn't the caller's: a stranger can't tell it exists."""
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        if not _owned(request.user, kwargs['slug']):
+            raise NotFound('Undangan tidak ditemukan.')
+
+
+class _OwnedChildList(_OwnInvitationOnly, generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     model = None
     related_name = None
@@ -242,7 +252,7 @@ class _OwnedChildList(generics.ListCreateAPIView):
         serializer.save(invitation=inv)
 
 
-class _OwnedChildDetail(generics.RetrieveUpdateDestroyAPIView):
+class _OwnedChildDetail(_OwnInvitationOnly, generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     model = None
 
@@ -329,7 +339,7 @@ class BankAccountDetail(_OwnedChildDetail):
     serializer_class = BankAccountWriteSerializer
 
 
-class MyWishList(generics.ListAPIView):
+class MyWishList(_OwnInvitationOnly, generics.ListAPIView):
     """Every wish on the invitation with its moderation status (newest first)."""
     serializer_class = OwnerWishSerializer
     permission_classes = [IsAuthenticated]
@@ -342,7 +352,7 @@ class MyWishList(generics.ListAPIView):
         return inv.rsvps.exclude(wishes='').order_by('-submitted_at', '-id')
 
 
-class MyWishDetail(generics.UpdateAPIView, generics.DestroyAPIView):
+class MyWishDetail(_OwnInvitationOnly, generics.UpdateAPIView, generics.DestroyAPIView):
     """PATCH {wish_status: visible|hidden} to approve, hide or unhide a wish.
     DELETE removes the wish text only; the guest's attendance answer stays."""
     serializer_class = OwnerWishSerializer

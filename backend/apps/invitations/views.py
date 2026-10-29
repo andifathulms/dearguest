@@ -242,13 +242,9 @@ class RSVPListView(generics.ListAPIView):
         return RSVP.objects.filter(invitation__slug=self.kwargs['slug']).select_related('guest')
 
     def list(self, request, slug=None, *args, **kwargs):
-        try:
-            invitation = Invitation.objects.get(slug=slug)
-        except Invitation.DoesNotExist:
-            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
-
-        if invitation.couple_user != request.user and not request.user.is_staff:
-            return Response({'detail': 'Akses ditolak.'}, status=status.HTTP_403_FORBIDDEN)
+        invitation, error = _owner_or_error(request, slug)
+        if error:
+            return error
 
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
@@ -318,6 +314,7 @@ class MusicPresetListView(generics.ListAPIView):
 class CouponValidateView(APIView):
     """Public: validate a promo code and return its discount."""
     permission_classes = [AllowAny]
+    throttle_scope = 'coupon'   # codes can't be guessed by brute force
 
     def get(self, request):
         code = (request.query_params.get('code') or '').strip().upper()

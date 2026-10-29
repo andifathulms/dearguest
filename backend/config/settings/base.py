@@ -97,6 +97,7 @@ REST_FRAMEWORK = {
         'guest_lookup': '60/hour',
         'guest_open': '120/hour',
         'funnel': '30/hour',
+        'coupon': '30/hour',
     },
 }
 
