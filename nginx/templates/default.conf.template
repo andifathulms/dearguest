@@ -1,6 +1,7 @@
 # Edge nginx for production. Rendered at container start by the nginx image's
-# envsubst step; only ${DOMAIN} and ${MEDIA_DOMAIN} are substituted
-# (NGINX_ENVSUBST_FILTER), so nginx's own $variables are left alone.
+# envsubst step; only ${DOMAIN}, ${MEDIA_DOMAIN}, ${ADMIN_PATH}, ${CSP_MODE}
+# and ${HSTS_SECONDS} are substituted (NGINX_ENVSUBST_FILTER), so nginx's own
+# $variables are left alone.
 
 # Compress text responses (JS, CSS, JSON, SVG): roughly 3x smaller on mobile data.
 gzip on;
@@ -46,6 +47,29 @@ map $uri $html_cache {
     "~\.html$"         "no-cache";
 }
 
+# Content Security Policy for the SPA. Sources: pack fonts and art are
+# same-origin; Google Fonts (index.html); uploads on MEDIA_DOMAIN; Google Maps
+# and YouTube embeds (MapsSection, LiveStreamSection); Sentry ingest.
+# Phase 3: add the payment provider's script/frame/connect origins here.
+map $host $csp_policy {
+    default "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://${MEDIA_DOMAIN}; media-src 'self' blob: https://${MEDIA_DOMAIN}; connect-src 'self' https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; report-uri /api/csp-report/";
+}
+map "${CSP_MODE}" $csp_enforce {
+    default    "";
+    enforce    $csp_policy;
+}
+map "${CSP_MODE}" $csp_report_only {
+    default    $csp_policy;
+    enforce    "";
+}
+map $host $hsts {
+    default    "max-age=${HSTS_SECONDS}; includeSubDomains";
+}
+
+# Admin login: at most 5 attempts a minute per client (Django adds its own
+# per-account lockout and TOTP).
+limit_req_zone $binary_remote_addr zone=admin_login:10m rate=5r/m;
+
 # Port 80: Let's Encrypt HTTP-01 challenges only; everything else goes to HTTPS.
 server {
     listen 80 default_server;
@@ -85,7 +109,13 @@ server {
         include /etc/nginx/snippets/proxy.conf;
     }
 
-    location /admin/ {
+    # Django admin, at a path of its own (ADMIN_PATH / ADMIN_URL).
+    location /${ADMIN_PATH}/ {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+    location = /${ADMIN_PATH}/login/ {
+        limit_req zone=admin_login burst=5 nodelay;
+        limit_req_status 429;
         include /etc/nginx/snippets/proxy.conf;
     }
 
@@ -114,12 +144,14 @@ server {
     location /assets/ {
         try_files $uri =404;
         add_header Cache-Control "public, max-age=31536000, immutable";
+        include /etc/nginx/snippets/security-headers.conf;
     }
 
     # The SPA shell must never be cached, or a deploy leaves guests on stale chunk hashes.
     location = /index.html {
         add_header Cache-Control "no-cache";
         add_header X-Robots-Tag $robots_tag;
+        include /etc/nginx/snippets/security-headers.conf;
     }
 
     # Client-side routes (/:slug, /dashboard/...) fall back to the SPA shell;
@@ -128,6 +160,7 @@ server {
         try_files $uri $uri/index.html @spa;
         add_header Cache-Control $html_cache;
         add_header X-Robots-Tag $robots_tag;
+        include /etc/nginx/snippets/security-headers.conf;
     }
 
     location @spa {

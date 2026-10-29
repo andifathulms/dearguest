@@ -105,9 +105,11 @@ class CrawlerPageTests(OgBase):
 
     def test_legacy_share_link_sends_people_to_the_clean_link(self):
         res = self.client.get('/share/live/?to=Budi&g=K7MPQ2')
-        self.assertContains(res, 'window.location.replace("http://localhost:5173/live/K7MPQ2")')
+        self.assertContains(res, 'http-equiv="refresh" content="0; url=http://localhost:5173/live/K7MPQ2"')
+        self.assertNotIn('<script', res.content.decode())
+        self.assertIn("default-src 'none'", res['Content-Security-Policy'])
         res = self.client.get('/share/live/?to=Budi')
-        self.assertContains(res, 'window.location.replace("http://localhost:5173/live?to=Budi")')
+        self.assertContains(res, 'http-equiv="refresh" content="0; url=http://localhost:5173/live?to=Budi"')
 
 
 class PreviewImageTests(OgBase):

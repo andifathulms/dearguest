@@ -44,3 +44,11 @@ SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
 # (SECURE_HSTS_PRELOAD = True, then hstspreload.org) when every subdomain serves HTTPS.
 SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=3600, cast=int)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# Preload stays off on purpose until the domain is final (see above); this is
+# the one intentional exception in `manage.py check --deploy`.
+SILENCED_SYSTEM_CHECKS = ['security.W021']
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+if len(SECRET_KEY) < 50:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured('SECRET_KEY must be at least 50 characters (python -c "import secrets; print(secrets.token_urlsafe(50))").')

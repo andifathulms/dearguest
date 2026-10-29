@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
     'corsheaders',
     'apps.invitations',
     'apps.auth_api',
@@ -31,11 +33,16 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
+
+# Django admin (config/admin_site.py): its own path and a TOTP second factor.
+ADMIN_URL = config('ADMIN_URL', default='admin/').strip('/') + '/'
+ADMIN_REQUIRE_OTP = config('ADMIN_REQUIRE_OTP', default=not DEBUG, cast=bool)
 
 TEMPLATES = [
     {
@@ -98,6 +105,7 @@ REST_FRAMEWORK = {
         'guest_open': '120/hour',
         'funnel': '30/hour',
         'coupon': '30/hour',
+        'csp': '120/hour',
     },
 }
 

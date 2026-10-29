@@ -1,3 +1,4 @@
+import logging
 import secrets
 from urllib.parse import quote
 
@@ -60,8 +61,35 @@ class InvitationAdminForm(forms.ModelForm):
             raise forms.ValidationError(exc.messages)
 
 
+audit_log = logging.getLogger('dearguest.audit')
+
+
+def audit(model_admin, request, obj, action):
+    """Record a staff action on an object: Django's admin history (LogEntry)
+    plus a structured log line that ships off the server."""
+    model_admin.log_change(request, obj, action)
+    audit_log.info('admin action', extra={'audit': {
+        'action': action, 'model': obj._meta.label, 'object_id': obj.pk, 'staff_id': request.user.pk,
+    }})
+
+
+class AuditedDeletes:
+    """Deletions are already in Django's history; this also logs them."""
+
+    def delete_model(self, request, obj):
+        audit_log.info('admin delete', extra={'audit': {
+            'action': 'delete', 'model': obj._meta.label, 'object_id': obj.pk, 'staff_id': request.user.pk}})
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            audit_log.info('admin delete', extra={'audit': {
+                'action': 'delete', 'model': obj._meta.label, 'object_id': obj.pk, 'staff_id': request.user.pk}})
+        super().delete_queryset(request, queryset)
+
+
 @admin.register(Invitation)
-class InvitationAdmin(admin.ModelAdmin):
+class InvitationAdmin(AuditedDeletes, admin.ModelAdmin):
     form = InvitationAdminForm
     list_display = ['slug', 'theme', 'tier', 'is_active', 'activation_requested', 'activation_code', 'wedding_date']
     list_filter = ['is_active', 'activation_requested', 'tier', 'theme']
@@ -73,30 +101,38 @@ class InvitationAdmin(admin.ModelAdmin):
 
     @admin.action(description='Terbitkan kode aktivasi (kirim ke pasangan)')
     def issue_activation_code(self, request, queryset):
-        import secrets
         for inv in queryset:
             inv.activation_code = secrets.token_hex(3).upper()  # 6-char code, e.g. A7K2QX
             inv.save(update_fields=['activation_code'])
+            audit(self, request, inv, 'Kode aktivasi diterbitkan')
         self.message_user(request, f'Kode aktivasi diterbitkan untuk {queryset.count()} undangan.')
 
     @admin.action(description='Aktifkan undangan yang dipilih')
     def activate_invitations(self, request, queryset):
-        queryset.update(is_active=True)
+        for inv in queryset:
+            inv.is_active = True
+            inv.save(update_fields=['is_active'])
+            audit(self, request, inv, 'Diaktifkan')
+        self.message_user(request, f'{queryset.count()} undangan diaktifkan.')
 
     @admin.action(description='Nonaktifkan undangan yang dipilih')
     def deactivate_invitations(self, request, queryset):
-        queryset.update(is_active=False)
+        for inv in queryset:
+            inv.is_active = False
+            inv.save(update_fields=['is_active'])
+            audit(self, request, inv, 'Dinonaktifkan')
+        self.message_user(request, f'{queryset.count()} undangan dinonaktifkan.')
 
 
 @admin.register(RSVP)
-class RSVPAdmin(admin.ModelAdmin):
+class RSVPAdmin(AuditedDeletes, admin.ModelAdmin):
     list_display = ['guest_name', 'invitation', 'attending', 'pax', 'submitted_at']
     list_filter = ['invitation', 'attending']
     readonly_fields = ['guest_name', 'whatsapp', 'attending', 'pax', 'wishes', 'submitted_at']
 
 
 @admin.register(ActivationRequest)
-class ActivationRequestAdmin(admin.ModelAdmin):
+class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
     """Inbox of couples who requested activation but aren't live yet."""
     form = InvitationAdminForm
     list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
@@ -141,6 +177,7 @@ class ActivationRequestAdmin(admin.ModelAdmin):
         for inv in queryset:
             inv.tier = 'premium'
             self._issue(inv)
+            audit(self, request, inv, 'Lunas: Premium, kode diterbitkan')
         self.message_user(request, f'{queryset.count()} undangan disetel Premium + kode diterbitkan. Kirim kode ke pasangan via WhatsApp.')
 
     @admin.action(description='✓ Konfirmasi lunas → Bisnis (2 undangan) + terbitkan kode')
@@ -148,6 +185,7 @@ class ActivationRequestAdmin(admin.ModelAdmin):
         for inv in queryset:
             inv.tier = 'bisnis'
             self._issue(inv)
+            audit(self, request, inv, 'Lunas: Bisnis, kode diterbitkan')
             if inv.couple_user:
                 profile, _ = CoupleProfile.objects.get_or_create(user=inv.couple_user)
                 if profile.max_invitations < 2:
@@ -160,11 +198,12 @@ class ActivationRequestAdmin(admin.ModelAdmin):
         for inv in queryset:
             inv.activation_code = secrets.token_hex(3).upper()
             inv.save(update_fields=['activation_code'])
+            audit(self, request, inv, 'Kode aktivasi diterbitkan')
         self.message_user(request, f'Kode aktivasi diterbitkan untuk {queryset.count()} undangan.')
 
 
 @admin.register(CoupleProfile)
-class CoupleProfileAdmin(admin.ModelAdmin):
+class CoupleProfileAdmin(AuditedDeletes, admin.ModelAdmin):
     list_display = ['user', 'whatsapp', 'max_invitations']
     list_editable = ['whatsapp', 'max_invitations']
     search_fields = ['user__username', 'whatsapp']
@@ -177,14 +216,14 @@ class MusicPresetAdmin(admin.ModelAdmin):
 
 
 @admin.register(Coupon)
-class CouponAdmin(admin.ModelAdmin):
+class CouponAdmin(AuditedDeletes, admin.ModelAdmin):
     list_display = ['code', 'discount_percent', 'active', 'expires_at', 'description']
     list_editable = ['discount_percent', 'active', 'expires_at']
     search_fields = ['code']
 
 
 @admin.register(Guest)
-class GuestAdmin(admin.ModelAdmin):
+class GuestAdmin(AuditedDeletes, admin.ModelAdmin):
     list_display = ['name', 'invitation', 'group', 'code', 'checked_in', 'checked_in_at']
     list_filter = ['invitation', 'checked_in', 'group']
     search_fields = ['name', 'code']

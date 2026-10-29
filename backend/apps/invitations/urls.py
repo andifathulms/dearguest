@@ -1,4 +1,5 @@
 from django.urls import path
+from .csp import CSPReportView
 from .funnel import FunnelVisitView
 from .views import (
     InvitationDetailView,
@@ -36,6 +37,7 @@ from .editor_views import (
 )
 
 urlpatterns = [
+    path('csp-report/', CSPReportView.as_view()),
     path('funnel/visit/', FunnelVisitView.as_view()),
     path('invitations/<slug:slug>/', InvitationDetailView.as_view()),
     path('invitations/<slug:slug>/rsvp/', RSVPCreateView.as_view()),
