@@ -312,6 +312,37 @@
       "pack": {
         "dir": "lavender"
       }
+    },
+    {
+      "id": "navy",
+      "name": "Mawar Malam",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/navy.webp",
+      "demoSlug": "demo-mawar-malam",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Mawar dan peoni putih, eukaliptus biru keabuan, dan garis emas tipis di atas kertas biru dongker.",
+        "category": "Taman & Bunga",
+        "colors": [
+          "#1e2b42",
+          "#f3efe6",
+          "#d4b672"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#14213d,#3e5866 55%,#f3efe6)",
+        "card": {
+          "bg": "#1e2b42",
+          "fg": "#f3efe6",
+          "accent": "#d4b672"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "navy"
+      }
     }
   ]
 }

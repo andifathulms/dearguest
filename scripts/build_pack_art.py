@@ -282,6 +282,38 @@ PACKS = {
         'texture': ('texture.jpg', 512, 70),
         'texture_tint': (253, 243, 228),   # the painted paper is a shade darker than the paintings'
     },
+    'navy': {
+        # Cut-outs on magenta (#D01C8B asked; ~#C61E85 delivered): the palette is navy and
+        # dusty blue, so cobalt can't be keyed or despilled, and it has no pinks. No despill;
+        # edge_fill recolours white petal edges from the petals and fades magenta-leaning strokes;
+        # tighter than the default, so the shrubs' mist (a gradient into the key) loses its pink.
+        'edge_fill': True,
+        'spill': (8, 24),
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: the centre garland ends ~30 %, the side roses ~40 % (left) and ~52 %
+        # (right edge); the bottom bed starts ~77 %, its side leaves ~57 %.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.54, 'bottom', 0.08, 1080),
+            ('hero-bottom', 'hero.jpg', 0.56, 1.0, 'top', 0.1, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (199, 30, 131), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (195, 31, 130), 720, (26, 64), 2, False),
+            # Prompt 8: moonlit shrubs from ~62 % to the bottom edge (it touched the edge again)
+            ('parallax-back', 'parallax-back.jpg', (198, 28, 134), 1080, (26, 64), 2, False, (0, 0.62, 1, 1)),
+            # the near layer also has a rose cluster at the bottom left (not asked), which
+            # floats over the text as it moves: keep the hanging roses (top 55 %) only
+            ('parallax-front', 'parallax-front.jpg', (197, 25, 132), 1080, (26, 64), 2, False, (0, 0, 1, 0.55)),
+        ],
+        # the sheet's lower third is a painted haze, a sixth time: the sprites end ~63 %
+        'sprites': ('petals-sheet.jpg', (200, 31, 134), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
+        'sprites_crop': (0, 0, 1, 0.7),
+        'texture': ('texture.jpg', 512, 70),
+        'texture_tint': (30, 43, 66),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -307,7 +339,7 @@ def resize_w(img, width):
     return img.resize((width, round(img.height * width / img.width)), Image.LANCZOS)
 
 
-def key(img, bg, ramp, close, fill=False, despill=False, edge_fill=False):
+def key(img, bg, ramp, close, fill=False, despill=False, edge_fill=False, spill=(14, 40)):
     """RGBA cut-out of `img` from a flat background colour `bg`. `despill`
     (blue-screen art): cap blue at max(red, green), removing the background's
     tint from translucent watercolour. Only for palettes with no true blues.
@@ -316,7 +348,8 @@ def key(img, bg, ramp, close, fill=False, despill=False, edge_fill=False):
     `edge_fill`: the soft edge takes the colour of the nearest solid pixel (only its
     alpha is kept), for feathery art (pampas) whose hairs unmix to a dark fringe; with
     blue despill it also fades strokes that are clearly bluer than red or green, and with
-    any other key, strokes whose colour leans towards the key's hue."""
+    any other key, strokes whose colour leans towards the key's hue (`spill`: where the
+    fade starts and how wide it is; a pack whose art is far from the key can go tighter)."""
     a = np.asarray(img.convert('RGB')).astype(np.float32)
     bg = np.array(bg, np.float32)
     dist = np.sqrt(((a - bg) ** 2).sum(2))
@@ -337,8 +370,8 @@ def key(img, bg, ramp, close, fill=False, despill=False, edge_fill=False):
         # Any other key (orange): strokes whose colour leans towards the key's hue are
         # key anti-aliased into the paint (outlines along a silhouette), so they fade.
         k = bg - bg.mean()
-        spill = ((a - a.mean(2, keepdims=True)) * (k / np.linalg.norm(k))).sum(2)
-        alpha = np.minimum(alpha, np.clip(1 - (spill - 14) / 40, 0, 1))
+        lean = ((a - a.mean(2, keepdims=True)) * (k / np.linalg.norm(k))).sum(2)
+        alpha = np.minimum(alpha, np.clip(1 - (lean - spill[0]) / spill[1], 0, 1))
     alpha = ndi.gaussian_filter(alpha, 0.6)
     # Unmix: observed = alpha*fg + (1-alpha)*bg  ->  fg = (observed - (1-alpha)*bg) / alpha
     safe = np.maximum(alpha, 1e-3)[..., None]
@@ -449,7 +482,8 @@ def build(pack):
         if crop:   # (x0, y0, x1, y1) fractions: drop parts of the canvas that aren't flat background
             x0, y0, x1, y1 = crop[0]
             raw = raw.crop((round(x0 * raw.width), round(y0 * raw.height), round(x1 * raw.width), round(y1 * raw.height)))
-        img = resize_w(key(raw, bg, ramp, close, fill, cfg.get('despill', False), cfg.get('edge_fill', False)), width)
+        img = resize_w(key(raw, bg, ramp, close, fill, cfg.get('despill', False), cfg.get('edge_fill', False),
+                           cfg.get('spill', (14, 40))), width)
         written += save_all(img, out, name, ('avif', 'webp'))
 
     if 'sprites' in cfg:
@@ -493,7 +527,8 @@ def build(pack):
             # not become see-through.
             pad = 40
             crop = (max(0, xs.start - pad), max(0, ys.start - pad), min(raw.width, xs.stop + pad), min(raw.height, ys.stop + pad))
-            sprite = trim(key(raw.crop(crop), bg, ramp, closes[i - 1], fill=fill, despill=cfg.get('despill', False), edge_fill=cfg.get('edge_fill', False)))
+            sprite = trim(key(raw.crop(crop), bg, ramp, closes[i - 1], fill=fill, despill=cfg.get('despill', False), edge_fill=cfg.get('edge_fill', False),
+                                 spill=cfg.get('spill', (14, 40))))
             sprite.thumbnail((size, size), Image.LANCZOS)
             written += save_all(sprite, out, f'{prefix}-{i}', ('webp',))
 
