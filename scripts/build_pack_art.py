@@ -252,6 +252,36 @@ PACKS = {
         # the painted paper is a touch greyer than the paintings' (~#FDF8FD)
         'texture_tint': (253, 248, 253),
     },
+    'bali': {
+        # Cut-outs on cobalt (~#2443BB delivered); the palette is warm (brick, paras,
+        # prada gold, cream, green) with no blues -> despill, and edge_fill for the janur
+        # strips and petal edges.
+        'despill': True,
+        'edge_fill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: the lintel, prada swags and garland end ~22 %; the steps, leaves and
+        # janur start ~79 %.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.27, 'bottom', 0.14, 1080),
+            ('hero-bottom', 'hero.jpg', 0.75, 1.0, 'top', 0.16, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (37, 67, 187), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (34, 66, 187), 720, (26, 64), 2, False),
+            # Prompt 8. The terraces touch the bottom edge this time (the firmer wording
+            # worked); cut the strip from just above the palms.
+            ('parallax-back', 'parallax-back.jpg', (36, 68, 189), 1080, (26, 64), 2, False, (0, 0.58, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (37, 70, 185), 1080, (26, 64), 2, False),
+        ],
+        # the sheet's lower third is painted steps again: the sprites end ~66 %
+        'sprites': ('petals-sheet.jpg', (39, 72, 187), 'petal', 96, (26, 64), (2, 2, 2, 2, 3, 2), False),
+        'sprites_crop': (0, 0, 1, 0.68),
+        'texture': ('texture.jpg', 512, 70),
+        'texture_tint': (253, 243, 228),   # the painted paper is a shade darker than the paintings'
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}

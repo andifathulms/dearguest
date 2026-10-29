@@ -257,6 +257,7 @@ Every pack moves. Most of it is shared and automatic; each pack only picks its c
 |---|---|---|
 | `doors` | two halves swing open towards the guest, in 3D | carved doors, gebyok, rumah gadang |
 | `curtain` | two halves gather to the sides | drapes, a lamming canopy |
+| `gate` | two halves slide apart sideways | a split gate (candi bentar) |
 | `part` | the top and bottom halves part | clouds above and below, a roofline over a runner |
 | `bloom` | the cover grows and fades, as if walking through it | florals, anything without a natural split |
 | `fade` | a plain fade | the fallback; also what reduced motion gets |

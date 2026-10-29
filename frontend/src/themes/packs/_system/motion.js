@@ -9,7 +9,7 @@
 export const EASE = [0.22, 1, 0.36, 1]
 
 // theme.json → motion.exit: how the cover leaves when the guest opens it.
-export const EXITS = ['fade', 'doors', 'curtain', 'part', 'bloom']
+export const EXITS = ['fade', 'doors', 'curtain', 'gate', 'part', 'bloom']
 // theme.json → motion.signature: the pack's ambient loops (_base/motion.css).
 export const SIGNATURES = ['drift', 'sway', 'shimmer', 'breathe']
 

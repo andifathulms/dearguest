@@ -25,7 +25,7 @@
 .pk-opening.pk-opening-exit { background: transparent; pointer-events: none; }
 .pk-exit-piece { position: absolute; inset: 0; background: var(--dg-bg); backface-visibility: hidden; will-change: transform, opacity; }
 /* split exits: the words fade before the pieces move, so they never tear */
-.pk-opening-exit:is([data-exit='doors'], [data-exit='curtain'], [data-exit='part']) .pk-cover-content {
+.pk-opening-exit:is([data-exit='doors'], [data-exit='curtain'], [data-exit='gate'], [data-exit='part']) .pk-cover-content {
   animation: pk-exit-text 0.3s ease-out forwards;
 }
 @keyframes pk-exit-text { to { opacity: 0; transform: translateY(-6px); } }

@@ -159,6 +159,37 @@
       }
     },
     {
+      "id": "bali",
+      "name": "Jepun Prada",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/bali.webp",
+      "demoSlug": "demo-jepun-prada",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Candi bentar bata dan batu paras, kain prada merah-emas, bunga jepun, dan janur di atas kertas krem.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#fdf3e4",
+          "#7a1f24",
+          "#c9a045"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fdf3e4,#a9573d 55%,#c9a045)",
+        "card": {
+          "bg": "#fdf3e4",
+          "fg": "#3a2418",
+          "accent": "#8c2a24"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "bali"
+      }
+    },
+    {
       "id": "floral",
       "name": "Merah Anggur",
       "collection": "signature",

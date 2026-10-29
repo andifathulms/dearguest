@@ -1,0 +1,12 @@
+{
+  "box": [
+    300,
+    40,
+    900,
+    380
+  ],
+  "ink": "#3a2418",
+  "accent": "#8c2a24",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/bali/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

@@ -9,6 +9,7 @@ import { useCopy } from '../../../../copy/CopyContext.jsx'
 //   bloom    it grows and fades, as if walking through it
 //   doors    two doors swing open towards the guest (gebyok, carved doors)
 //   curtain  two curtains gather to the sides (canopies, lamming drapes)
+//   gate     the two halves of a split gate slide apart sideways (candi bentar)
 //   part     the top and bottom halves part (clouds, roofline and runner)
 const HALF_L = 'inset(0% 50% 0% 0%)'
 const HALF_R = 'inset(0% 0% 0% 50%)'
@@ -27,6 +28,13 @@ const EXITS = {
     pieces: [
       { clip: HALF_L, origin: '0% 50%', to: { scaleX: 0.15, opacity: 0 } },
       { clip: HALF_R, origin: '100% 50%', to: { scaleX: 0.15, opacity: 0 } },
+    ],
+  },
+  gate: {
+    dur: 1.4,
+    pieces: [
+      { clip: HALF_L, to: { x: '-55%', opacity: 0 } },
+      { clip: HALF_R, to: { x: '55%', opacity: 0 } },
     ],
   },
   part: {

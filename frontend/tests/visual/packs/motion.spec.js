@@ -24,6 +24,15 @@ test('the cover leaves by the pack\'s exit, then the overlay is gone', async ({ 
   await expect(page.locator('body')).not.toHaveClass(/cover-open/)
 })
 
+test('a split-gate cover slides apart (gate exit)', async ({ page }) => {
+  await load(page, 'bali')
+  await page.locator('.pk-open-btn').click()
+  const exit = page.locator('.pk-opening-exit')
+  await expect(exit).toHaveAttribute('data-exit', 'gate')
+  await expect(exit.locator('.pk-exit-piece')).toHaveCount(2)
+  await expect(page.locator('.pk-opening')).toHaveCount(0, { timeout: 10_000 })
+})
+
 test('the hero curtain rests at the top and moves on scroll', async ({ page }) => {
   await load(page, 'sunda')
   await expect(page.locator('.pk-root')).toHaveAttribute('data-signature', 'drift sway')

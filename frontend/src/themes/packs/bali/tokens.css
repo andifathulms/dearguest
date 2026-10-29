@@ -1,0 +1,62 @@
+/* Bali — Jepun Prada: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page cream is sampled from the paintings so art and page meet without a seam;
+   the ink is a deep brown, the accent the red of the prada cloth. */
+.pk-root[data-pack='bali'] {
+  /* colour */
+  --dg-bg: #fdf3e4;
+  --dg-bg-alt: rgba(140, 42, 36, 0.035);
+  --dg-surface: rgba(255, 251, 244, 0.75);
+  --dg-surface-raised: #fffbf4;
+  --dg-ink: #3a2418;
+  --dg-ink-muted: #63483a;
+  --dg-ink-faint: #9c8574;
+  --dg-accent: #8c2a24;   /* prada red */
+  --dg-on-accent: #fdf3e4;
+  --dg-line: rgba(58, 36, 24, 0.16);
+  --dg-line-strong: rgba(58, 36, 24, 0.38);
+  --dg-scrim: linear-gradient(180deg, rgba(58, 36, 24, 0.2) 0%, rgba(58, 36, 24, 0) 25%, rgba(58, 36, 24, 0.45) 60%, rgba(58, 36, 24, 0.8) 100%);
+  --dg-focus: #8c2a24;
+
+  /* type */
+  --dg-font-display: 'DG Bali Display', 'Prata', Georgia, serif;
+  --dg-font-body: 'DG Bali Body', 'Libre Caslon Text', Georgia, serif;
+  --dg-font-label: 'DG Bali Label', 'Libre Caslon Text', Georgia, serif;
+  --dg-font-script: 'DG Bali Script', 'Petit Formal Script', cursive;
+  --dg-fs-names: clamp(2.6rem, 12vw, 4.6rem);
+  --dg-fs-title: clamp(1.6rem, 6.4vw, 2.3rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1rem;
+  --dg-fs-small: 0.94rem;
+  --dg-fs-label: 0.68rem;
+  --dg-lh-tight: 1.02;
+  --dg-lh-body: 1.75;
+  --dg-tracking-label: 0.22em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 8px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 8px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(58, 36, 24, 0.08);
+  --dg-shadow-float: 0 6px 20px rgba(58, 36, 24, 0.18);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

@@ -57,7 +57,7 @@ LAYOUTS = {'framed-card', 'full-bleed', 'arch', 'painted'}
 HEROES = {'photo', 'framed'}
 OPENINGS = {'none', 'css', 'lottie', 'layered-svg'}
 # theme.json → motion (keep in step with frontend/src/themes/packs/_system/motion.js)
-EXITS = {'fade', 'doors', 'curtain', 'part', 'bloom'}
+EXITS = {'fade', 'doors', 'curtain', 'gate', 'part', 'bloom'}
 SIGNATURES = {'drift', 'sway', 'shimmer', 'breathe'}
 
 errors = []
