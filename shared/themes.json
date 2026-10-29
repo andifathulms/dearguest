@@ -249,6 +249,37 @@
       "pack": {
         "dir": "rustic"
       }
+    },
+    {
+      "id": "lavender",
+      "name": "Wisteria Lila",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/lavender.webp",
+      "demoSlug": "demo-wisteria-lila",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Wisteria lila yang menjuntai, lavender, sweet pea putih, dan daun sage keperakan di atas kertas cat air.",
+        "category": "Taman & Bunga",
+        "colors": [
+          "#fdf8fd",
+          "#3f3550",
+          "#a88bcb"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fdf8fd,#c3aedb 55%,#7e62a8)",
+        "card": {
+          "bg": "#fdf8fd",
+          "fg": "#3f3550",
+          "accent": "#6e5491"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "lavender"
+      }
     }
   ]
 }

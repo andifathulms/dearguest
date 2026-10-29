@@ -1,0 +1,12 @@
+{
+  "box": [
+    320,
+    230,
+    900,
+    560
+  ],
+  "ink": "#3f3550",
+  "accent": "#6e5491",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/lavender/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

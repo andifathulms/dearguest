@@ -223,6 +223,35 @@ PACKS = {
         'sprites_crop': (0, 0, 1, 0.63),
         'texture': ('texture.jpg', 512, 70),
     },
+    'lavender': {
+        # Cut-outs on orange (#F08A00 asked; ~#EA7E00 delivered): lilac and violet carry
+        # more blue than red, so a blue key's despill would grey them. No despill at all;
+        # edge_fill recolours the soft edge from the petals instead.
+        'edge_fill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: the centre racemes end ~31 %, the side ones ~46 %; the lavender bed
+        # rises from ~68 % at the sides, ~80 % in the centre.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.5, 'bottom', 0.08, 1080),
+            ('hero-bottom', 'hero.jpg', 0.64, 1.0, 'top', 0.12, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (234, 126, 0), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (230, 128, 4), 720, (26, 64), 2, False),
+            # Prompt 8. The far field came mid-frame again (~62.5-79 %), but with a clean top
+            # outline, so it is a cut-out; faint ghost racemes above ~55 % are cropped off,
+            # and overrides.css fades its straight lower edge.
+            ('parallax-back', 'parallax-back.jpg', (234, 126, 0), 1080, (26, 64), 2, False, (0, 0.58, 1, 0.795)),
+            ('parallax-front', 'parallax-front.jpg', (236, 129, 0), 1080, (26, 64), 2, False),
+        ],
+        'sprites': ('petals-sheet.jpg', (230, 124, 1), 'petal', 96, (26, 64), (2, 2, 3, 2, 2, 2), False),
+        'texture': ('texture.jpg', 512, 70),
+        # the painted paper is a touch greyer than the paintings' (~#FDF8FD)
+        'texture_tint': (253, 248, 253),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -256,7 +285,8 @@ def key(img, bg, ramp, close, fill=False, despill=False, edge_fill=False):
     pull them down by the excess (for palettes with indigo, where blue can't be capped).
     `edge_fill`: the soft edge takes the colour of the nearest solid pixel (only its
     alpha is kept), for feathery art (pampas) whose hairs unmix to a dark fringe; with
-    blue despill it also fades strokes that are clearly bluer than red or green."""
+    blue despill it also fades strokes that are clearly bluer than red or green, and with
+    any other key, strokes whose colour leans towards the key's hue."""
     a = np.asarray(img.convert('RGB')).astype(np.float32)
     bg = np.array(bg, np.float32)
     dist = np.sqrt(((a - bg) ** 2).sum(2))
@@ -273,6 +303,12 @@ def key(img, bg, ramp, close, fill=False, despill=False, edge_fill=False):
         # red or green are key mixed into the paint (painted hair tips), so they fade.
         spill = a[..., 2] - np.maximum(a[..., 0], a[..., 1])
         alpha = np.minimum(alpha, np.clip(1 - (spill - 8) / 40, 0, 1))
+    elif edge_fill:
+        # Any other key (orange): strokes whose colour leans towards the key's hue are
+        # key anti-aliased into the paint (outlines along a silhouette), so they fade.
+        k = bg - bg.mean()
+        spill = ((a - a.mean(2, keepdims=True)) * (k / np.linalg.norm(k))).sum(2)
+        alpha = np.minimum(alpha, np.clip(1 - (spill - 14) / 40, 0, 1))
     alpha = ndi.gaussian_filter(alpha, 0.6)
     # Unmix: observed = alpha*fg + (1-alpha)*bg  ->  fg = (observed - (1-alpha)*bg) / alpha
     safe = np.maximum(alpha, 1e-3)[..., None]

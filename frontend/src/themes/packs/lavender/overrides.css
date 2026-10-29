@@ -1,0 +1,138 @@
+/* Lavender — Wisteria Lila: what tokens can't express (cap: 150 lines). See DESIGN.md. */
+
+/* The page is the same soft white paper the paintings are on. */
+.pk-root[data-pack='lavender'] {
+  background: var(--dg-bg) url('./assets/texture.webp') repeat;
+  background-size: 256px 256px;
+  font-feature-settings: 'kern', 'liga';
+}
+
+/* Names in Allison's flowing script; titles in Tenor Sans' open capitals, labels in Gentium capitals. */
+.pk-root[data-pack='lavender'] :is(.cover-names, .hero-names) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='lavender'] :is(.cover-amp, .hero-ampersand) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='lavender'] :is(.cover-label, .hero-label, .cover-guest-to, .countdown-label, .event-date, .story-date) {
+  font-family: var(--dg-font-label);
+  font-weight: 400;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='lavender'] .section-title {
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-fs-title);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Cover: under the wisteria. The calm zone is ~32–76 % of the height (the side racemes reach ~46 %, outside the middle 72 %). */
+.pk-root[data-pack='lavender'] .pk-cover--painted { place-items: center; }
+.pk-root[data-pack='lavender'] .pk-cover--painted .pk-cover-content {
+  width: min(84vw, 26rem);
+  gap: 0.45rem;
+  padding-block: 6vh 0;
+}
+.pk-root[data-pack='lavender'] .pk-cover--painted .cover-names { font-size: clamp(2.9rem, 13.5vw, 5rem); margin: 0.1rem 0 0.3rem; }
+.pk-root[data-pack='lavender'] .pk-cover .pk-monogram { display: none; }
+.pk-root[data-pack='lavender'] .cover-guest { margin-top: 0.3rem; }
+.pk-root[data-pack='lavender'] .cover-guest-to { letter-spacing: 0.14em; }
+.pk-root[data-pack='lavender'] .cover-guest-name { font-family: var(--dg-font-body); font-style: italic; font-size: clamp(1.35rem, 5.6vw, 1.7rem); }
+.pk-root[data-pack='lavender'] .pk-cover .pk-open-btn { margin-top: 0.6rem; }
+
+/* Soft violet pill buttons with a silver hairline. */
+.pk-root[data-pack='lavender'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn) {
+  border: 1px solid #c9cbd3;
+  background: linear-gradient(180deg, #8b70ad, #6e5491);
+  color: var(--dg-on-accent);
+  font-family: var(--dg-font-label);
+  letter-spacing: 0.14em;
+  box-shadow: var(--dg-shadow-float);
+}
+.pk-root[data-pack='lavender'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn):hover { background: #5d4580; color: #fdf8fd; }
+.pk-root[data-pack='lavender'] :is(.bank-copy-btn, .map-load, .rsvp-toggle-btn) { border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='lavender'] .rsvp-toggle-btn.active { background: var(--dg-ink); border-color: var(--dg-ink); color: var(--dg-on-accent); }
+
+/* Photo frames are ovals inside the silver wisteria wreath (photo-ring.webp). The
+   silver ring's inner edge is ~x 13–90 %, y 11–87 % of the art (the rose and racemes
+   lie over its lower left); the photo sits just inside it (x 15–88 %, y 13–85 %), so
+   the wreath extends past the photo by 20.5 % (left), 16.4 % (right), 18.1 % (top)
+   and 20.8 % (bottom); --w is the photo width. */
+.pk-root[data-pack='lavender'] .pk-photo-frame {
+  --w: min(46vw, 210px);
+  width: var(--w);
+  aspect-ratio: 0.817;
+  margin: calc(var(--w) * 0.22) auto calc(var(--w) * 0.26);
+}
+.pk-root[data-pack='lavender'] .pk-photo-frame .profile-photo {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+}
+.pk-root[data-pack='lavender'] .pk-photo-ring { inset: -18.1% -16.4% -20.8% -20.5%; }
+.pk-root[data-pack='lavender'] .pk-photo-ring img { width: 100%; height: 100%; }
+
+/* Hero. Phones: content between the bands (the middle racemes end ~0.56 W below the
+   top, the side ones at the edges ~0.82 W; the lavender bed starts ~0.36 W above the
+   bottom in the middle). The far field (parallax-back, Prompt 8) is a pale backdrop
+   behind the names, its straight lower edge faded and tucked behind the bed; it rises
+   as the bed sinks (depth -0.1). The near racemes (parallax-front) are fitted to the
+   width. Wide screens show the desktop painting (its own arbour and field), so the
+   depth layers stay hidden. The near layer is widened past the screen edges so only
+   the outer racemes show, clear of the wreath. */
+.pk-root[data-pack='lavender'] .pk-hero--framed { padding-block: 8rem 7rem; }
+@media (max-aspect-ratio: 1/1) {
+  .pk-root[data-pack='lavender'] .pk-hero--framed[data-bands] { padding-block: 58vw 42vw; }
+}
+.pk-root[data-pack='lavender'] .pk-hero--framed .hero-content { gap: 0.5rem; }
+.pk-root[data-pack='lavender'] .pk-hero-portrait { --w: min(42vw, 190px); }
+.pk-root[data-pack='lavender'] .pk-hero .pk-parallax-back { inset: auto 0 30vw; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+.pk-root[data-pack='lavender'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='lavender'] .pk-hero .pk-parallax-front { inset: 0 -14vw; }
+.pk-root[data-pack='lavender'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='lavender'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
+}
+.pk-root[data-pack='lavender'] :is(.hero-ornament, .pk-hero--framed .hero-scroll-cue) { display: none; }
+.pk-root[data-pack='lavender'] .hero-bismillah { font-size: 1.2rem; color: var(--dg-accent); }
+
+/* Greeting, verse and closing in Gentium italic. */
+.pk-root[data-pack='lavender'] :is(.greeting-text, .pk-closing p, .scripture-text) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  font-size: clamp(1.15rem, 4.6vw, 1.4rem);
+  line-height: 1.6;
+  color: var(--dg-ink);
+}
+
+/* Cards: white with a violet hairline. */
+.pk-root[data-pack='lavender'] :is(.event-card, .bank-card, .wish-card, .rsvp-success) {
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-line-strong);
+  border-radius: var(--dg-radius-card);
+  box-shadow: var(--dg-shadow-card);
+}
+.pk-root[data-pack='lavender'] :is(.event-type, .profile-name, .map-event-label) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 12vw, 3.5rem);   /* Allison's small x-height */
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='lavender'] .countdown-unit {
+  border: 1px solid var(--dg-line-strong);
+  border-radius: var(--dg-radius-card);
+  background: var(--dg-surface);
+}
+.pk-root[data-pack='lavender'] .countdown-value { font-family: var(--dg-font-display); color: var(--dg-ink); }
+.pk-root[data-pack='lavender'] :is(.rsvp-input, .rsvp-textarea) { background: #ffffff; border-color: var(--dg-line-strong); color: var(--dg-ink); }
+
+/* Closing: the wisteria branches hang over the last words as a lintel (the racemes
+   must hang down, so the second corner is mirrored, not rotated). */
+.pk-root[data-pack='lavender'] .pk-closing { padding-block: clamp(13rem, 56vw, 17rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
+.pk-root[data-pack='lavender'] .pk-closing .pk-corner { width: min(50vw, 230px); }
+.pk-root[data-pack='lavender'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }

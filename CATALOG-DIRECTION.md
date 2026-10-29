@@ -5,23 +5,23 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 ## Naming
 
 - **Theme names describe the look, not the ethnic group:** a signature object plus a material or colour. For example *Gebyok Sogan*, *Gonjong Songket*, *Lamming Zamrud*, *Merah Anggur*, *Taman Sage*. The cultural origin goes in the description and the reviewer notes, never in the name.
-- **Internal ids stay short and technical** (`javanese`, `minang`, `bugis`, `sunda`, `batak`, `floral`, `sage`, `rustic`). Customers never see them.
+- **Internal ids stay short and technical** (`javanese`, `minang`, `bugis`, `sunda`, `batak`, `floral`, `sage`, `rustic`, `lavender`). Customers never see them.
 - **Two words** where possible, Indonesian, easy to say out loud and to search for.
 
 ## Categories
 
 | Category | Promise | Live | Next candidates |
 |---|---|---|---|
-| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda), Gorga Ulos (Batak Toba) | Bali (kamboja, candi bentar); Palembang (songket limar, gold); Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
-| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour), Pampas Kraft (kraft paper, pampas, dried flowers) | **Wisteria Lila (Lavender: lilac wisteria, pastel), prompt ready**; Tropis (monstera, frangipani); Navy Bloom (deep navy with white flowers) |
+| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda), Gorga Ulos (Batak Toba) | **Jepun Prada (Bali: candi bentar, prada gold, frangipani), prompt ready**; Palembang (songket limar, gold); Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
+| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour), Pampas Kraft (kraft paper, pampas, dried flowers), Wisteria Lila (lilac wisteria, pastel) | Tropis (monstera, frangipani); Navy Bloom (deep navy with white flowers) |
 | *(later)* **Modern & Minimalis** | clean, editorial, photo-led | none yet | a painted-minimal pack: line-art florals or an arch, so it still has assets |
 
-**Suggested order.** Lavender next (Sunda, Rustic and Batak are live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
+**Suggested order.** Bali next (Sunda, Rustic, Batak and Lavender are live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
 1. Sunda (live)
 2. Rustic (live)
 3. Batak (live)
-4. Lavender (prompt ready: `PROMPT-LAVENDER-ASSETS.md`)
-5. Bali
+4. Lavender (live)
+5. Bali (prompt ready: `PROMPT-BALI-ASSETS.md`)
 6. Navy Bloom
 7. Palembang
 
@@ -44,7 +44,8 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
    - on a magenta key, use `'despill': 'magenta'` (edges only, so the art's own pinks survive). If part of the sprite sheet isn't flat, cut it off with `sprites_crop`.
    - feathery art (pampas, fringe) with a dark outline over a light background: `'edge_fill': True`. A blurred patch in a cut-out's key: `'clear'`. A painted texture that doesn't match the paintings' paper: `'texture_tint'`.
    - a Prompt 8 far layer that came as a strip with mist fading into the key: build it as a band (`'both'` fades both edges) and place it with the pack's CSS. Depth offsets are in screen heights, so a thin strip moves as much as a full-frame layer.
-   - high-contrast display faces (Bodoni, Didone): instance the small optical size, or hairlines vanish at phone sizes ("H" reads as "II").
+   - check every face at phone size before baselines: hairline and high-contrast faces (Bodoni, Italiana) break up at 1x ("H" reads as "II"). Use a small optical size, or a sturdier face for titles and labels.
+   - an orange key (lilac palettes): no despill; `edge_fill` fades strokes leaning towards the key's hue.
 4. **Pack:**
    - `theme.json` (`painted` cover, `framed` hero, and a `motion` block: `make check` fails without it). Choose them from `docs/theme-packs.md` §9:
      - `exit` from how the cover is composed: doors, curtain, part or bloom;
