@@ -19,7 +19,7 @@ SENSITIVE_KEYS = re.compile(
     r'account_number|rekening|body|data|query_string|to)$',
     re.IGNORECASE,
 )
-_SAFE_KEYS = {'event_id', 'level', 'logger', 'platform', 'release', 'environment', 'timestamp', 'type',
+_SAFE_KEYS = {'event_id', 'trace_id', 'span_id', 'parent_span_id', 'start_timestamp', 'level', 'logger', 'platform', 'release', 'environment', 'timestamp', 'type',
               'module', 'function', 'filename', 'lineno', 'abs_path', 'request_id', 'method', 'status'}
 
 _PATTERNS = [
@@ -49,6 +49,8 @@ def scrub(value, key=None, depth=0):
     masked outright; everything else is pattern-scrubbed."""
     if depth > 12:
         return MASK
+    if key in _SAFE_KEYS:
+        return value   # ids, timestamps, levels: not personal, and must stay intact
     if key is not None and key not in _SAFE_KEYS and SENSITIVE_KEYS.search(str(key)):
         return MASK if value not in (None, '', [], {}) else value
     if isinstance(value, dict):
@@ -73,21 +75,50 @@ def scrub_event(event, hint=None):
         if request.get('url'):
             request['url'] = scrub_text(request['url'])
     event.pop('user', None)
-    for key in ('exception', 'logentry', 'message', 'breadcrumbs', 'extra', 'contexts', 'tags', 'transaction', 'spans'):
+    if 'exception' in event:
+        event['exception'] = _scrub_frames(event['exception'])
+    if 'logentry' in event:
+        event['logentry'] = _scrub_logentry(event['logentry'])
+    if event.get('message'):
+        event['message'] = MASK
+    crumbs = event.get('breadcrumbs')
+    if isinstance(crumbs, dict) and isinstance(crumbs.get('values'), list):
+        crumbs['values'] = [scrub_breadcrumb(c) for c in crumbs['values']]
+    for key in ('extra', 'contexts', 'tags', 'spans'):
         if key in event:
-            event[key] = _scrub_frames(event[key]) if key == 'exception' else scrub(event[key])
+            event[key] = scrub(event[key])
+    if isinstance(event.get('transaction'), str):
+        event['transaction'] = scrub_text(event['transaction'])
     return event
 
 
 def _scrub_frames(exception):
-    """Exception values and stack locals: keep code locations, scrub the rest."""
+    """Keep what debugging needs (exception type, code locations); drop the
+    message, which can quote anything a guest typed -- names and addresses
+    that no pattern can recognise -- and every frame's local variables."""
     for exc in (exception or {}).get('values', []):
-        exc['value'] = scrub_text(exc.get('value'))
+        if exc.get('value'):
+            exc['value'] = MASK
         for frame in (exc.get('stacktrace') or {}).get('frames', []):
-            if 'vars' in frame:
-                frame['vars'] = {k: MASK for k in frame['vars']}
+            frame.pop('vars', None)
     return exception
 
 
+def _scrub_logentry(entry):
+    """Log events: keep the message template ("kirim ke %s gagal"), never
+    the parameters or the formatted text."""
+    if isinstance(entry, dict):
+        entry.pop('formatted', None)
+        if entry.get('params'):
+            entry['params'] = [MASK for _ in entry['params']]
+        entry['message'] = scrub_text(entry.get('message'))
+    return entry
+
+
 def scrub_breadcrumb(crumb, hint=None):
-    return scrub(crumb)
+    """SQL breadcrumbs carry %s placeholders only; any other message may quote
+    personal data, so it is dropped."""
+    crumb = scrub(crumb)
+    if crumb.get('category') != 'query' and crumb.get('message'):
+        crumb['message'] = MASK
+    return crumb

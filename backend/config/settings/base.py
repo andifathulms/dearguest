@@ -27,6 +27,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'config.logging.RequestIdMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -150,6 +151,24 @@ ADMIN_EMAIL = config('ADMIN_EMAIL', default='admin@undangan.local')
 RETENTION_DAYS = config('RETENTION_DAYS', default=90, cast=int)
 RETENTION_NOTICE_DAYS = 7
 
+# Ops (Phase 5): the git SHA of this build, and the token for the deep health
+# check (/api/health/?deep=1) that uptime monitoring calls.
+RELEASE = config('RELEASE', default='dev')
+HEALTH_TOKEN = config('HEALTH_TOKEN', default='')
+# Alerts from scheduled jobs (ops_report): a Telegram bot and chat.
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
+TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+
 # Public URLs used in emails, share pages, and redirects.
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173').rstrip('/')
 ADMIN_WHATSAPP_NUMBER = config('ADMIN_WHATSAPP_NUMBER', default='628123456789')
+
+# Structured JSON logs with request ids (config/logging.py); plain in development.
+from config.logging import config as _logging_config  # noqa: E402
+LOGGING = _logging_config(DEBUG)
+
+# Error tracking (config/sentry.py): off unless SENTRY_DSN is set.
+SENTRY_DSN = config('SENTRY_DSN', default='')
+if SENTRY_DSN:
+    from config import sentry as _sentry  # noqa: E402
+    _sentry.init(SENTRY_DSN, RELEASE, config('SENTRY_ENVIRONMENT', default='production'))

@@ -39,7 +39,9 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      target: app
     restart: unless-stopped
     logging: *logging
     command: gunicorn -c gunicorn.conf.py config.wsgi:application
@@ -50,6 +52,30 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.production
       - REDIS_URL=redis://redis:6379/0
+      - RELEASE=${RELEASE:-dev}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Periodic jobs (manage.py run_scheduler): nightly encrypted backup to R2,
+  # the retention purge, the certificate check. Reports to Telegram and the
+  # deep health check.
+  scheduler:
+    build:
+      context: ./backend
+      target: scheduler
+    restart: unless-stopped
+    logging: *logging
+    command: python manage.py run_scheduler
+    volumes:
+      - media_data:/app/media
+    env_file: ${ENV_FILE:-.env}
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - REDIS_URL=redis://redis:6379/0
+      - RELEASE=${RELEASE:-dev}
     depends_on:
       db:
         condition: service_healthy
@@ -64,6 +90,11 @@ services:
       args:
         VITE_PUBLIC_ORIGIN: ${VITE_PUBLIC_ORIGIN:?Set VITE_PUBLIC_ORIGIN in .env (e.g. https://dearguest.id)}
         VITE_ADMIN_WHATSAPP_NUMBER: ${ADMIN_WHATSAPP_NUMBER:-}
+        VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
+        VITE_RELEASE: ${RELEASE:-dev}
+        SENTRY_ORG: ${SENTRY_ORG:-}
+        SENTRY_PROJECT: ${SENTRY_PROJECT_FRONTEND:-}
+      secrets: [sentry_auth_token]
     restart: unless-stopped
     logging: *logging
     ports:
@@ -99,6 +130,12 @@ services:
       - letsencrypt:/etc/letsencrypt
       - certbot_www:/var/www/certbot
     entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'
+
+# Sentry source-map upload token for the nginx build (optional file; an
+# empty file just skips the upload).
+secrets:
+  sentry_auth_token:
+    file: ${SENTRY_AUTH_TOKEN_FILE:-./deploy/no-secret}
 
 volumes:
   postgres_data:

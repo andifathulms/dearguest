@@ -192,3 +192,7 @@ class ScrubberTests(APITestBase):
                          'request_id': 'abc', 'count': 3})
         self.assertEqual(out, {'guest_name': pii.MASK, 'whatsapp': pii.MASK, 'nested': [{'address': pii.MASK}],
                                'request_id': 'abc', 'count': 3})
+
+    def test_timestamps_and_ids_survive(self):
+        crumb = {'timestamp': '2026-10-29T10:51:53.502927Z', 'category': 'query', 'message': 'SELECT 1', 'request_id': 'abc'}
+        self.assertEqual(pii.scrub_breadcrumb(dict(crumb)), crumb)

@@ -49,6 +49,7 @@ OWNERSHIP = {
     'api/auth/password-reset/': 'public',
     'api/auth/password-reset-confirm/': 'public',
     'api/csp-report/': 'public',
+    'api/health/': 'public',   # no couple data; ?deep=1 needs HEALTH_TOKEN
     # The caller's own account / own list only.
     'api/auth/me/': 'self',
     'api/auth/reauth/': 'self',

@@ -30,6 +30,9 @@ export default defineConfig(({ command, mode }) => {
   if (command === 'build') requirePublicOrigin(mode)
   return {
     plugins: [react(), marketingPages()],
+    // Source maps only for Sentry: made when SENTRY_SOURCEMAPS is set, uploaded
+    // and then deleted during the image build (nginx/Dockerfile), never served.
+    build: { sourcemap: process.env.SENTRY_SOURCEMAPS ? 'hidden' : false },
     server: {
       host: true,
       port: 5173,

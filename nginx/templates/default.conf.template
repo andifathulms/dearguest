@@ -70,6 +70,18 @@ map $host $hsts {
 # per-account lockout and TOTP).
 limit_req_zone $binary_remote_addr zone=admin_login:10m rate=5r/m;
 
+# Access log: JSON, one line per request, with the request id Django also logs.
+# No query strings (?to= carries guests' names) and guest codes masked.
+map $uri $log_uri {
+    default                                                          $uri;
+    "~^(?<lead>/(?!(?:api|dashboard|tema|assets|static|media|social|theme-previews)/)[-\w]+/)[A-Za-z0-9]{6,12}/?$"   "${lead}[kode]";
+    "~^(?<lead>/og/[-\w]+/)[A-Za-z0-9]{4,12}(?<tail>/[0-9a-f]{16}\.jpg)$"   "${lead}[kode]${tail}";
+}
+log_format json escape=json '{"time":"$time_iso8601","request_id":"$request_id","method":"$request_method",'
+    '"path":"$log_uri","status":$status,"bytes":$body_bytes_sent,"duration":$request_time,'
+    '"upstream":"$upstream_response_time","crawler":"$og_crawler","ua_mobile":"$http_sec_ch_ua_mobile"}';
+access_log /dev/stdout json;
+
 # Port 80: Let's Encrypt HTTP-01 challenges only; everything else goes to HTTPS.
 server {
     listen 80 default_server;
