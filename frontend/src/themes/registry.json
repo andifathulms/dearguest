@@ -144,6 +144,68 @@
       }
     },
     {
+      "id": "batak",
+      "name": "Gorga Ulos",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/batak.webp",
+      "demoSlug": "demo-gorga-ulos",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Gorga merah-hitam-putih, atap rumah bolon, ulos berjumbai, dan Danau Toba di atas kertas gading.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#faf0e4",
+          "#1a1412",
+          "#a3201b"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#faf0e4,#1a1412 55%,#a3201b)",
+        "card": {
+          "bg": "#faf0e4",
+          "fg": "#1a1412",
+          "accent": "#a3201b"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "batak"
+      }
+    },
+    {
+      "id": "bali",
+      "name": "Jepun Prada",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/bali.webp",
+      "demoSlug": "demo-jepun-prada",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Candi bentar bata dan batu paras, kain prada merah-emas, bunga jepun, dan janur di atas kertas krem.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#fdf3e4",
+          "#7a1f24",
+          "#c9a045"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fdf3e4,#a9573d 55%,#c9a045)",
+        "card": {
+          "bg": "#fdf3e4",
+          "fg": "#3a2418",
+          "accent": "#8c2a24"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "bali"
+      }
+    },
+    {
       "id": "floral",
       "name": "Merah Anggur",
       "collection": "signature",
@@ -211,6 +273,99 @@
       },
       "pack": {
         "dir": "sage"
+      }
+    },
+    {
+      "id": "rustic",
+      "name": "Pampas Kraft",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/rustic.webp",
+      "demoSlug": "demo-pampas-kraft",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Pampas, mawar kering terakota, eukaliptus, dan pita tali goni di atas kertas kraft yang hangat.",
+        "category": "Taman & Bunga",
+        "colors": [
+          "#ead6bc",
+          "#4a3424",
+          "#a7654a"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#ead6bc,#c9a66b 55%,#a7654a)",
+        "card": {
+          "bg": "#ead6bc",
+          "fg": "#4a3424",
+          "accent": "#8a4528"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "rustic"
+      }
+    },
+    {
+      "id": "lavender",
+      "name": "Wisteria Lila",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/lavender.webp",
+      "demoSlug": "demo-wisteria-lila",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Wisteria lila yang menjuntai, lavender, sweet pea putih, dan daun sage keperakan di atas kertas cat air.",
+        "category": "Taman & Bunga",
+        "colors": [
+          "#fdf8fd",
+          "#3f3550",
+          "#a88bcb"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fdf8fd,#c3aedb 55%,#7e62a8)",
+        "card": {
+          "bg": "#fdf8fd",
+          "fg": "#3f3550",
+          "accent": "#6e5491"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "lavender"
+      }
+    },
+    {
+      "id": "navy",
+      "name": "Mawar Malam",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/navy.webp",
+      "demoSlug": "demo-mawar-malam",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Mawar dan peoni putih, eukaliptus biru keabuan, dan garis emas tipis di atas kertas biru dongker.",
+        "category": "Taman & Bunga",
+        "colors": [
+          "#1e2b42",
+          "#f3efe6",
+          "#d4b672"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#14213d,#3e5866 55%,#f3efe6)",
+        "card": {
+          "bg": "#1e2b42",
+          "fg": "#f3efe6",
+          "accent": "#d4b672"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "navy"
       }
     }
   ]

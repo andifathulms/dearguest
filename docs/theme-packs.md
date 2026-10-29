@@ -45,6 +45,7 @@ Registry entry for a pack:
   "layoutVariant": "full-bleed",              // framed-card | full-bleed | arch | painted
   "hero": "photo",                            // photo (default) | framed (§3)
   "opening": { "type": "css", "preset": "photo-crossfade-typeon", "durationMs": 1800 },
+  "motion": { "exit": "doors", "signature": ["sway", "shimmer"] },   // required (§9)
   "fonts": { "preload": ["fonts/display-300.woff2", "fonts/body-400.woff2"] },
   "photoFilters": ["none", "soft-warm", "bw"],  // offered in the editor; omit to hide the control
   "slots": {
@@ -169,7 +170,7 @@ z-order (bottom → top): `cover-bg` / `hero-bg` (0) · `hero-top` / `hero-botto
 | `hero-overlay` | painted elements over the hero photo's edges (garland, foliage, frame) | WebP alpha | 390×844 | 780×1688 | full colour | anchored bottom; keep the centre clear for names |
 | `hero-bg` | `framed` hero: the painting behind it (wide screens when bands exist) | AVIF + WebP + JPEG, opaque | 390×844 | 1080×2340, or landscape 1920×1080 | full colour | `object-fit: cover`; centre clear |
 | `hero-top` / `hero-bottom` | `framed` hero on portrait screens: painted bands pinned to the top / bottom | WebP / AVIF with alpha (inner edge fades out) | 390 wide | 1080 wide | full colour | cut from one painting by `scripts/build_pack_art.py` |
-| `parallax-back` / `-mid` / `-front` | depth layers behind cover/hero | WebP alpha | 390×844 each | 1080×2340 each | full colour | `depth`: 0.1 / 0.25 / 0.4 (fraction of scroll); each must read on its own; disabled under reduced motion |
+| `parallax-back` / `-mid` / `-front` | depth layers in the hero (static on a `framed-card` cover) | WebP alpha | 390×844 each | 1080×2340 each | full colour | `depth`: how far the layer trails the scroll, default 0.4 / 0.2 / −0.15 (0 moves with the page, 1 stands still, negative moves ahead; the offset is a fraction of a screen height, so a thin strip the pack's CSS places moves as much as a full-frame layer); each must read on its own; still under reduced motion (§9) |
 | `particles` | falling sprites (petals, jasmine, dust) | WebP alpha, 4–6 files (`frames: [...]`, plus `count`, `size` in px) | 32×32 | 64–96 px each | full colour | CSS fall + sway + spin, fixed positions (same every render), above the cover, `pointer-events: none`; none under reduced motion |
 | `opening` | the opening animation (§5) | Lottie JSON ≤ 150 KB (no embedded images over 30 KB), or layered SVG with named `<g id>` layers | full screen | artboard 1080×1920, 30 fps, ≤ 3 s | full colour | the final frame must look like the cover's end state |
 | `gift-card` | face of bank / QRIS / e-wallet cards | SVG or WebP alpha | 320×200 | 640×400 | full colour | text is rendered on top; keep the centre-left calm |
@@ -215,7 +216,8 @@ Packs listing `photoFilters` in `theme.json` get a "Filter foto" control in the 
 2. Write `packs/<id>/DESIGN.md`.
 3. Create `theme.json`, `tokens.css` (all tokens), `index.js`, fonts, assets.
 4. `?slots=1` to place art; `make check` until green.
-5. Flip `status` to `active`, `make themes`, add the demo (`demoSlug`), run the visual suite.
+5. Choose the pack's `motion` block (§9); `make check` fails without it.
+6. Flip `status` to `active`, `make themes`, add the demo (`demoSlug`), run the visual suite.
 
 **Painted art from an image model** (how Floral was made; `PROMPT-FLORAL-ASSETS.md`):
 
@@ -228,3 +230,54 @@ Packs listing `photoFilters` in `theme.json` get a "Filter foto" control in the 
    - **sprites**: a sheet split into particles;
    - a seamless **texture** tile.
 4. Check the cut-outs over a light background, not only over the page colour; see-through dark petals only show there.
+
+## 9. Motion
+
+Every pack moves. Most of it is shared and automatic; each pack only picks its cover exit and its signature loops.
+
+**Automatic, every pack, no configuration:**
+
+| Effect | What happens | Where |
+|---|---|---|
+| Hero curtain | as the guest scrolls past the hero, `hero-top` rises, `hero-bottom` sinks, `hero-bg` (or the photo) trails the page and the framed portrait tilts back in 3D | `_system/HeroMotion.jsx` |
+| Depth layers | filled `parallax-*` slots move at their `depth` (§4); empty ones render nothing | `_system/HeroMotion.jsx` |
+| Section titles | the title rises out of a mask, then the `heading-ornament` draws from its centre | `components/sections/SectionTitle.jsx` |
+| Gallery | each photo's frame unveils from its centre while the photo settles from a slight zoom, staggered | `GallerySection.jsx`, `_system/motion.js` |
+| Sprite wind | the `particles` layer lifts and leans against the scroll's velocity, then settles | `_system/Particles.jsx` |
+
+**Per pack, `theme.json → motion`** (required; `make check` validates it):
+
+```json
+"motion": { "exit": "doors", "signature": ["sway", "shimmer"] }
+```
+
+`exit`: how the cover leaves when the guest taps the open button (`_system/openings/CoverExit.jsx`). The text fades first, then:
+
+| Exit | Movement | Suits |
+|---|---|---|
+| `doors` | two halves swing open towards the guest, in 3D | carved doors, gebyok, rumah gadang |
+| `curtain` | two halves gather to the sides | drapes, a lamming canopy |
+| `gate` | two halves slide apart sideways | a split gate (candi bentar) |
+| `part` | the top and bottom halves part | clouds above and below, a roofline over a runner |
+| `bloom` | the cover grows and fades, as if walking through it | florals, anything without a natural split |
+| `fade` | a plain fade | the fallback; also what reduced motion gets |
+
+`signature`: one or two ambient loops that suit the art (`_base/motion.css`):
+
+| Signature | Movement | Needs |
+|---|---|---|
+| `drift` | the hero bands (and the wide painting) float slowly sideways | clouds, mist, water |
+| `sway` | the closing's hanging corner art moves in a breeze | melati strings, leaves, tassels |
+| `shimmer` | a light sweeps across the gold of `hero-top` and the photo frame | gold, silk, songket |
+| `breathe` | the framed portrait floats, barely | any pack |
+
+Current packs: Gebyok Sogan `doors` + sway, shimmer; Gonjong Songket `doors` + shimmer, breathe; Lamming Zamrud `curtain` + shimmer, sway; Siger Mega Mendung `part` + drift, sway; Merah Anggur and Taman Sage `bloom` + sway, breathe.
+
+**Rules for anything new here:**
+- **Rest = the old page.** Every effect is the identity at rest: scroll-linked values are 0 at the top of the page, reveals end at `transform: none` / `clip-path: none` (Framer `transitionEnd`), loops start invisible or at identity. That is why the visual baselines didn't change when motion was added, and why screenshots (which disable animations) stay stable.
+- **Reveals animate opacity too.** `tests/visual/packs/stub.js` `waitRevealed` waits for inline opacity 1, so a reveal that moves opacity with its other properties is waited for automatically.
+- **No second reveal layer on items a section already animates** (an IntersectionObserver class or a CSS scroll timeline on the same elements fights Framer and leaves items stuck hidden). Wrap, or animate an element nothing else animates.
+- **Cheap properties only** (transform, opacity, clip-path; the sheen's moving background is one small pseudo-element), no scroll listeners outside Framer's, no WebGL: guests open these links in WhatsApp's in-app browser on mid-range phones.
+- **Depth art (optional):** a prompt's Prompt 8 asks for `parallax-back` / `parallax-front` cut-outs on the key colour; build them as `keyed` entries in the recipe and add the slots to `theme.json`. They start moving with no code.
+- **Reduced motion:** Framer's `MotionConfig reducedMotion="user"` plus `useReducedMotion()` switch reveals to plain fades, freeze the hero, make the exit a fade; the loops only exist under `prefers-reduced-motion: no-preference`.
+- **Behaviour is tested** in `tests/visual/packs/motion.spec.js` (exit, curtain at rest and on scroll, reveals ending at rest, reduced motion).

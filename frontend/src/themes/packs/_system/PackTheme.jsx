@@ -4,6 +4,7 @@ import '../_base/base.css'
 import '../_base/variants.css'
 import '../_base/filters.css'
 import '../_base/openings.css'
+import '../_base/motion.css'
 import HeroSection from '../../../components/sections/HeroSection.jsx'
 import GuestGreeting from '../../../components/ui/GuestGreeting.jsx'
 import ScriptureSection from '../../../components/sections/ScriptureSection.jsx'
@@ -83,6 +84,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
           data-layout={m.layoutVariant}
           data-gallery={m.gallery || 'grid'}
           data-photo-filter={invitation.photo_filter || 'none'}
+          data-signature={(m.motion?.signature || []).join(' ') || undefined}
         >
           <ThemeAsset slot="texture" className="pk-texture" />
           <Particles />

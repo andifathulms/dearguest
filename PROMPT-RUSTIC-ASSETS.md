@@ -8,10 +8,12 @@
 
 The *Taman & Bunga* answer to the heritage themes: the outdoor "kebun" / barn look many Indonesian couples ask for. It sits between Taman Sage (fresh and white) and Merah Anggur (dark and dramatic).
 
+**Motion (suggested):** `exit: "bloom"` (no natural split in a loose spray), `signature: ["sway", "breathe"]` (pampas and grasses moving in a breeze). If Prompt 8 is delivered, its layers trail the hero's scroll for depth.
+
 **How to use** (same as before):
 1. Open **one** Gemini chat. Paste **Prompt 0** first.
 2. Paste Prompts 1–6 one at a time, choosing the aspect ratio each one names.
-3. **Prompt 7 (texture) is optional.** If Gemini refuses or paints something with objects in it, skip it; I generate the texture in code.
+3. **Prompt 7 (texture) and Prompt 8 (depth layers) are optional.** If Gemini refuses the texture or paints something with objects in it, skip it; I generate the texture in code. Without Prompt 8 the hero still moves; with it, it gains real depth.
 4. If one is off, correct it in the same chat instead of starting a new chat.
 5. File names don't matter. Drop everything into the repo's `assets/` folder.
 
@@ -122,13 +124,27 @@ File: **`texture`** · Aspect ratio **1:1** (square)
 Square image: a close-up, seamless, tileable texture of warm light kraft paper (#E9D9BF) with soft natural fibres and tiny flecks, evenly lit from edge to edge. No objects, no stains, no vignette, no text.
 ```
 
+## Prompt 8: depth layers (optional, two images)
+
+Files: **`parallax-back`** and **`parallax-front`** · Aspect ratio **9:16** (portrait), one image each
+
+```
+Image 8a of the set, same style. Portrait 9:16. A FAR layer for depth: a soft, pale, low band of distant pampas meadow and a faint tree line across the bottom 30% only, washed out and lighter than everything else in the set, as if seen through warm haze. Nothing above 70% of the height.
+Everything else must be completely flat, uniform, plain cobalt blue #2340C8 — one even colour edge to edge, no texture, no shadow, no gradient.
+```
+
+```
+Image 8b of the set, same style. Portrait 9:16. A NEAR layer for depth: two or three large pampas plumes and a dried rose, very close to the viewer and slightly soft, entering from the LEFT and RIGHT edges and cropped by them, each reaching no more than 20% of the width into the picture. The CENTRE 60% of the width, top to bottom, is empty.
+Everything else must be completely flat, uniform, plain cobalt blue #2340C8 — one even colour edge to edge, no texture, no shadow, no gradient.
+```
+
 ---
 
 ## Checklist before you drop them into `assets/`
 
 - [ ] No text, letters or watermark anywhere.
 - [ ] Prompts 1, 2, 3: the empty zones really are empty: no plume tips, stems or splashes.
-- [ ] Prompts 4, 5, 6: the background is one flat, even **cobalt blue** right to every edge, and the plumes are defined, not fuzzy.
+- [ ] Prompts 4, 5, 6 (and 8): the background is one flat, even **cobalt blue** right to every edge, and the plumes are defined, not fuzzy.
 - [ ] All look like one set: same kraft paper, same cream pampas, same terracotta and dusty rose.
 
 **For a reviewer:** this theme has no regional or religious elements. Please check two things. First, that the dried-flower palette reads as warm and festive, not as faded or mournful. Second, that it suits a garden ("kebun") or outdoor reception as Indonesian couples picture one. Should fresh *melati* be added for families who expect it?

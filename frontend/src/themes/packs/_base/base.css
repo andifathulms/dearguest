@@ -244,7 +244,7 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
   line-height: var(--dg-lh-tight);
 }
 .pk-root .section-title::before, .pk-root .section-title::after { content: none; }
-.pk-root .section-title + .pk-heading-ornament { margin-top: calc(-1 * var(--dg-space-4)); }
+.pk-root .section-title + .pk-ornament-reveal > .pk-heading-ornament { margin-top: calc(-1 * var(--dg-space-4)); }
 
 /* greeting */
 .pk-root .greeting-to { margin: 0 0 var(--dg-space-3); color: var(--dg-ink-muted); }

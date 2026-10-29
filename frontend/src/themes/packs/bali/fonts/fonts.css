@@ -1,0 +1,38 @@
+/* Self-hosted, Latin-subset woff2 (SIL Open Font License; see fonts/LICENSE.md).
+   Family names are pack-specific so they never collide with fonts loaded
+   elsewhere on the site. */
+@font-face {
+  font-family: 'DG Bali Script';
+  src: url('./script-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DG Bali Display';
+  src: url('./display-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DG Bali Label';
+  src: url('./label-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DG Bali Body';
+  src: url('./body-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DG Bali Body';
+  src: url('./body-400i.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}

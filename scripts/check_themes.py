@@ -58,6 +58,9 @@ SLOTS = {
 LAYOUTS = {'framed-card', 'full-bleed', 'arch', 'painted'}
 HEROES = {'photo', 'framed'}
 OPENINGS = {'none', 'css', 'lottie', 'layered-svg'}
+# theme.json → motion (keep in step with frontend/src/themes/packs/_system/motion.js)
+EXITS = {'fade', 'doors', 'curtain', 'gate', 'part', 'bloom'}
+SIGNATURES = {'drift', 'sway', 'shimmer', 'breathe'}
 
 errors = []
 
@@ -223,6 +226,15 @@ def check_pack(t):
             check_og(t, d, manifest)
         if (manifest.get('opening') or {}).get('type') not in OPENINGS:
             err(f'{t["id"]}: theme.json opening.type must be one of {sorted(OPENINGS)}')
+        motion = manifest.get('motion')
+        if not isinstance(motion, dict):
+            err(f'{t["id"]}: theme.json has no "motion" block (exit + signature, docs/theme-packs.md §9)')
+        else:
+            if motion.get('exit') not in EXITS:
+                err(f'{t["id"]}: theme.json motion.exit must be one of {sorted(EXITS)}')
+            sig = motion.get('signature')
+            if not isinstance(sig, list) or not sig or not set(sig) <= SIGNATURES:
+                err(f'{t["id"]}: theme.json motion.signature must be a non-empty list from {sorted(SIGNATURES)}')
         if manifest.get('hero', 'photo') not in HEROES:
             err(f'{t["id"]}: theme.json hero must be one of {sorted(HEROES)}')
         for slot, spec in (manifest.get('slots') or {}).items():

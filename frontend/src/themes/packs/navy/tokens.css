@@ -1,0 +1,62 @@
+/* Navy — Mawar Malam: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page navy is sampled from the paintings so art and page meet without a seam;
+   the ink is the roses' warm white, the accent the fine gold of the leaf veins. */
+.pk-root[data-pack='navy'] {
+  /* colour */
+  --dg-bg: #1e2b42;
+  --dg-bg-alt: rgba(243, 239, 230, 0.025);
+  --dg-surface: rgba(243, 239, 230, 0.05);
+  --dg-surface-raised: rgba(243, 239, 230, 0.09);
+  --dg-ink: #f3efe6;
+  --dg-ink-muted: #c7cdd8;
+  --dg-ink-faint: #8f9bb0;
+  --dg-accent: #d4b672;   /* the leaf veins' fine gold, lifted to read on navy */
+  --dg-on-accent: #14213d;
+  --dg-line: rgba(212, 182, 114, 0.22);
+  --dg-line-strong: rgba(212, 182, 114, 0.5);
+  --dg-scrim: linear-gradient(180deg, rgba(10, 16, 30, 0.25) 0%, rgba(10, 16, 30, 0) 25%, rgba(10, 16, 30, 0.45) 55%, rgba(10, 16, 30, 0.85) 100%);
+  --dg-focus: #e6cf96;
+
+  /* type */
+  --dg-font-display: 'DG Navy Display', 'Aboreto', Georgia, serif;
+  --dg-font-body: 'DG Navy Body', 'Castoro', Georgia, serif;
+  --dg-font-label: 'DG Navy Label', 'Castoro', Georgia, serif;
+  --dg-font-script: 'DG Navy Script', 'Corinthia', cursive;
+  --dg-fs-names: clamp(3.4rem, 16vw, 6rem);
+  --dg-fs-title: clamp(1.6rem, 6.4vw, 2.3rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1rem;
+  --dg-fs-small: 0.94rem;
+  --dg-fs-label: 0.68rem;
+  --dg-lh-tight: 1.02;
+  --dg-lh-body: 1.75;
+  --dg-tracking-label: 0.22em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 8px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 8px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --dg-shadow-float: 0 6px 20px rgba(0, 0, 0, 0.45);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

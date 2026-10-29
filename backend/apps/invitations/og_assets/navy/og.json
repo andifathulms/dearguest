@@ -1,0 +1,12 @@
+{
+  "box": [
+    340,
+    40,
+    880,
+    470
+  ],
+  "ink": "#f3efe6",
+  "accent": "#c8a75e",
+  "shadow": true,
+  "_generated": "GENERATED from frontend/src/themes/packs/navy/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

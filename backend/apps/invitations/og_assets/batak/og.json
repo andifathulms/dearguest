@@ -1,0 +1,12 @@
+{
+  "box": [
+    340,
+    80,
+    880,
+    470
+  ],
+  "ink": "#1a1412",
+  "accent": "#a3201b",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/batak/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

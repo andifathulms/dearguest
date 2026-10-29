@@ -12,6 +12,14 @@ disagree, this section, the reports (`THEMEPACK-REPORT.md`, `MARKETFIT-REPORT.md
 - Each pack has real painted art. Image-less CSS themes were removed (migration `0040`).
 - Catalogue direction, naming rule, categories and the next themes to build: **`CATALOG-DIRECTION.md`**.
 - System docs: `docs/theme-packs.md` (slots, layouts, the `painted` cover, the `framed` hero, particles).
+- **Every pack moves** (`docs/theme-packs.md` §9). Shared and automatic:
+  - the hero curtain on scroll (bands part, portrait tilts back in 3D);
+  - title and ornament reveals;
+  - the gallery unveil;
+  - sprites that react to scrolling;
+  - `parallax-*` depth layers.
+  Per pack: `theme.json → motion` (`exit` + `signature`), which `make check` requires. New motion
+  must rest exactly at the old page (scroll 0, `transitionEnd`), so the baselines stay valid.
 
 ### The art workflow: what the user means by…
 
@@ -21,13 +29,17 @@ That folder is a git-ignored inbox. Then:
 1. Identify the theme from the newest `PROMPT-*-ASSETS.md` that has no pack yet.
 2. **Move** the images to `design/packs/<id>/masters/` so `assets/` is empty again, and rename them by
    content: `cover-bg-portrait`, `cover-bg-desktop`, `hero`, `photo-ring`, `corner-tl`, `petals-sheet`,
-   `texture`. Gemini's file names are meaningless.
+   `texture`, and `parallax-back` / `parallax-front` if Prompt 8 was delivered. Gemini's file names are
+   meaningless.
 3. Measure the art: background colours, the calm zones for text, and the photo-ring opening.
 4. Add a recipe to `scripts/build_pack_art.py`, then run `python3 scripts/build_pack_art.py <id>`.
    Check the cut-outs over a light and a dark background. If `texture` is missing or tiles badly, use
    `texture_synth`.
 5. Build the pack:
-   - `theme.json`: `painted` layout, `framed` hero;
+   - `theme.json`: `painted` layout, `framed` hero, and a `motion` block. Pick the `exit` from the
+     cover's composition (doors, curtain, part, bloom) and one or two `signature` loops that suit
+     the art (drift, sway, shimmer, breathe). If Prompt 8 depth art arrived, also key it into
+     `parallax-back` / `parallax-front` slots;
    - `tokens.css`, with colours sampled from the paintings;
    - three OFL fonts that no other pack uses;
    - code-drawn ornaments;
@@ -38,17 +50,24 @@ That folder is a git-ignored inbox. Then:
    `seed_demos`.
 7. Visual spec `frontend/tests/visual/packs/<id>.spec.js`. Write the baselines with
    `sh scripts/visual-docker.sh <id>.spec.js --update-snapshots=missing` (the spec file **before** the
-   flag). Then verify the full suite **twice, with the machine idle**.
-8. Show the user screenshots (cover, hero, full page, desktop), fix what looks wrong, and commit on a
-   feature branch. Don't merge or push unless asked.
+   flag). Then verify the full suite **twice, with the machine idle**. The suite includes
+   `motion.spec.js`; add the new pack there when its exit differs from the ones it already covers.
+8. Show the user screenshots (cover, hero, full page, desktop, plus a frame mid-exit and the hero
+   scrolled), fix what looks wrong, and commit on a feature branch. Don't merge or push unless asked.
 
 **"Give me another prompt"**: write `PROMPT-<THEME>-ASSETS.md` for the next theme in
 `CATALOG-DIRECTION.md`, using the same structure as the existing prompt files:
-- a style brief (Prompt 0), then Prompts 1–7;
+- a style brief (Prompt 0), then Prompts 1–7, plus an optional Prompt 8 for depth layers
+  (`parallax-back`: a far, pale band sitting on the bottom edge, with a clear top outline, not
+  mist fading into the key; `parallax-front`: a few large sprigs cropped at the side edges;
+  both on the key colour, with the centre empty);
+- a suggested `motion` for the pack (exit + signature), in the prompt's intro;
 - exact percentage empty zones for text;
 - a separate hero painting with art only in the top and bottom bands;
 - cut-outs on one flat key colour that appears nowhere in the palette (cobalt `#2340C8` by default,
-  magenta `#D01C8B` if the palette has blue);
+  magenta `#D01C8B` if the palette has blue, orange `#F08A00` if it has lilac or violet, which blue
+  despill would grey). Ask, twice, for the key to stay flat across the sprite sheet's lower third:
+  Gemini keeps adding a haze or ground band there;
 - the texture prompt marked optional;
 - no people, no text, no religious symbols;
 - a note for a cultural reviewer.

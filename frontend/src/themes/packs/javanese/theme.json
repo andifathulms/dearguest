@@ -4,6 +4,7 @@
   "hero": "framed",
   "gallery": "editorial",
   "opening": { "type": "css", "preset": "painted-bloom", "durationMs": 2200 },
+  "motion": { "exit": "doors", "signature": ["sway", "shimmer"] },
   "fonts": { "preload": ["fonts/script-400.woff2", "fonts/display-500.woff2", "fonts/body-400.woff2"] },
   "photoFilters": ["none", "soft-warm", "bw"],
   "slots": {
