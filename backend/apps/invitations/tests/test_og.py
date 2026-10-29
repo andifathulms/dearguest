@@ -4,6 +4,7 @@ import io
 from datetime import datetime, timezone
 from urllib.parse import quote
 
+from django.test import override_settings
 from PIL import Image
 
 from apps.invitations import og
@@ -16,6 +17,7 @@ OFFENSIVE = '<b>KATA KASAR</b> "onclick=alert(1)'
 LONG_TO = 'Z' * 10_000
 
 
+@override_settings(FRONTEND_URL='http://localhost:5173')   # the URLs asserted below
 class OgBase(APITestBase):
     def setUp(self):
         super().setUp()
