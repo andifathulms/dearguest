@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 // screenshot once it has one, else a mock drawn from the registry colours.
 // With `loop`, a theme that has a preview video (frontend/scripts/
 // capture-docker.sh) plays it on hover, or on touch screens while the card
-// is mostly in view. Nothing downloads until it plays (preload="none"), and
-// it never plays for people who prefer reduced motion.
+// is mostly in view. The source is attached on the first play, so nothing
+// downloads before that (Safari fetches <source>s despite preload="none"),
+// and it never plays for people who prefer reduced motion.
 export default function ThemePreview({ theme, className = '', badge, loop = false }) {
   const label = badge ?? theme.badge
   const video = loop && theme.previewVideo ? theme.previewVideo : null
@@ -15,6 +16,7 @@ export default function ThemePreview({ theme, className = '', badge, loop = fals
   const play = () => {
     const el = ref.current
     if (!el || reducedMotion()) return
+    if (!el.getAttribute('src')) el.src = el.canPlayType('video/webm; codecs="vp9"') ? video.webm : video.mp4
     el.play().then(() => setPlaying(true)).catch(() => {})
   }
   const stop = () => {
@@ -40,10 +42,7 @@ export default function ThemePreview({ theme, className = '', badge, loop = fals
         {label && <span className="tp-badge">{label}</span>}
         <img className="tp-image" src={theme.previewImage} alt={`Pratinjau tema ${theme.name}`} loading="lazy" decoding="async" />
         {video && (
-          <video ref={ref} className="tp-video" muted loop playsInline preload="none" poster={theme.previewImage} aria-hidden="true" tabIndex={-1}>
-            <source src={video.webm} type="video/webm" />
-            <source src={video.mp4} type="video/mp4" />
-          </video>
+          <video ref={ref} className="tp-video" muted loop playsInline preload="none" poster={theme.previewImage} aria-hidden="true" tabIndex={-1} />
         )}
       </div>
     )
