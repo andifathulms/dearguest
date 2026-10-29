@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { catalogThemes } from '../themes/registry.js'
 import { variantOptions } from '../copy/copy.js'
 import { rememberTheme } from '../utils/themeChoice.js'
+import { trackVisit } from '../utils/funnel.js'
 import './LandingPage.css'
 import './ThemesGalleryPage.css'
 import './ThemeDetailPage.css'
@@ -16,6 +17,7 @@ export default function ThemeDetailPage() {
   const { id } = useParams()
   const theme = CATALOG.find(t => t.id === id)
   const [variant, setVariant] = useState('islam')
+  useEffect(trackVisit, [])
 
   if (!theme) {
     return (

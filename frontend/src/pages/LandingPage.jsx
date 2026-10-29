@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../api/client.js'
 import { catalogThemes, selectableThemes } from '../themes/registry.js'
 import ThemePreview from '../themes/ThemePreview.jsx'
+import { trackVisit } from '../utils/funnel.js'
 
 // Theme sections read the registry: counts reflect themes a couple can pick
 // today; the grids show pickable + "coming soon" themes.
@@ -112,6 +113,7 @@ function CouponBox({ code, setCode, coupon, setCoupon }) {
 export default function LandingPage() {
   const [code, setCode] = useState('')
   const [coupon, setCoupon] = useState(null)
+  useEffect(trackVisit, [])
   const pct = coupon?.discount_percent || 0
 
   return (

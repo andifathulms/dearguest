@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { catalogThemes, selectableThemes } from '../themes/registry.js'
 import ThemePreview from '../themes/ThemePreview.jsx'
+import { trackVisit } from '../utils/funnel.js'
 import './LandingPage.css'
 import './ThemesGalleryPage.css'
 
@@ -26,6 +27,7 @@ const matchCat = (t, cat) =>
 
 export default function ThemesGalleryPage() {
   const [category, setCategory] = useState('Semua')
+  useEffect(trackVisit, [])
   const list = CATALOG.filter(t => matchCat(t, category))
 
   return (

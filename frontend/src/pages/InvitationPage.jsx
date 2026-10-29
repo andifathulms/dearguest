@@ -24,6 +24,16 @@ export default function InvitationPage() {
     if (!pathCode && legacyCode) navigate(`/${slug}/${encodeURIComponent(legacyCode)}`, { replace: true })
   }, [slug, pathCode, legacyCode, navigate])
 
+  // Invitations are private pages: keep them out of search results (nginx also
+  // sends X-Robots-Tag; this covers crawlers that render the app).
+  useEffect(() => {
+    const meta = document.createElement('meta')
+    meta.name = 'robots'
+    meta.content = 'noindex, nofollow'
+    document.head.appendChild(meta)
+    return () => meta.remove()
+  }, [])
+
   // The guest's name comes from the couple's list, never from the URL.
   useEffect(() => {
     if (!code) { setGuest(null); return }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import api from '../api/client.js'
 import { rememberTheme } from '../utils/themeChoice.js'
+import { storedUtm } from '../utils/funnel.js'
 import './Auth.css'
 
 export default function RegisterPage() {
@@ -32,7 +33,7 @@ export default function RegisterPage() {
     }
     setLoading(true)
     try {
-      const res = await api.post('/auth/register/', form)
+      const res = await api.post('/auth/register/', { ...form, utm: storedUtm() })
       localStorage.setItem('access_token', res.data.access)
       localStorage.setItem('refresh_token', res.data.refresh)
       navigate('/onboarding')

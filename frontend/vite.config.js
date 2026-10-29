@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import crawlers from './crawlers.json'
+import marketingPages from './scripts/marketing-pages.js'
 
 // Share links, QR codes and copied invitation links are built on this origin
 // (src/utils/publicUrl.js). A build without it would ship relative links that
@@ -28,7 +29,7 @@ const INVITATION_PATH = '^/[-\\w]+(/[A-Za-z0-9]{4,12})?/?(\\?.*)?$'
 export default defineConfig(({ command, mode }) => {
   if (command === 'build') requirePublicOrigin(mode)
   return {
-    plugins: [react()],
+    plugins: [react(), marketingPages()],
     server: {
       host: true,
       port: 5173,

@@ -9,7 +9,7 @@ from django.utils.html import format_html
 from . import themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
-    CoupleProfile, ActivationRequest, Coupon, MusicPreset,
+    CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
 )
 
 
@@ -189,3 +189,39 @@ class GuestAdmin(admin.ModelAdmin):
     list_filter = ['invitation', 'checked_in', 'group']
     search_fields = ['name', 'code']
     readonly_fields = ['code', 'checked_in_at', 'created_at']
+
+
+@admin.register(FunnelEvent)
+class FunnelEventAdmin(admin.ModelAdmin):
+    """Weekly funnel: rows are weeks, columns are steps, optionally for one
+    traffic source (?source=). Read-only: events come from the site."""
+    change_list_template = 'admin/invitations/funnelevent/change_list.html'
+    list_display = ['week', 'step', 'utm_source', 'utm_medium', 'utm_campaign', 'created_at']
+    list_filter = ['step', 'utm_source']
+    WEEKS = 12
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        from datetime import timedelta
+        from django.db.models import Count
+        from django.utils import timezone
+
+        today = timezone.localdate()
+        monday = today - timedelta(days=today.weekday())
+        weeks = [monday - timedelta(weeks=i) for i in range(self.WEEKS)]
+        source = request.GET.get('source', '')
+        qs = FunnelEvent.objects.filter(week__gte=weeks[-1])
+        if source:
+            qs = qs.filter(utm_source='' if source == '(langsung)' else source)
+        counts = {(r['week'], r['step']): r['n'] for r in qs.values('week', 'step').annotate(n=Count('id'))}
+        steps = FunnelEvent.STEPS
+        rows = [(w, [counts.get((w, key), 0) for key, _ in steps]) for w in weeks]
+        sources = sorted({s or '(langsung)' for s in FunnelEvent.objects.values_list('utm_source', flat=True).distinct()})
+        context = {'funnel_steps': [label for _, label in steps], 'funnel_rows': rows,
+                   'funnel_sources': sources, 'funnel_source': source}
+        return super().changelist_view(request, extra_context={**context, **(extra_context or {})})

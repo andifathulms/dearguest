@@ -2,6 +2,7 @@
 every endpoint is scoped to {slug} and verifies the requester owns it (or is staff).
 is_active/watermark/tier remain admin-controlled (the paywall)."""
 import re
+from . import funnel
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -60,6 +61,7 @@ class MyInvitationsView(APIView):
         serializer = InvitationCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inv = serializer.save(couple_user=request.user, is_active=False)
+        funnel.record('onboarded', funnel.clean_utm(request.data))
         Couple.objects.get_or_create(
             invitation=inv,
             defaults={'bride_name': '', 'bride_parents': '', 'groom_name': '', 'groom_parents': ''},

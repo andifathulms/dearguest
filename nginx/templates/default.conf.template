@@ -29,6 +29,23 @@ map "$og_crawler$invitation_path" $og_proxy {
     "11"    1;
 }
 
+# Search engines may index the marketing site only. Everything else served
+# here (invitations, dashboard) says noindex; an empty value sends no header.
+map $request_uri $robots_tag {
+    default                                                     "noindex, nofollow";
+    "~^/(\?.*)?$"                                                "";
+    "~^/tema(/[a-z0-9-]+)?/?(\?.*)?$"                            "";
+    "~^/(register|robots\.txt|sitemap\.xml)"                    "";
+    "~^/(assets|social|theme-previews)/"                         "";
+}
+
+# HTML (the shell and the prerendered marketing pages) must be revalidated, or
+# a deploy leaves visitors on stale chunk hashes.
+map $uri $html_cache {
+    default            "";
+    "~\.html$"         "no-cache";
+}
+
 # Port 80: Let's Encrypt HTTP-01 challenges only; everything else goes to HTTPS.
 server {
     listen 80 default_server;
@@ -102,12 +119,15 @@ server {
     # The SPA shell must never be cached, or a deploy leaves guests on stale chunk hashes.
     location = /index.html {
         add_header Cache-Control "no-cache";
+        add_header X-Robots-Tag $robots_tag;
     }
 
     # Client-side routes (/:slug, /dashboard/...) fall back to the SPA shell;
     # prerendered pages (dist/<path>/index.html) are served as they are.
     location / {
         try_files $uri $uri/index.html @spa;
+        add_header Cache-Control $html_cache;
+        add_header X-Robots-Tag $robots_tag;
     }
 
     location @spa {

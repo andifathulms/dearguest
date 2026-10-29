@@ -1,4 +1,5 @@
 from django.conf import settings
+from apps.invitations import funnel
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
@@ -32,6 +33,7 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        funnel.record('register', funnel.clean_utm(request.data))
         refresh = RefreshToken.for_user(user)
         return Response(
             {

@@ -5,6 +5,7 @@ import { publicOrigin } from '../utils/publicUrl.js'
 import { selectableThemes } from '../themes/registry.js'
 import { variantOptions } from '../copy/copy.js'
 import { chosenTheme } from '../utils/themeChoice.js'
+import { storedUtm } from '../utils/funnel.js'
 import './Auth.css'
 
 // Themes a couple can pick right now (registry status "active").
@@ -50,7 +51,7 @@ export default function OnboardingPage() {
     if (!variant) { setError('Pilih gaya bahasa undangan.'); return }
     setLoading(true)
     try {
-      await api.post('/my/invitations/', { slug, theme, wedding_date: weddingDate, copy_variant: variant })
+      await api.post('/my/invitations/', { slug, theme, wedding_date: weddingDate, copy_variant: variant, utm: storedUtm() })
       navigate(`/dashboard/${slug}/edit`)
     } catch (err) {
       setError(err.response?.data?.detail || err.response?.data?.slug?.[0] || 'Gagal membuat undangan. Coba lagi.')

@@ -1,0 +1,20 @@
+{% extends "admin/change_list.html" %}
+{% block result_list %}
+<h2>Per minggu{% if funnel_source %} · sumber: {{ funnel_source }}{% endif %}</h2>
+<p>
+  Sumber:
+  <a href="?">semua</a>
+  {% for s in funnel_sources %} · <a href="?source={{ s|urlencode }}">{{ s }}</a>{% endfor %}
+</p>
+<table>
+  <thead><tr><th>Minggu (Senin)</th>{% for step in funnel_steps %}<th>{{ step }}</th>{% endfor %}</tr></thead>
+  <tbody>
+    {% for week, counts in funnel_rows %}
+      <tr><td>{{ week|date:"d M Y" }}</td>{% for n in counts %}<td>{{ n }}</td>{% endfor %}</tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="help">"Mulai bayar" dan "Lunas" terisi setelah pembayaran (Phase 3) aktif. Tanpa data pribadi: tiap baris hanya hitungan.</p>
+<h2>Semua kejadian</h2>
+{{ block.super }}
+{% endblock %}

@@ -421,3 +421,27 @@ class Guest(models.Model):
 
     def __str__(self):
         return f"{self.name} — {self.invitation.slug}"
+
+
+class FunnelEvent(models.Model):
+    """One step of a visitor becoming a paying couple, counted per week and
+    traffic source. Deliberately anonymous: no user, IP, session or device,
+    so steps can't be joined into a person's path, only counted."""
+    STEPS = [
+        ('visit', 'Kunjungan'),
+        ('register', 'Daftar'),
+        ('onboarded', 'Buat undangan'),
+        ('checkout', 'Mulai bayar'),   # Phase 3 (payments) emits these two
+        ('paid', 'Lunas'),
+    ]
+    step = models.CharField(max_length=12, choices=STEPS)
+    utm_source = models.CharField(max_length=100, blank=True)
+    utm_medium = models.CharField(max_length=100, blank=True)
+    utm_campaign = models.CharField(max_length=100, blank=True)
+    week = models.DateField(db_index=True)   # Monday of the week it happened
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Funnel'
+        verbose_name_plural = 'Funnel (per minggu)'
