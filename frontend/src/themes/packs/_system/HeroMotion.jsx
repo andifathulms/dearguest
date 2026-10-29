@@ -32,12 +32,14 @@ export function useHeroScroll(ref) {
 const DEPTH = { 'parallax-back': 0.4, 'parallax-mid': 0.2, 'parallax-front': -0.15 }
 
 // A parallax-* slot moving at its `depth` (theme.json). Renders nothing for an
-// empty slot, so packs without depth art are unaffected.
+// empty slot, so packs without depth art are unaffected. The offset is in vh
+// (the hero is about a screen tall), not % of the layer, so a thin strip (a lake
+// placed by the pack's CSS) trails the scroll as much as a full-frame layer.
 export function ParallaxLayer({ slot, motionState }) {
   const { pack } = usePack()
   const spec = pack.manifest.slots?.[slot]
   const depth = spec?.depth ?? DEPTH[slot]
-  const y = useTransform(motionState.progress, v => `${(v * depth * 100).toFixed(2)}%`)
+  const y = useTransform(motionState.progress, v => `${(v * depth * 100).toFixed(2)}vh`)
   if (!spec) return null
   return (
     <motion.div className={`pk-parallax pk-${slot}`} style={motionState.still ? undefined : { y }}>

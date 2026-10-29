@@ -127,6 +127,37 @@
       }
     },
     {
+      "id": "batak",
+      "name": "Gorga Ulos",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/batak.webp",
+      "demoSlug": "demo-gorga-ulos",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Gorga merah-hitam-putih, atap rumah bolon, ulos berjumbai, dan Danau Toba di atas kertas gading.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#faf0e4",
+          "#1a1412",
+          "#a3201b"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#faf0e4,#1a1412 55%,#a3201b)",
+        "card": {
+          "bg": "#faf0e4",
+          "fg": "#1a1412",
+          "accent": "#a3201b"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "batak"
+      }
+    },
+    {
       "id": "floral",
       "name": "Merah Anggur",
       "collection": "signature",

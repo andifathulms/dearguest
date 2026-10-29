@@ -58,13 +58,16 @@ That folder is a git-ignored inbox. Then:
 **"Give me another prompt"**: write `PROMPT-<THEME>-ASSETS.md` for the next theme in
 `CATALOG-DIRECTION.md`, using the same structure as the existing prompt files:
 - a style brief (Prompt 0), then Prompts 1–7, plus an optional Prompt 8 for depth layers
-  (`parallax-back`: a far, pale band low in the frame; `parallax-front`: a few large sprigs
-  cropped at the side edges; both on the key colour, with the centre empty);
+  (`parallax-back`: a far, pale band sitting on the bottom edge, with a clear top outline, not
+  mist fading into the key; `parallax-front`: a few large sprigs cropped at the side edges;
+  both on the key colour, with the centre empty);
 - a suggested `motion` for the pack (exit + signature), in the prompt's intro;
 - exact percentage empty zones for text;
 - a separate hero painting with art only in the top and bottom bands;
 - cut-outs on one flat key colour that appears nowhere in the palette (cobalt `#2340C8` by default,
-  magenta `#D01C8B` if the palette has blue);
+  magenta `#D01C8B` if the palette has blue, orange `#F08A00` if it has lilac or violet, which blue
+  despill would grey). Ask, twice, for the key to stay flat across the sprite sheet's lower third:
+  Gemini keeps adding a haze or ground band there;
 - the texture prompt marked optional;
 - no people, no text, no religious symbols;
 - a note for a cultural reviewer.

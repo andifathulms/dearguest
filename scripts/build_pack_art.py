@@ -192,6 +192,37 @@ PACKS = {
         # the painted kraft is yellower than the paintings' paper (~#E9D5BB): match it
         'texture_tint': (233, 213, 187),
     },
+    'batak': {
+        # Cut-outs on cobalt (~#2546BE delivered). The ornament has no blues -> despill, and
+        # edge_fill keeps the ulos fringe threads free of a cobalt outline.
+        'despill': True,
+        'edge_fill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: centre clear ~32-75 % (the ulos fringe hangs to ~31 %, deeper than asked);
+        # the runner, tandok and leaves start ~75 %.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.36, 'bottom', 0.1, 1080),
+            ('hero-bottom', 'hero.jpg', 0.72, 1.0, 'top', 0.12, 1080),
+            # Prompt 8's far layer: the lake came as a strip at ~68-83 % on cobalt (not the
+            # bottom 30 % asked), its haze a gradient out of the key. Cut below the gradient
+            # (~74.5 %) to the lake's straight lower edge (~82.6 %) and fade both edges, so it
+            # can rise out from behind the runner as the hero scrolls (overrides.css).
+            ('parallax-back', 'parallax-back.jpg', 0.745, 0.826, 'both', 0.4, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (38, 70, 191), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (33, 68, 186), 720, (26, 64), 2, False),
+            # Prompt 8's near layer: fig leaves and ulos fringe at the side edges.
+            ('parallax-front', 'parallax-front.jpg', (38, 69, 192), 1080, (26, 64), 2, False),
+        ],
+        # the sheet's lower third is a painted haze again: the sprites end ~62 %
+        'sprites': ('petals-sheet.jpg', (37, 69, 190), 'petal', 96, (26, 64), (2, 3, 2, 2, 2, 2), False),
+        'sprites_crop': (0, 0, 1, 0.63),
+        'texture': ('texture.jpg', 512, 70),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -336,7 +367,10 @@ def build(pack):
         img = Image.open(src / master).convert('RGB')
         band = resize_w(img.crop((0, round(y0 * img.height), img.width, round(y1 * img.height))), width)
         h = band.height
-        ramp = np.clip(np.arange(h) / (fade * h), 0, 1) if edge == 'top' else np.clip((h - 1 - np.arange(h)) / (fade * h), 0, 1)
+        from_top = np.clip(np.arange(h) / (fade * h), 0, 1)
+        from_bottom = np.clip((h - 1 - np.arange(h)) / (fade * h), 0, 1)
+        # 'both': a free-floating strip (a depth layer) fades at both edges
+        ramp = {'top': from_top, 'bottom': from_bottom, 'both': np.minimum(from_top, from_bottom)}[edge]
         ramp = ramp * ramp * (3 - 2 * ramp)   # smoothstep: no visible edge where the fade starts
         alpha = np.repeat((ramp * 255).astype(np.uint8)[:, None], band.width, 1)
         band.putalpha(Image.fromarray(alpha))
