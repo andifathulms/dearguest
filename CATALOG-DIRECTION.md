@@ -5,21 +5,21 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 ## Naming
 
 - **Theme names describe the look, not the ethnic group:** a signature object plus a material or colour. For example *Gebyok Sogan*, *Gonjong Songket*, *Lamming Zamrud*, *Merah Anggur*, *Taman Sage*. The cultural origin goes in the description and the reviewer notes, never in the name.
-- **Internal ids stay short and technical** (`javanese`, `minang`, `bugis`, `floral`, `sage`). Customers never see them.
+- **Internal ids stay short and technical** (`javanese`, `minang`, `bugis`, `sunda`, `floral`, `sage`, `rustic`). Customers never see them.
 - **Two words** where possible, Indonesian, easy to say out loud and to search for.
 
 ## Categories
 
 | Category | Promise | Live | Next candidates |
 |---|---|---|---|
-| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda) | Batak (ulos, gorga); Bali (kamboja, candi bentar); Palembang (songket limar, gold); Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
-| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour) | **Pampas Kraft (Rustic: kraft paper, pampas, dried flowers), prompt ready**; Lavender (lilac wisteria, pastel); Tropis (monstera, frangipani); Navy Bloom (deep navy with white flowers) |
+| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda) | **Gorga Ulos (Batak Toba: red-black-white gorga, ulos, on ivory), prompt ready**; Bali (kamboja, candi bentar); Palembang (songket limar, gold); Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
+| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour), Pampas Kraft (kraft paper, pampas, dried flowers) | Lavender (lilac wisteria, pastel); Tropis (monstera, frangipani); Navy Bloom (deep navy with white flowers) |
 | *(later)* **Modern & Minimalis** | clean, editorial, photo-led | none yet | a painted-minimal pack: line-art florals or an arch, so it still has assets |
 
-**Suggested order.** Rustic next (Sunda is live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
+**Suggested order.** Batak next (Sunda and Rustic are live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
 1. Sunda (live)
-2. Rustic (prompt ready: `PROMPT-RUSTIC-ASSETS.md`)
-3. Batak
+2. Rustic (live)
+3. Batak (prompt ready: `PROMPT-BATAK-ASSETS.md`)
 4. Lavender
 5. Bali
 6. Navy Bloom
@@ -42,6 +42,7 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
    - run `python3 scripts/build_pack_art.py <id>`;
    - check the cut-outs over a light and a dark background;
    - on a magenta key, use `'despill': 'magenta'` (edges only, so the art's own pinks survive). If part of the sprite sheet isn't flat, cut it off with `sprites_crop`.
+   - feathery art (pampas, fringe) with a dark outline over a light background: `'edge_fill': True`. A blurred patch in a cut-out's key: `'clear'`. A painted texture that doesn't match the paintings' paper: `'texture_tint'`.
 4. **Pack:**
    - `theme.json` (`painted` cover, `framed` hero, and a `motion` block: `make check` fails without it). Choose them from `docs/theme-packs.md` §9:
      - `exit` from how the cover is composed: doors, curtain, part or bloom;

@@ -162,6 +162,36 @@ PACKS = {
         'sprites_crop': (0, 0, 1, 0.57),
         'texture': ('texture.jpg', 512, 70),
     },
+    'rustic': {
+        # Cut-outs on cobalt (~#2344BD delivered); the palette has no blues -> despill.
+        # No hole filling: the wreath's opening and the gaps in the pampas must stay open.
+        # Edge fill: the pampas hairs unmix to a dark fringe; recolour them from the plume.
+        'despill': True,
+        'edge_fill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: centre clear ~24-78 % (the swag and bow end ~24 %); the side pampas
+        # reach ~38 % (top) and rise from ~62 % (bottom).
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.42, 'bottom', 0.12, 1080),
+            ('hero-bottom', 'hero.jpg', 0.58, 1.0, 'top', 0.14, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (35, 68, 191), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (36, 67, 185), 720, (26, 64), 2, False),
+        ],
+        # Patches of the key that Gemini smudged (x0, y0, x1, y1 fractions), painted
+        # back to flat key before cutting: the corner's lower right is a faint blur.
+        'clear': {'corner-tl': [(0.4, 0.74, 1, 1)]},
+        # the sheet's lower third is a painted haze, not flat cobalt: the sprites end ~60 %
+        'sprites': ('petals-sheet.jpg', (38, 69, 189), 'petal', 96, (26, 64), (2, 2, 3, 3, 2, 2), False),
+        'sprites_crop': (0, 0, 1, 0.66),
+        'texture': ('texture.jpg', 512, 70),
+        # the painted kraft is yellower than the paintings' paper (~#E9D5BB): match it
+        'texture_tint': (233, 213, 187),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -187,12 +217,15 @@ def resize_w(img, width):
     return img.resize((width, round(img.height * width / img.width)), Image.LANCZOS)
 
 
-def key(img, bg, ramp, close, fill=False, despill=False):
+def key(img, bg, ramp, close, fill=False, despill=False, edge_fill=False):
     """RGBA cut-out of `img` from a flat background colour `bg`. `despill`
     (blue-screen art): cap blue at max(red, green), removing the background's
     tint from translucent watercolour. Only for palettes with no true blues.
     `despill='magenta'`: in the soft edge, where both red and blue exceed green,
-    pull them down by the excess (for palettes with indigo, where blue can't be capped)."""
+    pull them down by the excess (for palettes with indigo, where blue can't be capped).
+    `edge_fill`: the soft edge takes the colour of the nearest solid pixel (only its
+    alpha is kept), for feathery art (pampas) whose hairs unmix to a dark fringe; with
+    blue despill it also fades strokes that are clearly bluer than red or green."""
     a = np.asarray(img.convert('RGB')).astype(np.float32)
     bg = np.array(bg, np.float32)
     dist = np.sqrt(((a - bg) ** 2).sum(2))
@@ -204,6 +237,11 @@ def key(img, bg, ramp, close, fill=False, despill=False):
             solid = ndi.binary_fill_holes(solid)
         solid = ndi.binary_erosion(solid, iterations=1)   # keep the soft edge from the ramp
         alpha = np.maximum(alpha, solid.astype(np.float32))
+    if edge_fill and despill is True:
+        # Blue-screen art with no blues of its own: strokes clearly bluer than they are
+        # red or green are key mixed into the paint (painted hair tips), so they fade.
+        spill = a[..., 2] - np.maximum(a[..., 0], a[..., 1])
+        alpha = np.minimum(alpha, np.clip(1 - (spill - 8) / 40, 0, 1))
     alpha = ndi.gaussian_filter(alpha, 0.6)
     # Unmix: observed = alpha*fg + (1-alpha)*bg  ->  fg = (observed - (1-alpha)*bg) / alpha
     safe = np.maximum(alpha, 1e-3)[..., None]
@@ -214,6 +252,11 @@ def key(img, bg, ramp, close, fill=False, despill=False):
         fg[..., 2] -= excess
     elif despill:
         fg[..., 2] = np.minimum(fg[..., 2], np.maximum(fg[..., 0], fg[..., 1]))
+    if edge_fill:
+        solid = alpha >= 0.95
+        if solid.any():
+            _, (iy, ix) = ndi.distance_transform_edt(~solid, return_indices=True)
+            fg = np.where(solid[..., None], fg, fg[iy, ix])
     fg = np.where(alpha[..., None] > 0.02, fg, 0)
     rgba = np.dstack([fg, alpha * 255]).astype(np.uint8)
     return Image.fromarray(rgba)
@@ -300,11 +343,13 @@ def build(pack):
         written += save_all(band, out, name, ('avif', 'webp'))
 
     for name, master, bg, width, ramp, close, fill, *crop in cfg.get('keyed', []):
-        raw = Image.open(src / master)
+        raw = Image.open(src / master).convert('RGB')
+        for x0, y0, x1, y1 in cfg.get('clear', {}).get(name, []):
+            raw.paste(tuple(bg), (round(x0 * raw.width), round(y0 * raw.height), round(x1 * raw.width), round(y1 * raw.height)))
         if crop:   # (x0, y0, x1, y1) fractions: drop parts of the canvas that aren't flat background
             x0, y0, x1, y1 = crop[0]
             raw = raw.crop((round(x0 * raw.width), round(y0 * raw.height), round(x1 * raw.width), round(y1 * raw.height)))
-        img = resize_w(key(raw, bg, ramp, close, fill, cfg.get('despill', False)), width)
+        img = resize_w(key(raw, bg, ramp, close, fill, cfg.get('despill', False), cfg.get('edge_fill', False)), width)
         written += save_all(img, out, name, ('avif', 'webp'))
 
     if 'sprites' in cfg:
@@ -348,13 +393,17 @@ def build(pack):
             # not become see-through.
             pad = 40
             crop = (max(0, xs.start - pad), max(0, ys.start - pad), min(raw.width, xs.stop + pad), min(raw.height, ys.stop + pad))
-            sprite = trim(key(raw.crop(crop), bg, ramp, closes[i - 1], fill=fill, despill=cfg.get('despill', False)))
+            sprite = trim(key(raw.crop(crop), bg, ramp, closes[i - 1], fill=fill, despill=cfg.get('despill', False), edge_fill=cfg.get('edge_fill', False)))
             sprite.thumbnail((size, size), Image.LANCZOS)
             written += save_all(sprite, out, f'{prefix}-{i}', ('webp',))
 
     if 'texture' in cfg:
         master, size, q = cfg['texture']
         tile = seamless(Image.open(src / master), size)
+        if 'texture_tint' in cfg:   # shift the tile's average to the paintings' paper, keeping its fibres
+            arr = np.asarray(tile).astype(np.float32)
+            arr += np.array(cfg['texture_tint'], np.float32) - arr.reshape(-1, 3).mean(0)
+            tile = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
         p = out / 'texture.webp'
         tile.save(p, 'WEBP', quality=q, method=6)
         written.append(p)

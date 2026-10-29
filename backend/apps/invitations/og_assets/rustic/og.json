@@ -1,0 +1,12 @@
+{
+  "box": [
+    360,
+    50,
+    840,
+    470
+  ],
+  "ink": "#4a3424",
+  "accent": "#8a4528",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/rustic/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

@@ -188,6 +188,37 @@
       "pack": {
         "dir": "sage"
       }
+    },
+    {
+      "id": "rustic",
+      "name": "Pampas Kraft",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/rustic.webp",
+      "demoSlug": "demo-pampas-kraft",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Pampas, mawar kering terakota, eukaliptus, dan pita tali goni di atas kertas kraft yang hangat.",
+        "category": "Taman & Bunga",
+        "colors": [
+          "#ead6bc",
+          "#4a3424",
+          "#a7654a"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#ead6bc,#c9a66b 55%,#a7654a)",
+        "card": {
+          "bg": "#ead6bc",
+          "fg": "#4a3424",
+          "accent": "#8a4528"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "rustic"
+      }
     }
   ]
 }
