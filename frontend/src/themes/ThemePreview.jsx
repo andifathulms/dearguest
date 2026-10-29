@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import './ThemePreview.css'
 
 // Preview tile for a registry theme card (landing, /tema): the pack's
 // screenshot once it has one, else a mock drawn from the registry colours.

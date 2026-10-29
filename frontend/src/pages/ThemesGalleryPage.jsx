@@ -1,122 +1,114 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { catalogThemes, selectableThemes } from '../themes/registry.js'
 import ThemePreview from '../themes/ThemePreview.jsx'
 import { trackVisit } from '../utils/funnel.js'
-import './LandingPage.css'
+import { SiteNav, SiteFooter, StickyBar } from '../brand/SiteChrome.jsx'
+import { Icon } from '../brand/icons.jsx'
+import { WA_HELP } from '../brand/site.js'
+import '../brand/brand.css'
 import './ThemesGalleryPage.css'
-
-const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
-const waOrder = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent('Halo, saya ingin memesan undangan digital')}`
 
 const CATALOG = catalogThemes()
 const THEME_COUNT = selectableThemes().length
 
-// Filter chips follow the catalogue: "Semua", then "Cinematic" when that
-// collection is listed, then each category in first-seen order.
+// Filters come from the registry, so new packs and categories appear by
+// themselves: "Cinematic" when that collection is listed, then each category in
+// first-seen order. Mood (light / dark paper) is read from each card's colour.
 const CATEGORIES = [
   'Semua',
   ...(CATALOG.some(t => t.collection === 'cinematic') ? ['Cinematic'] : []),
   ...new Set(CATALOG.map(t => t.category)),
 ]
-
-// 'Cinematic' filters by collection; everything else by category.
 const matchCat = (t, cat) =>
   cat === 'Semua' ? true : cat === 'Cinematic' ? t.collection === 'cinematic' : t.category === cat
 
+function luminance(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '')
+  if (!m) return 1
+  const n = parseInt(m[1], 16)
+  return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255
+}
+const moodOf = t => (luminance(t.card?.bg) < 0.45 ? 'Gelap' : 'Terang')
+const MOODS = ['Semua suasana', ...['Terang', 'Gelap'].filter(m => CATALOG.some(t => moodOf(t) === m))]
+
 export default function ThemesGalleryPage() {
   const [category, setCategory] = useState('Semua')
+  const [mood, setMood] = useState(MOODS[0])
   useEffect(trackVisit, [])
-  const list = CATALOG.filter(t => matchCat(t, category))
+  const list = CATALOG.filter(t => matchCat(t, category) && (mood === MOODS[0] || moodOf(t) === mood))
 
   return (
-    <div className="lp tg-page">
-      {/* Nav */}
-      <nav className="lp-nav">
-        <div className="lp-container lp-nav-inner">
-          <Link to="/" className="lp-brand">
-            <span className="lp-brand-mark">D</span>
-            <span>Dear<em>Guest</em></span>
-          </Link>
-          <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-primary lp-nav-cta">
-            Pesan Sekarang
-          </a>
-        </div>
-      </nav>
-
-      {/* Header */}
-      <header className="tg-header">
-        <div className="lp-container">
-          <Link to="/" className="tg-back">← Kembali ke beranda</Link>
-          <p className="lp-eyebrow">Galeri Tema</p>
-          <h1 className="lp-serif">{THEME_COUNT} Tema Undangan Eksklusif</h1>
-          <p className="tg-sub">Temukan gaya yang paling mewakili kalian — dari yang elegan dan mewah hingga lembut dan natural. Arahkan kursor (atau gulir di ponsel) untuk melihatnya bergerak, lalu buka tema untuk mencoba demonya.</p>
+    <div className="dg tg-page">
+      <SiteNav />
+      <header className="tg-header dg-dark">
+        <div className="dg-container tg-header-inner">
+          <p className="dg-eyebrow">Galeri tema</p>
+          <h1 className="dg-display">{THEME_COUNT} tema <em>berlukis</em></h1>
+          <p className="dg-lead">
+            Setiap sampul ditampilkan utuh, persis seperti yang dibuka tamu. Arahkan kursor (atau gulir di
+            ponsel) untuk melihatnya bergerak, lalu buka tema untuk mencoba demonya.
+          </p>
         </div>
       </header>
 
-      {/* Filter chips */}
       <div className="tg-filter-wrap">
-        <div className="lp-container tg-filter">
-          {CATEGORIES.map(cat => {
-            const count = CATALOG.filter(t => matchCat(t, cat)).length
-            return (
-              <button
-                key={cat}
-                className={`tg-chip ${category === cat ? 'active' : ''} ${cat === 'Cinematic' ? 'tg-chip-cine' : ''}`}
-                onClick={() => setCategory(cat)}
-              >
-                {cat === 'Cinematic' ? '✨ Cinematic' : cat} <span className="tg-chip-count">{count}</span>
+        <div className="dg-container tg-filter">
+          <div className="tg-filter-group" role="group" aria-label="Kategori">
+            {CATEGORIES.map(cat => (
+              <button key={cat} type="button" className="dg-chip" aria-pressed={category === cat} onClick={() => setCategory(cat)}>
+                {cat} <span className="count">{CATALOG.filter(t => matchCat(t, cat)).length}</span>
               </button>
-            )
-          })}
+            ))}
+          </div>
+          {MOODS.length > 2 && (
+            <div className="tg-filter-group" role="group" aria-label="Suasana">
+              {MOODS.map(m => (
+                <button key={m} type="button" className="dg-chip" aria-pressed={mood === m} onClick={() => setMood(m)}>{m}</button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Grid */}
-      <section className="lp-section tg-grid-section">
-        <div className="lp-container">
-          <div className="lp-theme-grid">
-            {list.map((t, i) => (
-              <motion.div
-                className="lp-theme-card"
-                key={t.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.4) }}
-              >
-                <Link to={`/tema/${t.id}`} className="tg-card-link" aria-label={`Lihat tema ${t.name}`}>
-                  <ThemePreview theme={t} loop badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
-                </Link>
-                <div className="lp-theme-body">
-                  <div className="tg-card-head">
-                    <h3><Link to={`/tema/${t.id}`}>{t.name}</Link></h3>
-                    <span className="tg-card-cat">{t.category}</span>
+      <main className="dg-container tg-main">
+        {list.length === 0 ? (
+          <div className="tg-empty">
+            <p>Belum ada tema dengan pilihan ini.</p>
+            <button type="button" className="dg-btn dg-btn-line" onClick={() => { setCategory('Semua'); setMood(MOODS[0]) }}>Tampilkan semua</button>
+          </div>
+        ) : (
+          <div className="tg-grid">
+            {list.map(t => {
+              const soon = t.status === 'coming' || !t.demo
+              return (
+                <article className="lp-theme-card" key={t.id}>
+                  <Link to={`/tema/${t.id}`} className="tg-card-link" aria-label={`Lihat tema ${t.name}`}>
+                    <ThemePreview theme={t} loop badge={soon ? 'Segera hadir' : undefined} />
+                  </Link>
+                  <div className="tg-card-body">
+                    <h2><Link to={`/tema/${t.id}`}>{t.name}</Link></h2>
+                    <p>{t.category} · {moodOf(t)}</p>
                   </div>
-                  <p>{t.desc}</p>
-                  <div className="lp-theme-swatches">
-                    {t.colors.map(c => <span key={c} style={{ background: c }} />)}
-                  </div>
-                  {t.status === 'coming' || !t.demo
-                    ? <span className="lp-theme-soon">Segera hadir</span>
-                    : <Link className="lp-theme-demo" to={`/tema/${t.id}`}>Lihat tema &amp; demo →</Link>}
-                </div>
-              </motion.div>
-            ))}
+                </article>
+              )
+            })}
+          </div>
+        )}
+      </main>
+
+      <section className="dg-band paper tg-cta">
+        <div className="dg-container tg-cta-inner">
+          <h2 className="dg-h2">Sudah menemukan <em>yang cocok</em>?</h2>
+          <p className="dg-lead">Buat undangannya sekarang, gratis untuk dicoba. Tema bisa diganti kapan saja.</p>
+          <div className="tg-cta-actions">
+            <Link to="/register" className="dg-btn dg-btn-ink">Buat Undangan {Icon.arrow}</Link>
+            <a href={WA_HELP} target="_blank" rel="noopener noreferrer" className="dg-btn dg-btn-wa">{Icon.whatsapp} Tanya Admin</a>
           </div>
         </div>
       </section>
-
-      {/* CTA */}
-      <section className="tg-cta">
-        <div className="lp-container">
-          <h2 className="lp-serif">Sudah menemukan yang cocok?</h2>
-          <p>Konsultasikan tema pilihan kalian sekarang — gratis, tanpa komitmen.</p>
-          <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-wa">
-            Chat WhatsApp Sekarang
-          </a>
-        </div>
-      </section>
+      <SiteFooter />
+      <StickyBar />
     </div>
   )
 }

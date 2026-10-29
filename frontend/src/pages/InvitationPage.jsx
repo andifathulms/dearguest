@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import api from '../api/client.js'
 import ThemeRenderer from '../themes/ThemeRenderer.jsx'
 import { GuestProvider } from '../copy/GuestContext.jsx'
+import { catalogThemes } from '../themes/registry.js'
+
+// "Pakai tema ini" bar for theme demos opened from /tema/:id (see DemoBar).
+const DemoBar = lazy(() => import('../components/ui/DemoBar.jsx'))
 
 export default function InvitationPage() {
   const { slug, code: pathCode } = useParams()
@@ -96,9 +100,13 @@ export default function InvitationPage() {
 
   // A ?to= name still shows on the cover of a general link (never on previews).
   const guestName = guest?.name || (pathCode ? '' : searchParams.get('to') || '')
+  // Only on a demo opened from the theme page, never inside its phone frame.
+  const demoTheme = searchParams.get('from') === 'tema' && window.self === window.top
+    ? catalogThemes().find(t => t.demo === slug) : null
   return (
     <GuestProvider value={guest}>
       <ThemeRenderer invitation={invitation} guestName={guestName} preview={preview} />
+      {demoTheme && <Suspense fallback={null}><DemoBar theme={demoTheme} /></Suspense>}
     </GuestProvider>
   )
 }

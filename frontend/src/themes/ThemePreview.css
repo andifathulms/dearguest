@@ -1,0 +1,24 @@
+/* Preview tile (ThemePreview.jsx): a pack's full cover, with an optional
+   loop on hover. Sized by its container; the cover keeps its phone ratio. */
+.lp-theme-preview {
+  position: relative; overflow: hidden; aspect-ratio: 360 / 780; width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+}
+.lp-theme-preview.tp-shot { background: #E9E2D8; }
+.lp-theme-preview .tp-image,
+.lp-theme-preview .tp-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.lp-theme-preview .tp-video { opacity: 0; transition: opacity .35s ease; }
+.lp-theme-preview.tp-playing .tp-video { opacity: 1; }
+.lp-theme-preview .tp-badge {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  font: 600 10.5px/1 system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase;
+  color: #17111A; background: #D2AE62; padding: 6px 9px; border-radius: 999px;
+}
+
+/* Registry mock for a theme with no screenshot yet ("coming soon"). */
+.tp-registry { padding: 1.5rem; gap: .5rem; }
+.tp-registry .tp-label { font-size: .6rem; letter-spacing: .3em; text-transform: uppercase; color: var(--tp-accent); }
+.tp-registry .tp-names { font: 400 2rem/1.1 Georgia, serif; }
+.tp-registry .tp-amp { display: block; font-size: 1rem; opacity: .7; }
+.tp-registry .tp-rule { width: 46px; height: 1px; background: var(--tp-accent); opacity: .6; }
+.tp-registry .tp-date { font-size: .62rem; letter-spacing: .2em; opacity: .75; }
