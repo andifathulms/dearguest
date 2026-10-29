@@ -18,9 +18,7 @@ export default function DashboardLogin() {
     setLoading(true)
     setError('')
     try {
-      const res = await api.post('/auth/login/', form)
-      localStorage.setItem('access_token', res.data.access)
-      localStorage.setItem('refresh_token', res.data.refresh)
+      await api.post('/auth/login/', form)
       navigate('/my')
     } catch (err) {
       setError('Akun atau kata sandi salah.')

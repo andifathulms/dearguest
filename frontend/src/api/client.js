@@ -2,40 +2,37 @@ import axios from 'axios'
 
 export const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
+// The session lives in httpOnly cookies set by the server (backend
+// apps/auth_api/cookies.py): scripts on the page never see a token. Writes
+// carry Django's CSRF token from the readable `csrftoken` cookie.
 const api = axios.create({
   baseURL: API_BASE,
+  withCredentials: true,
+  xsrfCookieName: 'csrftoken',
+  xsrfHeaderName: 'X-CSRFToken',
 })
 
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('access_token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
-
-// Access tokens live a day, refresh tokens a week. Without this the second day
-// of editing ends in a silent bounce to the login screen -- unsaved work and
-// all -- while a perfectly good refresh token sits in localStorage. On a 401 we
-// spend it once, retry the original request, and only log out if that fails.
-let refreshing = null
-
-function clearSession() {
+// Sessions from before cookies kept tokens here; they're useless now.
+try {
   localStorage.removeItem('access_token')
   localStorage.removeItem('refresh_token')
-}
+} catch { /* private mode */ }
+
+// Access tokens live 15 minutes. On a 401 we refresh once (the refresh cookie
+// rotates), retry the original request, and only give up if that fails --
+// the page then sends the couple to the login screen.
+let refreshing = null
 
 api.interceptors.response.use(
   response => response,
   async error => {
     const original = error.config
-    const refresh = localStorage.getItem('refresh_token')
-
     if (
       error.response?.status !== 401 ||
-      !refresh ||
       !original ||
       original._retried ||
-      // The refresh call itself failing must not loop.
-      original.url?.includes('/auth/refresh/')
+      // Login, logout and refresh failing must not loop (/auth/me/ may refresh).
+      /\/auth\/(login|logout|refresh|register)\//.test(original.url || '')
     ) {
       return Promise.reject(error)
     }
@@ -43,23 +40,12 @@ api.interceptors.response.use(
 
     // Concurrent 401s share one refresh instead of racing to spend the token.
     if (!refreshing) {
-      refreshing = axios
-        .post(`${API_BASE}/auth/refresh/`, { refresh })
-        .then(res => {
-          localStorage.setItem('access_token', res.data.access)
-          // SimpleJWT returns a new refresh token when rotation is enabled.
-          if (res.data.refresh) localStorage.setItem('refresh_token', res.data.refresh)
-          return res.data.access
-        })
-        .finally(() => { refreshing = null })
+      refreshing = api.post('/auth/refresh/').finally(() => { refreshing = null })
     }
-
     try {
-      const token = await refreshing
-      original.headers = { ...original.headers, Authorization: `Bearer ${token}` }
+      await refreshing
       return api(original)
     } catch {
-      clearSession()
       return Promise.reject(error)
     }
   },

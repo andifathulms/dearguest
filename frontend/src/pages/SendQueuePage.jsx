@@ -33,7 +33,6 @@ export default function SendQueuePage() {
   const undoTimer = useRef(null)
 
   useEffect(() => {
-    if (!localStorage.getItem('access_token')) { navigate('/dashboard'); return }
     api.get(`/invitations/${slug}/guests/`)
       .then(res => setGuests(res.data.guests || []))
       .catch(err => {

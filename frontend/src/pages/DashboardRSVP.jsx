@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import api from '../api/client.js'
+import { logout } from '../api/session.js'
 import GuestManager from '../components/GuestManager.jsx'
 import WishModeration from '../components/WishModeration.jsx'
 import './Dashboard.css'
@@ -40,13 +41,9 @@ export default function DashboardRSVP() {
   const loadRsvps = () => api.get(`/invitations/${slug}/rsvps/`).then(res => { setData(res.data); setLoading(false) })
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token) { navigate('/dashboard'); return }
     loadRsvps()
       .catch(err => {
         if (err.response?.status === 401 || err.response?.status === 403) {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
           navigate('/dashboard')
         } else {
           setError('Gagal memuat data RSVP.')
@@ -55,11 +52,7 @@ export default function DashboardRSVP() {
       })
   }, [slug, navigate]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleLogout() {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    navigate('/dashboard')
-  }
+  const handleLogout = () => logout(navigate)
 
   if (loading) return <div className="dr"><div className="dr-center">Memuat data…</div></div>
   if (error) return <div className="dr"><div className="dr-center">{error}</div></div>

@@ -28,7 +28,7 @@ export default function OnboardingPage() {
 
   // Require login. A couple may create several invitations, so no redirect here.
   useEffect(() => {
-    if (!localStorage.getItem('access_token')) navigate('/dashboard')
+    api.get('/auth/me/').catch(() => navigate('/dashboard'))
   }, [navigate])
 
   // Debounced slug availability check.

@@ -16,7 +16,7 @@ class FunnelTests(APITestBase):
             'whatsapp': '081234567890', 'utm': UTM,
         }, format='json')
         self.assertEqual(res.status_code, 201, res.data)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {res.data['access']}")
+        # Registration logged the client in with cookies.
         res = self.client.post('/api/my/invitations/', {
             'slug': 'andini-bagus', 'theme': 'sage', 'wedding_date': '2026-12-12', 'utm': UTM,
         }, format='json')

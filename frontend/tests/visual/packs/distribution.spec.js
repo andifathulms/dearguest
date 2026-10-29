@@ -19,7 +19,6 @@ const GUESTS = [
 async function stubDashboard(page) {
   const state = { guests: GUESTS.map(g => ({ max_pax: null, checked_in: false, ...g })), templates: {}, imported: null, opened: [] }
   await page.addInitScript(() => {
-    localStorage.setItem('access_token', 'test-token')
     window.__opened = []
     window.open = url => { window.__opened.push(url); return null }
   })

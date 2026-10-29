@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { formatDateOnly } from '../utils/dates.js'
 import api from '../api/client.js'
+import { logout as logoutSession } from '../api/session.js'
 import { themeName, themeSwatch } from '../themes/registry.js'
 import './MyInvitations.css'
 
@@ -19,7 +20,6 @@ export default function MyInvitationsPage() {
   const [max, setMax] = useState(1)
 
   useEffect(() => {
-    if (!localStorage.getItem('access_token')) { navigate('/dashboard'); return }
     api.get('/my/invitations/')
       .then(res => { setItems(res.data.invitations || []); setMax(res.data.max_invitations || 1) })
       .catch(err => {
@@ -28,9 +28,7 @@ export default function MyInvitationsPage() {
       })
   }, [navigate])
 
-  function logout() {
-    localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); navigate('/dashboard')
-  }
+  const logout = () => logoutSession(navigate)
 
   if (items === null) {
     return <div className="mi" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Memuat…</p></div>

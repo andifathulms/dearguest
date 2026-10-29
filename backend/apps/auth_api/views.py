@@ -5,22 +5,74 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
+from django.middleware.csrf import get_token
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
 
+from .cookies import REFRESH_COOKIE, clear_session, set_session
 from .serializers import RegisterSerializer, FlexibleTokenObtainPairSerializer
 
 
-class ThrottledLoginView(TokenObtainPairView):
-    """Login with abuse throttling; accepts username, email or WhatsApp number."""
-    serializer_class = FlexibleTokenObtainPairSerializer
+class ThrottledLoginView(APIView):
+    """Login with abuse throttling; accepts username, email or WhatsApp number.
+    The tokens go into httpOnly cookies, never into the response body."""
+    permission_classes = [AllowAny]
+    authentication_classes = []
     throttle_scope = 'login'
+
+    def post(self, request):
+        serializer = FlexibleTokenObtainPairSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tokens = serializer.validated_data
+        response = Response({'username': serializer.user.username})
+        return set_session(request, response, tokens['access'], tokens['refresh'])
+
+
+class CookieRefreshView(APIView):
+    """New access token (and, with rotation, a new refresh token) from the
+    dg_refresh cookie. The old refresh token is blacklisted."""
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        serializer = TokenRefreshSerializer(data={'refresh': request.COOKIES.get(REFRESH_COOKIE, '')})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception:   # missing, expired, blacklisted or tampered
+            return clear_session(Response({'detail': 'Sesi berakhir. Silakan masuk lagi.'},
+                                          status=status.HTTP_401_UNAUTHORIZED))
+        data = serializer.validated_data
+        return set_session(request, Response(status=status.HTTP_204_NO_CONTENT), data['access'], data.get('refresh'))
+
+
+class LogoutView(APIView):
+    """Blacklist the refresh token and clear the cookies."""
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        raw = request.COOKIES.get(REFRESH_COOKIE)
+        if raw:
+            try:
+                RefreshToken(raw).blacklist()
+            except TokenError:
+                pass
+        return clear_session(Response(status=status.HTTP_204_NO_CONTENT))
+
+
+def revoke_sessions(user):
+    """Blacklist every refresh token the user holds (password reset, account
+    changes). Access tokens still run out within their 15 minutes."""
+    for token in OutstandingToken.objects.filter(user=user):
+        BlacklistedToken.objects.get_or_create(token=token)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -35,14 +87,8 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save()
         funnel.record('register', funnel.clean_utm(request.data))
         refresh = RefreshToken.for_user(user)
-        return Response(
-            {
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-                'username': user.username,
-            },
-            status=status.HTTP_201_CREATED,
-        )
+        response = Response({'username': user.username}, status=status.HTTP_201_CREATED)
+        return set_session(request, response, refresh.access_token, refresh)
 
 
 class MeView(APIView):
@@ -52,6 +98,7 @@ class MeView(APIView):
     def get(self, request):
         user = request.user
         invitations = list(user.invitations.order_by('-created_at').values('slug', 'is_active'))
+        get_token(request)   # make sure the client has a CSRF cookie
         return Response({
             'username': user.username,
             'email': user.email,
@@ -109,4 +156,5 @@ class PasswordResetConfirmView(APIView):
             return Response({'detail': ' '.join(exc.messages)}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(password)
         user.save()
+        revoke_sessions(user)
         return Response({'detail': 'Kata sandi berhasil diperbarui. Silakan masuk.'})

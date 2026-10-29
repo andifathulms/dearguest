@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client.js'
+import { logout as logoutSession } from '../api/session.js'
 import { invitationUrl } from '../utils/publicUrl.js'
 import { getTheme, selectableThemes, themeName } from '../themes/registry.js'
 import { makeT, variantOptions, variantMeta } from '../copy/copy.js'
@@ -711,13 +712,10 @@ export default function EditorPage() {
   }, [navigate, slug])
 
   useEffect(() => {
-    if (!localStorage.getItem('access_token')) { navigate('/dashboard'); return }
     load()
   }, [load, navigate])
 
-  function logout() {
-    localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); navigate('/dashboard')
-  }
+  const logout = () => logoutSession(navigate)
   function copyLink() {
     navigator.clipboard.writeText(invitationUrl(inv.slug)).then(() => notify('Link undangan disalin'))
   }

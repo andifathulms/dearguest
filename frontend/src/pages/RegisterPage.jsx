@@ -33,9 +33,7 @@ export default function RegisterPage() {
     }
     setLoading(true)
     try {
-      const res = await api.post('/auth/register/', { ...form, utm: storedUtm() })
-      localStorage.setItem('access_token', res.data.access)
-      localStorage.setItem('refresh_token', res.data.refresh)
+      await api.post('/auth/register/', { ...form, utm: storedUtm() })
       navigate('/onboarding')
     } catch (err) {
       const data = err.response?.data

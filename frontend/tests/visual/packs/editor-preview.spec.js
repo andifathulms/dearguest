@@ -4,7 +4,6 @@ import { test, expect } from '@playwright/test'
 import { SLUG, stubEditor } from './stub.js'
 
 test('live preview follows theme and photo-filter changes', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('access_token', 'test-token'))
   const state = await stubEditor(page)
   await page.goto(`/dashboard/${SLUG}/edit`)
   const preview = page.frameLocator('iframe[title="Pratinjau undangan"]')

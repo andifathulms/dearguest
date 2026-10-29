@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { catalogThemes } from '../themes/registry.js'
 import { variantOptions } from '../copy/copy.js'
 import { rememberTheme } from '../utils/themeChoice.js'
+import { useSession } from '../api/session.js'
 import { trackVisit } from '../utils/funnel.js'
 import './LandingPage.css'
 import './ThemesGalleryPage.css'
@@ -17,6 +18,7 @@ export default function ThemeDetailPage() {
   const { id } = useParams()
   const theme = CATALOG.find(t => t.id === id)
   const [variant, setVariant] = useState('islam')
+  const session = useSession()
   useEffect(trackVisit, [])
 
   if (!theme) {
@@ -31,7 +33,7 @@ export default function ThemeDetailPage() {
   }
 
   const live = theme.status !== 'coming' && theme.demo
-  const loggedIn = !!localStorage.getItem('access_token')
+  const loggedIn = !!session
   const useHref = `${loggedIn ? '/onboarding' : '/register'}?theme=${theme.id}`
   const demoUrl = live ? `/${theme.demo}?variant=${variant}` : null
   const others = CATALOG.filter(t => t.id !== theme.id && t.status !== 'coming').slice(0, 3)
