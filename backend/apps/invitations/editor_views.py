@@ -2,7 +2,9 @@
 every endpoint is scoped to {slug} and verifies the requester owns it (or is staff).
 is_active/watermark/tier remain admin-controlled (the paywall)."""
 import re
-from . import funnel
+from . import export, funnel
+from apps.auth_api.cookies import recently_authenticated
+from django.http import FileResponse
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -372,3 +374,20 @@ class MyWishDetail(_OwnInvitationOnly, generics.UpdateAPIView, generics.DestroyA
         instance.wishes = ''
         instance.wish_status = 'visible'
         instance.save(update_fields=['wishes', 'wish_status', 'updated_at'])
+
+
+class ExportView(APIView):
+    """GET: the invitation's data and files as a ZIP (export.py). Needs a fresh
+    password confirmation (POST /api/auth/reauth/)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, slug):
+        inv = _owned(request.user, slug)
+        if not inv:
+            return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        if not recently_authenticated(request):
+            return Response({'detail': 'Konfirmasi kata sandi dulu.', 'code': 'reauth_required'},
+                            status=status.HTTP_403_FORBIDDEN)
+        data = EditorInvitationSerializer(inv, context={'request': request}).data
+        return FileResponse(export.build(inv, data), as_attachment=True, filename=f'dearguest-{inv.slug}.zip',
+                            content_type='application/zip')

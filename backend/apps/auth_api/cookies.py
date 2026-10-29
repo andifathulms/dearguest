@@ -6,6 +6,7 @@ a script injected into the page can't read them.
 Both are httpOnly, SameSite=Lax and Secure outside development. Unsafe
 methods also need Django's CSRF token (CookieJWTAuthentication)."""
 from django.conf import settings
+from django.core import signing
 from django.middleware.csrf import get_token
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
 
@@ -33,4 +34,29 @@ def set_session(request, response, access, refresh=None):
 def clear_session(response):
     response.delete_cookie(ACCESS_COOKIE, path='/', samesite='Lax')
     response.delete_cookie(REFRESH_COOKIE, path=REFRESH_PATH, samesite='Lax')
+    response.delete_cookie(RECENT_COOKIE, path='/api/', samesite='Lax')
     return response
+
+
+# Re-authentication: export and account deletion need the password again
+# within the last few minutes, proven by a short-lived signed cookie.
+RECENT_COOKIE = 'dg_recent'
+RECENT_SECONDS = 5 * 60
+_RECENT_SALT = 'dearguest.recent-auth'
+
+
+def mark_recent(response, user):
+    value = signing.dumps({'u': user.pk}, salt=_RECENT_SALT)
+    response.set_cookie(RECENT_COOKIE, value, path='/api/', max_age=RECENT_SECONDS, **_flags())
+    return response
+
+
+def recently_authenticated(request):
+    raw = request.COOKIES.get(RECENT_COOKIE)
+    if not raw or not request.user.is_authenticated:
+        return False
+    try:
+        data = signing.loads(raw, salt=_RECENT_SALT, max_age=RECENT_SECONDS)
+    except signing.BadSignature:
+        return False
+    return data.get('u') == request.user.pk

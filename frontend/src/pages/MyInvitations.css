@@ -39,3 +39,19 @@
 
 .mi-empty { background: #fff; border: 1px dashed #d8ccb8; border-radius: 14px; padding: 3rem 1.5rem; text-align: center; }
 .mi-empty p { color: #8a7f74; margin-bottom: 1.25rem; }
+
+/* Data & privacy (AccountData.jsx) */
+.mi-privacy { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #e6ddcf; }
+.mi-privacy h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 1.1rem; margin: 0 0 0.4rem; }
+.mi-privacy p { color: #8a7f74; font-size: 0.85rem; line-height: 1.6; margin: 0 0 1rem; max-width: 60ch; }
+.mi-privacy-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.mi-danger { color: #b3261e; border-color: #e7b9b5; }
+.mi-danger:hover { color: #fff; background: #b3261e; border-color: #b3261e; }
+.mi-modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0, 0, 0, 0.45); display: grid; place-items: center; padding: 1rem; }
+.mi-modal { background: #fff; border-radius: 14px; padding: 1.5rem; width: min(100%, 400px); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25); }
+.mi-modal h3 { font-family: 'Playfair Display', serif; font-weight: 500; margin: 0 0 0.5rem; }
+.mi-modal p { color: #4a4038; font-size: 0.85rem; line-height: 1.6; margin: 0 0 1rem; }
+.mi-modal-label { display: block; font-size: 0.78rem; color: #8a7f74; margin-bottom: 0.3rem; }
+.mi-modal input { width: 100%; box-sizing: border-box; padding: 0.7rem 0.8rem; border: 1px solid #e6ddcf; border-radius: 8px; font: inherit; }
+.mi-modal-error { color: #b3261e !important; margin: 0.5rem 0 0 !important; }
+.mi-modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem; }

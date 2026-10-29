@@ -17,6 +17,7 @@ from .views import (
     MusicPresetListView,
 )
 from .editor_views import (
+    ExportView,
     MyInvitationsView,
     MyInvitationDetailView,
     MusicPresetSelectView,
@@ -57,6 +58,7 @@ urlpatterns = [
     path('my/slug-check/', SlugCheckView.as_view()),
     path('my/invitations/', MyInvitationsView.as_view()),
     path('my/invitations/<slug:slug>/', MyInvitationDetailView.as_view()),
+    path('my/invitations/<slug:slug>/export.zip', ExportView.as_view()),
     path('my/invitations/<slug:slug>/request-activation/', RequestActivationView.as_view()),
     path('my/invitations/<slug:slug>/activate/', ActivateView.as_view()),
     path('my/invitations/<slug:slug>/music-preset/', MusicPresetSelectView.as_view()),

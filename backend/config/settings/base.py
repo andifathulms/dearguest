@@ -144,6 +144,12 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Undangan Digital <noreply@undangan.local>')
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='admin@undangan.local')
 
+# Personal data retention (UU PDP): guest lists, RSVPs, wishes, photos, music
+# and bank details are deleted this many days after an invitation expires
+# (manage.py purge_expired, run daily by the scheduler).
+RETENTION_DAYS = config('RETENTION_DAYS', default=90, cast=int)
+RETENTION_NOTICE_DAYS = 7
+
 # Public URLs used in emails, share pages, and redirects.
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173').rstrip('/')
 ADMIN_WHATSAPP_NUMBER = config('ADMIN_WHATSAPP_NUMBER', default='628123456789')

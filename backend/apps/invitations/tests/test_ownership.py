@@ -51,6 +51,8 @@ OWNERSHIP = {
     'api/csp-report/': 'public',
     # The caller's own account / own list only.
     'api/auth/me/': 'self',
+    'api/auth/reauth/': 'self',
+    'api/auth/delete-account/': 'self',
     'api/my/slug-check/': 'self',
     'api/my/invitations/': 'self',
     # One couple's data.
@@ -72,6 +74,7 @@ OWNERSHIP = {
         ('patch', '/api/my/invitations/{slug}/'),
         ('delete', '/api/my/invitations/{slug}/'),
     ]),
+    'api/my/invitations/<slug:slug>/export.zip': ('owner', [('get', '/api/my/invitations/{slug}/export.zip')]),
     'api/my/invitations/<slug:slug>/request-activation/': ('owner', [('post', '/api/my/invitations/{slug}/request-activation/')]),
     'api/my/invitations/<slug:slug>/activate/': ('owner', [('post', '/api/my/invitations/{slug}/activate/')]),
     'api/my/invitations/<slug:slug>/music-preset/': ('owner', [

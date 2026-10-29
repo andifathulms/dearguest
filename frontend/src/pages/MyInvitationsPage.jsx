@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { formatDateOnly } from '../utils/dates.js'
 import api from '../api/client.js'
 import { logout as logoutSession } from '../api/session.js'
+import AccountData from '../components/AccountData.jsx'
 import { themeName, themeSwatch } from '../themes/registry.js'
 import './MyInvitations.css'
 
@@ -97,6 +98,8 @@ export default function MyInvitationsPage() {
             })}
           </div>
         )}
+
+        <AccountData invitations={items} />
       </div>
     </div>
   )
