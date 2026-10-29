@@ -28,9 +28,14 @@ export default function InvitationPage() {
   useEffect(() => {
     if (!code) { setGuest(null); return }
     api.get(`/invitations/${slug}/guest/${encodeURIComponent(code)}/`)
-      .then(({ data }) => setGuest({ code: data.code, name: data.name, maxPax: data.max_pax }))
+      .then(({ data }) => {
+        setGuest({ code: data.code, name: data.name, maxPax: data.max_pax })
+        // Tell the couple this guest opened their link (no IP or device is
+        // stored; the server ignores crawlers, the couple and quick repeats).
+        if (!preview) api.post(`/invitations/${slug}/guest/${encodeURIComponent(data.code)}/open/`).catch(() => {})
+      })
       .catch(() => setGuest(null))   // unknown code: a general invitation
-  }, [slug, code])
+  }, [slug, code, preview])
 
   useEffect(() => {
     api.get(preview ? `/my/invitations/${slug}/` : `/invitations/${slug}/`)

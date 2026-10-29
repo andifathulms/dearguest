@@ -94,6 +94,7 @@ REST_FRAMEWORK = {
         'password_reset': '5/hour',
         'activate': '10/hour',
         'guest_lookup': '60/hour',
+        'guest_open': '120/hour',
     },
 }
 

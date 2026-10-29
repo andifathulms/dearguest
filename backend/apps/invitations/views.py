@@ -1,6 +1,9 @@
 from datetime import date
 from django.core.cache import cache
 from django.db import IntegrityError, transaction
+from django.db.models import F, Value
+from django.db.models.functions import Coalesce
+from django.utils import timezone
 from django.http import HttpResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -11,6 +14,7 @@ from rest_framework.views import APIView
 from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
 from . import csv_export, guest_import, ics, maps, moderation
+from .crawlers import is_crawler
 from .entitlements import has_feature
 from .throttling import client_ip
 from .serializers import (
@@ -179,6 +183,37 @@ class PublicGuestView(APIView):
         return Response({'code': guest.code, 'name': guest.name, 'max_pax': guest.max_pax or MAX_PAX})
 
 
+OPEN_REPEAT_SECONDS = 30 * 60
+
+
+class GuestOpenView(APIView):
+    """POST: the guest opened their personal link. Counted once per 30 minutes;
+    crawlers (WhatsApp's preview fetch included) and the couple or staff are
+    ignored. Always answers 204 for a valid code, so it reveals nothing."""
+    permission_classes = [AllowAny]
+    throttle_scope = 'guest_open'
+
+    def post(self, request, slug, code):
+        invitation, error = _public_or_404(slug)
+        if error:
+            return error
+        guest = find_guest(invitation, code)
+        if not guest:
+            return Response({'detail': 'Tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+        user = request.user
+        own = user.is_authenticated and (user.is_staff or invitation.couple_user_id == user.id)
+        if own or is_crawler(request.META.get('HTTP_USER_AGENT')) or not has_feature(invitation, 'open_tracking'):
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        # Keyed on the guest only (no IP): a repeat within the window is the same open.
+        if cache.add(f'guest_open_{guest.pk}', 1, timeout=OPEN_REPEAT_SECONDS):
+            now = timezone.now()
+            Guest.objects.filter(pk=guest.pk).update(
+                open_count=F('open_count') + 1, last_opened_at=now,
+                first_opened_at=Coalesce('first_opened_at', Value(now)),
+            )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class RSVPListView(generics.ListAPIView):
     serializer_class = RSVPSerializer
     permission_classes = [IsAuthenticated]
@@ -290,6 +325,10 @@ class GuestListCreateView(generics.ListCreateAPIView):
         stats = {
             'total': guests.count(),
             'checked_in': guests.filter(checked_in=True).count(),
+            'sent': guests.filter(sent_at__isnull=False).count(),
+            'opened': guests.filter(first_opened_at__isnull=False).count(),
+            'sent_not_opened': guests.filter(sent_at__isnull=False, first_opened_at__isnull=True).count(),
+            'responded': guests.filter(rsvps__isnull=False).distinct().count(),
         }
         return Response({'guests': GuestSerializer(guests, many=True).data, 'stats': stats})
 

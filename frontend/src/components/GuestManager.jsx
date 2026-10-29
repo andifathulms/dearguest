@@ -15,10 +15,19 @@ const ic = {
   trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" /></svg>,
 }
 
+const FILTERS = [
+  { id: 'all', label: 'Semua tamu', test: () => true },
+  { id: 'unsent', label: 'Belum dikirim', test: g => !g.sent_at },
+  { id: 'sent_unopened', label: 'Terkirim tapi belum dibuka', test: g => g.sent_at && !g.open_count },
+  { id: 'opened', label: 'Sudah dibuka', test: g => g.open_count > 0 },
+  { id: 'no_rsvp', label: 'Belum RSVP', test: g => !g.responded },
+]
+
 export default function GuestManager({ slug }) {
   const wa = useWaMessages(slug)
   const [guests, setGuests] = useState([])
   const [stats, setStats] = useState({ total: 0, checked_in: 0 })
+  const [filter, setFilter] = useState('all')
   const [bulk, setBulk] = useState('')
   const [group, setGroup] = useState('')
   const [loading, setLoading] = useState(true)
@@ -120,6 +129,7 @@ export default function GuestManager({ slug }) {
   }
 
   if (loading) return <div className="gm-empty">Memuat daftar tamu…</div>
+  const shown = guests.filter(FILTERS.find(f => f.id === filter).test)
 
   return (
     <div>
@@ -154,16 +164,30 @@ export default function GuestManager({ slug }) {
       {/* Stats */}
       <div className="gm-stats">
         <div className="gm-stat"><strong>{stats.total}</strong><span>TOTAL TAMU</span></div>
+        <div className="gm-stat"><strong>{stats.sent ?? 0}</strong><span>TERKIRIM</span></div>
+        <div className="gm-stat"><strong>{stats.opened ?? 0}</strong><span>DIBUKA</span></div>
+        <div className="gm-stat"><strong>{stats.responded ?? 0}</strong><span>SUDAH RSVP</span></div>
         <div className="gm-stat"><strong style={{ color: '#4CAF50' }}>{stats.checked_in}</strong><span>SUDAH HADIR</span></div>
-        <div className="gm-stat"><strong style={{ color: '#b8924e' }}>{stats.total - stats.checked_in}</strong><span>BELUM HADIR</span></div>
+      </div>
+
+      <div className="gm-filter">
+        <label>
+          Tampilkan
+          <select value={filter} onChange={e => setFilter(e.target.value)}>
+            {FILTERS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+          </select>
+        </label>
+        {filter !== 'all' && <span>{shown.length} tamu</span>}
       </div>
 
       {/* List */}
-      {guests.length === 0 ? (
+      {guests.length > 0 && shown.length === 0 ? (
+        <div className="gm-list"><div className="gm-empty">Tidak ada tamu untuk filter ini.</div></div>
+      ) : guests.length === 0 ? (
         <div className="gm-list"><div className="gm-empty">Belum ada tamu. Tambahkan di atas untuk membuat link & QR personal.</div></div>
       ) : (
         <div className="gm-list">
-          {guests.map(g => (
+          {shown.map(g => (
             <div className={`gm-row ${g.checked_in ? 'checked' : ''}`} key={g.id}>
               <label className="gm-check" title="Tandai hadir (check-in)">
                 <input type="checkbox" checked={g.checked_in} onChange={() => toggleCheck(g)} />
@@ -177,6 +201,9 @@ export default function GuestManager({ slug }) {
                     : ' · belum RSVP'}
                   {g.checked_in ? ' · check-in ✓' : ''}
                   {g.sent_at && <span className="gm-tag-sent"> · terkirim</span>}
+                  {g.open_count > 0
+                    ? <span className="gm-tag-opened" title={`Terakhir dibuka ${new Date(g.last_opened_at).toLocaleString('id-ID')}`}> · dibuka{g.open_count > 1 ? ` ${g.open_count}×` : ''}</span>
+                    : g.sent_at && <span className="gm-tag-unopened"> · belum dibuka</span>}
                 </div>
               </div>
               <label className="gm-pax" title="Berapa orang yang diundang dengan link ini">

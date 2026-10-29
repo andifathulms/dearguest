@@ -397,6 +397,12 @@ class Guest(models.Model):
     # Marked by the couple's send queue when they come back from WhatsApp; we
     # can't see whether WhatsApp actually delivered it.
     sent_at = models.DateTimeField(null=True, blank=True)
+    # Opens of this guest's personal link (POST .../guest/<code>/open/). No IP,
+    # device or location is stored; repeats within 30 minutes count once, and
+    # crawlers and the couple's own visits are ignored.
+    first_opened_at = models.DateTimeField(null=True, blank=True)
+    last_opened_at = models.DateTimeField(null=True, blank=True)
+    open_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

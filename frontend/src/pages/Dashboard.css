@@ -87,8 +87,8 @@
 .gm-btn-wa { background: #25d366; border-color: #25d366; color: #fff; }
 .gm-btn-wa:hover { background: #1ebe5b; color: #fff; }
 
-.gm-stats { display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-.gm-stat { background: #fff; border: 1px solid #e0e0dc; border-radius: 8px; padding: 1rem 1.5rem; text-align: center; min-width: 120px; }
+.gm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+.gm-stat { background: #fff; border: 1px solid #e0e0dc; border-radius: 8px; padding: 0.9rem 0.5rem; text-align: center; }
 .gm-stat strong { display: block; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 400; line-height: 1; }
 .gm-stat span { font-size: 0.72rem; color: #888; letter-spacing: 0.05em; }
 
