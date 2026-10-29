@@ -7,5 +7,6 @@ class InvitationsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
 
     def ready(self):
-        from . import files
+        from . import files, payload_cache
         files.connect()
+        payload_cache.connect()

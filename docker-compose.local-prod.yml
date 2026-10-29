@@ -20,6 +20,9 @@ services:
     deploy:
       resources:
         limits: { cpus: "0.2", memory: 256M }
+    volumes:
+      # Load tests only: simulated guests' addresses (see the file).
+      - ./deploy/loadtest-realip.conf:/etc/nginx/conf.d/00-loadtest-realip.conf:ro
 
   # Stands in for Cloudflare R2: an S3 API served by rclone (the backup tool).
   s3:
