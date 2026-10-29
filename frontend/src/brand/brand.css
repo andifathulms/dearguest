@@ -100,7 +100,7 @@
 .dg-btn:hover { transform: translateY(-1px); }
 .dg-btn:disabled { opacity: .55; cursor: default; transform: none; }
 .dg-btn svg { width: 17px; height: 17px; flex: none; }
-.dg-btn-sm { padding: 10px 16px; font-size: 13.5px; }
+.dg-btn-sm { padding: 10px 16px; font-size: 13.5px; line-height: 14px; }  /* whole-pixel heights keep what follows on the pixel grid */
 .dg-btn-block { width: 100%; }
 .dg-btn-ink { background: var(--dg-ink); color: var(--dg-porcelain); }
 .dg-btn-ink:hover { background: #3A2D35; }
@@ -226,3 +226,8 @@
 @media (prefers-reduced-motion: reduce) {
   .dg *, .dg *::before, .dg *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* A branded block inside a page that isn't (yet) on the brand layer, e.g. the
+   dashboard's bar and RSVP tab next to guest-list components. */
+.dg.dg-inline { min-height: 0; background: transparent; overflow-x: visible; }
+.dg.dg-inline.dg-dark { background: var(--dg-malam); }

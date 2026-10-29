@@ -21,6 +21,8 @@ const photoFiltersFor = themeId => {
 }
 import ImageCropper from '../components/ui/ImageCropper.jsx'
 import { compressImage } from '../utils/compressImage.js'
+import { formatRp } from '../brand/plans.js'
+import '../brand/brand.css'
 import './Editor.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -605,15 +607,20 @@ function PublishCard({ inv, reload, notify }) {
   const [reqLoading, setReqLoading] = useState(false)
   const [activating, setActivating] = useState(false)
   const [err, setErr] = useState('')
+  const [plans, setPlans] = useState([])
+  useEffect(() => {
+    if (inv.is_active) return
+    api.get('/site/marketing/').then(({ data }) => setPlans((data.plans || []).filter(p => p.price > 0))).catch(() => {})
+  }, [inv.is_active])
 
   const waUrl = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
-    `Halo admin, saya ingin mengaktifkan undangan "${inv.slug}". Saya sudah melakukan pembayaran (bukti terlampir). Mohon kode aktivasinya 🙏`
+    `Halo admin, saya ingin mengaktifkan undangan "${inv.slug}". Saya sudah melakukan pembayaran (bukti terlampir). Mohon kode aktivasinya.`
   )}`
 
   if (inv.is_active) {
     return (
       <div className="ed-card ed-publish active">
-        <h2>🎉 Undangan Kamu Sudah Aktif</h2>
+        <h2>Undangan kalian sudah aktif</h2>
         <p className="ed-card-sub">Undangan sudah bisa dibagikan ke tamu.</p>
         <a className="ed-btn" style={{ textDecoration: 'none' }} href={`/${inv.slug}`} target="_blank" rel="noopener noreferrer">Lihat Undangan ↗</a>
       </div>
@@ -629,7 +636,7 @@ function PublishCard({ inv, reload, notify }) {
     setErr('')
     if (!code.trim()) { setErr('Masukkan kode aktivasi.'); return }
     setActivating(true)
-    try { await api.post(`/my/invitations/${inv.slug}/activate/`, { code }); notify('Undangan aktif! 🎉'); reload() }
+    try { await api.post(`/my/invitations/${inv.slug}/activate/`, { code }); notify('Undangan aktif'); reload() }
     catch (e) { setErr(e.response?.data?.detail || 'Kode tidak valid.') }
     finally { setActivating(false) }
   }
@@ -651,6 +658,12 @@ function PublishCard({ inv, reload, notify }) {
       <ol className="ed-steps">
         <li>
           <strong>Hubungi admin & kirim bukti pembayaran.</strong>
+          {plans.length > 0 && (
+            <p className="ed-pub-plans">
+              {plans.map(p => <span key={p.slug}><b>{p.name}</b> {formatRp(p.price)}</span>)}
+              <small>sekali bayar per undangan</small>
+            </p>
+          )}
           <div className="ed-pub-row">
             {inv.activation_requested
               ? <span className="ed-saved">✓ Permintaan aktivasi terkirim</span>
@@ -658,12 +671,12 @@ function PublishCard({ inv, reload, notify }) {
             <a className="ed-mini" style={{ background: '#25d366', color: '#fff', borderColor: '#25d366' }} href={waUrl} target="_blank" rel="noopener noreferrer">WhatsApp Admin</a>
           </div>
           {inv.activation_requested && !inv.has_activation_code && (
-            <p className="ed-pub-wait">⏳ Menunggu konfirmasi admin — biasanya dalam beberapa jam. Kode aktivasi akan dikirim via WhatsApp.</p>
+            <p className="ed-pub-wait">Menunggu konfirmasi admin. Kode aktivasi dikirim lewat WhatsApp.</p>
           )}
         </li>
         <li>
           <strong>Masukkan kode aktivasi dari admin.</strong>
-          {inv.has_activation_code && <p className="ed-pub-ready">✓ Admin sudah menerbitkan kode — cek WhatsApp lalu masukkan di bawah.</p>}
+          {inv.has_activation_code && <p className="ed-pub-ready">Admin sudah menerbitkan kode. Cek WhatsApp, lalu masukkan di bawah.</p>}
           <div className="ed-pub-row">
             <input className="ed-input" aria-label="Kode aktivasi" style={{ maxWidth: '200px', textTransform: 'uppercase', letterSpacing: '0.1em' }} value={code} onChange={e => setCode(e.target.value)} placeholder="mis. A7K2QX" />
             <button className="ed-btn ed-btn-sm" onClick={activate} disabled={activating}>{activating ? '…' : 'Aktifkan'}</button>
@@ -682,7 +695,8 @@ export default function EditorPage() {
   const [inv, setInv] = useState(null)
   const [status, setStatus] = useState('loading')
   const [toast, setToast] = useState('')
-  const [showPreview, setShowPreview] = useState(false)
+  // Wide screens show the live preview beside the form from the start.
+  const [showPreview, setShowPreview] = useState(() => !!window.matchMedia?.('(min-width: 1025px)').matches)
   const [previewKey, setPreviewKey] = useState(0)
   const [dirty, setDirty] = useState(false)
 
@@ -720,11 +734,11 @@ export default function EditorPage() {
     navigator.clipboard.writeText(invitationUrl(inv.slug)).then(() => notify('Link undangan disalin'))
   }
 
-  if (status === 'loading') return <div className="ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Memuat editor…</p></div>
-  if (status === 'error') return <div className="ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Gagal memuat. Coba muat ulang.</p></div>
+  if (status === 'loading') return <div className="dg ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Memuat editor…</p></div>
+  if (status === 'error') return <div className="dg ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Gagal memuat. Coba muat ulang.</p></div>
 
   return (
-    <div className="ed">
+    <div className="dg ed">
       <div className="ed-bar">
         <div className="ed-bar-title">Editor Undangan<small>{inv.slug}</small></div>
         <div className="ed-bar-actions">

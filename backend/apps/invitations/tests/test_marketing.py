@@ -54,3 +54,18 @@ class SeedMarketingTests(TestCase):
     def test_publish_flag(self):
         call_command('seed_marketing', '--sample-testimonials', '--publish', stdout=open('/dev/null', 'w'))
         self.assertEqual(Testimonial.objects.filter(is_published=True).count(), 3)
+
+
+class InvitationProgressTests(TestCase):
+    def test_checklist_follows_what_the_couple_filled_in(self):
+        from datetime import date
+        from django.contrib.auth.models import User
+        from apps.invitations.models import Couple, Invitation
+        user = User.objects.create_user('pasangan', password='rahasia-123')
+        inv = Invitation.objects.create(slug='rani-dimas', theme='sage', wedding_date=date(2027, 1, 9), couple_user=user)
+        Couple.objects.create(invitation=inv, bride_name='Rani', groom_name='Dimas', bride_parents='', groom_parents='')
+        client = APIClient()
+        client.force_authenticate(user)
+        row = client.get('/api/my/invitations/').json()['invitations'][0]
+        done = {step['key']: step['done'] for step in row['progress']}
+        self.assertEqual(done, {'couple': True, 'events': False, 'photos': False, 'guests': False, 'active': False})

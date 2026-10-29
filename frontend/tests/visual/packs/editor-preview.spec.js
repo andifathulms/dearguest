@@ -19,7 +19,9 @@ test('live preview follows theme and photo-filter changes', async ({ page }) => 
     if (await page.getByRole('button', { name: 'Pratinjau Langsung' }).isVisible()) await showPreview()
   }
 
-  await showPreview()
+  // Wide screens open the preview by default; phones open it on demand.
+  await expect(page.locator('.ed-bar')).toBeVisible()
+  if (await page.getByRole('button', { name: 'Pratinjau Langsung' }).isVisible()) await showPreview()
   // The pack renders in the preview, without the opening gate.
   await expect(preview.locator('.pk-root')).toHaveAttribute('data-photo-filter', 'none')
   await expect(preview.locator('.pk-opening')).toHaveCount(0)

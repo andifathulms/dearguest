@@ -1,36 +1,60 @@
 /* ===== RSVP dashboard (uses shared ui.css tokens) ===== */
 .dr { min-height: 100vh; background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); }
 .dr-bar {
-  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line); padding: 0.9rem 1.5rem;
-  display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;
+  border-bottom: 1px solid var(--dg-malam-line);
+  padding: 12px max(20px, env(safe-area-inset-right, 0px)) 12px max(20px, env(safe-area-inset-left, 0px));
+  display: flex; justify-content: space-between; align-items: center; gap: 12px 20px; flex-wrap: wrap;
 }
-.dr-bar h1 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 1.3rem; margin: 0; }
-.dr-bar h1 small { display: block; font-family: 'Inter', sans-serif; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; font-weight: 400; }
-.dr-bar-actions { display: flex; gap: 0.5rem; align-items: center; }
+.dr-bar-left { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.dr-bar h1 { font: 600 15px/18px var(--dg-f-ui); margin: 0; padding-left: 20px; border-left: 1px solid var(--dg-malam-line); }
+.dr-bar h1 small { display: block; font-size: 12.5px; line-height: 16px; font-weight: 400; color: var(--dg-on-malam-soft); }
+.dr-bar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.dr-bar-link { font-size: 14px; line-height: 20px; color: var(--dg-on-malam-soft); text-decoration: none; padding: 0 6px; }
+.dr-bar-link:hover { color: var(--dg-on-malam); }
+@media (max-width: 560px) { .dr-bar h1 { display: none; } }
 .dr-body { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
 
-.dr-stats { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
-.dr-stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.75rem; text-align: center; min-width: 130px; }
-.dr-stat strong { display: block; font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 400; line-height: 1; }
-.dr-stat span { display: block; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; margin-top: 0.4rem; }
+/* RSVP tab (brand layer, .dr-rsvp) */
+.dr-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 28px; }
+.dr-stat { background: var(--dg-white); border: 1px solid var(--dg-line); border-radius: var(--dg-r-m); padding: 20px 22px; display: grid; gap: 6px; }
+.dr-stat strong { font: 400 46px/1 var(--dg-f-display); color: var(--dg-ink); }
+.dr-stat span { font-size: 13.5px; color: var(--dg-muted); }
+.dr-stat.lead { background: var(--dg-malam); border-color: var(--dg-malam); }
+.dr-stat.lead strong { color: var(--dg-prada); }
+.dr-stat.lead span { color: var(--dg-on-malam-soft); }
+.dr-stat.yes strong { color: var(--dg-good); }
+.dr-stat.no strong { color: var(--dg-bad); }
+@media (max-width: 760px) { .dr-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dr-stat strong { font-size: 38px; } }
 
-.dr-table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
+.dr-tools { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-bottom: 14px; }
+.dr-search { flex: 1 1 240px; max-width: 360px; padding: 10px 14px; font-size: 14.5px; }
+.dr-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.dr-csv { margin-left: auto; }
+
+.dr-table-wrap { background: var(--dg-white); border: 1px solid var(--dg-line); border-radius: var(--dg-r-m); overflow-x: auto; }
 .dr-table { width: 100%; border-collapse: collapse; }
 .dr-table th {
-  padding: 0.7rem 0.85rem; text-align: left; font-size: 0.7rem; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); font-weight: 500; background: #faf7f1;
+  padding: 12px 14px; text-align: left; font: 600 11.5px/1 var(--dg-f-ui); letter-spacing: .1em;
+  text-transform: uppercase; color: var(--dg-muted); border-bottom: 1px solid var(--dg-line); background: var(--dg-porcelain);
 }
-.dr-table td { padding: 0.8rem 0.85rem; font-size: 0.85rem; border-bottom: 1px solid #f0ece4; vertical-align: top; }
+.dr-table td { padding: 13px 14px; font-size: 14.5px; border-bottom: 1px solid var(--dg-line); vertical-align: top; }
 .dr-table tr:last-child td { border-bottom: none; }
-.dr-wishes { color: var(--ink-soft); max-width: 250px; white-space: pre-wrap; word-break: break-word; }
-.dr-time { color: var(--muted); white-space: nowrap; font-size: 0.75rem; }
-.dr-yes { color: var(--ok); font-weight: 500; }
-.dr-no { color: #e07070; font-weight: 500; }
-.dr-empty { padding: 3rem; text-align: center; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.dr-name { font-weight: 600; }
+.dr-muted { color: var(--dg-muted); }
+.dr-center-cell { text-align: center; }
+.dr-pill { font: 600 11.5px/1 var(--dg-f-ui); padding: 5px 9px; border-radius: 999px; }
+.dr-pill.yes { background: #E5F1E8; color: var(--dg-good); }
+.dr-pill.no { background: #F8EAE6; color: var(--dg-bad); }
+.dr-wishes { color: var(--dg-ink-soft); max-width: 280px; white-space: pre-wrap; word-break: break-word; }
+.dr-time { color: var(--dg-muted, var(--muted)); white-space: nowrap; font-size: 13px; }
+.dr-empty { padding: 48px 24px; text-align: center; color: var(--dg-muted, var(--muted)); background: var(--dg-white, var(--surface)); border: 1px dashed var(--dg-line, var(--line)); border-radius: 16px; }
 .dr-center { min-height: 100vh; display: grid; place-items: center; color: var(--muted); font-family: 'Inter', sans-serif; }
 
-.dr-updated { display: block; margin-top: 0.2rem; color: var(--muted); font-size: 0.7rem; }
+.dr-updated { display: block; margin-top: 3px; color: var(--dg-muted, var(--muted)); font-size: 12px; }
+/* outside .dr-rsvp (wish moderation reuses these) */
+.wm-head .dr-time { font-size: 0.75rem; color: var(--muted); }
+.dr-yes { color: var(--ok); font-weight: 500; }
+.dr-no { color: #e07070; font-weight: 500; }
 
 /* ===== Wish moderation ===== */
 .wm-settings { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 1rem; margin-bottom: 1.5rem; }

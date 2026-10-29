@@ -5,6 +5,7 @@ import useWaMessages from '../components/useWaMessages.js'
 import { defaultTemplate, renderMessage, unknownVariables, VARIABLES } from '../utils/waTemplate.js'
 import { normaliseWhatsapp, waLink } from '../utils/whatsapp.js'
 import { guestUrl } from '../utils/publicUrl.js'
+import '../brand/brand.css'
 import './Dashboard.css'
 import './DashboardRSVP.css'
 import './SendQueue.css'
@@ -108,12 +109,15 @@ export default function SendQueuePage() {
 
   return (
     <div className="dr">
-      <div className="dr-bar">
-        <h1>Kirim Undangan<small>{slug}</small></h1>
-        <div className="dr-bar-actions">
-          <Link className="ui-btn ui-btn-ghost" to={`/dashboard/${slug}`}>Kembali ke Dashboard</Link>
+      <header className="dr-bar dg dg-inline dg-dark">
+        <div className="dr-bar-left">
+          <Link to="/my" className="dg-brand">Dear<i>Guest</i></Link>
+          <h1>Kirim Undangan<small>{slug}</small></h1>
         </div>
-      </div>
+        <div className="dr-bar-actions">
+          <Link className="dg-btn dg-btn-line dg-btn-sm" to={`/dashboard/${slug}`}>Kembali ke Tamu &amp; RSVP</Link>
+        </div>
+      </header>
 
       <div className="dr-body sq">
         {!allowed ? (

@@ -418,9 +418,22 @@ class InvitationListSerializer(serializers.ModelSerializer):
     bride_name = serializers.SerializerMethodField()
     groom_name = serializers.SerializerMethodField()
 
+    progress = serializers.SerializerMethodField()
+
     class Meta:
         model = Invitation
-        fields = ['slug', 'theme', 'tier', 'wedding_date', 'is_active', 'activation_requested', 'bride_name', 'groom_name']
+        fields = ['slug', 'theme', 'tier', 'wedding_date', 'is_active', 'activation_requested', 'bride_name', 'groom_name', 'progress']
+
+    def get_progress(self, obj):
+        """The "siap" checklist on the couple's invitation card, in editing order."""
+        c = self._couple(obj)
+        return [
+            {'key': 'couple', 'label': 'Data mempelai', 'done': bool(c and c.bride_name and c.groom_name)},
+            {'key': 'events', 'label': 'Acara & lokasi', 'done': obj.events.exists()},
+            {'key': 'photos', 'label': 'Foto', 'done': obj.photos.exists()},
+            {'key': 'guests', 'label': 'Daftar tamu', 'done': obj.guests.exists()},
+            {'key': 'active', 'label': 'Aktifkan undangan', 'done': obj.is_active},
+        ]
 
     def _couple(self, obj):
         try:
