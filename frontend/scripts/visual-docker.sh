@@ -8,9 +8,9 @@
 set -eu
 cd "$(dirname "$0")/.."
 NETWORK=${COMPOSE_NETWORK:-dearguest_default}
-exec docker run --rm --network "$NETWORK" --ipc=host \
+exec docker run --rm --network "$NETWORK" --ipc=host -e PW_CONFIG \
   -v "$PWD":/work -w /work \
   -v dearguest_playwright_node_modules:/work/node_modules \
   mcr.microsoft.com/playwright:v1.61.1-noble \
   sh -ec '[ -d node_modules/@playwright/test ] || npm ci --no-audit --no-fund
-          exec npx --no-install playwright test -c playwright.packs.config.js "$@"' sh "$@"
+          exec npx --no-install playwright test -c "${PW_CONFIG:-playwright.packs.config.js}" "$@"' sh "$@"

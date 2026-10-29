@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import PaymentLogo from '../ui/PaymentLogo.jsx'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
+import { copyText } from '../../utils/clipboard.js'
 
 function typeLabel(account, t) {
   if (account.account_type === 'ewallet') return t('gift.typeEwallet')
@@ -16,7 +17,7 @@ function BankCard({ account }) {
   const isQris = account.account_type === 'qris'
 
   function handleCopy() {
-    navigator.clipboard.writeText(account.account_number).then(() => {
+    copyText(account.account_number).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
@@ -63,7 +64,7 @@ function GiftAddressCard({ recipient, address, phone }) {
   const text = [recipient, address, phone].filter(Boolean).join('\n')
 
   function handleCopy() {
-    navigator.clipboard.writeText(text).then(() => {
+    copyText(text).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })

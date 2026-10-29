@@ -22,6 +22,7 @@ const photoFiltersFor = themeId => {
 import ImageCropper from '../components/ui/ImageCropper.jsx'
 import { compressImage } from '../utils/compressImage.js'
 import './Editor.css'
+import { copyText } from '../utils/clipboard.js'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
 
@@ -717,7 +718,7 @@ export default function EditorPage() {
 
   const logout = () => logoutSession(navigate)
   function copyLink() {
-    navigator.clipboard.writeText(invitationUrl(inv.slug)).then(() => notify('Link undangan disalin'))
+    copyText(invitationUrl(inv.slug)).then(() => notify('Link undangan disalin'))
   }
 
   if (status === 'loading') return <div className="ed" style={{ display: 'grid', placeItems: 'center' }}><p style={{ color: '#8a7f74', padding: '4rem' }}>Memuat editor…</p></div>
