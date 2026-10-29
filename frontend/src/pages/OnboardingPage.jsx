@@ -6,6 +6,7 @@ import { selectableThemes } from '../themes/registry.js'
 import { variantOptions } from '../copy/copy.js'
 import { chosenTheme } from '../utils/themeChoice.js'
 import { storedUtm } from '../utils/funnel.js'
+import AuthShell from '../brand/AuthShell.jsx'
 import './Auth.css'
 
 // Themes a couple can pick right now (registry status "active").
@@ -60,12 +61,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="auth">
+    <AuthShell wide>
       <div className="auth-card auth-wide">
-        <div className="auth-brand">
-          <span className="auth-brand-mark">D</span>
-          <span>Dear<em>Guest</em></span>
-        </div>
         <h1>Buat Undangan Baru</h1>
         <p className="auth-sub">Tentukan alamat, tema, dan tanggal. Semua bisa diubah nanti di editor.</p>
 
@@ -73,12 +70,11 @@ export default function OnboardingPage() {
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
             <label className="auth-label" htmlFor="onb-slug">Alamat undangan</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.82rem', color: '#a89a86' }}>{publicOrigin}/</span>
+            <div className="onb-slug">
+              <span>{publicOrigin}/</span>
               <input
                 className="auth-input"
                 id="onb-slug"
-                style={{ flex: 1, minWidth: '160px' }}
                 value={slug}
                 onChange={e => setSlug(slugify(e.target.value))}
                 placeholder="dinda-raka"
@@ -87,14 +83,14 @@ export default function OnboardingPage() {
             </div>
             {slug && check && (
               check.available
-                ? <p className="auth-hint ok">✓ Tersedia</p>
+                ? <p className="auth-hint ok">Tersedia</p>
                 : <p className="auth-hint bad">✕ {check.valid ? 'Sudah dipakai, pilih yang lain' : 'Format tidak valid'}</p>
             )}
           </div>
 
           <div className="auth-field">
-            <label className="auth-label">Pilih tema</label>
-            <div className="onb-themes">
+            <span className="auth-label" id="onb-theme-label">Pilih tema</span>
+            <div className="onb-themes" role="group" aria-labelledby="onb-theme-label">
               {THEMES.map(t => (
                 <button
                   type="button"
@@ -103,11 +99,9 @@ export default function OnboardingPage() {
                   onClick={() => setTheme(t.id)}
                   aria-pressed={theme === t.id}
                 >
-                  <div className="onb-mock" style={{ background: t.card.bg, color: t.card.fg }}>
-                    <span className="onb-mock-label" style={{ color: t.card.accent }}>The Wedding Of</span>
-                    <span className="onb-mock-names">Andini &amp; Bagus</span>
-                    <span className="onb-mock-rule" style={{ background: t.card.accent }} />
-                  </div>
+                  {t.previewImage
+                    ? <img src={t.previewImage} alt="" loading="lazy" />
+                    : <span className="onb-mock" style={{ background: t.card.bg }} />}
                   <div className="onb-theme-name">{t.name}</div>
                 </button>
               ))}
@@ -137,6 +131,6 @@ export default function OnboardingPage() {
           </button>
         </form>
       </div>
-    </div>
+    </AuthShell>
   )
 }

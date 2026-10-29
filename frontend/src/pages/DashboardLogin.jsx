@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import api from '../api/client.js'
+import AuthShell from '../brand/AuthShell.jsx'
 import './Auth.css'
 
 export default function DashboardLogin() {
@@ -28,11 +29,10 @@ export default function DashboardLogin() {
   }
 
   return (
-    <div className="auth">
+    <AuthShell>
       <div className="auth-card">
-        <div className="auth-brand"><span className="auth-brand-mark">D</span><span>Dear<em>Guest</em></span></div>
-        <h1>Masuk</h1>
-        <p className="auth-sub">Masuk untuk mengelola undangan dan melihat data RSVP kamu.</p>
+        <h1>Selamat datang kembali</h1>
+        <p className="auth-sub">Kelola undangan, daftar tamu, dan RSVP kalian.</p>
 
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>
@@ -49,16 +49,13 @@ export default function DashboardLogin() {
           </div>
           <button className="auth-btn" type="submit" disabled={loading}>{loading ? 'Masuk…' : 'Masuk'}</button>
         </form>
-        <p className="auth-foot" style={{ marginTop: '1rem' }}>
+        <p className="auth-foot">
           <Link to="/forgot-password">Lupa kata sandi?</Link>
         </p>
-        <p className="auth-foot" style={{ marginTop: '0.75rem' }}>
+        <p className="auth-foot">
           Belum punya akun? <Link to="/register">Daftar gratis</Link>
         </p>
-        <p className="auth-foot" style={{ marginTop: '0.75rem' }}>
-          <Link to="/" style={{ color: '#8a7f74', fontWeight: 400 }}>← Kembali ke Beranda</Link>
-        </p>
       </div>
-    </div>
+    </AuthShell>
   )
 }

@@ -1,0 +1,22 @@
+/* Auth & onboarding shell (AuthShell.jsx). The forms inside keep their
+   auth-* class names (pages/Auth.css styles them on the brand tokens). */
+.auth { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); min-height: 100vh; }
+.auth.auth-is-wide { grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr); }
+.auth-art {
+  position: sticky; top: 0; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; justify-items: center; gap: 24px;
+  padding: 32px 32px 40px; background: radial-gradient(100% 80% at 50% 30%, #2E2131 0%, var(--dg-malam) 65%);
+}
+.auth-art .dg-brand { justify-self: start; color: var(--dg-on-malam); }
+.auth-art-phone { align-self: center; width: min(280px, 60%, 38vh); }
+.auth-art-img { animation: auth-fade .8s var(--dg-ease); }
+@keyframes auth-fade { from { opacity: 0; } }
+.auth-art-cap { margin: 0; font-size: 13.5px; color: var(--dg-on-malam-soft); }
+.auth-art-cap b { color: var(--dg-on-malam); font-weight: 600; }
+.auth-main { display: grid; align-content: center; justify-items: center; gap: 24px; padding: 48px max(20px, env(safe-area-inset-right, 0px)) 48px max(20px, env(safe-area-inset-left, 0px)); }
+.auth-mobile-brand { display: none; }
+@media (max-width: 900px) {
+  .auth, .auth.auth-is-wide { grid-template-columns: 1fr; }
+  .auth-art { display: none; }
+  .auth-main { align-content: start; padding-top: 28px; }
+  .auth-mobile-brand { display: inline-flex; justify-self: start; }
+}

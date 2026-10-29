@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import api from '../api/client.js'
 import { rememberTheme } from '../utils/themeChoice.js'
 import { storedUtm } from '../utils/funnel.js'
+import AuthShell from '../brand/AuthShell.jsx'
 import './Auth.css'
 
 export default function RegisterPage() {
@@ -45,14 +46,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="auth">
+    <AuthShell>
       <div className="auth-card">
-        <div className="auth-brand">
-          <span className="auth-brand-mark">D</span>
-          <span>Dear<em>Guest</em></span>
-        </div>
-        <h1>Buat Akun</h1>
-        <p className="auth-sub">Daftar gratis dan mulai rancang undangan pernikahan digital kalian.</p>
+        <h1>Mulai undangan kalian</h1>
+        <p className="auth-sub">Gratis untuk dicoba. Bayar hanya saat undangan siap diaktifkan.</p>
 
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>
@@ -91,6 +88,6 @@ export default function RegisterPage() {
         </form>
         <p className="auth-foot">Sudah punya akun? <Link to="/dashboard">Masuk</Link></p>
       </div>
-    </div>
+    </AuthShell>
   )
 }

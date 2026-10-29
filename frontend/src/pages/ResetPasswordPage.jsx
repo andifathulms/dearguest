@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import api from '../api/client.js'
+import AuthShell from '../brand/AuthShell.jsx'
 import './Auth.css'
 
 export default function ResetPasswordPage() {
@@ -32,18 +33,17 @@ export default function ResetPasswordPage() {
 
   if (!uid || !token) {
     return (
-      <div className="auth"><div className="auth-card">
+      <AuthShell><div className="auth-card">
         <h1>Tautan Tidak Valid</h1>
         <p className="auth-sub">Tautan reset tidak lengkap. Silakan minta tautan baru.</p>
         <p className="auth-foot"><Link to="/forgot-password">Minta tautan reset</Link></p>
-      </div></div>
+      </div></AuthShell>
     )
   }
 
   return (
-    <div className="auth">
+    <AuthShell>
       <div className="auth-card">
-        <div className="auth-brand"><span className="auth-brand-mark">D</span><span>Dear<em>Guest</em></span></div>
         <h1>Atur Ulang Kata Sandi</h1>
         <p className="auth-sub">Masukkan kata sandi baru untuk akunmu.</p>
         {error && <div className="auth-error">{error}</div>}
@@ -59,6 +59,6 @@ export default function ResetPasswordPage() {
           <button className="auth-btn" type="submit" disabled={loading}>{loading ? 'Menyimpan…' : 'Simpan Kata Sandi'}</button>
         </form>
       </div>
-    </div>
+    </AuthShell>
   )
 }

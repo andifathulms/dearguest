@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client.js'
+import AuthShell from '../brand/AuthShell.jsx'
 import './Auth.css'
 
 export default function ForgotPasswordPage() {
@@ -22,9 +23,8 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="auth">
+    <AuthShell>
       <div className="auth-card">
-        <div className="auth-brand"><span className="auth-brand-mark">D</span><span>Dear<em>Guest</em></span></div>
         <h1>Lupa Kata Sandi</h1>
         {sent ? (
           <>
@@ -45,6 +45,6 @@ export default function ForgotPasswordPage() {
           </>
         )}
       </div>
-    </div>
+    </AuthShell>
   )
 }
