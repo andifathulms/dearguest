@@ -39,6 +39,9 @@ services:
       retries: 5
 
   backend:
+    # Tagged with the git SHA (scripts/deploy.sh sets RELEASE): rolling back
+    # is starting the previous tag again.
+    image: dearguest-backend:${RELEASE:-dev}
     build:
       context: ./backend
       target: app
@@ -63,6 +66,7 @@ services:
   # the retention purge, the certificate check. Reports to Telegram and the
   # deep health check.
   scheduler:
+    image: dearguest-scheduler:${RELEASE:-dev}
     build:
       context: ./backend
       target: scheduler
@@ -84,6 +88,7 @@ services:
 
   # The one public entry point: SPA + reverse proxy + /static/ + /media/ + TLS.
   nginx:
+    image: dearguest-nginx:${RELEASE:-dev}
     build:
       context: .
       dockerfile: nginx/Dockerfile
