@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import api from '../api/client.js'
+import { rememberTheme } from '../utils/themeChoice.js'
 import './Auth.css'
 
 export default function RegisterPage() {
@@ -9,6 +10,10 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+
+  // From "Pakai tema ini": onboarding preselects it.
+  useEffect(() => { rememberTheme(params.get('theme')) }, [params])
 
   function handleChange(e) {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }))

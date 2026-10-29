@@ -49,7 +49,7 @@ export default function ThemesGalleryPage() {
           <Link to="/" className="tg-back">← Kembali ke beranda</Link>
           <p className="lp-eyebrow">Galeri Tema</p>
           <h1 className="lp-serif">{THEME_COUNT} Tema Undangan Eksklusif</h1>
-          <p className="tg-sub">Temukan gaya yang paling mewakili kalian — dari yang elegan dan mewah hingga lembut dan natural. Klik tema mana pun untuk melihat demo lengkapnya.</p>
+          <p className="tg-sub">Temukan gaya yang paling mewakili kalian — dari yang elegan dan mewah hingga lembut dan natural. Arahkan kursor (atau gulir di ponsel) untuk melihatnya bergerak, lalu buka tema untuk mencoba demonya.</p>
         </div>
       </header>
 
@@ -83,10 +83,12 @@ export default function ThemesGalleryPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.4) }}
               >
-                <ThemePreview theme={t} badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
+                <Link to={`/tema/${t.id}`} className="tg-card-link" aria-label={`Lihat tema ${t.name}`}>
+                  <ThemePreview theme={t} loop badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
+                </Link>
                 <div className="lp-theme-body">
                   <div className="tg-card-head">
-                    <h3>{t.name}</h3>
+                    <h3><Link to={`/tema/${t.id}`}>{t.name}</Link></h3>
                     <span className="tg-card-cat">{t.category}</span>
                   </div>
                   <p>{t.desc}</p>
@@ -95,7 +97,7 @@ export default function ThemesGalleryPage() {
                   </div>
                   {t.status === 'coming' || !t.demo
                     ? <span className="lp-theme-soon">Segera hadir</span>
-                    : <a className="lp-theme-demo" href={`/${t.demo}`} target="_blank" rel="noopener noreferrer">Lihat Demo Lengkap ↗</a>}
+                    : <Link className="lp-theme-demo" to={`/tema/${t.id}`}>Lihat tema &amp; demo →</Link>}
                 </div>
               </motion.div>
             ))}

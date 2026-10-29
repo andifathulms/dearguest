@@ -117,7 +117,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
 
           {invitation.watermark && (
             <div className="watermark-footer">
-              Dibuat dengan <a href="/">Dear Guest</a>
+              Dibuat dengan <a href={watermarkHref(invitation.slug)}>Dear Guest</a>
             </div>
           )}
 
@@ -127,4 +127,13 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
       </PackContext.Provider>
     </MotionConfig>
   )
+}
+
+// The free-tier footer link, tagged so the funnel can count invitations that
+// bring in new couples. The campaign is a hash of the slug: no names.
+function watermarkHref(slug) {
+  let h = 0x811c9dc5
+  for (const ch of slug || '') h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193) >>> 0
+  const campaign = h.toString(16).padStart(8, '0')
+  return `/?utm_source=invitation&utm_medium=watermark&utm_campaign=${campaign}`
 }

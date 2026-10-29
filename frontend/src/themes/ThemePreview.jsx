@@ -1,12 +1,50 @@
+import { useEffect, useRef, useState } from 'react'
+
 // Preview tile for a registry theme card (landing, /tema): the pack's
 // screenshot once it has one, else a mock drawn from the registry colours.
-export default function ThemePreview({ theme, className = '', badge }) {
+// With `loop`, a theme that has a preview video (frontend/scripts/
+// capture-docker.sh) plays it on hover, or on touch screens while the card
+// is mostly in view. Nothing downloads until it plays (preload="none"), and
+// it never plays for people who prefer reduced motion.
+export default function ThemePreview({ theme, className = '', badge, loop = false }) {
   const label = badge ?? theme.badge
+  const video = loop && theme.previewVideo ? theme.previewVideo : null
+  const ref = useRef(null)
+  const [playing, setPlaying] = useState(false)
+
+  const play = () => {
+    const el = ref.current
+    if (!el || reducedMotion()) return
+    el.play().then(() => setPlaying(true)).catch(() => {})
+  }
+  const stop = () => {
+    const el = ref.current
+    if (!el) return
+    el.pause()
+    setPlaying(false)
+  }
+
+  // Touch screens have no hover: play while at least 60% of the card shows.
+  useEffect(() => {
+    const el = ref.current
+    if (!video || !el || !window.matchMedia?.('(hover: none)').matches || !('IntersectionObserver' in window)) return
+    const io = new IntersectionObserver(([entry]) => (entry.intersectionRatio >= 0.6 ? play() : stop()), { threshold: [0, 0.6] })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [video]) // eslint-disable-line react-hooks/exhaustive-deps
+
   if (theme.previewImage) {
     return (
-      <div className={`lp-theme-preview tp-shot ${className}`}>
+      <div className={`lp-theme-preview tp-shot ${playing ? 'tp-playing' : ''} ${className}`}
+        onMouseEnter={video ? play : undefined} onMouseLeave={video ? stop : undefined}>
         {label && <span className="tp-badge">{label}</span>}
         <img className="tp-image" src={theme.previewImage} alt={`Pratinjau tema ${theme.name}`} loading="lazy" decoding="async" />
+        {video && (
+          <video ref={ref} className="tp-video" muted loop playsInline preload="none" poster={theme.previewImage} aria-hidden="true" tabIndex={-1}>
+            <source src={video.webm} type="video/webm" />
+            <source src={video.mp4} type="video/mp4" />
+          </video>
+        )}
       </div>
     )
   }
@@ -23,3 +61,5 @@ export default function ThemePreview({ theme, className = '', badge }) {
     </div>
   )
 }
+
+const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches

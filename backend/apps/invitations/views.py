@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
-from . import csv_export, guest_import, ics, maps, moderation
+from . import copy, csv_export, guest_import, ics, maps, moderation, themes
 from .crawlers import is_crawler
 from .entitlements import has_feature
 from .throttling import client_ip
@@ -84,7 +84,27 @@ class InvitationDetailView(generics.RetrieveAPIView):
         if error:
             return error
         serializer = self.get_serializer(invitation, context={'request': request})
-        return Response(serializer.data)
+        data = serializer.data
+        variant = request.query_params.get('variant')
+        if variant and variant in copy.variants() and themes.is_demo_slug(slug):
+            data = demo_in_variant(data, variant)
+        return Response(data)
+
+
+CEREMONIES = {'akad', 'pemberkatan', 'sakramen'}
+
+
+def demo_in_variant(data, variant):
+    """A demo invitation shown in another copy variant, for the theme page's
+    toggle. Only ever applied to demos: a couple's invitation keeps its own.
+    The demo's own greeting/closing give way to the variant's defaults, and its
+    ceremony events take the variant's ceremony types (akad -> pemberkatan)."""
+    ceremony = next((t for t in copy.variant_meta(variant)['_defaultEvents'] if t in CEREMONIES), None)
+    events = [
+        {**e, 'event_type': ceremony} if ceremony and e['event_type'] in CEREMONIES else e
+        for e in data['events']
+    ]
+    return {**data, 'copy_variant': variant, 'opening_text': '', 'closing_text': '', 'events': events}
 
 
 class RSVPCreateView(generics.CreateAPIView):

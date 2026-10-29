@@ -1,0 +1,26 @@
+/* ===== /tema/:id — one theme, its demo in a phone frame ===== */
+.td-page { min-height: 100vh; background: var(--cream); padding-bottom: 3rem; }
+.td-main { display: grid; gap: 2rem; padding-top: 2rem; }
+.td-phone {
+  justify-self: center; width: min(100%, 360px); aspect-ratio: 390 / 844;
+  border-radius: 32px; border: 10px solid #1c1712; background: #1c1712; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(28, 23, 18, 0.22);
+}
+.td-phone iframe, .td-phone img { width: 100%; height: 100%; border: 0; display: block; background: #fff; object-fit: cover; object-position: top; }
+.td-info h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 500; margin: 0.25rem 0 0.75rem; }
+.td-desc { color: var(--ink-soft, #4a4038); line-height: 1.7; max-width: 52ch; }
+.td-swatches { margin: 1rem 0 1.5rem; }
+.td-variants { border: 0; padding: 0; margin: 0 0 1.5rem; }
+.td-variants legend { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: #8a7f74; margin-bottom: 0.6rem; }
+.td-variant-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.td-note { font-size: 0.8rem; color: #8a7f74; margin-top: 0.6rem; }
+.td-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.td-others-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.td-other { display: grid; gap: 0.4rem; text-decoration: none; color: inherit; font-size: 0.82rem; }
+.td-other img { width: 100%; aspect-ratio: 720 / 1000; object-fit: cover; object-position: top; border-radius: 10px; border: 1px solid #eadfcd; }
+.td-missing { padding: 6rem 0; text-align: center; display: grid; gap: 1.5rem; justify-items: center; }
+
+@media (min-width: 900px) {
+  .td-main { grid-template-columns: 380px minmax(0, 1fr); gap: 4rem; align-items: start; padding-top: 3rem; }
+  .td-phone { position: sticky; top: 90px; width: 380px; }
+}

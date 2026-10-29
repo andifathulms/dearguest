@@ -21,6 +21,8 @@ from sync_themes import CANONICAL, FILES, OG_ROLES, ROOT, render_copy, render_cr
 THEMES_DIR = ROOT / 'frontend' / 'src' / 'themes'
 PACKS_DIR = THEMES_DIR / 'packs'
 OVERRIDES_MAX_LINES = 150
+PUBLIC_DIR = ROOT / 'frontend' / 'public'
+PREVIEW_VIDEO_MAX_BYTES = 1536 * 1024
 
 KINDS = {'pack'}
 STATUSES = {'active', 'hidden', 'coming'}
@@ -171,8 +173,29 @@ def check_entries(themes):
             seen_demos.add(demo)
         # (This used to sit under `elif` after the demo check, so every pack
         # with a demo -- i.e. every live pack -- went unvalidated.)
+        check_previews(t)
         if t.get('kind') == 'pack' and t.get('status') != 'coming':
             check_pack(t)
+
+
+def check_previews(t):
+    """The still and the optional loop (frontend/scripts/capture-docker.sh) exist and stay small."""
+    tid = t.get('id', '<no id>')
+    files = [('previewImage', t.get('previewImage'))]
+    video = t.get('previewVideo')
+    if video is not None:
+        if not isinstance(video, dict) or set(video) != {'webm', 'mp4'}:
+            err(f'{tid}: previewVideo must be {{"webm": ..., "mp4": ...}}')
+            return
+        files += [('previewVideo.webm', video['webm']), ('previewVideo.mp4', video['mp4'])]
+    for field, url in files:
+        if t.get('status') == 'coming' and field == 'previewImage':
+            continue
+        path = PUBLIC_DIR / str(url).lstrip('/')
+        if not url or not path.is_file():
+            err(f'{tid}: {field} {url} is not in frontend/public')
+        elif field.startswith('previewVideo') and path.stat().st_size > PREVIEW_VIDEO_MAX_BYTES:
+            err(f'{tid}: {field} is {path.stat().st_size // 1024} KB, over {PREVIEW_VIDEO_MAX_BYTES // 1024} KB')
 
 
 def css_tokens(path):

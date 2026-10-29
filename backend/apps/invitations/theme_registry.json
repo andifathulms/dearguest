@@ -11,6 +11,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/javanese.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/javanese.webm",
+        "mp4": "/theme-previews/javanese.mp4"
+      },
       "demoSlug": "demo-gebyok-sogan",
       "demoTemporary": true,
       "catalog": {
@@ -42,6 +46,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/minang.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/minang.webm",
+        "mp4": "/theme-previews/minang.mp4"
+      },
       "demoSlug": "demo-gonjong-songket",
       "demoTemporary": true,
       "catalog": {
@@ -73,6 +81,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/bugis.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/bugis.webm",
+        "mp4": "/theme-previews/bugis.mp4"
+      },
       "demoSlug": "demo-lamming-zamrud",
       "demoTemporary": true,
       "catalog": {
@@ -104,6 +116,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/sunda.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/sunda.webm",
+        "mp4": "/theme-previews/sunda.mp4"
+      },
       "demoSlug": "demo-siger-mega-mendung",
       "demoTemporary": true,
       "catalog": {
@@ -135,6 +151,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/floral.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/floral.webm",
+        "mp4": "/theme-previews/floral.mp4"
+      },
       "demoSlug": "demo-merah-anggur",
       "demoTemporary": true,
       "catalog": {
@@ -166,6 +186,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/sage.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/sage.webm",
+        "mp4": "/theme-previews/sage.mp4"
+      },
       "demoSlug": "demo-taman-sage",
       "demoTemporary": true,
       "catalog": {

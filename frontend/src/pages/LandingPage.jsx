@@ -9,6 +9,11 @@ import ThemePreview from '../themes/ThemePreview.jsx'
 // today; the grids show pickable + "coming soon" themes.
 const THEME_COUNT = selectableThemes().length
 const FEATURED_THEMES = catalogThemes().slice(0, 6)
+// The feature blurb names real themes from the registry, so it can't go stale.
+const THEME_NAMES = selectableThemes().map(t => t.name)
+const THEME_BLURB = THEME_NAMES.length > 2
+  ? `${THEME_NAMES.slice(0, -1).join(', ')} dan ${THEME_NAMES.at(-1)}: setiap tema dilukis tangan, dari Pesona Nusantara hingga taman bunga.`
+  : 'Setiap tema dilukis tangan, dari Pesona Nusantara hingga taman bunga.'
 import './LandingPage.css'
 
 const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
@@ -31,7 +36,7 @@ const Icon = {
 }
 
 const features = [
-  { icon: Icon.palette, title: `${THEME_COUNT} Tema Eksklusif`, desc: 'Dari Javanese emas, floral, dan minimalis hingga zamrud, marun, langit malam, arabesque, art deco, dan rose gold — semua dengan palet premium.' },
+  { icon: Icon.palette, title: `${THEME_COUNT} Tema Lukisan Tangan`, desc: THEME_BLURB },
   { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
   { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
   { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
@@ -192,7 +197,9 @@ export default function LandingPage() {
           <div className="lp-theme-grid">
             {FEATURED_THEMES.map((t, i) => (
               <motion.div className="lp-theme-card" key={t.id} {...fade(i * 0.08)}>
-                <ThemePreview theme={t} badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
+                <Link to={`/tema/${t.id}`} className="tg-card-link" aria-label={`Lihat tema ${t.name}`}>
+                  <ThemePreview theme={t} loop badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
+                </Link>
                 <div className="lp-theme-body">
                   <h3>{t.name}</h3>
                   <p>{t.desc}</p>
@@ -201,7 +208,7 @@ export default function LandingPage() {
                   </div>
                   {t.status === 'coming' || !t.demo
                     ? <span className="lp-theme-soon">Segera hadir</span>
-                    : <a className="lp-theme-demo" href={`/${t.demo}`} target="_blank" rel="noopener noreferrer">Lihat Demo Lengkap ↗</a>}
+                    : <Link className="lp-theme-demo" to={`/tema/${t.id}`}>Lihat tema &amp; demo →</Link>}
                 </div>
               </motion.div>
             ))}

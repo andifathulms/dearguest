@@ -37,8 +37,10 @@ export default function InvitationPage() {
       .catch(() => setGuest(null))   // unknown code: a general invitation
   }, [slug, code, preview])
 
+  // ?variant= (theme page's toggle) is honoured by the server for demo invitations only.
+  const variant = searchParams.get('variant') || ''
   useEffect(() => {
-    api.get(preview ? `/my/invitations/${slug}/` : `/invitations/${slug}/`)
+    api.get(preview ? `/my/invitations/${slug}/` : `/invitations/${slug}/`, { params: !preview && variant ? { variant } : undefined })
       .then(res => {
         setInvitation(res.data)
         setStatus('ok')
@@ -55,7 +57,7 @@ export default function InvitationPage() {
         }
         setStatus('error')
       })
-  }, [slug, preview])
+  }, [slug, preview, variant])
 
   if (status === 'loading') {
     return (

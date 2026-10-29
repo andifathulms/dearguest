@@ -25,6 +25,7 @@ function toCard(t) {
     colors: t.catalog.colors,
     preview: t.catalog.previewClass,
     previewImage: t.previewImage,
+    previewVideo: t.previewVideo || null,
     swatch: t.catalog.swatch,
     card: t.catalog.card,
     badge: t.catalog.badge,

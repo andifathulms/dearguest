@@ -4,6 +4,7 @@ import api from '../api/client.js'
 import { publicOrigin } from '../utils/publicUrl.js'
 import { selectableThemes } from '../themes/registry.js'
 import { variantOptions } from '../copy/copy.js'
+import { chosenTheme } from '../utils/themeChoice.js'
 import './Auth.css'
 
 // Themes a couple can pick right now (registry status "active").
@@ -16,7 +17,7 @@ function slugify(s) {
 export default function OnboardingPage() {
   const navigate = useNavigate()
   const [slug, setSlug] = useState('')
-  const [theme, setTheme] = useState(THEMES[0]?.id || '')
+  const [theme, setTheme] = useState(() => chosenTheme(THEMES.map(t => t.id)) || THEMES[0]?.id || '')
   const [weddingDate, setWeddingDate] = useState('')
   const [variant, setVariant] = useState('')
   const [check, setCheck] = useState(null) // {valid, available}

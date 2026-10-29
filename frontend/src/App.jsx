@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // so a guest opening an invitation never downloads the editor/cropper/etc.
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'))
 const ThemesGalleryPage = lazy(() => import('./pages/ThemesGalleryPage.jsx'))
+const ThemeDetailPage = lazy(() => import('./pages/ThemeDetailPage.jsx'))
 const DashboardLogin = lazy(() => import('./pages/DashboardLogin.jsx'))
 const DashboardRSVP = lazy(() => import('./pages/DashboardRSVP.jsx'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'))
@@ -31,6 +32,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/tema" element={<ThemesGalleryPage />} />
+          <Route path="/tema/:id" element={<ThemeDetailPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<DashboardLogin />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

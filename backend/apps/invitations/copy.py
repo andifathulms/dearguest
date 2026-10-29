@@ -32,6 +32,10 @@ def variant_choices():
     return [(v, labels[v]['_label']) for v in variants()]
 
 
+def variant_meta(variant):
+    return _copy()['locales'][LOCALE]['variants'][variant]
+
+
 def t(key, variant=DEFAULT_VARIANT, **values):
     loc = _copy()['locales'][LOCALE]
     text = loc['variants'].get(variant, {}).get(key, loc['base'].get(key, key))

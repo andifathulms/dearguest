@@ -24,6 +24,11 @@ def get(theme_id):
     return entries().get(theme_id)
 
 
+def is_demo_slug(slug):
+    """A theme's demo invitation (seed_demos), not a couple's."""
+    return any(t.get('demoSlug') == slug for t in _load()['themes'])
+
+
 def is_selectable(theme_id):
     """Couples may pick only active themes."""
     entry = get(theme_id)

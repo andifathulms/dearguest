@@ -89,6 +89,7 @@
 }
 .lp-brand {
   display: flex;
+  text-decoration: none;
   align-items: center;
   gap: 0.6rem;
   font-family: 'Playfair Display', serif;
@@ -653,6 +654,11 @@
 /* Registry-driven previews: pack screenshots, or a mock from the registry colours */
 .lp-theme-preview.tp-shot { padding: 0; }
 .lp-theme-preview .tp-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.lp-theme-preview .tp-video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top;
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.lp-theme-preview.tp-playing .tp-video { opacity: 1; }
 .tp-registry .tp-label { color: var(--tp-accent); }
 .tp-registry .tp-rule { background: var(--tp-accent); }
 .lp-theme-soon { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; }
@@ -801,3 +807,6 @@
 .tp-snow .tp-amp, .tp-snow .tp-label { color: #5f80a6; }
 .tp-snow .tp-date { color: #6d7f8e; }
 .tp-snow .tp-rule { background: #8fb3d9; }
+
+/* Theme cards link to /tema/:id (gallery and landing). */
+.tg-card-link { display: block; color: inherit; }
