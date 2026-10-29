@@ -1,5 +1,6 @@
 from django.urls import path
 from .funnel import FunnelVisitView
+from .marketing import MarketingView
 from .views import (
     InvitationDetailView,
     RSVPCreateView,
@@ -37,6 +38,7 @@ from .editor_views import (
 
 urlpatterns = [
     path('funnel/visit/', FunnelVisitView.as_view()),
+    path('site/marketing/', MarketingView.as_view()),
     path('invitations/<slug:slug>/', InvitationDetailView.as_view()),
     path('invitations/<slug:slug>/rsvp/', RSVPCreateView.as_view()),
     path('invitations/<slug:slug>/rsvps/', RSVPListView.as_view()),

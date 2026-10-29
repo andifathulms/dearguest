@@ -37,6 +37,7 @@ OWNERSHIP = {
     r'^(?!(?:admin|api|media|share|og|static)(?:/|$))(?P<slug>[-\w]+)/(?P<code>[A-Za-z0-9]{4,12})/?$': 'public',
     # Site-wide, no couple data.
     'api/funnel/visit/': 'public',
+    'api/site/marketing/': 'public',
     'api/coupons/validate/': 'public',
     'api/music-presets/': 'public',
     r'^media/(?P<path>.*)$': 'debug-only',   # Django serves media only with DEBUG; nginx in prod

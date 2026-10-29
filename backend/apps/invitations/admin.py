@@ -10,6 +10,7 @@ from . import themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
+    Plan, Testimonial,
 )
 
 
@@ -181,6 +182,37 @@ class CouponAdmin(admin.ModelAdmin):
     list_display = ['code', 'discount_percent', 'active', 'expires_at', 'description']
     list_editable = ['discount_percent', 'active', 'expires_at']
     search_fields = ['code']
+
+
+@admin.register(Plan)
+class PlanAdmin(admin.ModelAdmin):
+    """Landing-page pricing cards. Leave "compare at price" empty unless the plan
+    really sold at that price; use the badge (e.g. "Harga perkenalan") instead."""
+    list_display = ['name', 'price', 'compare_at_price', 'badge', 'is_featured', 'is_active', 'order']
+    list_editable = ['price', 'compare_at_price', 'badge', 'is_featured', 'is_active', 'order']
+    prepopulated_fields = {'slug': ('name',)}
+
+
+class TestimonialAdminForm(forms.ModelForm):
+    theme = forms.ChoiceField(required=False)
+
+    class Meta:
+        model = Testimonial
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['theme'].choices = [('', '(tanpa sampul)')] + themes.choices()
+
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    """Landing-page quotes. Publish real couples only, with their consent.
+    Rows marked "sample" are placeholders from seed_marketing."""
+    form = TestimonialAdminForm
+    list_display = ['names', 'city', 'theme', 'is_published', 'is_sample', 'order']
+    list_editable = ['is_published', 'order']
+    list_filter = ['is_published', 'is_sample']
 
 
 @admin.register(Guest)

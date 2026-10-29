@@ -378,6 +378,63 @@ class Coupon(models.Model):
         return f"{self.code} (-{self.discount_percent}%)"
 
 
+class Plan(models.Model):
+    """A pricing card on the landing page, edited in the admin.
+
+    `compare_at_price` is the struck-through "was" price: leave it empty unless
+    the plan really sold at that price. `badge` (e.g. "Harga perkenalan") is
+    shown instead when there is no honest "was" price to show."""
+    slug = models.SlugField(max_length=30, unique=True)
+    name = models.CharField(max_length=60)
+    price = models.PositiveIntegerField(help_text='Rupiah, e.g. 99000. 0 = gratis.')
+    compare_at_price = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text='Optional "was" price, shown struck through. Only a price the plan really had.')
+    badge = models.CharField(max_length=40, blank=True, help_text='Small label, e.g. "Paling dipilih" or "Harga perkenalan".')
+    audience = models.CharField(max_length=140, blank=True, help_text='Who it is for, one line.')
+    features = models.TextField(blank=True, help_text='One feature per line.')
+    cta_label = models.CharField(max_length=40, default='Pilih paket')
+    is_featured = models.BooleanField(default=False, help_text='Highlighted card (dark).')
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'price']
+
+    def feature_list(self):
+        return [line.strip() for line in self.features.splitlines() if line.strip()]
+
+    def __str__(self):
+        return f"{self.name} (Rp{self.price:,})".replace(',', '.')
+
+
+class Testimonial(models.Model):
+    """A couple's quote on the landing page. Only published ones are shown.
+
+    Publish real quotes only, with the couple's consent: a made-up testimonial on
+    a commercial page misleads buyers. `seed_marketing --sample-testimonials`
+    creates placeholders for local development; they are unpublished unless the
+    command is told otherwise."""
+    names = models.CharField(max_length=80, help_text='e.g. "Rani & Dimas"')
+    city = models.CharField(max_length=60, blank=True)
+    theme = models.CharField(max_length=30, blank=True, help_text='Theme id they used (shows its cover).')
+    quote = models.TextField(max_length=400)
+    is_published = models.BooleanField(default=False)
+    is_sample = models.BooleanField(default=False, help_text='Placeholder text, not a real couple. Replace before launch.')
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'pk']
+
+    def clean(self):
+        from . import themes
+        if self.theme:
+            themes.validate_registered_theme(self.theme)
+
+    def __str__(self):
+        return self.names
+
+
 MAX_PAX = 10  # per RSVP when the guest has no own limit
 
 
