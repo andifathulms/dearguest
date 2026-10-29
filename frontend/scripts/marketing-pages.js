@@ -42,7 +42,7 @@ export default function marketingPages() {
 
       write('tema', withTags(shell, {
         title: 'Galeri Tema Undangan Pernikahan Digital · DearGuest',
-        desc: `${themes.length} tema undangan pernikahan bertema lukisan tangan: ${themes.map(t => t.name).join(', ')}.`,
+        desc: `${themes.length} tema undangan pernikahan berlukis: ${themes.map(t => t.name).join(', ')}.`,
         url: `${origin}/tema`,
         noscript: `<h1>Galeri Tema DearGuest</h1><ul>${themes.map(t =>
           `<li><a href="/tema/${t.id}">${esc(t.name)}</a>: ${esc(t.catalog.desc)}</li>`).join('')}</ul>`,

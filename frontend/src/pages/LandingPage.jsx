@@ -1,364 +1,383 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import api from '../api/client.js'
-import { catalogThemes, selectableThemes } from '../themes/registry.js'
-import ThemePreview from '../themes/ThemePreview.jsx'
+import { selectableThemes } from '../themes/registry.js'
+import { variantOptions } from '../copy/copy.js'
 import { trackVisit } from '../utils/funnel.js'
+import { rememberTheme } from '../utils/themeChoice.js'
+import { useSession } from '../api/session.js'
+import { SiteNav, SiteFooter, StickyBar, useHashScroll } from '../brand/SiteChrome.jsx'
+import { Icon } from '../brand/icons.jsx'
+import { WA_HELP, waLink } from '../brand/site.js'
+import { DEFAULT_PLANS, formatRp } from '../brand/plans.js'
+import '../brand/brand.css'
+import './Home.css'
 
-// Theme sections read the registry: counts reflect themes a couple can pick
-// today; the grids show pickable + "coming soon" themes.
-const THEME_COUNT = selectableThemes().length
-const FEATURED_THEMES = catalogThemes().slice(0, 6)
-// The feature blurb names real themes from the registry, so it can't go stale.
-const THEME_NAMES = selectableThemes().map(t => t.name)
-const THEME_BLURB = THEME_NAMES.length > 2
-  ? `${THEME_NAMES.slice(0, -1).join(', ')} dan ${THEME_NAMES.at(-1)}: setiap tema dilukis tangan, dari Pesona Nusantara hingga taman bunga.`
-  : 'Setiap tema dilukis tangan, dari Pesona Nusantara hingga taman bunga.'
-import './LandingPage.css'
+// Everything theme-related reads the registry, so a new pack shows up here
+// (counts, categories, picker, hero) without touching this file.
+const THEMES = selectableThemes().filter(t => t.previewImage)
+const COUNT = selectableThemes().length
+const CATEGORIES = [...new Set(THEMES.map(t => t.category))]
+const VARIANTS = variantOptions()
 
-const ADMIN_WA = import.meta.env.VITE_ADMIN_WHATSAPP_NUMBER || '628123456789'
-const wa = (msg) => `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`
-const waOrder = wa('Halo, saya ingin memesan undangan digital')
+// Hero fan: these three when they exist (a dark lacquer centre between two
+// light papers reads best), else the first three themes with a cover.
+const HERO_PREFERRED = ['sunda', 'minang', 'navy']
+const HERO = (() => {
+  const picked = HERO_PREFERRED.map(id => THEMES.find(t => t.id === id)).filter(Boolean)
+  return picked.length === 3 ? picked : THEMES.slice(0, 3)
+})()
 
-/* ---- inline SVG icon set (no emoji, crisp at any size) ---- */
-const Icon = {
-  rsvp: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>,
-  music: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="18" r="2.5" /><circle cx="17" cy="16" r="2.5" /><path d="M8.5 18V6l11-2v10" /></svg>,
-  map: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>,
-  gift: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v9h14v-9" /><path d="M12 8S10 3 7.5 4.5 9.5 8 12 8zM12 8s2-5 4.5-3.5S14.5 8 12 8z" /></svg>,
-  chart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="13" y="7" width="3" height="10" /></svg>,
-  palette: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r="1" /><circle cx="17.5" cy="10.5" r="1" /><circle cx="8.5" cy="7.5" r="1" /><circle cx="6.5" cy="12.5" r="1" /><path d="M12 2a10 10 0 0 0 0 20c1 0 1.5-.8 1.5-1.6 0-.5-.2-.9-.5-1.2-.3-.4-.5-.8-.5-1.2 0-.9.7-1.5 1.6-1.5H16a6 6 0 0 0 6-6c0-4.4-4.5-8-10-8z" /></svg>,
-  gallery: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></svg>,
-  heart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" /></svg>,
-  check: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>,
-  plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>,
-  whatsapp: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.6-.8-2.6-1.4-3.7-3.2-.3-.5.3-.4.8-1.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3 1.8.8 2.5.8 3.4.7.6-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2z" /></svg>,
+const joinId = list => list.length > 1 ? `${list.slice(0, -1).join(', ')} dan ${list.at(-1)}` : (list[0] || '')
+
+const GROUPS = [
+  {
+    who: 'Untuk tamu', title: 'Dibuka, lalu dikenang',
+    items: ['Nama tamu tampil di sampul undangan', 'Musik, galeri foto, dan kisah kalian', 'Peta lokasi dan "Simpan ke Kalender"'],
+  },
+  {
+    who: 'Untuk kalian', title: 'Tahu siapa yang datang',
+    items: ['RSVP dan jumlah tamu langsung masuk', 'Kirim ke daftar tamu lewat WhatsApp', 'Lihat siapa yang sudah membuka undangan'],
+  },
+  {
+    who: 'Untuk keluarga', title: 'Doa dan hadiah, tersimpan rapi',
+    items: ['Amplop digital, salin rekening sekali tap', 'Dinding ucapan yang bisa kalian saring', `Teks ${joinId(VARIANTS.map(v => v.label))}`],
+  },
+]
+
+const STEPS = [
+  { title: 'Pilih tema, isi data', desc: 'Nama mempelai, acara, foto, dan rekening amplop. Pratinjaunya tampil langsung saat kalian mengisi.' },
+  { title: 'Aktifkan', desc: 'Coba gratis dulu. Bayar sekali saat sudah yakin, tanpa biaya bulanan.' },
+  { title: 'Kirim ke tamu', desc: 'Masukkan daftar tamu, lalu kirim tautan pribadi satu per satu lewat WhatsApp.' },
+]
+
+const FAQS = [
+  { q: 'Berapa lama membuat undangannya?', a: 'Isi data mempelai, acara, dan foto, lalu lihat pratinjaunya langsung. Semua tersimpan, jadi bisa dilanjutkan kapan saja. Kalau ingin disiapkan oleh admin, paket Bisnis dikerjakan dalam 24 jam.' },
+  { q: 'Apakah nama tamu bisa muncul otomatis?', a: 'Bisa. Masukkan daftar tamu (bisa ditempel dari Excel atau Google Sheets), dan setiap tamu mendapat tautan pribadi dengan namanya di sampul undangan.' },
+  { q: 'Bagaimana cara membayar?', a: 'Coba gratis dulu. Saat siap, minta aktivasi dari editor, transfer sesuai paket, lalu kirim bukti ke admin lewat WhatsApp. Admin mengirim kode aktivasi, dan undangan langsung aktif tanpa watermark.' },
+  { q: 'Apakah ada pilihan untuk agama selain Islam?', a: `Ada. Pilih gaya teks ${joinId(VARIANTS.map(v => v.label))}. Salam pembuka, nama acara, dan ayat mengikuti pilihan itu, dan bisa diubah kapan saja.` },
+  { q: 'Bisakah ganti tema setelah undangan dibuat?', a: 'Bisa, kapan saja dari editor. Data, foto, dan daftar tamu tetap utuh.' },
+  { q: 'Berapa lama undangan bisa diakses?', a: 'Undangan berbayar aktif hingga 3 bulan setelah tanggal pernikahan. Paket Gratis aktif 14 hari.' },
+]
+
+function useMarketing() {
+  const [data, setData] = useState({ plans: DEFAULT_PLANS, testimonials: [] })
+  useEffect(() => {
+    let live = true
+    api.get('/site/marketing/')
+      .then(({ data: d }) => live && setData({ plans: d.plans?.length ? d.plans : DEFAULT_PLANS, testimonials: d.testimonials || [] }))
+      .catch(() => {})
+    return () => { live = false }
+  }, [])
+  return data
 }
 
-const features = [
-  { icon: Icon.palette, title: `${THEME_COUNT} Tema Lukisan Tangan`, desc: THEME_BLURB },
-  { icon: Icon.rsvp, title: 'Konfirmasi RSVP', desc: 'Tamu mengonfirmasi kehadiran dan jumlah orang langsung dari undangan, tersimpan otomatis.' },
-  { icon: Icon.music, title: 'Musik Latar', desc: 'Iringi undangan dengan lagu favorit kalian. Diputar lembut saat undangan dibuka.' },
-  { icon: Icon.map, title: 'Peta Lokasi', desc: 'Google Maps terintegrasi untuk akad dan resepsi — tamu tinggal klik untuk navigasi.' },
-  { icon: Icon.gift, title: 'Amplop Digital', desc: 'Terima hadiah via transfer dengan tombol salin nomor rekening yang praktis.' },
-  { icon: Icon.gallery, title: 'Galeri & Kisah', desc: 'Bagikan momen prewedding dan perjalanan cinta kalian dalam galeri yang elegan.' },
-  { icon: Icon.chart, title: 'Dashboard RSVP', desc: 'Pantau konfirmasi tamu real-time dan unduh data sebagai CSV kapan saja.' },
-  { icon: Icon.heart, title: 'Doa & Ucapan', desc: 'Dinding ucapan langsung dari tamu, tampil cantik dan diperbarui otomatis.' },
-]
-
-const steps = [
-  { n: 1, title: 'Pesan & Konsultasi', desc: 'Hubungi kami via WhatsApp, pilih tema, dan ceritakan detail acara kalian.' },
-  { n: 2, title: 'Kirim Data', desc: 'Berikan foto, nama mempelai, jadwal, lokasi, dan rekening. Kami susun semuanya.' },
-  { n: 3, title: 'Undangan Jadi', desc: 'Undangan siap dalam 1–2 hari, lengkap dengan link personalisasi nama tamu.' },
-  { n: 4, title: 'Bagikan', desc: 'Sebar via WhatsApp ke semua tamu dan pantau RSVP dari dashboard.' },
-]
-
-const plans = [
-  { name: 'Gratis', desc: 'Coba dulu, tanpa biaya.', price: '0', was: null, featured: false, cta: 'Mulai Gratis', features: ['1 undangan aktif 14 hari', 'Tema dasar', 'RSVP & dinding ucapan', 'Countdown & peta lokasi'] },
-  { name: 'Premium', desc: 'Paling populer untuk pasangan.', price: '99', was: '199', featured: true, cta: 'Pilih Premium', features: ['Semua tema eksklusif', 'Galeri foto & kisah cinta', 'Musik latar & amplop digital', 'Dashboard RSVP + export CSV', 'Tanpa watermark'] },
-  { name: 'Bisnis', desc: 'Untuk dua acara dalam satu akun.', price: '179', was: '299', featured: false, cta: 'Pilih Bisnis', features: ['Semua fitur Premium', '2 undangan dalam 1 akun', 'Kustomisasi warna & tata letak', 'Foto tanpa batas', 'Prioritas pengerjaan (24 jam)'] },
-]
-
-const faqs = [
-  { q: 'Berapa lama undangan selesai dibuat?', a: 'Umumnya 1–2 hari kerja setelah data lengkap kami terima. Paket Eksklusif diprioritaskan dalam 24 jam.' },
-  { q: 'Apakah nama tamu bisa muncul otomatis?', a: 'Bisa. Setiap tamu mendapat link personal sehingga namanya tampil di sampul undangan, terasa lebih personal.' },
-  { q: 'Berapa lama undangan bisa diakses?', a: 'Undangan aktif hingga 3 bulan setelah tanggal pernikahan, cukup untuk seluruh rangkaian acara.' },
-  { q: 'Bagaimana cara membayar dan memesan?', a: 'Cukup klik tombol WhatsApp, kami akan memandu pemilihan tema, pengiriman data, hingga pembayaran.' },
-  { q: 'Apakah bisa request warna atau tema khusus?', a: 'Tentu. Pada paket Eksklusif kami melayani kustomisasi warna, tata letak, dan kebutuhan khusus lainnya.' },
-]
-
-const fade = (delay = 0) => ({
-  initial: { opacity: 0, y: 28 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-60px' },
-  transition: { duration: 0.6, delay },
-})
-
-function FaqItem({ q, a }) {
-  const [open, setOpen] = useState(false)
+function Hero() {
+  const [center, ...sides] = [HERO[1], HERO[0], HERO[2]]
   return (
-    <div className={`lp-faq-item ${open ? 'open' : ''}`}>
-      <button className="lp-faq-q" onClick={() => setOpen(o => !o)} aria-expanded={open}>
-        <span>{q}</span>
-        <span className="ic">{Icon.plus}</span>
-      </button>
-      {open && <p className="lp-faq-a">{a}</p>}
-    </div>
+    <section className="hm-hero dg-dark">
+      <div className="dg-container hm-hero-grid">
+        <div className="hm-hero-copy">
+          <p className="dg-eyebrow">Undangan pernikahan digital</p>
+          <h1 className="dg-display">Undangan berlukis, dengan <em>nama setiap tamu</em> di sampulnya.</h1>
+          <p className="dg-lead">
+            {COUNT} tema berlukis, dari {joinId(CATEGORIES)}. RSVP, peta, amplop digital, dan
+            dinding ucapan sudah termasuk. Kirim satu tautan lewat WhatsApp.
+          </p>
+          <div className="hm-actions">
+            <a href="#tema" className="dg-btn dg-btn-gold">Pilih Tema {Icon.arrow}</a>
+            <Link to="/register" className="dg-btn dg-btn-line">Coba Gratis</Link>
+          </div>
+          <dl className="hm-proof">
+            <div><dt className="dg-num">{COUNT}</dt><dd>tema berlukis</dd></div>
+            <div><dt className="dg-num">{VARIANTS.length}</dt><dd>gaya teks: {VARIANTS.map(v => v.label).join(', ')}</dd></div>
+            <div><dt className="dg-num">Rp0</dt><dd>untuk mencoba</dd></div>
+          </dl>
+        </div>
+        <div className="hm-fan" aria-hidden="true">
+          {sides[0] && <div className="dg-phone hm-p hm-p1"><img src={sides[0].previewImage} alt="" /></div>}
+          {center && <div className="dg-phone hm-p hm-p2"><img src={center.previewImage} alt="" fetchpriority="high" /></div>}
+          {sides[1] && <div className="dg-phone hm-p hm-p3"><img src={sides[1].previewImage} alt="" /></div>}
+          <div className="hm-note hm-note1"><small>Kepada Yth.</small><b>Nama tamu kalian</b><small>tampil otomatis di sampul</small></div>
+          <div className="hm-note hm-note2"><b><span className="hm-dot" />Hadir · 2 orang</b><small>RSVP langsung masuk ke dashboard</small></div>
+        </div>
+      </div>
+    </section>
   )
 }
 
-function CouponBox({ code, setCode, coupon, setCoupon }) {
+function ThemePicker() {
+  const session = useSession()
+  const [cat, setCat] = useState(CATEGORIES[0])
+  const list = useMemo(() => THEMES.filter(t => t.category === cat), [cat])
+  const [id, setId] = useState(list[0]?.id)
+  const theme = THEMES.find(t => t.id === id) || list[0]
+  if (!theme) return null
+  const useHref = `${session ? '/onboarding' : '/register'}?theme=${theme.id}`
+
+  return (
+    <section className="dg-band paper" id="tema">
+      <div className="dg-container">
+        <div className="dg-head hm-head-row">
+          <div className="hm-head-text">
+            <p className="dg-eyebrow">Galeri tema</p>
+            <h2 className="dg-h2">Pilih gayanya, <em>lihat sampulnya utuh</em>.</h2>
+            <p className="dg-lead">Persis seperti yang dibuka tamu di ponselnya. Nama, tanggal, dan nama tamu sudah di tempatnya.</p>
+          </div>
+          <Link to="/tema" className="dg-link hm-all">Lihat semua {COUNT} tema</Link>
+        </div>
+
+        <div className="hm-stage dg-dark">
+          <div className="dg-phone hm-stage-phone">
+            <img key={theme.id} src={theme.previewImage} alt={`Sampul tema ${theme.name}`} className="hm-fade" />
+          </div>
+          <div className="hm-stage-info">
+            <div className="hm-tabs" role="group" aria-label="Kategori tema">
+              {CATEGORIES.map(c => (
+                <button key={c} type="button" className="dg-chip" aria-pressed={c === cat}
+                  onClick={() => { setCat(c); setId(THEMES.find(t => t.category === c)?.id) }}>
+                  {c} <span className="count">{THEMES.filter(t => t.category === c).length}</span>
+                </button>
+              ))}
+            </div>
+            <h3 className="hm-stage-name">{theme.name}</h3>
+            <p className="hm-stage-desc">{theme.desc}</p>
+            <div className="hm-swatches" aria-label="Warna tema">
+              {theme.colors.map(c => <span key={c} style={{ background: c }} />)}
+            </div>
+            <div className="hm-actions">
+              <Link to={useHref} className="dg-btn dg-btn-gold" onClick={() => rememberTheme(theme.id)}>Pakai Tema Ini</Link>
+              <Link to={`/tema/${theme.id}`} className="dg-btn dg-btn-line">Coba Demo</Link>
+            </div>
+            <div className="hm-thumbs" role="group" aria-label={`Tema ${cat}`}>
+              {list.map(t => (
+                <button key={t.id} type="button" aria-pressed={t.id === theme.id} aria-label={t.name} onClick={() => setId(t.id)}>
+                  <img src={t.previewImage} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Features() {
+  return (
+    <section className="dg-band" id="fitur">
+      <div className="dg-container">
+        <div className="dg-head">
+          <p className="dg-eyebrow">Semua dalam satu tautan</p>
+          <h2 className="dg-h2">Tamu merasa diundang <em>secara pribadi</em>.</h2>
+        </div>
+        <div className="hm-groups">
+          {GROUPS.map(g => (
+            <div className="hm-group" key={g.who}>
+              <p className="hm-who">{g.who}</p>
+              <h3 className="dg-h3">{g.title}</h3>
+              <ul>{g.items.map(i => <li key={i}>{Icon.check}<span>{i}</span></li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Steps() {
+  return (
+    <section className="dg-band paper" id="cara-kerja">
+      <div className="dg-container">
+        <div className="dg-head">
+          <p className="dg-eyebrow">Cara kerja</p>
+          <h2 className="dg-h2">Buat sendiri dalam <em>tiga langkah</em>.</h2>
+        </div>
+        <ol className="hm-steps">
+          {STEPS.map((s, i) => (
+            <li key={s.title}>
+              <span className="hm-step-n dg-num">{i + 1}</span>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+            </li>
+          ))}
+        </ol>
+        <p className="hm-help">
+          Lebih suka dibantu? Admin kami bisa menyiapkan undangan untuk kalian.{' '}
+          <a href={WA_HELP} target="_blank" rel="noopener noreferrer" className="dg-link">Chat lewat WhatsApp</a>
+        </p>
+      </div>
+    </section>
+  )
+}
+
+function Coupon({ coupon, setCoupon }) {
+  const [open, setOpen] = useState(false)
+  const [code, setCode] = useState('')
   const [status, setStatus] = useState('')
   async function apply(e) {
     e.preventDefault()
     if (!code.trim()) return
     setStatus('checking')
     try {
-      const res = await api.get(`/coupons/validate/?code=${encodeURIComponent(code)}`)
-      if (res.data.valid) { setCoupon(res.data); setStatus('ok') }
-      else { setCoupon(null); setStatus('bad') }
+      const res = await api.get('/coupons/validate/', { params: { code } })
+      if (res.data.valid) { setCoupon(res.data); setStatus('ok') } else { setCoupon(null); setStatus('bad') }
     } catch { setStatus('bad') }
   }
+  if (!open && !coupon) {
+    return <button type="button" className="hm-promo-toggle" onClick={() => setOpen(true)}>Punya kode promo?</button>
+  }
   return (
-    <form className="lp-coupon" onSubmit={apply}>
-      <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="Kode promo (mis. CINTA20)" />
-      <button type="submit" className="lp-btn lp-btn-ghost">Pakai</button>
-      {status === 'ok' && coupon && <span className="lp-coupon-ok">✓ {coupon.code} −{coupon.discount_percent}% diterapkan</span>}
-      {status === 'bad' && <span className="lp-coupon-bad">Kode tidak valid</span>}
+    <form className="hm-coupon" onSubmit={apply}>
+      <label htmlFor="hm-coupon" className="dg-label">Kode promo</label>
+      <div className="hm-coupon-row">
+        <input id="hm-coupon" className="dg-input" value={code} autoFocus={!coupon}
+          onChange={e => setCode(e.target.value.toUpperCase())} placeholder="mis. CINTA20" />
+        <button type="submit" className="dg-btn dg-btn-line" disabled={status === 'checking'}>Pakai</button>
+      </div>
+      {status === 'ok' && coupon && <p className="hm-coupon-ok">{coupon.code}: potongan {coupon.discount_percent}% diterapkan pada harga di atas.</p>}
+      {status === 'bad' && <p className="hm-coupon-bad">Kode tidak berlaku. Periksa ejaannya atau tanyakan ke admin.</p>}
     </form>
   )
 }
 
-export default function LandingPage() {
-  const [code, setCode] = useState('')
+function Pricing({ plans }) {
   const [coupon, setCoupon] = useState(null)
-  useEffect(trackVisit, [])
   const pct = coupon?.discount_percent || 0
-
   return (
-    <div className="lp">
-      {/* ===== Nav ===== */}
-      <nav className="lp-nav">
-        <div className="lp-container lp-nav-inner">
-          <a href="#top" className="lp-brand" style={{ textDecoration: 'none' }}>
-            <span className="lp-brand-mark">D</span>
-            <span>Dear<span style={{ fontStyle: 'italic' }}>Guest</span></span>
-          </a>
-          <div className="lp-nav-menu lp-nav-links">
-            <a href="#tema">Tema</a>
-            <a href="#fitur">Fitur</a>
-            <a href="#harga">Harga</a>
-            <a href="#faq">FAQ</a>
-            <Link to="/dashboard">Masuk</Link>
-          </div>
-          <Link to="/register" className="lp-btn lp-btn-primary lp-nav-cta">
-            Buat Undangan
-          </Link>
+    <section className="dg-band" id="harga">
+      <div className="dg-container">
+        <div className="dg-head center">
+          <p className="dg-eyebrow">Harga</p>
+          <h2 className="dg-h2">Sekali bayar, <em>tanpa biaya bulanan</em>.</h2>
+          <p className="dg-lead">Mulai gratis. Bayar saat undangan siap diaktifkan.</p>
         </div>
-      </nav>
-
-      {/* ===== Hero ===== */}
-      <header className="lp-hero" id="top">
-        <div className="lp-hero-inner">
-          <motion.div {...fade(0)}>
-            <span className="lp-hero-badge"><span className="dot" /> Dipercaya pasangan di seluruh Indonesia</span>
-          </motion.div>
-          <motion.h1 {...fade(0.05)}>
-            Undangan Pernikahan <em>Digital</em> yang Elegan & Berkesan
-          </motion.h1>
-          <motion.p className="lp-hero-sub" {...fade(0.1)}>
-            Rayakan hari bahagia kalian dengan undangan online yang indah — tema eksklusif,
-            RSVP, galeri, musik, dan amplop digital. Mudah dibagikan, tanpa kertas.
-          </motion.p>
-          <motion.div className="lp-hero-actions" {...fade(0.15)}>
-            <Link to="/register" className="lp-btn lp-btn-primary">Buat Undangan Gratis</Link>
-            <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-wa">
-              {Icon.whatsapp} Konsultasi via WhatsApp
-            </a>
-          </motion.div>
-          <motion.div className="lp-hero-trust" {...fade(0.25)}>
-            <div><strong>{THEME_COUNT}</strong> Tema Eksklusif</div>
-            <div><strong>1–2</strong> Hari Pengerjaan</div>
-            <div><strong>100%</strong> Responsif di HP</div>
-          </motion.div>
-        </div>
-      </header>
-
-      {/* ===== Trust metrics + sustainability ===== */}
-      <section className="lp-stats">
-        <div className="lp-container">
-          <div className="lp-stats-grid">
-            {[
-              { value: `${THEME_COUNT}`, label: 'Tema Eksklusif' },
-              { value: '100%', label: 'Optimal di HP' },
-              { value: '24 jam', label: 'Pengerjaan' },
-              { value: '0', label: 'Kertas Terbuang' },
-            ].map((s, i) => (
-              <motion.div className="lp-stat" key={s.label} {...fade(i * 0.06)}>
-                <strong className="lp-serif">{s.value}</strong>
-                <span>{s.label}</span>
-              </motion.div>
-            ))}
-          </div>
-          <motion.p className="lp-stats-eco" {...fade(0.2)}>
-            🌿 Setiap undangan digital membantu mengurangi limbah kertas — elegan sekaligus ramah lingkungan.
-          </motion.p>
-        </div>
-      </section>
-
-
-      {/* ===== Themes ===== */}
-      <section className="lp-section lp-themes" id="tema">
-        <div className="lp-container">
-          <div className="lp-section-head">
-            <p className="lp-eyebrow">Koleksi Premium</p>
-            <h2>{THEME_COUNT} tema, satu kesan: mewah</h2>
-            <p>Setiap tema dirancang dengan tipografi, warna, dan ornamen yang harmonis untuk menonjolkan momen kalian. Berikut beberapa favorit kami.</p>
-          </div>
-          <div className="lp-theme-grid">
-            {FEATURED_THEMES.map((t, i) => (
-              <motion.div className="lp-theme-card" key={t.id} {...fade(i * 0.08)}>
-                <Link to={`/tema/${t.id}`} className="tg-card-link" aria-label={`Lihat tema ${t.name}`}>
-                  <ThemePreview theme={t} loop badge={t.status === 'coming' ? 'Segera hadir' : undefined} />
-                </Link>
-                <div className="lp-theme-body">
-                  <h3>{t.name}</h3>
-                  <p>{t.desc}</p>
-                  <div className="lp-theme-swatches">
-                    {t.colors.map(c => <span key={c} style={{ background: c }} />)}
-                  </div>
-                  {t.status === 'coming' || !t.demo
-                    ? <span className="lp-theme-soon">Segera hadir</span>
-                    : <Link className="lp-theme-demo" to={`/tema/${t.id}`}>Lihat tema &amp; demo →</Link>}
+        <div className="hm-prices" style={{ '--cols': `repeat(${Math.min(plans.length, 3)}, minmax(0, 1fr))` }}>
+          {plans.map(p => {
+            const final = pct && p.price ? Math.round(p.price * (1 - pct / 100)) : p.price
+            const was = pct && p.price ? p.price : p.compare_at_price
+            return (
+              <div key={p.slug} className={`hm-plan ${p.is_featured ? 'dg-dark featured' : ''}`}>
+                <div className="hm-plan-top">
+                  <span className="hm-plan-name">{p.name}</span>
+                  {p.badge && <span className="hm-badge">{p.badge}</span>}
                 </div>
-              </motion.div>
-            ))}
-          </div>
-          <div className="lp-themes-more">
-            <Link className="lp-btn lp-btn-primary" to="/tema">
-              Jelajahi Semua {THEME_COUNT} Tema {Icon.palette}
-            </Link>
-          </div>
+                <div className="hm-amount">
+                  {was ? <s className="dg-num">{formatRp(was)}</s> : null}
+                  <span className="dg-num"><small>Rp</small>{formatRp(final, false)}</span>
+                </div>
+                {p.audience && <p className="hm-aud">{p.audience}</p>}
+                <ul>{p.features.map(f => <li key={f}>{Icon.check}<span>{f}</span></li>)}</ul>
+                <Link to="/register" className={`dg-btn dg-btn-block ${p.is_featured ? 'dg-btn-gold' : 'dg-btn-line'}`}>{p.cta_label}</Link>
+              </div>
+            )
+          })}
         </div>
-      </section>
-
-      {/* ===== Features ===== */}
-      <section className="lp-section" id="fitur">
-        <div className="lp-container">
-          <div className="lp-section-head">
-            <p className="lp-eyebrow">Fitur Lengkap</p>
-            <h2>Semua yang kalian butuhkan, dalam satu tautan</h2>
-            <p>Dirancang untuk memudahkan kalian dan memanjakan tamu undangan.</p>
-          </div>
-          <div className="lp-feature-grid">
-            {features.map((f, i) => (
-              <motion.div className="lp-feature" key={f.title} {...fade((i % 4) * 0.06)}>
-                <div className="lp-feature-icon">{f.icon}</div>
-                <h3>{f.title}</h3>
-                <p>{f.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== How it works ===== */}
-      <section className="lp-section lp-steps">
-        <div className="lp-container">
-          <div className="lp-section-head">
-            <p className="lp-eyebrow">Cara Pesan</p>
-            <h2>Hanya 4 langkah mudah</h2>
-          </div>
-          <div className="lp-step-grid">
-            {steps.map((s, i) => (
-              <motion.div className="lp-step" key={s.n} {...fade(i * 0.08)}>
-                <div className="lp-step-num">{s.n}</div>
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Pricing ===== */}
-      <section className="lp-section" id="harga">
-        <div className="lp-container">
-          <div className="lp-section-head">
-            <p className="lp-eyebrow">Harga</p>
-            <h2>Harga terjangkau, sekali bayar</h2>
-            <p>Mulai dari gratis. Tanpa biaya bulanan, tanpa biaya tersembunyi — dan setiap paket sudah termasuk pendampingan penuh via WhatsApp.</p>
-          </div>
-          <p className="lp-price-promo">🎉 Harga promo — hemat hingga 50% untuk periode terbatas</p>
-          <CouponBox code={code} setCode={setCode} coupon={coupon} setCoupon={setCoupon} />
-          <div className="lp-price-grid">
-            {plans.map((p, i) => {
-              const isFree = p.price === '0'
-              const base = Number(p.price)
-              const finalPrice = pct ? Math.round(base * (1 - pct / 100)) : base
-              return (
-                <motion.div className={`lp-price-card ${p.featured ? 'featured' : ''}`} key={p.name} {...fade(i * 0.08)}>
-                  {p.featured && <span className="lp-price-tag">Paling Populer</span>}
-                  <div className="lp-price-name lp-serif">{p.name}</div>
-                  <p className="lp-price-desc">{p.desc}</p>
-                  {isFree ? (
-                    <div className="lp-price-amount lp-serif">Gratis</div>
-                  ) : (
-                    <div className="lp-price-amount lp-serif">
-                      {pct ? <span className="lp-price-was">Rp{p.price}.000</span> : (p.was && <span className="lp-price-was">Rp{p.was}.000</span>)}
-                      <span><small>Rp</small>{finalPrice}.000</span>
-                    </div>
-                  )}
-                  <p className="lp-price-note">{isFree ? 'tanpa kartu kredit' : 'sekali bayar / undangan'}</p>
-                  <ul className="lp-price-features">
-                    {p.features.map(ft => (
-                      <li key={ft}>{Icon.check}<span>{ft}</span></li>
-                    ))}
-                  </ul>
-                  {isFree ? (
-                    <Link to="/register" className="lp-btn lp-btn-ghost">{p.cta}</Link>
-                  ) : (
-                    <a
-                      href={wa(`Halo, saya tertarik dengan paket ${p.name} untuk undangan digital${pct ? ` (kode promo ${coupon.code})` : ''}`)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`lp-btn ${p.featured ? 'lp-btn-primary' : 'lp-btn-ghost'}`}
-                    >
-                      {p.cta}
-                    </a>
-                  )}
-                </motion.div>
-              )
-            })}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ===== FAQ ===== */}
-      <section className="lp-section" id="faq">
-        <div className="lp-container">
-          <div className="lp-section-head">
-            <p className="lp-eyebrow">FAQ</p>
-            <h2>Pertanyaan yang sering ditanyakan</h2>
-          </div>
-          <div className="lp-faq-list">
-            {faqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== CTA ===== */}
-      <section className="lp-cta">
-        <motion.div {...fade(0)}>
-          <h2>Siap membuat undangan <em>impian</em>?</h2>
-          <p>Konsultasikan kebutuhan acara kalian sekarang. Gratis, tanpa komitmen.</p>
-          <a href={waOrder} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn-wa">
-            {Icon.whatsapp} Chat WhatsApp Sekarang
+        <div className="hm-price-foot">
+          <Coupon coupon={coupon} setCoupon={setCoupon} />
+          <a className="dg-link" target="_blank" rel="noopener noreferrer"
+            href={waLink(`Halo, saya ingin dibantu membuat undangan digital${coupon ? ` (kode promo ${coupon.code})` : ''}`)}>
+            Ingin dibantu admin? Chat WhatsApp
           </a>
-        </motion.div>
-      </section>
-
-      {/* ===== Footer ===== */}
-      <footer className="lp-footer">
-        <div className="lp-container">
-          <div className="lp-footer-inner">
-            <div className="lp-brand">
-              <span className="lp-brand-mark">D</span>
-              <span>Dear<span style={{ fontStyle: 'italic' }}>Guest</span></span>
-            </div>
-            <div className="lp-footer-links">
-              <a href="#tema">Tema</a>
-              <a href="#fitur">Fitur</a>
-              <a href="#harga">Harga</a>
-              <a href="#faq">FAQ</a>
-              <a href={waOrder} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-            </div>
-          </div>
-          <p className="lp-footer-copy">© {new Date().getFullYear()} Dear Guest · Undangan pernikahan online untuk pasangan Indonesia 🤍</p>
         </div>
-      </footer>
+      </div>
+    </section>
+  )
+}
+
+function Testimonials({ items }) {
+  if (!items.length) return null
+  const cover = id => THEMES.find(t => t.id === id)
+  return (
+    <section className="dg-band dg-dark hm-quotes">
+      <div className="dg-container">
+        <div className="dg-head">
+          <p className="dg-eyebrow">Dari pasangan DearGuest</p>
+          <h2 className="dg-h2">Kata mereka yang <em>sudah mengirim</em>.</h2>
+        </div>
+        <div className="hm-quote-grid" style={{ '--cols': `repeat(${Math.min(items.length, 3)}, minmax(0, 1fr))` }}>
+          {items.map(t => {
+            const th = cover(t.theme)
+            return (
+              <figure key={t.id} className="hm-quote">
+                <span className="hm-quote-mark">{Icon.quote}</span>
+                <blockquote>{t.quote}</blockquote>
+                <figcaption>
+                  {th && <img src={th.previewImage} alt="" loading="lazy" />}
+                  <span><b>{t.names}</b>{[t.city, t.theme_name && `tema ${t.theme_name}`].filter(Boolean).join(' · ')}</span>
+                </figcaption>
+              </figure>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Faq() {
+  const [open, setOpen] = useState(0)
+  return (
+    <section className="dg-band paper" id="faq">
+      <div className="dg-container hm-faq-grid">
+        <div className="dg-head">
+          <p className="dg-eyebrow">FAQ</p>
+          <h2 className="dg-h2">Yang sering <em>ditanyakan</em>.</h2>
+          <p className="dg-small">Belum terjawab? <a href={WA_HELP} target="_blank" rel="noopener noreferrer" className="dg-link">Tanya admin</a></p>
+        </div>
+        <div className="hm-faq">
+          {FAQS.map((f, i) => (
+            <div key={f.q} className="hm-faq-item">
+              <h3>
+                <button type="button" aria-expanded={open === i} aria-controls={`faq-${i}`} id={`faq-q-${i}`}
+                  onClick={() => setOpen(o => (o === i ? -1 : i))}>
+                  <span>{f.q}</span><span className="hm-faq-ic">{Icon.plus}</span>
+                </button>
+              </h3>
+              <div id={`faq-${i}`} role="region" aria-labelledby={`faq-q-${i}`} hidden={open !== i}>
+                <p>{f.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Closing() {
+  return (
+    <section className="dg-band dg-dark hm-closing">
+      <div className="dg-container hm-closing-inner">
+        <h2 className="dg-display">Hari kalian layak <em>dirayakan dengan indah</em>.</h2>
+        <div className="hm-actions">
+          <Link to="/register" className="dg-btn dg-btn-gold">Buat Undangan Gratis</Link>
+          <Link to="/tema" className="dg-btn dg-btn-line">Lihat Semua Tema</Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default function LandingPage() {
+  const { plans, testimonials } = useMarketing()
+  useEffect(trackVisit, [])
+  useHashScroll()
+  return (
+    <div className="dg hm">
+      <SiteNav />
+      <main>
+        <Hero />
+        <ThemePicker />
+        <Features />
+        <Steps />
+        <Pricing plans={plans} />
+        <Testimonials items={testimonials} />
+        <Faq />
+        <Closing />
+      </main>
+      <SiteFooter />
+      <StickyBar />
     </div>
   )
 }
