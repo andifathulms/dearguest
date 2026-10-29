@@ -1,0 +1,37 @@
+# Prod-like local stack: docker-compose.prod.yml plus this file, with
+# deploy/local-prod.env. Use scripts/local-prod.sh (it passes all three).
+# What it can't stand in for: real DNS, Let's Encrypt, Cloudflare, R2, email
+# deliverability and real phones (LAUNCH-READINESS.md).
+services:
+  # Caps matching the production VPS (2 vCPU / 4 GB) for load tests.
+  backend:
+    deploy:
+      resources:
+        limits: { cpus: "1.2", memory: 1536M }
+  db:
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 1024M }
+  redis:
+    deploy:
+      resources:
+        limits: { cpus: "0.1", memory: 256M }
+  nginx:
+    deploy:
+      resources:
+        limits: { cpus: "0.2", memory: 256M }
+
+  # Stands in for Cloudflare R2: an S3 API served by rclone (the backup tool).
+  s3:
+    image: rclone/rclone:1.69.3
+    command: serve s3 /data --addr :9000 --auth-key local-prod,local-prod-only
+    ports: ["9000:9000"]
+    volumes: [s3_data:/data]
+
+  # Catches every email (http://localhost:8025).
+  mailpit:
+    image: axllent/mailpit:v1.24
+    ports: ["8025:8025"]
+
+volumes:
+  s3_data:
