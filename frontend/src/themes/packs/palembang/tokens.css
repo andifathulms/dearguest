@@ -1,0 +1,62 @@
+/* Palembang — Limas Emas: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page maroon is sampled from the lacquer so art and page meet without a seam;
+   the ink is a warm ivory, the accent the gold of the lak florals. */
+.pk-root[data-pack='palembang'] {
+  /* colour */
+  --dg-bg: #3d0a0e;
+  --dg-bg-alt: rgba(246, 233, 207, 0.025);
+  --dg-surface: rgba(246, 233, 207, 0.05);
+  --dg-surface-raised: rgba(246, 233, 207, 0.09);
+  --dg-ink: #f6e9cf;
+  --dg-ink-muted: #dcc7a4;
+  --dg-ink-faint: #a88d74;
+  --dg-accent: #e2bd68;   /* lak gold */
+  --dg-on-accent: #3d0a0e;
+  --dg-line: rgba(226, 189, 104, 0.24);
+  --dg-line-strong: rgba(226, 189, 104, 0.52);
+  --dg-scrim: linear-gradient(180deg, rgba(26, 4, 6, 0.25) 0%, rgba(26, 4, 6, 0) 25%, rgba(26, 4, 6, 0.45) 55%, rgba(26, 4, 6, 0.85) 100%);
+  --dg-focus: #f0d58a;
+
+  /* type */
+  --dg-font-display: 'DG Palembang Display', 'Abhaya Libre', Georgia, serif;
+  --dg-font-body: 'DG Palembang Body', 'Source Serif 4', Georgia, serif;
+  --dg-font-label: 'DG Palembang Label', 'Source Serif 4', Georgia, serif;
+  --dg-font-script: 'DG Palembang Script', 'Lavishly Yours', cursive;
+  --dg-fs-names: clamp(3rem, 14vw, 5.4rem);
+  --dg-fs-title: clamp(1.6rem, 6.4vw, 2.3rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1rem;
+  --dg-fs-small: 0.94rem;
+  --dg-fs-label: 0.68rem;
+  --dg-lh-tight: 1.02;
+  --dg-lh-body: 1.75;
+  --dg-tracking-label: 0.22em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 8px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 8px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --dg-shadow-float: 0 6px 20px rgba(0, 0, 0, 0.45);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

@@ -1,0 +1,139 @@
+/* Palembang — Limas Emas: what tokens can't express (cap: 150 lines). See DESIGN.md. */
+
+/* The page is the same maroon lacquer the paintings are on. */
+.pk-root[data-pack='palembang'] {
+  background: var(--dg-bg) url('./assets/texture.webp') repeat;
+  background-size: 256px 256px;
+  font-feature-settings: 'kern', 'liga';
+}
+
+/* Names in Lavishly Yours; titles in Abhaya Libre capitals, labels in Source Serif capitals. Light text gets a soft shadow on the dark lacquer. */
+.pk-root[data-pack='palembang'] :is(.cover-names, .hero-names) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--dg-ink);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+}
+.pk-root[data-pack='palembang'] :is(.cover-amp, .hero-ampersand) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='palembang'] :is(.cover-label, .hero-label, .cover-guest-to, .countdown-label, .event-date, .story-date) {
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='palembang'] .section-title {
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-fs-title);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Cover: inside the carved panels, under the songket. The calm zone is ~31–78 % of the height, the middle 76 % of the width. */
+.pk-root[data-pack='palembang'] .pk-cover--painted { place-items: center; }
+.pk-root[data-pack='palembang'] .pk-cover--painted .pk-cover-content {
+  width: min(74vw, 25rem);
+  padding-inline: 0;   /* the column already sits inside the carved side panels */
+  gap: 0.45rem;
+  padding-block: 8vh 0;
+}
+.pk-root[data-pack='palembang'] .pk-cover--painted .cover-names { font-size: clamp(2.9rem, 13.5vw, 5rem); margin: 0.1rem 0 0.3rem; }
+.pk-root[data-pack='palembang'] .pk-cover .pk-monogram { display: none; }
+.pk-root[data-pack='palembang'] .cover-guest { margin-top: 0.3rem; }
+.pk-root[data-pack='palembang'] .cover-guest-to { letter-spacing: 0.14em; }
+.pk-root[data-pack='palembang'] .cover-guest-name { font-family: var(--dg-font-body); font-style: italic; font-size: clamp(1.35rem, 5.6vw, 1.7rem); }
+.pk-root[data-pack='palembang'] .pk-cover .pk-open-btn { margin-top: 0.6rem; }
+
+/* Gold lacquer pill buttons with maroon text and an ivory hairline. */
+.pk-root[data-pack='palembang'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn) {
+  border: 1px solid rgba(243, 239, 230, 0.6);
+  background: linear-gradient(180deg, #f0d58a, #c99a3c);
+  color: var(--dg-on-accent);
+  font-family: var(--dg-font-label);
+  letter-spacing: 0.14em;
+  box-shadow: var(--dg-shadow-float);
+}
+.pk-root[data-pack='palembang'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn):hover { background: #f6e2a4; color: var(--dg-on-accent); }
+.pk-root[data-pack='palembang'] :is(.bank-copy-btn, .map-load, .rsvp-toggle-btn) { border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='palembang'] .rsvp-toggle-btn.active { background: var(--dg-accent); border-color: var(--dg-accent); color: var(--dg-on-accent); }
+
+/* Photo frames are ovals inside the carved gilded frame (photo-ring.webp). Its opening
+   is x 20.7–79.3 %, y 23.3–77.4 % of the art (the cempaka set the top); the photo
+   overlaps the rim slightly (x 20.1–79.9 %, y 22.7–78 %), so the frame extends past the
+   photo by 33.6 % (sides), 41 % (top) and 39.8 % (bottom); --w is the photo width. */
+.pk-root[data-pack='palembang'] .pk-photo-frame {
+  --w: min(38vw, 170px);
+  width: var(--w);
+  aspect-ratio: 0.871;
+  margin: calc(var(--w) * 0.47) auto calc(var(--w) * 0.46);
+}
+.pk-root[data-pack='palembang'] .pk-photo-frame .profile-photo {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+}
+.pk-root[data-pack='palembang'] .pk-photo-ring { inset: -41% -33.6% -39.8% -33.6%; }
+.pk-root[data-pack='palembang'] .pk-photo-ring img { width: 100%; height: 100%; }
+
+/* Hero. Phones: content between the bands (the songket fringe ends ~0.54 W below the
+   top; the floor step starts ~0.39 W above the bottom). The Musi river (parallax-back,
+   Prompt 8) lies on the hero's foot behind the floor, its stilt-house skyline showing
+   above it, and rises as the floor sinks (depth -0.1), its straight lower edge faded;
+   the text ends above it. The
+   near songket drapes (parallax-front) are fitted to the width and pushed past the
+   edges. Wide screens show the desktop painting, so the depth layers stay hidden. */
+.pk-root[data-pack='palembang'] .pk-hero--framed { padding-block: 6rem 13rem; }   /* wide: lift the text clear of the river */
+@media (max-aspect-ratio: 1/1) {
+  .pk-root[data-pack='palembang'] .pk-hero--framed[data-bands] { padding-block: 56vw 62vw; }
+}
+.pk-root[data-pack='palembang'] .pk-hero--framed .hero-content { gap: 0.5rem; }
+.pk-root[data-pack='palembang'] .pk-hero-portrait { --w: min(36vw, 165px); }
+.pk-root[data-pack='palembang'] .pk-hero .pk-parallax-back { inset: auto 0 4vw; opacity: 0.85; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+.pk-root[data-pack='palembang'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='palembang'] .pk-hero .pk-parallax-front { inset: 0 -10vw; }
+.pk-root[data-pack='palembang'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='palembang'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
+}
+.pk-root[data-pack='palembang'] :is(.hero-ornament, .pk-hero--framed .hero-scroll-cue) { display: none; }
+.pk-root[data-pack='palembang'] .hero-bismillah { font-size: 1.2rem; color: var(--dg-accent); }
+
+/* Greeting, verse and closing in Source Serif italic. */
+.pk-root[data-pack='palembang'] :is(.greeting-text, .pk-closing p, .scripture-text) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  font-size: clamp(1.15rem, 4.6vw, 1.4rem);
+  line-height: 1.6;
+  color: var(--dg-ink);
+}
+
+/* Cards: translucent over the lacquer, with a gold hairline. */
+.pk-root[data-pack='palembang'] :is(.event-card, .bank-card, .wish-card, .rsvp-success) {
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-line-strong);
+  border-radius: var(--dg-radius-card);
+  box-shadow: var(--dg-shadow-card);
+}
+.pk-root[data-pack='palembang'] :is(.event-type, .profile-name, .map-event-label) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 11vw, 3.3rem);
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='palembang'] .countdown-unit {
+  border: 1px solid var(--dg-line-strong);
+  border-radius: var(--dg-radius-card);
+  background: var(--dg-surface);
+}
+.pk-root[data-pack='palembang'] .countdown-value { font-family: var(--dg-font-display); color: var(--dg-ink); }
+.pk-root[data-pack='palembang'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(0, 0, 0, 0.25); border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='palembang'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
+
+/* Closing: the carved gilded corners with songket and cempaka frame the last words as a
+   lintel (the cloth must hang down, so the second corner is mirrored, not rotated). */
+.pk-root[data-pack='palembang'] .pk-closing { padding-block: clamp(13rem, 56vw, 17rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
+.pk-root[data-pack='palembang'] .pk-closing .pk-corner { width: min(50vw, 230px); }
+.pk-root[data-pack='palembang'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }

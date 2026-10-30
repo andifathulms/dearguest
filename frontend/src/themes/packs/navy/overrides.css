@@ -82,9 +82,9 @@
    top; the bed starts ~0.41 W above the bottom). The moonlit shrubs (parallax-back,
    Prompt 8) stand behind the bed, dimmed to read as distant mist so the light text
    over them keeps its contrast, their straight lower edge faded, and rise as the bed
-   sinks (depth -0.1). The near
-   roses (parallax-front) are fitted to the width and pushed past the edges. Wide
-   screens show the desktop painting, so the depth layers stay hidden. */
+   sinks (depth -0.1). The near roses (parallax-front) are fitted to the width and
+   pushed past the edges. Wide screens show the desktop painting, so the depth layers
+   stay hidden. */
 .pk-root[data-pack='navy'] .pk-hero--framed { padding-block: 8rem 9rem; }
 @media (max-aspect-ratio: 1/1) {
   .pk-root[data-pack='navy'] .pk-hero--framed[data-bands] { padding-block: 56vw 48vw; }

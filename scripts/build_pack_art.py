@@ -314,6 +314,35 @@ PACKS = {
         'texture': ('texture.jpg', 512, 70),
         'texture_tint': (30, 43, 66),
     },
+    'palembang': {
+        # Cut-outs on cobalt (~#2444BB delivered); the ornament (maroon, red, gold, ivory,
+        # green) has no blues -> despill + edge_fill. The river (parallax-back) is truly
+        # blue-grey water, so it is keyed plain.
+        'despill': True,
+        'edge_fill': True,
+        'plain': ('parallax-back',),
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: the songket fringe ends ~30 % in the centre, the side drapes ~37 %;
+        # the floor step and cempaka start ~78 %.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.4, 'bottom', 0.1, 1080),
+            ('hero-bottom', 'hero.jpg', 0.74, 1.0, 'top', 0.14, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (36, 68, 183), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (32, 64, 185), 720, (26, 64), 2, False),
+            # Prompt 8: the Musi river from ~73 % to the bottom edge (it touched the edge),
+            # and the near songket drapes at the top only (the top-only wording worked)
+            ('parallax-back', 'parallax-back.jpg', (35, 69, 191), 1080, (26, 64), 2, False, (0, 0.7, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (36, 66, 188), 1080, (26, 64), 2, False, (0, 0, 1, 0.42)),
+        ],
+        # the first sheet with no haze band: the bottom third really is flat key
+        'sprites': ('petals-sheet.jpg', (37, 73, 193), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
+        'texture': ('texture.jpg', 512, 70),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -482,8 +511,9 @@ def build(pack):
         if crop:   # (x0, y0, x1, y1) fractions: drop parts of the canvas that aren't flat background
             x0, y0, x1, y1 = crop[0]
             raw = raw.crop((round(x0 * raw.width), round(y0 * raw.height), round(x1 * raw.width), round(y1 * raw.height)))
-        img = resize_w(key(raw, bg, ramp, close, fill, cfg.get('despill', False), cfg.get('edge_fill', False),
-                           cfg.get('spill', (14, 40))), width)
+        plain = name in cfg.get('plain', ())   # art with real blues of its own (water, sky): no blue clean-up
+        img = resize_w(key(raw, bg, ramp, close, fill, False if plain else cfg.get('despill', False),
+                           False if plain else cfg.get('edge_fill', False), cfg.get('spill', (14, 40))), width)
         written += save_all(img, out, name, ('avif', 'webp'))
 
     if 'sprites' in cfg:

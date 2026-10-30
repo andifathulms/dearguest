@@ -10,7 +10,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/javanese.webp",
-      "previewVideo": { "webm": "/theme-previews/javanese.webm", "mp4": "/theme-previews/javanese.mp4" },
+      "previewVideo": {
+        "webm": "/theme-previews/javanese.webm",
+        "mp4": "/theme-previews/javanese.mp4"
+      },
       "demoSlug": "demo-gebyok-sogan",
       "demoTemporary": true,
       "catalog": {
@@ -42,7 +45,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/minang.webp",
-      "previewVideo": { "webm": "/theme-previews/minang.webm", "mp4": "/theme-previews/minang.mp4" },
+      "previewVideo": {
+        "webm": "/theme-previews/minang.webm",
+        "mp4": "/theme-previews/minang.mp4"
+      },
       "demoSlug": "demo-gonjong-songket",
       "demoTemporary": true,
       "catalog": {
@@ -74,7 +80,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/bugis.webp",
-      "previewVideo": { "webm": "/theme-previews/bugis.webm", "mp4": "/theme-previews/bugis.mp4" },
+      "previewVideo": {
+        "webm": "/theme-previews/bugis.webm",
+        "mp4": "/theme-previews/bugis.mp4"
+      },
       "demoSlug": "demo-lamming-zamrud",
       "demoTemporary": true,
       "catalog": {
@@ -106,7 +115,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/sunda.webp",
-      "previewVideo": { "webm": "/theme-previews/sunda.webm", "mp4": "/theme-previews/sunda.mp4" },
+      "previewVideo": {
+        "webm": "/theme-previews/sunda.webm",
+        "mp4": "/theme-previews/sunda.mp4"
+      },
       "demoSlug": "demo-siger-mega-mendung",
       "demoTemporary": true,
       "catalog": {
@@ -193,6 +205,37 @@
       }
     },
     {
+      "id": "palembang",
+      "name": "Limas Emas",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/palembang.webp",
+      "demoSlug": "demo-limas-emas",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Ukiran emas rumah limas, songket limar merah-emas, bunga cempaka, dan Sungai Musi di atas pernis merah marun.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#3d0a0e",
+          "#f6e9cf",
+          "#e2bd68"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#3d0a0e,#9b1b22 55%,#e2bd68)",
+        "card": {
+          "bg": "#3d0a0e",
+          "fg": "#f6e9cf",
+          "accent": "#e2bd68"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "palembang"
+      }
+    },
+    {
       "id": "floral",
       "name": "Merah Anggur",
       "collection": "signature",
@@ -200,7 +243,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/floral.webp",
-      "previewVideo": { "webm": "/theme-previews/floral.webm", "mp4": "/theme-previews/floral.mp4" },
+      "previewVideo": {
+        "webm": "/theme-previews/floral.webm",
+        "mp4": "/theme-previews/floral.mp4"
+      },
       "demoSlug": "demo-merah-anggur",
       "demoTemporary": true,
       "catalog": {
@@ -232,7 +278,10 @@
       "status": "active",
       "tier": "premium",
       "previewImage": "/theme-previews/sage.webp",
-      "previewVideo": { "webm": "/theme-previews/sage.webm", "mp4": "/theme-previews/sage.mp4" },
+      "previewVideo": {
+        "webm": "/theme-previews/sage.webm",
+        "mp4": "/theme-previews/sage.mp4"
+      },
       "demoSlug": "demo-taman-sage",
       "demoTemporary": true,
       "catalog": {

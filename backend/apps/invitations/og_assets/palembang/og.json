@@ -1,0 +1,12 @@
+{
+  "box": [
+    320,
+    30,
+    880,
+    430
+  ],
+  "ink": "#f6e9cf",
+  "accent": "#e2bd68",
+  "shadow": true,
+  "_generated": "GENERATED from frontend/src/themes/packs/palembang/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

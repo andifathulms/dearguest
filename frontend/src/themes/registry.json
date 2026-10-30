@@ -206,6 +206,37 @@
       }
     },
     {
+      "id": "palembang",
+      "name": "Limas Emas",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/palembang.webp",
+      "demoSlug": "demo-limas-emas",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Ukiran emas rumah limas, songket limar merah-emas, bunga cempaka, dan Sungai Musi di atas pernis merah marun.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#3d0a0e",
+          "#f6e9cf",
+          "#e2bd68"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#3d0a0e,#9b1b22 55%,#e2bd68)",
+        "card": {
+          "bg": "#3d0a0e",
+          "fg": "#f6e9cf",
+          "accent": "#e2bd68"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "palembang"
+      }
+    },
+    {
       "id": "floral",
       "name": "Merah Anggur",
       "collection": "signature",
