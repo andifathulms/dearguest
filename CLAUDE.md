@@ -72,6 +72,19 @@ That folder is a git-ignored inbox. Then:
 - no people, no text, no religious symbols;
 - a note for a cultural reviewer.
 
+**"Section art for <theme>"** (planned, November 2026): the user painted that theme's four extra pieces from
+`prompts/sections/PROMPT-<ID>-SECTIONS.md`, against the theme's own reference painting. They are keyed
+cut-outs on the theme's key colour:
+- `section-edge`: a tall spray from the left edge, shown at the sides of sections behind the cards, mirrored
+  and alternating, with its own scroll speed;
+- `section-garland`: a horizontal garland, the painted divider between sections;
+- `monogram-wreath`: a round wreath around the initials at the closing and between the profiles;
+- `card-corner`: an L-shaped corner for event and gift cards and the RSVP form.
+
+Seven packs also get optional `parallax-back` / `parallax-front`. The shared rendering for these slots is
+built with the first theme that arrives. Each slot is optional per pack, and like all motion it must rest
+at the old page.
+
 ### Standing rules
 - Don't commit `docker-compose.yml` (the user's local port remap: web 5190, api 8020, db 5440), or
   `RECON.md`, `PHASE0-REPORT.md`, `PROMPT-ASSET-MOTION.md`.

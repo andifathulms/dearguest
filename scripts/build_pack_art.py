@@ -343,6 +343,35 @@ PACKS = {
         'sprites': ('petals-sheet.jpg', (37, 73, 193), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
         'texture': ('texture.jpg', 512, 70),
     },
+    'tropis': {
+        # Cut-outs on cobalt (~#2444BA delivered); greens, white, blush, coral and gold
+        # have no blues -> despill, and edge_fill for the palm leaflets and monstera holes.
+        'despill': True,
+        'edge_fill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: the canopy runs deeper than asked, ~34 % in the centre and ~40 % at
+        # the sides; the bed starts ~69 %.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.43, 'bottom', 0.08, 1080),
+            ('hero-bottom', 'hero.jpg', 0.66, 1.0, 'top', 0.09, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (36, 68, 185), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (36, 70, 188), 720, (26, 64), 2, False),
+            # Prompt 8. The palms end in a torn-paper edge above more key, not at the image
+            # edge: cut the strip out whole (~81-97 %) and tuck that edge under the bed.
+            # The near layer is a canopy across the top, ending ~40 %.
+            ('parallax-back', 'parallax-back.jpg', (37, 68, 190), 1080, (26, 64), 2, False, (0, 0.78, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (36, 69, 186), 1080, (26, 64), 2, False, (0, 0, 1, 0.42)),
+        ],
+        # the sheet's lower third is flat key again (the elements end ~69 %)
+        'sprites': ('petals-sheet.jpg', (36, 67, 189), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
+        # no painted texture was delivered: warm white paper, the paintings' own
+        'texture_synth': {'size': 512, 'rgb': (252, 251, 246), 'grain': 1.3, 'weave': 0, 'mottle': 0.5},
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}

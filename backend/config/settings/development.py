@@ -3,6 +3,10 @@ from decouple import config
 
 DEBUG = True
 
+# The capture and visual containers reach the app as frontend:5173, and the Vite
+# proxy passes that host on with each /api request.
+ALLOWED_HOSTS = [*ALLOWED_HOSTS, 'frontend']
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

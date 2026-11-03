@@ -5,7 +5,7 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 ## Naming
 
 - **Theme names describe the look, not the ethnic group:** a signature object plus a material or colour. For example *Gebyok Sogan*, *Gonjong Songket*, *Lamming Zamrud*, *Merah Anggur*, *Taman Sage*. The cultural origin goes in the description and the reviewer notes, never in the name.
-- **Internal ids stay short and technical** (`javanese`, `minang`, `bugis`, `sunda`, `batak`, `floral`, `sage`, `rustic`, `lavender`, `bali`, `navy`, `palembang`). Customers never see them.
+- **Internal ids stay short and technical** (`javanese`, `minang`, `bugis`, `sunda`, `batak`, `floral`, `sage`, `rustic`, `lavender`, `bali`, `navy`, `palembang`, `tropis`). Customers never see them.
 - **Two words** where possible, Indonesian, easy to say out loud and to search for.
 
 ## Categories
@@ -13,10 +13,10 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 | Category | Promise | Live | Next candidates |
 |---|---|---|---|
 | **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda), Gorga Ulos (Batak Toba), Jepun Prada (Bali), Limas Emas (Palembang) | Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
-| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour), Pampas Kraft (kraft paper, pampas, dried flowers), Wisteria Lila (lilac wisteria, pastel), Mawar Malam (white blooms on deep navy) | **Anggrek Bulan (Tropis: monstera, palms and white moth orchids), prompt ready** |
+| **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour), Pampas Kraft (kraft paper, pampas, dried flowers), Wisteria Lila (lilac wisteria, pastel), Mawar Malam (white blooms on deep navy), Anggrek Bulan (Tropis: monstera, palms and white moth orchids) | none queued |
 | *(later)* **Modern & Minimalis** | clean, editorial, photo-led | none yet | a painted-minimal pack: line-art florals or an arch, so it still has assets |
 
-**Suggested order.** Tropis next (Sunda, Rustic, Batak, Lavender, Bali, Navy Bloom and Palembang are live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
+**Suggested order.** First, section art for every live theme (`prompts/sections/`); then Betawi (Sunda, Rustic, Batak, Lavender, Bali, Navy Bloom, Palembang and Tropis are live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
 1. Sunda (live)
 2. Rustic (live)
 3. Batak (live)
@@ -24,7 +24,7 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 5. Bali (live)
 6. Navy Bloom (live)
 7. Palembang (live)
-8. Tropis (prompt ready: `PROMPT-TROPIS-ASSETS.md`)
+8. Tropis (live)
 9. Betawi
 10. Modern & Minimalis (the first painted-minimal pack)
 11. Melayu
