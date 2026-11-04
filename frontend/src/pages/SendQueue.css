@@ -31,6 +31,7 @@ a.gm-btn, a.gm-btn:hover { text-decoration: none; }
 .sq-done { padding: 2rem 1rem; text-align: center; color: var(--muted); display: grid; gap: 0.75rem; justify-items: center; }
 
 .sq-tabs { margin-bottom: 1rem; overflow-x: auto; }
+.sq-modes { margin-bottom: 0; overflow-x: auto; }
 .sq-tpl { display: grid; gap: 1rem; }
 .sq-textarea {
   width: 100%; box-sizing: border-box; min-height: 220px; border: 1px solid var(--line); border-radius: 8px;
@@ -49,6 +50,8 @@ a.gm-btn, a.gm-btn:hover { text-decoration: none; }
 
 .gm-send-all { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
 .gm-send-all p { margin: 0; font-size: 0.82rem; color: var(--muted); }
+.gm-remind { background: #fbf3e2; border: 1px solid #efdcb4; border-radius: 10px; padding: 0.7rem 0.9rem; }
+.gm-remind p { color: #7a5514; }
 .gm-tag-sent { color: var(--ok); }
 .gm-tag-opened { color: #2f6db0; }
 .gm-tag-unopened { color: #b0641e; }

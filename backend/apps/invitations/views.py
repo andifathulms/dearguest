@@ -346,6 +346,9 @@ class GuestListCreateView(generics.ListCreateAPIView):
             'opened': guests.filter(first_opened_at__isnull=False).count(),
             'sent_not_opened': guests.filter(sent_at__isnull=False, first_opened_at__isnull=True).count(),
             'responded': guests.filter(rsvps__isnull=False).distinct().count(),
+            # Sent the invitation but no answer yet: the reminder queue.
+            'awaiting_reply': guests.filter(sent_at__isnull=False, rsvps__isnull=True).count(),
+            'reminded': guests.filter(reminded_at__isnull=False).count(),
         }
         return Response({'guests': GuestSerializer(guests, many=True).data, 'stats': stats})
 

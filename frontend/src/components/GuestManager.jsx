@@ -21,6 +21,8 @@ const FILTERS = [
   { id: 'sent_unopened', label: 'Terkirim tapi belum dibuka', test: g => g.sent_at && !g.open_count },
   { id: 'opened', label: 'Sudah dibuka', test: g => g.open_count > 0 },
   { id: 'no_rsvp', label: 'Belum RSVP', test: g => !g.responded },
+  { id: 'awaiting', label: 'Terkirim tapi belum RSVP', test: g => g.sent_at && !g.responded },
+  { id: 'reminded', label: 'Sudah diingatkan, belum RSVP', test: g => g.reminded_at && !g.responded },
 ]
 
 export default function GuestManager({ slug }) {
@@ -137,6 +139,12 @@ export default function GuestManager({ slug }) {
         <p>{guests.filter(g => g.sent_at).length} dari {guests.length} tamu sudah dikirimi undangan.</p>
         <Link className="gm-btn gm-btn-wa" to={`/dashboard/${slug}/kirim`}>{ic.wa} Kirim ke tamu satu per satu</Link>
       </div>
+      {stats.awaiting_reply > 0 && (
+        <div className="gm-send-all gm-remind">
+          <p>{stats.awaiting_reply} tamu sudah dikirimi undangan tapi belum mengisi RSVP.</p>
+          <Link className="gm-btn" to={`/dashboard/${slug}/kirim?mode=pengingat`}>{ic.wa} Ingatkan mereka</Link>
+        </div>
+      )}
 
       <GuestImport slug={slug} existing={guests} onDone={load} />
 
@@ -204,6 +212,7 @@ export default function GuestManager({ slug }) {
                   {g.open_count > 0
                     ? <span className="gm-tag-opened" title={`Terakhir dibuka ${new Date(g.last_opened_at).toLocaleString('id-ID')}`}> · dibuka{g.open_count > 1 ? ` ${g.open_count}×` : ''}</span>
                     : g.sent_at && <span className="gm-tag-unopened"> · belum dibuka</span>}
+                  {g.reminded_at && !g.responded && <span className="gm-tag-sent"> · diingatkan</span>}
                 </div>
               </div>
               <label className="gm-pax" title="Berapa orang yang diundang dengan link ini">

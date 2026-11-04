@@ -12,7 +12,7 @@ export const VARIABLES = [
   { key: 'acara', label: 'nama acara' },
 ]
 const KNOWN = new Set(VARIABLES.map(v => v.key))
-export const TEMPLATE_KEYS = ['formal', 'casual', 'group']
+export const TEMPLATE_KEYS = ['formal', 'casual', 'group', 'reminder']
 
 export function defaultTemplate(key, t) {
   return t(`blast.${key}`, { salam: t('blast.salam'), greeting: t('share.greeting') })

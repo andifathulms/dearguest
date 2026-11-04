@@ -65,7 +65,7 @@ class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
         fields = ['id', 'name', 'whatsapp', 'group', 'max_pax', 'code', 'checked_in', 'checked_in_at',
-                  'sent_at', 'first_opened_at', 'last_opened_at', 'open_count', 'responded', 'attending', 'created_at']
+                  'sent_at', 'reminded_at', 'first_opened_at', 'last_opened_at', 'open_count', 'responded', 'attending', 'created_at']
         read_only_fields = ['code', 'checked_in_at', 'first_opened_at', 'last_opened_at', 'open_count', 'created_at']
 
     def validate_max_pax(self, value):
@@ -344,7 +344,7 @@ class BankAccountWriteSerializer(serializers.ModelSerializer):
         fields = ['id', 'account_type', 'bank_name', 'account_number', 'account_name', 'qris_image', 'order']
 
 
-WA_TEMPLATE_KEYS = ('formal', 'casual', 'group')
+WA_TEMPLATE_KEYS = ('formal', 'casual', 'group', 'reminder')
 WA_TEMPLATE_MAX = 2000
 
 

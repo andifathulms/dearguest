@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import api from '../api/client.js'
 import useWaMessages from '../components/useWaMessages.js'
-import { defaultTemplate, renderMessage, unknownVariables, VARIABLES } from '../utils/waTemplate.js'
+import { defaultTemplate, renderMessage, TEMPLATE_KEYS, unknownVariables, VARIABLES } from '../utils/waTemplate.js'
 import { normaliseWhatsapp, waLink } from '../utils/whatsapp.js'
 import { guestUrl } from '../utils/publicUrl.js'
 import '../brand/brand.css'
@@ -14,7 +14,28 @@ const TEMPLATE_TABS = [
   { key: 'formal', label: 'Formal' },
   { key: 'casual', label: 'Santai' },
   { key: 'group', label: 'Grup WhatsApp' },
+  { key: 'reminder', label: 'Pengingat RSVP' },
 ]
+
+// Two queues on one page. "Undangan" sends the invitation; "Pengingat" goes
+// back to guests who were sent it but haven't answered the RSVP yet. Each
+// marks its own timestamp (sent_at / reminded_at) when the couple comes back.
+const MODES = {
+  invite: {
+    field: 'sent_at',
+    template: null,   // the couple's chosen formal / santai template
+    pool: () => true,
+    statuses: [['unsent', 'Belum dikirim'], ['sent', 'Sudah dikirim'], ['all', 'Semua tamu']],
+    shrinking: 'unsent',
+  },
+  remind: {
+    field: 'reminded_at',
+    template: 'reminder',
+    pool: g => !!g.sent_at && !g.responded,
+    statuses: [['unsent', 'Belum diingatkan'], ['sent', 'Sudah diingatkan'], ['all', 'Semua yang belum menjawab']],
+    shrinking: 'unsent',
+  },
+}
 const UNDO_MS = 6000
 
 // Send personal invitations one guest at a time: open WhatsApp with the
@@ -24,6 +45,9 @@ export default function SendQueuePage() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const wa = useWaMessages(slug)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const modeKey = searchParams.get('mode') === 'pengingat' ? 'remind' : 'invite'
+  const mode = MODES[modeKey]
   const [guests, setGuests] = useState(null)
   const [group, setGroup] = useState('')
   const [status, setStatus] = useState('unsent')
@@ -44,32 +68,41 @@ export default function SendQueuePage() {
 
   const groups = useMemo(() => [...new Set((guests || []).map(g => g.group).filter(Boolean))].sort(), [guests])
   const queue = useMemo(() => (guests || []).filter(g =>
-    (!group || g.group === group) &&
-    (status === 'all' || (status === 'sent' ? !!g.sent_at : !g.sent_at))), [guests, group, status])
+    mode.pool(g) && (!group || g.group === group) &&
+    (status === 'all' || (status === 'sent' ? !!g[mode.field] : !g[mode.field]))), [guests, group, status, mode])
   const current = queue[Math.min(pos, queue.length - 1)] || null
   const sentCount = (guests || []).filter(g => g.sent_at).length
+  const awaiting = (guests || []).filter(MODES.remind.pool)
+  const remindedCount = awaiting.filter(g => g.reminded_at).length
+  const message = guest => wa.messageFor(guest, mode.template || undefined)
+
+  function switchMode(key) {
+    setSearchParams(key === 'remind' ? { mode: 'pengingat' } : {}, { replace: true })
+    setStatus('unsent')
+    setPos(0)
+  }
 
   function flash(msg) {
     setToast(msg)
     setTimeout(() => setToast(''), 2000)
   }
 
-  async function setSent(guest, sent) {
-    const sent_at = sent ? new Date().toISOString() : null
-    setGuests(list => list.map(g => (g.id === guest.id ? { ...g, sent_at } : g)))
+  async function setSent(guest, sent, field = mode.field) {
+    const value = sent ? new Date().toISOString() : null
+    setGuests(list => list.map(g => (g.id === guest.id ? { ...g, [field]: value } : g)))
     try {
-      await api.patch(`/invitations/${slug}/guests/${guest.id}/`, { sent_at })
+      await api.patch(`/invitations/${slug}/guests/${guest.id}/`, { [field]: value })
     } catch {
-      setGuests(list => list.map(g => (g.id === guest.id ? { ...g, sent_at: guest.sent_at } : g)))
+      setGuests(list => list.map(g => (g.id === guest.id ? { ...g, [field]: guest[field] } : g)))
       flash('Gagal menyimpan status')
     }
   }
 
-  // Marked sent: the "Belum dikirim" list shrinks, so the same position is
-  // already the next guest; in the other views move on by one.
+  // Marked: the "Belum dikirim / diingatkan" list shrinks, so the same
+  // position is already the next guest; in the other views move on by one.
   function markSent(guest) {
     setSent(guest, true)
-    if (status !== 'unsent') setPos(p => p + 1)
+    if (status !== mode.shrinking) setPos(p => p + 1)
     clearTimeout(undoTimer.current)
     setUndo(guest)
     undoTimer.current = setTimeout(() => setUndo(null), UNDO_MS)
@@ -89,7 +122,7 @@ export default function SendQueuePage() {
       if (document.visibilityState !== 'visible' || !pending.current) return
       const guest = (guests || []).find(g => g.id === pending.current)
       pending.current = null
-      if (guest && !guest.sent_at) markSent(guest)
+      if (guest && !guest[mode.field]) markSent(guest)
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
@@ -97,7 +130,7 @@ export default function SendQueuePage() {
 
   function send(guest) {
     pending.current = guest.id
-    window.open(waLink(guest.whatsapp, wa.messageFor(guest)), '_blank', 'noopener')
+    window.open(waLink(guest.whatsapp, message(guest)), '_blank', 'noopener')
   }
 
   function copy(text, msg = 'Pesan disalin') {
@@ -124,16 +157,30 @@ export default function SendQueuePage() {
           <div className="dr-empty">Fitur kirim massal belum tersedia untuk paket undangan ini.</div>
         ) : (
           <>
+            <div className="dash-tabs sq-modes" role="tablist" aria-label="Jenis pesan">
+              <button role="tab" aria-selected={modeKey === 'invite'} className={`dash-tab ${modeKey === 'invite' ? 'active' : ''}`}
+                onClick={() => switchMode('invite')}>Kirim undangan</button>
+              <button role="tab" aria-selected={modeKey === 'remind'} className={`dash-tab ${modeKey === 'remind' ? 'active' : ''}`}
+                onClick={() => switchMode('remind')}>
+                Ingatkan RSVP{awaiting.length - remindedCount > 0 && <span className="dash-tab-count">{awaiting.length - remindedCount}</span>}
+              </button>
+            </div>
+
             <section className="sq-panel" aria-labelledby="sq-queue-title">
               <div className="sq-head">
-                <h2 id="sq-queue-title">Kirim satu per satu</h2>
-                <span className="sq-progress">{sentCount} dari {guests.length} tamu sudah dikirimi</span>
+                <h2 id="sq-queue-title">{modeKey === 'remind' ? 'Ingatkan yang belum menjawab' : 'Kirim satu per satu'}</h2>
+                <span className="sq-progress">
+                  {modeKey === 'remind'
+                    ? `${awaiting.length} tamu sudah dikirimi tapi belum RSVP · ${remindedCount} sudah diingatkan`
+                    : `${sentCount} dari ${guests.length} tamu sudah dikirimi`}
+                </span>
               </div>
+              {modeKey === 'remind' && (
+                <p className="sq-hint">Pesan pengingat memakai template "Pengingat RSVP" di bawah. Tamu yang menjawab otomatis keluar dari daftar ini.</p>
+              )}
               <div className="sq-filters">
                 <select value={status} onChange={e => { setStatus(e.target.value); setPos(0) }} aria-label="Status kirim">
-                  <option value="unsent">Belum dikirim</option>
-                  <option value="sent">Sudah dikirim</option>
-                  <option value="all">Semua tamu</option>
+                  {mode.statuses.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
                 <select value={group} onChange={e => { setGroup(e.target.value); setPos(0) }} aria-label="Grup tamu">
                   <option value="">Semua grup</option>
@@ -147,7 +194,11 @@ export default function SendQueuePage() {
                 </div>
               ) : !current || pos >= queue.length ? (
                 <div className="sq-done">
-                  {queue.length === 0 && status === 'unsent' ? 'Semua tamu di daftar ini sudah dikirimi undangan. 🤍' : 'Sudah sampai di akhir daftar.'}
+                  {queue.length === 0 && status === 'unsent'
+                    ? (modeKey === 'remind'
+                      ? (awaiting.length === 0 ? 'Semua tamu yang sudah dikirimi undangan sudah menjawab RSVP. 🤍' : 'Semua tamu yang belum menjawab sudah diingatkan.')
+                      : 'Semua tamu di daftar ini sudah dikirimi undangan. 🤍')
+                    : 'Sudah sampai di akhir daftar.'}
                   {queue.length > 0 && <button className="gm-btn" onClick={() => setPos(0)}>Mulai lagi dari awal</button>}
                 </div>
               ) : (
@@ -155,19 +206,20 @@ export default function SendQueuePage() {
                   guest={current}
                   index={Math.min(pos, queue.length - 1)}
                   total={queue.length}
-                  message={wa.messageFor(current)}
+                  remind={modeKey === 'remind'}
+                  message={message(current)}
                   link={guestUrl(slug, current.code)}
                   onSend={() => send(current)}
-                  onCopy={() => copy(wa.messageFor(current))}
+                  onCopy={() => copy(message(current))}
                   onSkip={() => setPos(p => p + 1)}
-                  onMark={() => (current.sent_at ? setPos(p => p + 1) : markSent(current))}
+                  onMark={() => (current[mode.field] ? setPos(p => p + 1) : markSent(current))}
                 />
               )}
             </section>
 
-            <TemplateEditor wa={wa} sample={current || guests[0]} />
+            <TemplateEditor key={modeKey} wa={wa} sample={current || guests[0]} initialTab={mode.template || wa.active} />
 
-            <section className="sq-panel" aria-labelledby="sq-group-title">
+            {modeKey === 'invite' && <section className="sq-panel" aria-labelledby="sq-group-title">
               <h2 id="sq-group-title">Pesan untuk grup WhatsApp</h2>
               <p className="sq-hint">Untuk grup keluarga, kantor atau alumni: satu link umum tanpa nama tamu. Tamu dari grup tidak tercatat per orang.</p>
               <pre className="sq-message">{wa.groupMessage()}</pre>
@@ -175,14 +227,14 @@ export default function SendQueuePage() {
                 <button className="gm-btn" onClick={() => copy(wa.groupMessage())}>Salin pesan</button>
                 <a className="gm-btn gm-btn-wa" href={waLink('', wa.groupMessage())} target="_blank" rel="noopener noreferrer">Bagikan via WhatsApp</a>
               </div>
-            </section>
+            </section>}
           </>
         )}
       </div>
 
       {undo && (
         <div className="gm-toast sq-undo" role="status">
-          {undo.name} ditandai terkirim
+          {undo.name} ditandai {modeKey === 'remind' ? 'sudah diingatkan' : 'terkirim'}
           <button onClick={undoSent}>Batalkan</button>
         </div>
       )}
@@ -191,8 +243,9 @@ export default function SendQueuePage() {
   )
 }
 
-function GuestCard({ guest, index, total, message, link, onSend, onCopy, onSkip, onMark }) {
+function GuestCard({ guest, index, total, remind, message, link, onSend, onCopy, onSkip, onMark }) {
   const number = normaliseWhatsapp(guest.whatsapp)
+  const done = remind ? guest.reminded_at : guest.sent_at
   return (
     <div className="sq-card" data-testid="sq-card">
       <div className="sq-card-top">
@@ -201,7 +254,10 @@ function GuestCard({ guest, index, total, message, link, onSend, onCopy, onSkip,
           <div className="sq-meta">
             {number ? `+${number}` : 'Belum ada nomor WhatsApp'}
             {guest.group ? ` · ${guest.group}` : ''}
-            {guest.sent_at ? ' · sudah dikirim' : ''}
+            {remind
+              ? (guest.open_count > 0 ? ` · undangan dibuka${guest.open_count > 1 ? ` ${guest.open_count}×` : ''}` : ' · undangan belum dibuka')
+              : (guest.sent_at ? ' · sudah dikirim' : '')}
+            {remind && guest.reminded_at ? ` · diingatkan ${new Date(guest.reminded_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}` : ''}
           </div>
         </div>
         <span className="sq-count">{index + 1} / {total}</span>
@@ -213,14 +269,14 @@ function GuestCard({ guest, index, total, message, link, onSend, onCopy, onSkip,
         <button className="gm-btn gm-btn-wa sq-send" onClick={onSend}>Kirim via WhatsApp</button>
         <button className="gm-btn" onClick={onCopy}>Salin pesan</button>
         <button className="gm-btn" onClick={onSkip}>Lewati</button>
-        <button className="gm-btn" onClick={onMark}>{guest.sent_at ? 'Berikutnya' : 'Tandai terkirim'}</button>
+        <button className="gm-btn" onClick={onMark}>{done ? 'Berikutnya' : (remind ? 'Tandai diingatkan' : 'Tandai terkirim')}</button>
       </div>
     </div>
   )
 }
 
-function TemplateEditor({ wa, sample }) {
-  const [tab, setTab] = useState(wa.active)
+function TemplateEditor({ wa, sample, initialTab }) {
+  const [tab, setTab] = useState(initialTab)
   const [drafts, setDrafts] = useState({})
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState('')
@@ -253,7 +309,7 @@ function TemplateEditor({ wa, sample }) {
     try {
       const next = { ...wa.saved, ...patch }
       // Text equal to the default is stored as "use the default".
-      for (const key of ['formal', 'casual', 'group']) if (next[key] === defaultTemplate(key, wa.t)) next[key] = ''
+      for (const key of TEMPLATE_KEYS) if (next[key] === defaultTemplate(key, wa.t)) next[key] = ''
       await wa.saveTemplates(next)
       setDrafts({})
       setSaved('Tersimpan')
@@ -271,7 +327,7 @@ function TemplateEditor({ wa, sample }) {
         {TEMPLATE_TABS.map(t => (
           <button key={t.key} role="tab" aria-selected={tab === t.key}
             className={`dash-tab ${tab === t.key ? 'active' : ''}`} onClick={() => setTab(t.key)}>
-            {t.label}{t.key === wa.active && <span className="dash-tab-count">dipakai</span>}
+            {t.label}{(t.key === wa.active || t.key === 'reminder') && <span className="dash-tab-count">dipakai</span>}
           </button>
         ))}
       </div>
@@ -291,7 +347,7 @@ function TemplateEditor({ wa, sample }) {
           )}
           <div className="sq-actions">
             <button className="gm-btn gm-btn-primary" disabled={saving} onClick={() => save({ [tab]: text })}>Simpan template</button>
-            {tab !== 'group' && tab !== wa.active && (
+            {(tab === 'formal' || tab === 'casual') && tab !== wa.active && (
               <button className="gm-btn" disabled={saving} onClick={() => save({ [tab]: text, active: tab })}>Pakai untuk kirim</button>
             )}
             {!isDefault && <button className="gm-btn" disabled={saving} onClick={() => edit(defaultTemplate(tab, wa.t))}>Kembalikan ke bawaan</button>}
