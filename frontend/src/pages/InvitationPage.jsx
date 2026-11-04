@@ -53,8 +53,10 @@ export default function InvitationPage() {
 
   // ?variant= (theme page's toggle) is honoured by the server for demo invitations only.
   const variant = searchParams.get('variant') || ''
+  // A personal link's code picks the events for the guest's group (sessions).
   useEffect(() => {
-    api.get(preview ? `/my/invitations/${slug}/` : `/invitations/${slug}/`, { params: !preview && variant ? { variant } : undefined })
+    const params = preview ? undefined : { ...(variant && { variant }), ...(code && { g: code }) }
+    api.get(preview ? `/my/invitations/${slug}/` : `/invitations/${slug}/`, { params })
       .then(res => {
         setInvitation(res.data)
         setStatus('ok')
@@ -71,7 +73,7 @@ export default function InvitationPage() {
         }
         setStatus('error')
       })
-  }, [slug, preview, variant])
+  }, [slug, preview, variant, code])
 
   if (status === 'loading') {
     return (

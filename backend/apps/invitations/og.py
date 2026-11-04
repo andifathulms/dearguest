@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 from django.conf import settings
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+from . import audience
 from .copy import event_label, t
 
 ASSETS = Path(__file__).resolve().parent / 'og_assets'
@@ -44,8 +45,9 @@ GAP = 18
 
 # ---- what the preview says -------------------------------------------------
 
-def primary_event(invitation):
-    events = list(invitation.events.all())
+def primary_event(invitation, guest=None):
+    """The countdown's event, among those this guest sees (audience.py)."""
+    events = audience.visible_events(invitation.events.all(), guest)
     return next((e for e in events if e.is_primary), None) or (min(events, key=lambda e: e.start) if events else None)
 
 
@@ -67,7 +69,7 @@ def preview_data(invitation, guest=None):
     """Everything drawn into the image, and therefore everything the hash covers."""
     variant = invitation.copy_variant
     couple = getattr(invitation, 'couple', None)
-    event = primary_event(invitation)
+    event = primary_event(invitation, guest)
     return {
         'v': LAYOUT_VERSION,
         'pack': invitation.theme,

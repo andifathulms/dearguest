@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import api from '../api/client.js'
 import { eventLabel, makeT } from '../copy/copy.js'
-import { primaryEvent } from '../utils/events.js'
+import { eventsFor, primaryEvent } from '../utils/events.js'
 import { guestUrl, invitationUrl } from '../utils/publicUrl.js'
 import { invitationVars, renderMessage, templateFor } from '../utils/waTemplate.js'
 
@@ -17,16 +17,19 @@ export default function useWaMessages(slug) {
   const t = useMemo(() => makeT(invitation?.copy_variant), [invitation?.copy_variant])
   const saved = invitation?.wa_templates || {}
   const active = saved.active || 'formal'
-  const shared = useMemo(() => (invitation ? invitationVars({
-    couple: invitation.couple, event: primaryEvent(invitation.events), t, eventLabel,
+  // {acara} / {tanggal} name the first event the guest's group sees (sessions);
+  // `shared` is for the general link and the WhatsApp group message.
+  const varsFor = useCallback(group => (invitation ? invitationVars({
+    couple: invitation.couple, event: primaryEvent(eventsFor(invitation.events, group)), t, eventLabel,
   }) : {}), [invitation, t])
+  const shared = useMemo(() => varsFor(null), [varsFor])
 
   const templateText = useCallback(key => templateFor(key, saved, t), [saved, t])
 
   // `key` defaults to the template the couple chose (formal or santai).
   const messageFor = useCallback((guest, key = active) => renderMessage(templateText(key), {
-    ...shared, nama: guest.name, link: guestUrl(slug, guest.code),
-  }), [templateText, shared, slug, active])
+    ...varsFor(guest.group || ''), nama: guest.name, link: guestUrl(slug, guest.code),
+  }), [templateText, varsFor, slug, active])
 
   const groupMessage = useCallback(() => renderMessage(templateText('group'), {
     ...shared, nama: '', link: invitationUrl(slug),
@@ -37,5 +40,5 @@ export default function useWaMessages(slug) {
     setInvitation(res.data)
   }, [slug])
 
-  return { invitation, t, ready: !!invitation, saved, active, shared, templateText, messageFor, groupMessage, saveTemplates }
+  return { invitation, t, ready: !!invitation, saved, active, shared, varsFor, templateText, messageFor, groupMessage, saveTemplates }
 }

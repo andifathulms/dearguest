@@ -270,17 +270,63 @@ const lastTz = () => { try { return localStorage.getItem(LAST_TZ_KEY) || 'Asia/J
 
 // Server times are instants; the editor shows and edits them as wall-clock
 // time in each event's own zone (WIB / WITA / WIT).
-const toDraft = e => ({ ...e, startLocal: toLocalInputValue(e.start, e.timezone), endLocal: toLocalInputValue(e.end, e.timezone) })
+const toDraft = e => ({
+  ...e, startLocal: toLocalInputValue(e.start, e.timezone), endLocal: toLocalInputValue(e.end, e.timezone),
+  groups: e.groups || [], restricted: (e.groups || []).length > 0,
+})
+
+// "Siapa yang melihat acara ini": everyone, or only some guest groups (e.g.
+// akad for Keluarga, or reception sessions by group). Groups come from the
+// guest list; a name can also be typed before the guests are added.
+function EventAudience({ it, i, update, knownGroups }) {
+  const [draft, setDraft] = useState('')
+  const options = [...new Set([...knownGroups, ...it.groups])]
+  const toggle = name => update(i, 'groups', it.groups.includes(name) ? it.groups.filter(g => g !== name) : [...it.groups, name])
+  function addTyped() {
+    const name = draft.trim().split(/\s+/).join(' ')
+    if (name && !it.groups.some(g => g.toLowerCase() === name.toLowerCase())) update(i, 'groups', [...it.groups, name])
+    setDraft('')
+  }
+  return (
+    <div className="ed-field">
+      <label>Siapa yang melihat acara ini</label>
+      <div className="ed-aud">
+        <label className="ed-check"><input type="radio" name={`evt-${i}-aud`} checked={!it.restricted} onChange={() => update(i, 'restricted', false)} /> Semua tamu</label>
+        <label className="ed-check"><input type="radio" name={`evt-${i}-aud`} checked={it.restricted} onChange={() => update(i, 'restricted', true)} /> Hanya grup tertentu</label>
+      </div>
+      {it.restricted && (
+        <div className="ed-aud-groups">
+          {options.length === 0 && <p className="ed-hint">Belum ada grup di daftar tamu. Ketik nama grup, mis. "Keluarga" atau "Sesi 1".</p>}
+          {options.map(name => (
+            <label key={name} className="ed-check ed-aud-chip">
+              <input type="checkbox" checked={it.groups.includes(name)} onChange={() => toggle(name)} /> {name}
+            </label>
+          ))}
+          <input className="ed-input ed-aud-new" value={draft} onChange={e => setDraft(e.target.value)} placeholder="+ grup lain, tekan Enter"
+            aria-label="Tambah grup" onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTyped() } }} onBlur={addTyped} />
+          <p className="ed-hint">Hanya tamu di grup terpilih yang melihat acara ini lewat link pribadinya. Link umum dan pesan grup WhatsApp hanya menampilkan acara untuk semua tamu.</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function EventsSection({ inv, reload, notify }) {
   const t = makeT(inv.copy_variant)
   const [items, setItems] = useState(inv.events.map(toDraft))
   useEffect(() => { setItems(inv.events.map(toDraft)) }, [inv])
+  const [guestGroups, setGuestGroups] = useState([])
+  useEffect(() => {
+    api.get(`/invitations/${inv.slug}/guests/`)
+      .then(res => setGuestGroups([...new Set((res.data.guests || []).map(g => g.group.trim()).filter(Boolean))].sort()))
+      .catch(() => {})
+  }, [inv.slug])
 
   const update = (i, k, v) => setItems(arr => arr.map((it, j) => j === i ? { ...it, [k]: v } : it))
   const addDraft = (type = 'resepsi') => setItems(arr => [...arr, {
     event_type: type, title: '', startLocal: '', endLocal: '', timezone: arr.at(-1)?.timezone || lastTz(),
     venue_name: '', address: '', maps_link: '', dress_code: '', is_primary: arr.length === 0,
+    groups: [], restricted: false,
   }])
   // The variant's usual events that aren't in the list yet, as one-click adds.
   const suggestions = (variantMeta(inv.copy_variant)._defaultEvents || []).filter(type => !items.some(it => it.event_type === type))
@@ -301,11 +347,12 @@ function EventsSection({ inv, reload, notify }) {
 
   async function saveOne(it, i) {
     if (!it.startLocal) { notify('Isi tanggal & waktu mulai'); return }
+    if (it.restricted && it.groups.length === 0) { notify('Pilih minimal satu grup, atau pilih "Semua tamu"'); return }
     const payload = {
       event_type: it.event_type, title: it.title, timezone: it.timezone,
       start: fromLocalInput(it.startLocal, it.timezone), end: it.endLocal ? fromLocalInput(it.endLocal, it.timezone) : null,
       venue_name: it.venue_name, address: it.address, maps_link: it.maps_link, dress_code: it.dress_code,
-      is_primary: it.is_primary, order: it.id ? it.order : i,
+      is_primary: it.is_primary, order: it.id ? it.order : i, groups: it.restricted ? it.groups : [],
     }
     try {
       if (it.id) await api.put(`/my/invitations/${inv.slug}/events/${it.id}/`, payload)
@@ -332,7 +379,7 @@ function EventsSection({ inv, reload, notify }) {
       {items.map((it, i) => (
         <div className="ed-item" key={it.id || `new-${i}`}>
           <div className="ed-item-head">
-            <strong>{it.title || t(`events.type.${it.event_type}`)}</strong>
+            <strong>{it.title || t(`events.type.${it.event_type}`)}{it.restricted && it.groups.length > 0 && <small className="ed-aud-tag"> · {it.groups.join(', ')}</small>}</strong>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <div className="ed-reorder">
                 <button onClick={() => move(i, -1)} disabled={i === 0} aria-label="Naik">↑</button>
@@ -371,6 +418,7 @@ function EventsSection({ inv, reload, notify }) {
             <div className="ed-field"><label htmlFor={`evt-${i}-maps`}>Link Google Maps atau koordinat</label><input id={`evt-${i}-maps`} className="ed-input" value={it.maps_link} onChange={e => update(i, 'maps_link', e.target.value)} placeholder="https://maps.app.goo.gl/… atau -7.80, 110.36" /></div>
             <div className="ed-field"><label htmlFor={`evt-${i}-dress`}>Dress code (opsional)</label><input id={`evt-${i}-dress`} className="ed-input" value={it.dress_code} onChange={e => update(i, 'dress_code', e.target.value)} /></div>
           </div>
+          <EventAudience it={it} i={i} update={update} knownGroups={guestGroups} />
           <button className="ed-btn ed-btn-sm" onClick={() => saveOne(it, i)}>Simpan Acara</button>
         </div>
       ))}

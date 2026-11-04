@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import SectionTitle from './SectionTitle.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
+import { useGuest } from '../../copy/GuestContext.jsx'
 import { eventLabel } from '../../copy/copy.js'
 import { API_BASE } from '../../api/client.js'
 import { formatEventDate, formatEventRange, googleCalendarDates, localTimeNote } from '../../utils/dates.js'
@@ -23,12 +24,15 @@ function googleCalendarUrl(event, title) {
 // One "Simpan ke Kalender" control: Google Calendar, or an .ics file that
 // iPhone / Outlook open natively.
 function CalendarMenu({ event, title, slug, t }) {
+  // A group's event only downloads with the guest's code.
+  const code = useGuest()?.code
+  const ics = `${API_BASE}/invitations/${slug}/events/${event.id}/calendar.ics${code ? `?g=${encodeURIComponent(code)}` : ''}`
   return (
     <details className="event-calendar">
       <summary className="event-maps-link event-calendar-link">+ {t('events.calendar')}</summary>
       <div className="event-calendar-menu">
         <a href={googleCalendarUrl(event, title)} target="_blank" rel="noopener noreferrer">{t('events.calendarGoogle')}</a>
-        <a href={`${API_BASE}/invitations/${slug}/events/${event.id}/calendar.ics`} download>{t('events.calendarIcs')}</a>
+        <a href={ics} download>{t('events.calendarIcs')}</a>
       </div>
     </details>
   )

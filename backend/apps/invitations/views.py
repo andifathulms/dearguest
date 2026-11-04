@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
-from . import copy, csv_export, guest_import, ics, maps, moderation, themes
+from . import audience, copy, csv_export, guest_import, ics, maps, moderation, themes
 from .crawlers import is_crawler
 from .entitlements import has_feature
 from .throttling import client_ip
@@ -88,7 +88,9 @@ class InvitationDetailView(generics.RetrieveAPIView):
         variant = request.query_params.get('variant')
         if variant and variant in copy.variants() and themes.is_demo_slug(slug):
             data = demo_in_variant(data, variant)
-        return Response(data)
+        # A personal link (?g=<code>) sees its group's events; others see the shared ones.
+        guest = find_guest(invitation, request.query_params.get('g'))
+        return Response(audience.for_guest(data, guest))
 
 
 CEREMONIES = {'akad', 'pemberkatan', 'sakramen'}
@@ -296,6 +298,10 @@ class EventCalendarView(APIView):
         if error:
             return error
         event = invitation.events.filter(pk=pk).first()
+        user = request.user
+        own = user.is_authenticated and (user.is_staff or invitation.couple_user_id == user.id)
+        if event and not own and not audience.sees(event.groups, find_guest(invitation, request.query_params.get('g'))):
+            event = None   # an event for other groups looks like a missing one
         if not event:
             return Response({'detail': 'Acara tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
         body = ics.event_ics(event, invitation, host=request.get_host().split(':')[0], maps_url=maps.open_url(event))

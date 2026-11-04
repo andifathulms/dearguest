@@ -1,6 +1,7 @@
 from django.urls import path
 from .funnel import FunnelVisitView
 from .gifts import GiftConfirmCreateView, MyGiftDetail, MyGiftList
+from .headcount import HeadcountView
 from .marketing import MarketingView
 from .views import (
     InvitationDetailView,
@@ -44,6 +45,7 @@ urlpatterns = [
     path('invitations/<slug:slug>/rsvp/', RSVPCreateView.as_view()),
     path('invitations/<slug:slug>/rsvps/', RSVPListView.as_view()),
     path('invitations/<slug:slug>/rsvps.csv', RSVPCsvView.as_view()),
+    path('invitations/<slug:slug>/headcount/', HeadcountView.as_view()),
     path('invitations/<slug:slug>/guest/<str:code>/', PublicGuestView.as_view()),
     path('invitations/<slug:slug>/guest/<str:code>/open/', GuestOpenView.as_view()),
     path('invitations/<slug:slug>/wishes/', WishesListView.as_view()),

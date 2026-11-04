@@ -236,6 +236,8 @@ class Event(models.Model):
     lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     dress_code = models.CharField(max_length=200, blank=True)
+    # Guest groups that see this event; empty = everyone (audience.py).
+    groups = models.JSONField(default=list, blank=True)
     is_primary = models.BooleanField(default=False)  # the countdown's target; exactly one per invitation (API-enforced)
     order = models.PositiveIntegerField(default=0)
 

@@ -285,7 +285,7 @@ function TemplateEditor({ wa, sample, initialTab }) {
   const unknown = unknownVariables(text)
   const isDefault = text === defaultTemplate(tab, wa.t)
   const preview = renderMessage(text, {
-    ...wa.shared,
+    ...(tab === 'group' ? wa.shared : wa.varsFor(sample?.group || '')),
     nama: tab === 'group' ? '' : (sample?.name || 'Bapak/Ibu Tamu'),
     link: tab === 'group' ? 'https://…/undangan' : 'https://…/undangan/KODE',
   })

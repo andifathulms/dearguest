@@ -165,8 +165,9 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
+        # `groups` is used by the view to filter per guest, then removed (audience.for_guest).
         fields = ['id', 'event_type', 'title', 'start', 'end', 'timezone', 'venue_name', 'address',
-                  'maps_url', 'embed_url', 'dress_code', 'is_primary', 'order']
+                  'maps_url', 'embed_url', 'dress_code', 'is_primary', 'order', 'groups']
 
     def get_maps_url(self, obj):
         return maps.open_url(obj)
@@ -302,7 +303,20 @@ class EventWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ['id', 'event_type', 'title', 'start', 'end', 'timezone', 'venue_name', 'address',
-                  'maps_link', 'dress_code', 'is_primary', 'order']
+                  'maps_link', 'dress_code', 'is_primary', 'order', 'groups']
+
+    def validate_groups(self, value):
+        if not isinstance(value, list) or not all(isinstance(g, str) for g in value):
+            raise serializers.ValidationError('Daftar grup tidak valid.')
+        cleaned, seen = [], set()
+        for name in value:
+            name = ' '.join(name.split())[:100]
+            if name and name.casefold() not in seen:
+                seen.add(name.casefold())
+                cleaned.append(name)
+        if len(cleaned) > 30:
+            raise serializers.ValidationError('Maksimal 30 grup per acara.')
+        return cleaned
 
     def validate(self, attrs):
         # A time sent without an offset is wall-clock time in the event's own

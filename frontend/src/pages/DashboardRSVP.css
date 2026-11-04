@@ -90,3 +90,16 @@
 .gl-line { margin: 0.4rem 0 0; font-size: 0.88rem; }
 .dr-body > .dash-tabs { overflow-x: auto; }
 .dr-body > .dash-tabs .dash-tab { white-space: nowrap; flex: none; }
+
+/* Rekap untuk katering (Headcount) */
+.hc { background: var(--dg-white); border: 1px solid var(--dg-line); border-radius: var(--dg-r-m); padding: 18px 22px; margin-bottom: 28px; display: grid; gap: 12px; }
+.hc-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.hc-head h2 { margin: 0; font: 500 1.15rem/1.3 var(--dg-f-display); }
+.hc-head p { margin: 4px 0 0; font-size: 13px; color: var(--dg-muted); max-width: 60ch; }
+.hc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.hc-total { margin: 0; font-size: 14px; color: var(--dg-muted); }
+.hc-total strong { font: 400 2rem/1 var(--dg-f-display); color: var(--dg-ink); margin-right: 6px; }
+.hc-total span { display: inline; }
+.hc-table caption { text-align: left; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dg-muted); padding: 4px 0 8px; }
+.hc-sub { display: block; font-size: 11.5px; color: var(--dg-muted); font-weight: 400; }
+.hc-est { font-weight: 600; }

@@ -197,3 +197,11 @@
 .ed-pub-plans { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin: 8px 0 4px; font-size: 0.88rem; color: var(--dg-ink-soft); }
 .ed-pub-plans b { color: var(--dg-ink); font-weight: 600; }
 .ed-pub-plans small { color: var(--dg-muted); font-size: 0.78rem; }
+
+/* Event audience (EditorPage EventAudience) */
+.ed-aud { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; }
+.ed-aud-groups { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; align-items: center; }
+.ed-aud-chip { border: 1px solid #e3ddd2; border-radius: 999px; padding: 0.3rem 0.75rem; background: #fff; }
+.ed-aud-new { flex: 1 1 12rem; min-width: 0; }
+.ed-aud-groups .ed-hint { flex-basis: 100%; margin: 0.2rem 0 0; }
+.ed-aud-tag { font-weight: 400; color: #8a7a5a; }

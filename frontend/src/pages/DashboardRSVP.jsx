@@ -7,6 +7,7 @@ import { logout } from '../api/session.js'
 import GuestManager from '../components/GuestManager.jsx'
 import WishModeration from '../components/WishModeration.jsx'
 import GiftLog from '../components/GiftLog.jsx'
+import Headcount from '../components/Headcount.jsx'
 import '../brand/brand.css'
 import './Dashboard.css'
 import './DashboardRSVP.css'
@@ -98,7 +99,7 @@ export default function DashboardRSVP() {
         ) : tab === 'wishes' ? (
           <WishModeration slug={slug} onChange={loadRsvps} />
         ) : (
-          <RsvpTab rsvps={rsvps} stats={stats} onCsv={() => downloadCSV(slug).catch(() => setError('Gagal mengunduh CSV.'))} />
+          <RsvpTab slug={slug} rsvps={rsvps} stats={stats} onCsv={() => downloadCSV(slug).catch(() => setError('Gagal mengunduh CSV.'))} />
         )}
       </div>
     </div>
@@ -106,7 +107,7 @@ export default function DashboardRSVP() {
 }
 
 // RSVP tab: the numbers first, then the answers, searchable and filterable.
-function RsvpTab({ rsvps, stats, onCsv }) {
+function RsvpTab({ slug, rsvps, stats, onCsv }) {
   const [q, setQ] = useState('')
   const [filter, setFilter] = useState('all')
   const needle = q.trim().toLowerCase()
@@ -123,6 +124,8 @@ function RsvpTab({ rsvps, stats, onCsv }) {
         <StatCard label="tidak hadir" value={stats.total_tidak_hadir || 0} tone="no" />
         <StatCard label="total jawaban" value={rsvps.length} />
       </div>
+
+      <Headcount slug={slug} />
 
       {rsvps.length === 0 ? (
         <div className="dr-empty">Belum ada konfirmasi. Jawaban tamu muncul di sini begitu mereka mengisi RSVP.</div>

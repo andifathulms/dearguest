@@ -55,6 +55,7 @@ OWNERSHIP = {
     # One couple's data.
     'api/invitations/<slug:slug>/rsvps/': ('owner', [('get', '/api/invitations/{slug}/rsvps/')]),
     'api/invitations/<slug:slug>/rsvps.csv': ('owner', [('get', '/api/invitations/{slug}/rsvps.csv')]),
+    'api/invitations/<slug:slug>/headcount/': ('owner', [('get', '/api/invitations/{slug}/headcount/')]),
     'api/invitations/<slug:slug>/guests/': ('owner', [
         ('get', '/api/invitations/{slug}/guests/'),
         ('post', '/api/invitations/{slug}/guests/'),
