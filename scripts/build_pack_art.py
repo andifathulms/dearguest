@@ -44,7 +44,17 @@ PACKS = {
             # (the wreath keeps its open centre for the photo; everything else is solid inside its outline)
             ('photo-ring', 'photo-ring.jpg', (55, 12, 21), 880, (22, 58), 4, False),
             ('corner-tl', 'corner-tl.jpg', (57, 14, 23), 720, (22, 58), 4, True),
+            # Section art (prompts/sections), painted on cobalt, not cut from the wine
+            # ground like the pieces above: blue despill for these only (despill_for).
+            # The card corner came back as another crescent, not an L: unused.
+            ('section-edge', 'section-edge.jpg', (36, 73, 190), 720, (26, 64), 2, False, (0, 0.01, 0.6, 0.995)),
+            ('section-garland', 'section-garland.jpg', (35, 72, 188), 1200, (26, 64), 2, False, (0, 0.22, 1, 0.76)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (35, 72, 186), 640, (26, 64), 2, False),
+            # depth layers (section prompts S5, S6): the far shrubs touch the bottom edge
+            ('parallax-back', 'parallax-back.jpg', (37, 71, 186), 1080, (26, 64), 2, False, (0, 0.57, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (37, 73, 185), 1080, (26, 64), 2, False, (0, 0, 1, 0.7)),
         ],
+        'despill_for': ('section-edge', 'section-garland', 'monogram-wreath', 'parallax-back', 'parallax-front'),
         # petals-sheet: a grid of separate sprites, each cut and keyed on its own.
         # Closing strength per sprite (reading order): solid petals need a strong
         # one; the star-shaped jasmine and the orchid need a light one, or the
@@ -69,6 +79,13 @@ PACKS = {
         'keyed': [
             ('photo-ring', 'photo-ring.jpg', (36, 135, 136), 880, (24, 60), 3, False),
             ('corner-tl', 'corner-tl.jpg', (30, 128, 128), 720, (24, 60), 3, False),
+            # Section art and depth layers (prompts/sections), on the same teal.
+            ('section-edge', 'section-edge.jpg', (31, 135, 139), 720, (24, 60), 3, False, (0, 0.01, 0.66, 0.99)),
+            ('section-garland', 'section-garland.jpg', (34, 134, 137), 1200, (24, 60), 3, False, (0, 0.32, 1, 0.74)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (36, 136, 138), 640, (24, 60), 3, False),
+            ('card-corner', 'card-corner.jpg', (38, 133, 137), 360, (24, 60), 3, False, (0, 0, 0.68, 0.66)),
+            ('parallax-back', 'parallax-back.jpg', (38, 133, 138), 1080, (24, 60), 3, False, (0, 0.62, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (39, 132, 137), 1080, (24, 60), 3, False, (0, 0, 1, 0.55)),
         ],
         'sprites': ('petals-sheet.jpg', (39, 135, 137), 'petal', 96, (24, 60), (2, 3, 4, 4, 3, 2), False),
         'texture': ('texture.jpg', 512, 70),
@@ -112,7 +129,19 @@ PACKS = {
             ('photo-ring', 'photo-ring.jpg', (30, 67, 184), 880, (26, 64), 2, False),
             # the corner's blue darkens below ~80 % (not flat): cut the art above it
             ('corner-tl', 'corner-tl.jpg', (33, 68, 184), 720, (26, 64), 2, False, (0, 0, 1, 0.8)),
+            # Section art (prompts/sections). The garland came twice (a faded copy above
+            # the real one, cropped off); the card corner came with a leftover half wreath,
+            # cleared back to key: the bracket's leg ends ~74 %.
+            ('section-edge', 'section-edge.jpg', (34, 70, 192), 720, (26, 64), 2, False, (0, 0.02, 0.62, 0.99)),
+            ('section-garland', 'section-garland.jpg', (31, 72, 190), 1200, (26, 64), 2, False, (0, 0.3, 1, 0.73)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (33, 72, 189), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (35, 72, 187), 360, (26, 64), 2, False, (0, 0, 0.64, 0.76)),
+            # depth layers (section prompts S5, S6): the far stilt houses touch the bottom
+            # edge; the near sabbe drapes hang from the top only
+            ('parallax-back', 'parallax-back.jpg', (35, 70, 189), 1080, (26, 64), 2, False, (0, 0.54, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (35, 70, 188), 1080, (26, 64), 2, False, (0, 0, 1, 0.62)),
         ],
+        'clear': {'card-corner': [(0.085, 0.47, 1, 1), (0, 0.74, 0.085, 1)]},
         'sprites': ('petals-sheet.jpg', (37, 72, 188), 'petal', 96, (26, 64), (2, 3, 3, 3, 2, 2), False),
         # Gemini wouldn't paint this one; generated to match the paintings' silk.
         'texture_synth': {'size': 512, 'rgb': (18, 80, 57), 'grain': 2.2, 'weave': 1.6, 'mottle': 3.0},
@@ -217,7 +246,14 @@ PACKS = {
             ('corner-tl', 'corner-tl.jpg', (33, 68, 186), 720, (26, 64), 2, False),
             # Prompt 8's near layer: fig leaves and ulos fringe at the side edges.
             ('parallax-front', 'parallax-front.jpg', (38, 69, 192), 1080, (26, 64), 2, False),
+            # Section art (prompts/sections). The card corner came with a leftover half
+            # wreath below it, separate from the bracket: cleared, then cropped.
+            ('section-edge', 'section-edge.jpg', (33, 69, 186), 720, (26, 64), 2, False, (0, 0.02, 0.68, 0.99)),
+            ('section-garland', 'section-garland.jpg', (33, 70, 184), 1200, (26, 64), 2, False, (0, 0.24, 1, 0.77)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (34, 70, 184), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (35, 70, 182), 360, (26, 64), 2, False, (0, 0, 0.6, 0.6)),
         ],
+        'clear': {'card-corner': [(0.08, 0.49, 1, 1)]},
         # the sheet's lower third is a painted haze again: the sprites end ~62 %
         'sprites': ('petals-sheet.jpg', (37, 69, 190), 'petal', 96, (26, 64), (2, 3, 2, 2, 2, 2), False),
         'sprites_crop': (0, 0, 1, 0.63),
@@ -275,7 +311,14 @@ PACKS = {
             # worked); cut the strip from just above the palms.
             ('parallax-back', 'parallax-back.jpg', (36, 68, 189), 1080, (26, 64), 2, False, (0, 0.58, 1, 1)),
             ('parallax-front', 'parallax-front.jpg', (37, 70, 185), 1080, (26, 64), 2, False),
+            # Section art (prompts/sections). The card corner came with a leftover half
+            # wreath below it, cleared back to key: the bracket's leg ends ~55 %.
+            ('section-edge', 'section-edge.jpg', (34, 70, 188), 720, (26, 64), 2, False, (0, 0.02, 0.68, 0.99)),
+            ('section-garland', 'section-garland.jpg', (32, 69, 187), 1200, (26, 64), 2, False, (0, 0.29, 1, 0.79)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (33, 70, 187), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (34, 69, 185), 360, (26, 64), 2, False, (0, 0, 0.62, 0.6)),
         ],
+        'clear': {'card-corner': [(0.1, 0.41, 1, 1), (0, 0.555, 0.1, 1)]},
         # the sheet's lower third is painted steps again: the sprites end ~66 %
         'sprites': ('petals-sheet.jpg', (39, 72, 187), 'petal', 96, (26, 64), (2, 2, 2, 2, 3, 2), False),
         'sprites_crop': (0, 0, 1, 0.68),
@@ -541,8 +584,10 @@ def build(pack):
             x0, y0, x1, y1 = crop[0]
             raw = raw.crop((round(x0 * raw.width), round(y0 * raw.height), round(x1 * raw.width), round(y1 * raw.height)))
         plain = name in cfg.get('plain', ())   # art with real blues of its own (water, sky): no blue clean-up
-        img = resize_w(key(raw, bg, ramp, close, fill, False if plain else cfg.get('despill', False),
-                           False if plain else cfg.get('edge_fill', False), cfg.get('spill', (14, 40))), width)
+        # pieces painted on cobalt in a pack whose older cut-outs were keyed another way
+        cobalt = name in cfg.get('despill_for', ())
+        img = resize_w(key(raw, bg, ramp, close, fill, False if plain else (True if cobalt else cfg.get('despill', False)),
+                           False if plain else (True if cobalt else cfg.get('edge_fill', False)), cfg.get('spill', (14, 40))), width)
         written += save_all(img, out, name, ('avif', 'webp'))
 
     if 'sprites' in cfg:

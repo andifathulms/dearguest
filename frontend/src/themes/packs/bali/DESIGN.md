@@ -24,6 +24,10 @@ tinted to the paintings' cream.
 | `photo-ring` | a carved paras-stone oval with a gold inner rim, a jepun and janur crest, and a prada swag at its foot, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | a carved paras corner with draped prada and a jepun spray, used as a lintel over the closing |
 | `particles` | white and pink jepun, a jepun petal, woven janur, a leaf, a gold prada motif |
+| `section-edge` | section art: jepun, leaves, plaited janur and a red prada swag, at the sides of the sections |
+| `section-garland` | section art: jepun and plaited janur with prada touches, the divider between sections |
+| `monogram-wreath` | section art: a plaited janur ring with jepun and fine gold patra tendrils, around the initials |
+| `card-corner` | section art: a carved paras-stone bracket with a jepun blossom, on the event and gift cards (the delivered sheet also had a half wreath below it, cleared in the recipe) |
 | page background | `texture.webp`, seamless cream paper (set in overrides.css) |
 
 **Motion.**

@@ -15,6 +15,11 @@ stays calm so the couple's names and details read clearly.
 | `photo-ring` | oval wreath around the hero portrait and both profile photos |
 | `corner-tl` (mirrored to `corner-br`) | frames the closing words |
 | `particles` | six falling sprites: two peony petals, jasmine, orchid petal, eucalyptus leaf, jasmine bud |
+| `section-edge` | section art: wine and dusty-rose peonies, white moth orchids, jasmine and trailing amaranthus, at the sides of the sections |
+| `section-garland` | section art: peonies, orchids, jasmine and eucalyptus with amaranthus tails, the divider between sections |
+| `monogram-wreath` | section art: small peonies, orchids, jasmine and olive leaves around the initials |
+| `parallax-back` | depth (section prompt S5): a misty line of dark shrubs and garden trees behind the hero's bottom band, dimmed; trails the scroll (`depth` -0.1). Phones only |
+| `parallax-front` | depth (section prompt S6): peonies and amaranthus hanging at the sides, ahead of the scroll. Phones only |
 | page background | `texture.webp`, a seamless velvet tile (in overrides.css) |
 
 **Type.** Pinyon Script for names and section titles; Cormorant for labels
@@ -29,3 +34,7 @@ without a seam. Ink cream `#f4e8da`, accent antique gold `#c9a55c`.
 **Cultural notes.** Melati is the traditional wedding flower across Java and
 Sumatra; anggrek bulan is the national "puspa pesona". No religious motifs, so
 the pack suits every copy variant.
+
+**Section art.** The section pieces were painted on cobalt, unlike the older cut-outs (keyed from the
+wine ground), so the recipe despills them only (`despill_for`). The card corner came back as a crescent,
+not an L, so the pack has no `card-corner` yet; the master is kept as `card-corner-unused.jpg`.

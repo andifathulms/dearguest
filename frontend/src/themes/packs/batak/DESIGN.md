@@ -26,6 +26,10 @@ cropped off.
 | `photo-ring` | a carved gorga oval crowned by a rumah bolon roof point, with a folded ulos at its foot, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | a carved gorga bracket with a draped ulos and fig leaves, used as a lintel over the closing |
 | `particles` | an ulos tassel, a gorga rosette, a fig leaf, jasmine, woven pandan, a hibiscus petal |
+| `section-edge` | section art: a folded ulos with fig leaves, jasmine and pandan, at the sides of the sections |
+| `section-garland` | section art: an ulos runner with its fringe at both ends and leaves, jasmine and pandan at the centre, the divider between sections |
+| `monogram-wreath` | section art: a carved gorga ring with a rumah bolon roof point on top and a folded ulos below, around the initials |
+| `card-corner` | section art: a carved gorga bracket with fig leaves and jasmine, on the event and gift cards (the delivered sheet also had a half wreath below it, cleared in the recipe) |
 | page background | `texture.webp`, seamless ivory paper (set in overrides.css) |
 
 **The lake strip.** Prompt 8a asked for the lake in the bottom 30% of the frame, but it

@@ -54,6 +54,8 @@ SLOTS = {
     'cover-bg', 'cover-frame', 'corner-tl', 'corner-br', 'monogram-frame', 'heading-ornament',
     'divider', 'photo-mask', 'photo-ring', 'hero-overlay', 'parallax-back', 'parallax-mid',
     'parallax-front', 'particles', 'opening', 'gift-card', 'og-template', 'texture', 'hero-bg', 'hero-top', 'hero-bottom',
+    # section art (prompts/sections)
+    'section-edge', 'section-garland', 'monogram-wreath', 'card-corner',
 }
 LAYOUTS = {'framed-card', 'full-bleed', 'arch', 'painted'}
 HEROES = {'photo', 'framed'}

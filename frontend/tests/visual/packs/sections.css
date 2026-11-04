@@ -2,3 +2,5 @@
    covered by the cover/opening/hero shots, and over every pixel it makes each
    baseline PNG several times larger. */
 .pk-texture { display: none !important; }
+/* Side sprays drift with the scroll position; pin them at rest. */
+.pk-section-edge { transform: none !important; }

@@ -17,6 +17,12 @@ paper. The light counterpart of Floral's dark wine.
 | `photo-ring` | oval frame of ronce melati with mawar and kantil, around the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | carved bracket with melati strings, framing the closing words |
 | `particles` | kembang setaman: melati, melati bud, kantil petal, mawar petal, kenanga, janur curl |
+| `section-edge` | section art: ronce melati strings from a carved teak bracket with kenanga, kantil and a red rose, at the sides of the sections |
+| `section-garland` | section art: a ronce melati swag with kantil and kenanga, the divider between sections |
+| `monogram-wreath` | section art: jasmine-bud strings wound with kantil, kenanga and red roses around the initials |
+| `card-corner` | section art: a carved teak corner with sogan-gold relief and melati, on the event and gift cards |
+| `parallax-back` | depth (section prompt S5): a joglo roof among palms in haze, standing behind the hero's bottom band; trails the scroll (`depth` -0.1). Phones only |
+| `parallax-front` | depth (section prompt S6): carved teak brackets with melati strings at the top corners, ahead of the scroll. Phones only |
 | page background | `texture.webp`, seamless ivory paper (in overrides.css) |
 
 **Type.** Cinzel (Roman capitals) for titles and labels, like engraved

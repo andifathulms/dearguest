@@ -76,7 +76,18 @@
    start at ~0.72 of the screen width from the top/bottom; see build_pack_art.py). */
 .pk-root[data-pack='floral'] .pk-hero--framed { padding-block: 9rem 8rem; }
 @media (max-aspect-ratio: 1/1) {
-  .pk-root[data-pack='floral'] .pk-hero--framed[data-bands] { padding-block: 50vw 70vw; }
+  .pk-root[data-pack='floral'] .pk-hero--framed[data-bands] { padding-block: 50vw 92vw; }
+}
+/* Depth (section prompts S5, S6), phones only: the misty treeline and wine shrubs (parallax-back) stand
+   behind the bottom band, their top ~0.25 W above it, below the date, their lower
+   half faded, rising as the band sinks (depth -0.1); the near peonies and amaranthus (parallax-front) are
+   fitted to the width and pushed past the edges. Wide screens show the desktop painting. */
+.pk-root[data-pack='floral'] .pk-hero .pk-parallax-back { inset: auto 0 20vw; opacity: 0.45; -webkit-mask-image: linear-gradient(#000 45%, transparent 85%); mask-image: linear-gradient(#000 45%, transparent 85%); }
+.pk-root[data-pack='floral'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='floral'] .pk-hero .pk-parallax-front { inset: 0 -22vw; }
+.pk-root[data-pack='floral'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='floral'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
 }
 .pk-root[data-pack='floral'] .pk-hero--framed .hero-scroll-cue { display: none; }
 .pk-root[data-pack='floral'] .pk-hero--framed .hero-content { gap: 0.6rem; }
