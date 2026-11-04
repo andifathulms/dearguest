@@ -6,6 +6,7 @@ import { logout as logoutSession } from '../api/session.js'
 import { getTheme, themeName } from '../themes/registry.js'
 import { Icon } from '../brand/icons.jsx'
 import { waLink } from '../brand/site.js'
+import AccountData from '../components/AccountData.jsx'
 import '../brand/brand.css'
 import './MyInvitations.css'
 
@@ -128,6 +129,8 @@ export default function MyInvitationsPage() {
             )}
           </>
         )}
+
+        {items !== null && <AccountData invitations={items} />}
       </main>
     </div>
   )

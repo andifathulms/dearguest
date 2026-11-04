@@ -9,6 +9,7 @@ import '../brand/brand.css'
 import './Dashboard.css'
 import './DashboardRSVP.css'
 import './SendQueue.css'
+import { copyText } from '../utils/clipboard.js'
 
 const TEMPLATE_TABS = [
   { key: 'formal', label: 'Formal' },
@@ -134,7 +135,7 @@ export default function SendQueuePage() {
   }
 
   function copy(text, msg = 'Pesan disalin') {
-    navigator.clipboard.writeText(text).then(() => flash(msg))
+    copyText(text).then(() => flash(msg))
   }
 
   if (!guests || !wa.ready) return <div className="dr"><div className="dr-center">Memuat…</div></div>

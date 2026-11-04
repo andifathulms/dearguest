@@ -1,0 +1,114 @@
+# Every pull request (and main): the checks a release must pass.
+# Lighthouse runs on the prod-like stack; Playwright on Linux baselines.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      db:
+        image: postgres:16-alpine
+        env: { POSTGRES_DB: undangan_db, POSTGRES_USER: undangan_user, POSTGRES_PASSWORD: undangan_pass }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U undangan_user" --health-interval 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      DB_HOST: localhost
+      REDIS_URL: redis://localhost:6379/0
+      SECRET_KEY: ci-only-${{ github.run_id }}-not-a-secret-0123456789abcdefghij
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: sudo apt-get update && sudo apt-get install -y libfribidi0
+      - run: pip install -r requirements.txt
+      - name: Theme registry, OG assets, copies (make check)
+        run: python ../scripts/check_themes.py
+      - name: No missing migrations
+        run: python manage.py makemigrations --check --dry-run
+      - name: Tests (ownership sweep, uploads, auth, privacy, observability, ...)
+        run: python manage.py test apps --noinput
+      - name: Deploy checks with production settings
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.production
+          DB_PASSWORD: undangan_pass
+          ALLOWED_HOSTS: dearguest.example
+          CSRF_TRUSTED_ORIGINS: https://dearguest.example
+        run: python manage.py check --deploy --fail-level WARNING
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run test:unit
+      - name: Production build
+        env: { VITE_PUBLIC_ORIGIN: https://dearguest.example }
+        run: npm run build
+
+  visual:
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/playwright:v1.61.1-noble
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: Dev server (the suite stubs the API)
+        run: |
+          npx vite --host 127.0.0.1 --port 5173 > /tmp/vite.log 2>&1 &
+          npx --yes wait-on@8 -t 60000 http-get://127.0.0.1:5173/
+      - name: Playwright, Linux baselines (Chromium + WebKit)
+        env: { PREVIEW_URL: "http://127.0.0.1:5173", CI: "1" }
+        run: npx playwright test -c playwright.packs.config.js
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: visual-diffs, path: frontend/test-results, retention-days: 7 }
+
+  lighthouse:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prod-like stack (production settings, nginx, TLS)
+        run: |
+          sh scripts/local-prod.sh up
+          sh scripts/local-prod.sh exec -T backend python manage.py shell < scripts/lighthouse-seed.py
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Lighthouse CI (mobile, slow 4G) with budgets
+        run: npx --yes @lhci/cli@0.14.0 autorun --config=.lighthouserc.cjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: lighthouse, path: .lighthouseci, retention-days: 14 }
+
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Python dependencies (pip-audit)
+        run: pip install pip-audit && pip-audit -r backend/requirements.txt
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: npm production dependencies (high and above)
+        working-directory: frontend
+        run: npm ci --ignore-scripts && npm audit --omit=dev --audit-level=high
+      - name: Secrets in the history (gitleaks)
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 git /repo --config /repo/.gitleaks.toml --redact --no-banner

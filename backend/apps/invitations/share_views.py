@@ -12,7 +12,6 @@ page with a 404, so a shared link never leaks names before (or after) the
 invitation is public. Personal previews come only from a guest-list code;
 `?to=` is never read here.
 """
-import json
 from urllib.parse import parse_qs
 
 from django.conf import settings
@@ -29,6 +28,8 @@ GENERIC_TITLE = 'DearGuest · Undangan Pernikahan Digital'
 GENERIC_DESC = 'Undangan pernikahan digital untuk pasangan Indonesia.'
 SITE_NAME = 'DearGuest'
 NOINDEX = 'noindex, nofollow'
+# The tag page has no script and one inline style attribute.
+SHARE_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 # First path segments that belong to the site, not to an invitation. A crawler
 # asking for one of these gets the site's own tags.
 SITE_PATHS = {
@@ -69,12 +70,9 @@ def _render(title, desc, url, image=None, redirect=None, status=200):
             ('name', 'twitter:image', image),
         ]
     meta = '\n  '.join(f'<meta {attr}="{key}" content="{escape(value)}" />' for attr, key, value in tags)
-    go = ''
-    if redirect:
-        # json.dumps gives a valid JS string; escaping '<' keeps "</script>" inert.
-        target_js = json.dumps(redirect).replace('<', '\\u003c')
-        go = (f'<meta http-equiv="refresh" content="0; url={escape(redirect)}" />\n'
-              f'  <script>window.location.replace({target_js});</script>')
+    # A meta refresh, not a script: the page then needs no inline JS, so it can
+    # run under a strict Content-Security-Policy (set below).
+    go = f'<meta http-equiv="refresh" content="0; url={escape(redirect)}" />' if redirect else ''
     link = escape(redirect or url)
     html = f"""<!DOCTYPE html>
 <html lang="id">
@@ -95,6 +93,7 @@ def _render(title, desc, url, image=None, redirect=None, status=200):
 </html>"""
     response = HttpResponse(html, status=status)
     response['X-Robots-Tag'] = NOINDEX
+    response['Content-Security-Policy'] = SHARE_CSP
     return response
 
 

@@ -17,7 +17,7 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .cookies import REFRESH_COOKIE, clear_session, set_session
+from .cookies import REFRESH_COOKIE, clear_session, mark_recent, recently_authenticated, set_session
 from .serializers import RegisterSerializer, FlexibleTokenObtainPairSerializer
 
 
@@ -158,3 +158,34 @@ class PasswordResetConfirmView(APIView):
         user.save()
         revoke_sessions(user)
         return Response({'detail': 'Kata sandi berhasil diperbarui. Silakan masuk.'})
+
+
+class ReauthView(APIView):
+    """POST {password}: confirm the password again before export or account
+    deletion. Sets the short-lived dg_recent cookie."""
+    permission_classes = [IsAuthenticated]
+    throttle_scope = 'login'
+
+    def post(self, request):
+        if not request.user.check_password(request.data.get('password') or ''):
+            return Response({'detail': 'Kata sandi salah.'}, status=status.HTTP_403_FORBIDDEN)
+        return mark_recent(Response(status=status.HTTP_204_NO_CONTENT), request.user)
+
+
+class DeleteAccountView(APIView):
+    """POST: delete the account, every invitation and all their data and files
+    (right to erasure, UU PDP). Needs a fresh password confirmation.
+    Phase 3: keep invoices, anonymised, for bookkeeping before deleting."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not recently_authenticated(request):
+            return Response({'detail': 'Konfirmasi kata sandi dulu.', 'code': 'reauth_required'},
+                            status=status.HTTP_403_FORBIDDEN)
+        from apps.invitations.retention import delete_invitation
+        user = request.user
+        for inv in list(user.invitations.all()):
+            delete_invitation(inv)
+        revoke_sessions(user)
+        user.delete()
+        return clear_session(Response(status=status.HTTP_204_NO_CONTENT))

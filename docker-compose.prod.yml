@@ -1,10 +1,21 @@
 # Production stack. Required in .env: DOMAIN, VITE_PUBLIC_ORIGIN, SECRET_KEY,
-# DB_PASSWORD, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, FRONTEND_URL. See
-# PHASE0-REPORT.md for the first-deploy steps (DNS, certificates, migrate).
+# DB_PASSWORD, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, FRONTEND_URL. Deploy and
+# roll back with scripts/deploy.sh / scripts/rollback.sh (RUNBOOK.md).
+# ENV_FILE picks another env file (the prod-like local stack uses
+# deploy/local-prod.env).
+
+# Every service: rotated json-file logs (max 50 MB each).
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_DB: ${DB_NAME:-undangan_db}
       POSTGRES_USER: ${DB_USER:-undangan_user}
@@ -20,6 +31,7 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    logging: *logging
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -27,16 +39,47 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
+    # Tagged with the git SHA (scripts/deploy.sh sets RELEASE): rolling back
+    # is starting the previous tag again.
+    image: dearguest-backend:${RELEASE:-dev}
+    build:
+      context: ./backend
+      target: app
     restart: unless-stopped
-    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    logging: *logging
+    command: gunicorn -c gunicorn.conf.py config.wsgi:application
     volumes:
       - media_data:/app/media
       - static_data:/app/staticfiles
-    env_file: .env
+    env_file: ${ENV_FILE:-.env}
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.production
       - REDIS_URL=redis://redis:6379/0
+      - RELEASE=${RELEASE:-dev}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Periodic jobs (manage.py run_scheduler): nightly encrypted backup to R2,
+  # the retention purge, the certificate check. Reports to Telegram and the
+  # deep health check.
+  scheduler:
+    image: dearguest-scheduler:${RELEASE:-dev}
+    build:
+      context: ./backend
+      target: scheduler
+    restart: unless-stopped
+    logging: *logging
+    command: python manage.py run_scheduler
+    volumes:
+      - media_data:/app/media
+    env_file: ${ENV_FILE:-.env}
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - REDIS_URL=redis://redis:6379/0
+      - RELEASE=${RELEASE:-dev}
     depends_on:
       db:
         condition: service_healthy
@@ -45,13 +88,20 @@ services:
 
   # The one public entry point: SPA + reverse proxy + /static/ + /media/ + TLS.
   nginx:
+    image: dearguest-nginx:${RELEASE:-dev}
     build:
       context: .
       dockerfile: nginx/Dockerfile
       args:
         VITE_PUBLIC_ORIGIN: ${VITE_PUBLIC_ORIGIN:?Set VITE_PUBLIC_ORIGIN in .env (e.g. https://dearguest.id)}
         VITE_ADMIN_WHATSAPP_NUMBER: ${ADMIN_WHATSAPP_NUMBER:-}
+        VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
+        VITE_RELEASE: ${RELEASE:-dev}
+        SENTRY_ORG: ${SENTRY_ORG:-}
+        SENTRY_PROJECT: ${SENTRY_PROJECT_FRONTEND:-}
+      secrets: [sentry_auth_token]
     restart: unless-stopped
+    logging: *logging
     ports:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"
@@ -60,7 +110,12 @@ services:
       MEDIA_DOMAIN: ${MEDIA_DOMAIN:-media.invalid}
       TLS_CERT_PATH: ${TLS_CERT_PATH:-}
       TLS_KEY_PATH: ${TLS_KEY_PATH:-}
-      NGINX_ENVSUBST_FILTER: DOMAIN
+      # Django admin lives at /${ADMIN_PATH}/ (not /admin/); keep in step with ADMIN_URL.
+      ADMIN_PATH: ${ADMIN_PATH:-admin}
+      # enforce | report-only (debugging a blocked resource: see RUNBOOK.md)
+      CSP_MODE: ${CSP_MODE:-enforce}
+      HSTS_SECONDS: ${SECURE_HSTS_SECONDS:-3600}
+      NGINX_ENVSUBST_FILTER: DOMAIN|ADMIN_PATH|CSP_MODE|HSTS_SECONDS
     volumes:
       - media_data:/app/media:ro
       - static_data:/app/staticfiles:ro
@@ -75,10 +130,17 @@ services:
   certbot:
     image: certbot/certbot:v2.11.0
     restart: unless-stopped
+    logging: *logging
     volumes:
       - letsencrypt:/etc/letsencrypt
       - certbot_www:/var/www/certbot
     entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'
+
+# Sentry source-map upload token for the nginx build (optional file; an
+# empty file just skips the upload).
+secrets:
+  sentry_auth_token:
+    file: ${SENTRY_AUTH_TOKEN_FILE:-./deploy/no-secret}
 
 volumes:
   postgres_data:

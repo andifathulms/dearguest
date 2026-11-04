@@ -1,16 +1,25 @@
+import re
+
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 
 from apps.invitations.share_views import crawler_view, og_image_view, share_view
+from apps.invitations.health import health_view
+from config.admin_site import DearGuestAdminSite
+
+# TOTP, lockout and its own path for the default admin site (admin_site.py).
+admin.site.__class__ = DearGuestAdminSite
+ADMIN_SEGMENT = settings.ADMIN_URL.split('/')[0]
 
 # A slug that isn't one of the backend's own prefixes (so /admin still gets its
 # trailing-slash redirect).
-INVITATION = r'(?!(?:admin|api|media|share|og|static)(?:/|$))(?P<slug>[-\w]+)'
+INVITATION = rf'(?!(?:admin|{re.escape(ADMIN_SEGMENT)}|api|media|share|og|static)(?:/|$))(?P<slug>[-\w]+)'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
+    path('api/health/', health_view),
     path('api/', include('apps.invitations.urls')),
     path('api/auth/', include('apps.auth_api.urls')),
     path('share/<slug:slug>/', share_view),

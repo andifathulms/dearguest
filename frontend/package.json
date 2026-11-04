@@ -12,6 +12,7 @@
     "test:unit": "TZ=America/Los_Angeles node --test src/utils/*.test.js"
   },
   "dependencies": {
+    "@sentry/react": "11.10.0",
     "axios": "^1.7.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.0.0",

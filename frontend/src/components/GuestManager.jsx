@@ -7,6 +7,7 @@ import { waLink } from '../utils/whatsapp.js'
 import GuestImport from './GuestImport.jsx'
 import useWaMessages from './useWaMessages.js'
 import '../pages/SendQueue.css'
+import { copyText } from '../utils/clipboard.js'
 
 const ic = {
   link: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></svg>,
@@ -110,7 +111,7 @@ export default function GuestManager({ slug }) {
   }
 
   function copyLink(g) {
-    navigator.clipboard.writeText(guestLink(g)).then(() => showToast('Link disalin'))
+    copyText(guestLink(g)).then(() => showToast('Link disalin'))
   }
 
   // The couple's chosen template (formal or santai), as in the send queue.

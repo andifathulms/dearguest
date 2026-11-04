@@ -101,6 +101,10 @@ class Invitation(models.Model):
     activation_code = models.CharField(max_length=20, blank=True)
     activation_requested = models.BooleanField(default=False)
     activation_requested_at = models.DateTimeField(null=True, blank=True)
+    # Retention (retention.py): guest data is deleted RETENTION_DAYS after
+    # expires_at; the couple is emailed a week before.
+    purge_notice_sent_at = models.DateTimeField(null=True, blank=True)
+    purged_at = models.DateTimeField(null=True, blank=True)
     couple_user = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='invitations'

@@ -31,3 +31,6 @@ frontend/blob-report/
 
 # Inbox for new theme art (see PROMPT-*-ASSETS.md); masters move to design/packs/<pack>/masters/
 /assets/
+loadtest/codes.json
+/.deploy/
+.lighthouseci/
