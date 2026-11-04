@@ -30,6 +30,13 @@ OWNERSHIP = {
     'api/invitations/<slug:slug>/guest/<str:code>/open/': 'public',
     'api/invitations/<slug:slug>/wishes/': 'public',
     'api/invitations/<slug:slug>/gift/': 'public',
+    # Usher link: guarded by its token, not by login (tests/test_usher.py).
+    'api/usher/<str:token>/': 'public',
+    'api/usher/<str:token>/checkin/': 'public',
+    'api/usher/<str:token>/walkin/': 'public',
+    'api/usher/<str:token>/guests/<int:pk>/': 'public',
+    'api/usher/<str:token>/guests/<int:pk>/undo/': 'public',
+    'api/usher/<str:token>/arrivals/': 'public',
     'api/invitations/<slug:slug>/events/<int:pk>/calendar.ics': 'public',
     'share/<slug:slug>/': 'public',
     r'^og/(?P<slug>[-\w]+)/(?P<digest>[0-9a-f]{16})\.jpg$': 'public',
@@ -56,6 +63,10 @@ OWNERSHIP = {
     'api/invitations/<slug:slug>/rsvps/': ('owner', [('get', '/api/invitations/{slug}/rsvps/')]),
     'api/invitations/<slug:slug>/rsvps.csv': ('owner', [('get', '/api/invitations/{slug}/rsvps.csv')]),
     'api/invitations/<slug:slug>/headcount/': ('owner', [('get', '/api/invitations/{slug}/headcount/')]),
+    'api/invitations/<slug:slug>/guestbook.csv': ('owner', [('get', '/api/invitations/{slug}/guestbook.csv')]),
+    'api/my/invitations/<slug:slug>/usher/': ('owner', [
+        ('get', '/api/my/invitations/{slug}/usher/'), ('patch', '/api/my/invitations/{slug}/usher/'),
+    ]),
     'api/invitations/<slug:slug>/guests/': ('owner', [
         ('get', '/api/invitations/{slug}/guests/'),
         ('post', '/api/invitations/{slug}/guests/'),
@@ -154,7 +165,8 @@ class OwnershipSweep(APITestBase):
     def snapshot(self):
         self.inv.refresh_from_db()
         return {
-            'inv': (self.inv.is_active, self.inv.dress_code, self.inv.theme, self.inv.music_preset_id, self.inv.activation_requested),
+            'inv': (self.inv.is_active, self.inv.dress_code, self.inv.theme, self.inv.music_preset_id, self.inv.activation_requested,
+                    self.inv.usher_enabled, self.inv.usher_token, self.inv.souvenir_stock),
             'couple': (self.inv.couple.bride_name, self.inv.couple.groom_name),
             'counts': [m.objects.filter(invitation=self.inv).count()
                        for m in (Guest, RSVP, Event, Story, Photo, BankAccount, GiftConfirmation)],
@@ -174,7 +186,8 @@ class OwnershipSweep(APITestBase):
                    'account_name': 'x', 'event_type': 'akad', 'venue_name': 'x', 'address': 'x',
                    'start': '2026-12-12T01:00:00Z', 'dress_code': 'Diretas', 'theme': 'floral', 'code': 'ABC123',
                    'preset': self.preset.pk, 'bride_name': 'Diretas', 'wish_status': 'hidden', 'rows': [{'name': 'x'}],
-                   'sent_at': '2026-10-28T10:00:00Z', 'thanked': True, 'sender_name': 'x'}
+                   'sent_at': '2026-10-28T10:00:00Z', 'thanked': True, 'sender_name': 'x',
+                   'usher_enabled': True, 'rotate': True, 'souvenir_stock': 5}
         before = self.snapshot()
         for who in ('stranger', 'anonymous'):
             if who == 'stranger':

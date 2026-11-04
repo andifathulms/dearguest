@@ -91,6 +91,11 @@ class Invitation(models.Model):
     wishlist_url = models.URLField(blank=True)  # gift registry / wishlist link
     # "Saya sudah kirim hadiah" form under the gift cards (gifts.py).
     gift_confirm = models.BooleanField(default=True)
+    # Mode Penerima Tamu (usher.py): the ushers' link works while enabled and
+    # only around the wedding days; rotating the token cuts old links off.
+    usher_enabled = models.BooleanField(default=False)
+    usher_token = models.CharField(max_length=40, blank=True, db_index=True)
+    souvenir_stock = models.PositiveIntegerField(null=True, blank=True)  # null: souvenirs aren't counted
     # Manual activation (no payment gateway): admin issues activation_code after
     # confirming payment; the couple enters it in the editor to go live.
     activation_code = models.CharField(max_length=20, blank=True)
@@ -476,6 +481,12 @@ class Guest(models.Model):
     code = models.CharField(max_length=12, blank=True)
     checked_in = models.BooleanField(default=False)
     checked_in_at = models.DateTimeField(null=True, blank=True)
+    # Filled at the door by the ushers (usher.py): how many came, the number
+    # written on their envelope (amplop), and whether they took a souvenir.
+    arrived_pax = models.PositiveSmallIntegerField(null=True, blank=True)
+    envelope_no = models.CharField(max_length=20, blank=True)
+    souvenir_given = models.BooleanField(default=False)
+    is_walk_in = models.BooleanField(default=False)   # added at the door, not invited through the list
     # Marked by the couple's send queue when they come back from WhatsApp; we
     # can't see whether WhatsApp actually delivered it.
     sent_at = models.DateTimeField(null=True, blank=True)

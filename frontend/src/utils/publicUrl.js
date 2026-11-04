@@ -21,3 +21,7 @@ export const guestUrl = (slug, code) => publicUrl(`/${slug}/${code}`)
 // The /share page: same invitation, but with server-rendered Open Graph tags
 // so WhatsApp shows a rich preview. qs may include ?to=&g= for personalization.
 export const shareUrl = (slug, qs = '') => publicUrl(`/share/${slug}${qs}`)
+
+// Mode Penerima Tamu: the ushers' screen and the welcome screen for a TV.
+export const usherUrl = token => publicUrl(`/penerima/${token}`)
+export const welcomeScreenUrl = token => publicUrl(`/penerima/${token}/layar`)

@@ -8,6 +8,7 @@ import GuestManager from '../components/GuestManager.jsx'
 import WishModeration from '../components/WishModeration.jsx'
 import GiftLog from '../components/GiftLog.jsx'
 import Headcount from '../components/Headcount.jsx'
+import VenueSetup from '../components/VenueSetup.jsx'
 import '../brand/brand.css'
 import './Dashboard.css'
 import './DashboardRSVP.css'
@@ -90,10 +91,15 @@ export default function DashboardRSVP() {
           <button className={`dash-tab ${tab === 'gifts' ? 'active' : ''}`} onClick={() => setTab('gifts')}>
             Kado
           </button>
+          <button className={`dash-tab ${tab === 'venue' ? 'active' : ''}`} onClick={() => setTab('venue')}>
+            Hari-H
+          </button>
         </div>
 
         {tab === 'guests' ? (
           <GuestManager slug={slug} />
+        ) : tab === 'venue' ? (
+          <VenueSetup slug={slug} />
         ) : tab === 'gifts' ? (
           <GiftLog slug={slug} />
         ) : tab === 'wishes' ? (

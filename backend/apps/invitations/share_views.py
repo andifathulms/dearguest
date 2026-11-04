@@ -33,7 +33,7 @@ NOINDEX = 'noindex, nofollow'
 # asking for one of these gets the site's own tags.
 SITE_PATHS = {
     'tema', 'register', 'dashboard', 'forgot-password', 'reset-password', 'my',
-    'onboarding', 'admin', 'api', 'media', 'share', 'og', 'static', 'assets',
+    'onboarding', 'admin', 'api', 'media', 'share', 'og', 'static', 'assets', 'penerima',
 }
 
 

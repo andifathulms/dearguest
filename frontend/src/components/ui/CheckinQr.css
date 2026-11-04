@@ -1,0 +1,16 @@
+.ciq-btn {
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 18px;
+  border: 0; border-radius: 999px; background: #1d1b18; color: #fff; font: 600 14px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25); cursor: pointer;
+}
+.ciq-btn svg { width: 20px; height: 20px; }
+.ciq-wrap { position: fixed; inset: 0; z-index: 90; background: rgba(0, 0, 0, .6); display: grid; place-items: center; padding: 16px; }
+.ciq-card {
+  width: min(340px, 100%); background: #fff; color: #1d1b18; border-radius: 20px; padding: 24px 20px; text-align: center;
+  display: grid; justify-items: center; gap: 10px; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+.ciq-label { margin: 0; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #6b645a; }
+.ciq-name { margin: 0; font-size: 20px; font-weight: 600; overflow-wrap: anywhere; }
+.ciq-hint { margin: 0; font-size: 13.5px; color: #5f5a52; line-height: 1.5; }
+.ciq-close { min-height: 44px; padding: 0 28px; border: 1px solid #d8d2c8; border-radius: 999px; background: none; font: inherit; font-size: 14px; cursor: pointer; }

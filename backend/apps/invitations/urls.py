@@ -2,6 +2,10 @@ from django.urls import path
 from .funnel import FunnelVisitView
 from .gifts import GiftConfirmCreateView, MyGiftDetail, MyGiftList
 from .headcount import HeadcountView
+from .usher import (
+    GuestbookCsvView, MyUsherView, UsherArrivalsView, UsherCheckInView, UsherGuestView, UsherHomeView,
+    UsherUndoView, UsherWalkInView,
+)
 from .marketing import MarketingView
 from .views import (
     InvitationDetailView,
@@ -46,6 +50,14 @@ urlpatterns = [
     path('invitations/<slug:slug>/rsvps/', RSVPListView.as_view()),
     path('invitations/<slug:slug>/rsvps.csv', RSVPCsvView.as_view()),
     path('invitations/<slug:slug>/headcount/', HeadcountView.as_view()),
+    path('invitations/<slug:slug>/guestbook.csv', GuestbookCsvView.as_view()),
+    # Mode Penerima Tamu: the ushers' token link (usher.py).
+    path('usher/<str:token>/', UsherHomeView.as_view()),
+    path('usher/<str:token>/checkin/', UsherCheckInView.as_view()),
+    path('usher/<str:token>/walkin/', UsherWalkInView.as_view()),
+    path('usher/<str:token>/guests/<int:pk>/', UsherGuestView.as_view()),
+    path('usher/<str:token>/guests/<int:pk>/undo/', UsherUndoView.as_view()),
+    path('usher/<str:token>/arrivals/', UsherArrivalsView.as_view()),
     path('invitations/<slug:slug>/guest/<str:code>/', PublicGuestView.as_view()),
     path('invitations/<slug:slug>/guest/<str:code>/open/', GuestOpenView.as_view()),
     path('invitations/<slug:slug>/wishes/', WishesListView.as_view()),
@@ -67,6 +79,7 @@ urlpatterns = [
     path('my/invitations/<slug:slug>/couple/', MyCoupleView.as_view()),
     path('my/invitations/<slug:slug>/wishes/', MyWishList.as_view()),
     path('my/invitations/<slug:slug>/wishes/<int:pk>/', MyWishDetail.as_view()),
+    path('my/invitations/<slug:slug>/usher/', MyUsherView.as_view()),
     path('my/invitations/<slug:slug>/gifts/', MyGiftList.as_view()),
     path('my/invitations/<slug:slug>/gifts/<int:pk>/', MyGiftDetail.as_view()),
     path('my/invitations/<slug:slug>/events/', EventListCreate.as_view()),

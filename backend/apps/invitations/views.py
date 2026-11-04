@@ -90,7 +90,12 @@ class InvitationDetailView(generics.RetrieveAPIView):
             data = demo_in_variant(data, variant)
         # A personal link (?g=<code>) sees its group's events; others see the shared ones.
         guest = find_guest(invitation, request.query_params.get('g'))
-        return Response(audience.for_guest(data, guest))
+        data = audience.for_guest(data, guest)
+        if guest and invitation.usher_enabled:
+            from .usher import window_open
+            # Around the wedding days a personal link shows its QR for the ushers.
+            data['checkin_qr'] = window_open(invitation)
+        return Response(data)
 
 
 CEREMONIES = {'akad', 'pemberkatan', 'sakramen'}

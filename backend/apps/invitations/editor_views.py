@@ -196,7 +196,8 @@ class SlugCheckView(APIView):
     def get(self, request):
         slug = (request.query_params.get('slug') or '').strip().lower()
         valid = bool(re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug))
-        available = valid and not Invitation.objects.filter(slug=slug).exists()
+        from .share_views import SITE_PATHS   # the site's own first path segments
+        available = valid and slug not in SITE_PATHS and not Invitation.objects.filter(slug=slug).exists()
         return Response({'slug': slug, 'valid': valid, 'available': available})
 
 

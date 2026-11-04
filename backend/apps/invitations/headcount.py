@@ -52,7 +52,7 @@ def summarise(guests, answers, general=()):
 
 
 def headcount(invitation):
-    guests = list(invitation.guests.all())
+    guests = list(invitation.guests.filter(is_walk_in=False))   # walk-ins weren't expected
     answers, general = _latest_answers(invitation)
 
     events = []

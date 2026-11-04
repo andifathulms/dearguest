@@ -207,7 +207,8 @@ export default function GuestManager({ slug }) {
                   {g.responded
                     ? (g.attending ? ' · RSVP: Hadir ✓' : ' · RSVP: Tidak hadir')
                     : ' · belum RSVP'}
-                  {g.checked_in ? ' · check-in ✓' : ''}
+                  {g.is_walk_in ? ' · tanpa undangan' : ''}
+                  {g.checked_in ? ` · check-in ✓${g.arrived_pax ? ` ${g.arrived_pax} org` : ''}${g.envelope_no ? ` · amplop ${g.envelope_no}` : ''}` : ''}
                   {g.sent_at && <span className="gm-tag-sent"> · terkirim</span>}
                   {g.open_count > 0
                     ? <span className="gm-tag-opened" title={`Terakhir dibuka ${new Date(g.last_opened_at).toLocaleString('id-ID')}`}> · dibuka{g.open_count > 1 ? ` ${g.open_count}×` : ''}</span>

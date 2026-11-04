@@ -7,6 +7,8 @@ import { catalogThemes } from '../themes/registry.js'
 
 // "Pakai tema ini" bar for theme demos opened from /tema/:id (see DemoBar).
 const DemoBar = lazy(() => import('../components/ui/DemoBar.jsx'))
+// Mode Penerima Tamu: the guest's QR, only on personal links around the wedding days.
+const CheckinQr = lazy(() => import('../components/ui/CheckinQr.jsx'))
 
 export default function InvitationPage() {
   const { slug, code: pathCode } = useParams()
@@ -109,6 +111,7 @@ export default function InvitationPage() {
     <GuestProvider value={guest}>
       <ThemeRenderer invitation={invitation} guestName={guestName} preview={preview} />
       {demoTheme && <Suspense fallback={null}><DemoBar theme={demoTheme} /></Suspense>}
+      {invitation.checkin_qr && guest && <Suspense fallback={null}><CheckinQr slug={slug} guest={guest} /></Suspense>}
     </GuestProvider>
   )
 }

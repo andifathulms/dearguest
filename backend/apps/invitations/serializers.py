@@ -65,6 +65,7 @@ class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
         fields = ['id', 'name', 'whatsapp', 'group', 'max_pax', 'code', 'checked_in', 'checked_in_at',
+                  'arrived_pax', 'envelope_no', 'souvenir_given', 'is_walk_in',
                   'sent_at', 'reminded_at', 'first_opened_at', 'last_opened_at', 'open_count', 'responded', 'attending', 'created_at']
         read_only_fields = ['code', 'checked_in_at', 'first_opened_at', 'last_opened_at', 'open_count', 'created_at']
 
@@ -422,7 +423,8 @@ class InvitationCreateSerializer(serializers.ModelSerializer):
         value = value.strip().lower()
         if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', value):
             raise serializers.ValidationError('Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.')
-        if Invitation.objects.filter(slug=value).exists():
+        from .share_views import SITE_PATHS   # /dashboard, /penerima/… belong to the site
+        if value in SITE_PATHS or Invitation.objects.filter(slug=value).exists():
             raise serializers.ValidationError('Slug ini sudah digunakan. Pilih yang lain.')
         return value
 
