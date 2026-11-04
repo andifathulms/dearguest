@@ -27,7 +27,7 @@ def _pax(value):
 
 
 def import_guests(invitation, rows):
-    """Create guests from `rows` ([{name, whatsapp, group, max_pax}]).
+    """Create guests from `rows` ([{name, whatsapp, group, table, max_pax}]).
     Returns (created guests, [{row, name, reason}] for skipped rows)."""
     numbers = {normalise_whatsapp(w) for w in invitation.guests.values_list('whatsapp', flat=True)} - {''}
     names = {n.casefold() for n in invitation.guests.values_list('name', flat=True)}
@@ -55,7 +55,7 @@ def import_guests(invitation, rows):
             numbers.add(number)
         to_create.append(Guest(
             invitation=invitation, name=name, whatsapp=number,
-            group=_clean(row.get('group'), 100), max_pax=_pax(row.get('max_pax')),
+            group=_clean(row.get('group'), 100), table=_clean(row.get('table'), 40), max_pax=_pax(row.get('max_pax')),
         ))
     with transaction.atomic():
         for guest in to_create:

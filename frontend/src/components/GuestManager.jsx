@@ -100,6 +100,18 @@ export default function GuestManager({ slug }) {
     }
   }
 
+  // Their table at the reception, free text ("12", "VIP A"); saved on leaving the field.
+  async function setTable(g, value) {
+    const table = value.replace(/\s+/g, ' ').trim()
+    if (table === g.table) return
+    try {
+      await api.patch(`/invitations/${slug}/guests/${g.id}/`, { table })
+      await load()
+    } catch {
+      showToast('Gagal menyimpan meja')
+    }
+  }
+
   async function remove(g) {
     if (!window.confirm(`Hapus ${g.name} dari daftar tamu?`)) return
     try {
@@ -224,6 +236,11 @@ export default function GuestManager({ slug }) {
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
                 orang
+              </label>
+              <label className="gm-pax gm-table" title="Meja tamu ini di resepsi (opsional)">
+                meja
+                <input key={g.table} defaultValue={g.table} maxLength={40} placeholder="—" aria-label={`Meja untuk ${g.name}`}
+                  onBlur={e => setTable(g, e.target.value)} onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }} />
               </label>
               <div className="gm-row-actions">
                 <button className="gm-btn" onClick={() => copyLink(g)}>{ic.link} Link</button>

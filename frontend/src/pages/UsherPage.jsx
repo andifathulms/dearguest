@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import { Link, useParams } from 'react-router-dom'
 import api from '../api/client.js'
 import { formatClock } from '../utils/dates.js'
+import { seatLabel } from '../utils/seat.js'
 import { codeFromScan, expectedPax, matchesGuest } from '../utils/usher.js'
 import '../brand/brand.css'
 import './Usher.css'
@@ -27,13 +28,18 @@ function Stepper({ id, value, onChange, max = 50 }) {
   )
 }
 
-// The arrival details an usher fills in: people, envelope number, souvenir.
+// The arrival details an usher fills in: people, table, envelope number, souvenir.
 function ArrivalFields({ form, setForm, souvenirs }) {
   return (
     <>
       <div className="us-field">
         <label htmlFor="us-pax">Jumlah orang yang datang</label>
         <Stepper id="us-pax" value={form.arrived_pax} onChange={v => setForm(f => ({ ...f, arrived_pax: v }))} />
+      </div>
+      <div className="us-field">
+        <label htmlFor="us-table">Meja <small>(opsional)</small></label>
+        <input id="us-table" className="dg-input" value={form.table} maxLength={40}
+          onChange={e => setForm(f => ({ ...f, table: e.target.value }))} placeholder="mis. 12 atau VIP A" />
       </div>
       <div className="us-field">
         <label htmlFor="us-envelope">Nomor amplop <small>(tulis nomor yang sama di amplop)</small></label>
@@ -52,6 +58,7 @@ function ArrivalFields({ form, setForm, souvenirs }) {
 function GuestSheet({ guest, tz, souvenirs, busy, onCheckIn, onSave, onUndo, onClose }) {
   const [form, setForm] = useState({
     arrived_pax: guest.arrived_pax || expectedPax(guest),
+    table: guest.table || '',
     envelope_no: guest.envelope_no || '',
     souvenir: guest.checked_in ? guest.souvenir_given : souvenirs !== 0,
   })
@@ -65,7 +72,10 @@ function GuestSheet({ guest, tz, souvenirs, busy, onCheckIn, onSave, onUndo, onC
         <p className="us-sheet-meta">
           {[guest.group, ...guest.sessions].filter(Boolean).join(' · ') || 'Tanpa grup'}
         </p>
-        <p className={`us-pill ${!guest.rsvp ? 'none' : guest.rsvp.attending ? '' : 'no'}`}>{rsvpText(guest)}</p>
+        <div className="us-badges">
+          <p className={`us-pill ${!guest.rsvp ? 'none' : guest.rsvp.attending ? '' : 'no'}`}>{rsvpText(guest)}</p>
+          {guest.table && <p className="us-seat">{seatLabel(guest.table)}</p>}
+        </div>
 
         {guest.checked_in && (
           <p className="us-already" role="status">
@@ -80,7 +90,7 @@ function GuestSheet({ guest, tz, souvenirs, busy, onCheckIn, onSave, onUndo, onC
           {guest.checked_in ? (
             <>
               <button type="button" className="dg-btn dg-btn-ink dg-btn-block" disabled={busy}
-                onClick={() => onSave(guest, { arrived_pax: form.arrived_pax, envelope_no: form.envelope_no, souvenir_given: form.souvenir })}>
+                onClick={() => onSave(guest, { arrived_pax: form.arrived_pax, table: form.table, envelope_no: form.envelope_no, souvenir_given: form.souvenir })}>
                 Simpan perubahan
               </button>
               <button type="button" className="dg-btn dg-btn-line dg-btn-block us-undo" disabled={busy} onClick={() => onUndo(guest)}>
@@ -102,7 +112,7 @@ function GuestSheet({ guest, tz, souvenirs, busy, onCheckIn, onSave, onUndo, onC
 function WalkInSheet({ souvenirs, busy, onSubmit, onClose }) {
   const [name, setName] = useState('')
   const [group, setGroup] = useState('')
-  const [form, setForm] = useState({ arrived_pax: 1, envelope_no: '', souvenir: souvenirs !== 0 })
+  const [form, setForm] = useState({ arrived_pax: 1, table: '', envelope_no: '', souvenir: souvenirs !== 0 })
   return (
     <div className="us-sheet-wrap" role="dialog" aria-modal="true" aria-labelledby="us-walkin-title" onClick={onClose}>
       <form className="us-sheet" onClick={e => e.stopPropagation()}
@@ -192,7 +202,8 @@ export default function UsherPage() {
     const res = await api.post(`${base}checkin/`, { guest_id: guest.id, ...form })
     apply(res)
     setOpenId(null)
-    flash(res.data.already ? `${guest.name} sudah check-in sebelumnya` : `${guest.name} · ${form.arrived_pax} orang tercatat`, res.data.already ? 'warn' : 'ok')
+    const seat = seatLabel(res.data.guest?.table)
+    flash(res.data.already ? `${guest.name} sudah check-in sebelumnya` : `${guest.name} · ${form.arrived_pax} orang${seat ? ` · ${seat}` : ''}`, res.data.already ? 'warn' : 'ok')
   })
 
   const save = (guest, patch) => run(async () => {
@@ -270,7 +281,7 @@ export default function UsherPage() {
 
       <div className="us-search">
         <input className="dg-input" type="search" value={q} onChange={e => setQ(e.target.value)}
-          placeholder="Cari nama, grup, atau nomor amplop" aria-label="Cari tamu" />
+          placeholder="Cari nama, grup, meja, atau nomor amplop" aria-label="Cari tamu" />
         <div className="us-filters" role="group" aria-label="Saring tamu">
           {FILTERS.map(([key, label]) => (
             <button key={key} type="button" className="dg-chip" aria-pressed={filter === key} onClick={() => setFilter(key)}>
@@ -287,7 +298,10 @@ export default function UsherPage() {
             <button type="button" className={`us-row ${g.checked_in ? 'in' : ''}`} onClick={() => setOpenId(g.id)}>
               <span className="us-row-main">
                 <span className="us-row-name">{g.name}</span>
-                <span className="us-row-meta">{[g.group, ...g.sessions].filter(Boolean).join(' · ') || 'Tanpa grup'} · {rsvpText(g)}</span>
+                <span className="us-row-meta">
+                  {g.table && <b className="us-row-seat">{seatLabel(g.table)}</b>}
+                  {[g.group, ...g.sessions].filter(Boolean).join(' · ') || 'Tanpa grup'} · {rsvpText(g)}
+                </span>
               </span>
               {g.checked_in ? (
                 <span className="us-row-in">

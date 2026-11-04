@@ -44,7 +44,7 @@ export default function GuestImport({ slug, existing, onDone }) {
     setError('')
     try {
       const res = await api.post(`/invitations/${slug}/guests/import/`, {
-        rows: ok.map(({ name, number, group, max_pax }) => ({ name, whatsapp: number, group, max_pax })),
+        rows: ok.map(({ name, number, group, table, max_pax }) => ({ name, whatsapp: number, group, table, max_pax })),
       })
       setResult(res.data)
       setText('')
@@ -107,7 +107,7 @@ export default function GuestImport({ slug, existing, onDone }) {
 
           <div className="gi-table-wrap">
             <table className="gi-table">
-              <thead><tr><th>#</th><th>Nama</th><th>WhatsApp</th><th>Grup</th><th>Orang</th><th>Status</th></tr></thead>
+              <thead><tr><th>#</th><th>Nama</th><th>WhatsApp</th><th>Grup</th><th>Meja</th><th>Orang</th><th>Status</th></tr></thead>
               <tbody>
                 {preview.slice(0, PREVIEW_ROWS).map(r => (
                   <tr key={r.row} className={r.skip ? 'gi-skip' : ''}>
@@ -115,6 +115,7 @@ export default function GuestImport({ slug, existing, onDone }) {
                     <td>{r.name || '—'}</td>
                     <td>{r.number ? `+${r.number}` : (r.whatsapp || '—')}</td>
                     <td>{r.group || '—'}</td>
+                    <td>{r.table || '—'}</td>
                     <td>{r.max_pax ?? '—'}</td>
                     <td>{r.skip || 'OK'}</td>
                   </tr>

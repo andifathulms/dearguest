@@ -97,6 +97,8 @@ class InvitationDetailView(generics.RetrieveAPIView):
         # group's events; others see the shared ones.
         guest = find_guest(invitation, request.query_params.get('g'))
         data = audience.for_guest(data, guest)
+        if guest and guest.table:
+            data['seat'] = guest.table
         if guest and invitation.usher_enabled:
             from .usher import window_open
             # Around the wedding days a personal link shows its QR for the ushers.

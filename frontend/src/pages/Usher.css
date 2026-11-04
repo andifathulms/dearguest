@@ -54,6 +54,9 @@
 .us-sheet-head h2 { margin: 0; font: 400 28px/1.1 var(--dg-f-display); overflow-wrap: anywhere; }
 .us-x { background: none; border: 0; font-size: 30px; line-height: 1; color: var(--dg-muted); cursor: pointer; padding: 0 4px; min-width: 44px; min-height: 44px; }
 .us-sheet-meta { margin: -8px 0 0; color: var(--dg-muted); font-size: 14px; }
+.us-badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.us-seat { margin: 0; padding: 4px 12px; border-radius: var(--dg-pill); background: var(--dg-ink); color: var(--dg-white); font-size: 13px; font-weight: 600; }
+.us-row-seat { font-weight: 600; color: var(--dg-ink-soft); margin-right: 6px; }
 .us-pill { justify-self: start; margin: 0; padding: 4px 12px; border-radius: var(--dg-pill); background: #E6F0E9; color: var(--dg-good); font-size: 13px; font-weight: 600; }
 .us-pill.no { background: #F6E3DE; color: var(--dg-bad); }
 .us-pill.none { background: var(--dg-paper); color: var(--dg-ink-soft); }

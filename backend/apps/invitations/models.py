@@ -478,6 +478,9 @@ class Guest(models.Model):
     name = models.CharField(max_length=200)
     whatsapp = models.CharField(max_length=20, blank=True)
     group = models.CharField(max_length=100, blank=True)  # e.g. Keluarga, Teman Kantor
+    # Where they sit at the reception, free text: "12", "Meja 12", "VIP A".
+    # Shown on their invitation and QR pass, to the ushers and on the welcome screen.
+    table = models.CharField(max_length=40, blank=True)
     # How many people this invitation is for; null means the invitation-wide limit.
     max_pax = models.PositiveSmallIntegerField(null=True, blank=True)
     # Unique per invitation (the link carries the slug). Pre-Oct-2026 codes are

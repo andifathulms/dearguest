@@ -21,6 +21,8 @@ test('name search ignores accents, case and word order', () => {
   assert.ok(matchesGuest({ name: 'André' }, 'andre'))
   assert.ok(matchesGuest(g, '017'))
   assert.ok(!matchesGuest(g, 'sri budi'))
+  assert.ok(matchesGuest({ name: 'Rina', table: '12' }, 'meja 12'))
+  assert.ok(matchesGuest({ name: 'Rina', table: 'VIP A' }, 'vip'))
 })
 
 test('check-in pre-fills the RSVP count, else the invitation limit', () => {

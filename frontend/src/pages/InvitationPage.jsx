@@ -111,7 +111,7 @@ export default function InvitationPage() {
     <GuestProvider value={guest}>
       <ThemeRenderer invitation={invitation} guestName={guestName} preview={preview} />
       {demoTheme && <Suspense fallback={null}><DemoBar theme={demoTheme} /></Suspense>}
-      {invitation.checkin_qr && guest && <Suspense fallback={null}><CheckinQr slug={slug} guest={guest} /></Suspense>}
+      {invitation.checkin_qr && guest && <Suspense fallback={null}><CheckinQr slug={slug} guest={guest} seat={invitation.seat} /></Suspense>}
     </GuestProvider>
   )
 }

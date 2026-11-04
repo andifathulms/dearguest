@@ -61,7 +61,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
   // are skipped (not rendered as blank wrappers) so alternating tones and
   // dividers fall between real sections only.
   const sections = [
-    [true, <GuestGreeting guestName={guestName} openingText={invitation.opening_text} />],
+    [true, <GuestGreeting guestName={guestName} openingText={invitation.opening_text} seat={invitation.seat} />],
     [Boolean(scriptureFor(invitation)), <ScriptureSection />],
     [Boolean(primary?.start), <CountdownTimer targetDate={primary?.start} />],
     [has(events), <EventsSection events={events} dressCode={invitation.dress_code} />],

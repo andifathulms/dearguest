@@ -3,6 +3,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import api from '../api/client.js'
 import { formatDateOnly } from '../utils/dates.js'
 import { usherUrl, welcomeScreenUrl } from '../utils/publicUrl.js'
+import { tableSummary } from '../utils/seat.js'
 import { waLink } from '../utils/whatsapp.js'
 
 const POLL_MS = 20000
@@ -13,6 +14,51 @@ async function downloadGuestbook(slug) {
   const a = Object.assign(document.createElement('a'), { href: url, download: `buku-tamu-${slug}.csv` })
   a.click()
   URL.revokeObjectURL(url)
+}
+
+// Who sits where, from the guest list (tables are set there or in the import).
+function Tables({ slug }) {
+  const [summary, setSummary] = useState(null)
+  useEffect(() => {
+    const load = () => api.get(`/invitations/${slug}/guests/`).then(res => setSummary(tableSummary(res.data.guests || []))).catch(() => {})
+    load()
+    const timer = setInterval(load, POLL_MS)
+    return () => clearInterval(timer)
+  }, [slug])
+  if (!summary) return null
+  const { tables, unseated } = summary
+  return (
+    <section className="vs-card" aria-labelledby="vs-tables-title">
+      <h3 id="vs-tables-title">Meja</h3>
+      {tables.length === 0 ? (
+        <p className="vs-hint">
+          Isi kolom "meja" di tab Tamu (atau kolom Meja saat impor). Tamu melihat mejanya di undangan pribadi dan QR check-in,
+          penerima tamu melihatnya saat check-in, dan layar sambutan mengarahkan ke meja itu.
+        </p>
+      ) : (
+        <>
+          <p className="vs-hint">
+            {tables.length} meja{unseated > 0 ? ` · ${unseated} tamu belum punya meja` : ' · semua tamu sudah punya meja'}.
+            Ubah di tab Tamu; penerima tamu juga bisa memindahkan tamu saat check-in.
+          </p>
+          <div className="vs-tables" role="table" aria-label="Ringkasan meja">
+            <div className="vs-tables-head" role="row">
+              <span role="columnheader">Meja</span><span role="columnheader">Undangan</span>
+              <span role="columnheader">Sudah datang</span><span role="columnheader">Orang hadir</span>
+            </div>
+            {tables.map(t => (
+              <div key={t.table} role="row" className={t.arrived === t.guests ? 'full' : ''}>
+                <span role="cell">{t.label}</span>
+                <span role="cell" className="dg-num">{t.guests}</span>
+                <span role="cell" className="dg-num">{t.arrived}/{t.guests}</span>
+                <span role="cell" className="dg-num">{t.arrived_pax}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  )
 }
 
 // The couple's "Hari-H" tab: switch on Mode Penerima Tamu, hand the link to
@@ -130,6 +176,8 @@ export default function VenueSetup({ slug }) {
           </section>
         </>
       )}
+
+      <Tables slug={slug} />
     </div>
   )
 }

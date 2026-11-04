@@ -7,14 +7,14 @@ test('parses an Excel paste (tabs) with a header and CRLF', () => {
   assert.deepEqual(rows, [['Nama', 'No HP', 'Grup'], ['Budi Santoso', '0812 3456 7890', 'Kantor'], ['Siti', '+62 812-3456-7891', '']])
   const guess = guessColumns(rows)
   assert.equal(guess.hasHeader, true)
-  assert.deepEqual(guess.mapping, { name: 0, whatsapp: 1, group: 2, max_pax: -1 })
+  assert.deepEqual(guess.mapping, { name: 0, whatsapp: 1, group: 2, table: -1, max_pax: -1 })
 })
 
 test('parses quoted CSV with commas, quotes and a BOM', () => {
   const rows = parseTable('﻿name,whatsapp,jumlah\n"Keluarga Bpk. Joko, S.H.",081234567892,2\n"Ani ""Ndut""",,1\n')
   assert.deepEqual(rows[1], ['Keluarga Bpk. Joko, S.H.', '081234567892', '2'])
   assert.deepEqual(rows[2], ['Ani "Ndut"', '', '1'])
-  assert.deepEqual(guessColumns(rows).mapping, { name: 0, whatsapp: 1, group: -1, max_pax: 2 })
+  assert.deepEqual(guessColumns(rows).mapping, { name: 0, whatsapp: 1, group: -1, table: -1, max_pax: 2 })
 })
 
 test('semicolon CSV (Excel in Indonesian locale)', () => {
@@ -23,7 +23,7 @@ test('semicolon CSV (Excel in Indonesian locale)', () => {
 
 test('without a header, the phone column is found by its content', () => {
   const rows = parseTable('0812 3456 7890\tBudi\n0812 3456 7891\tSiti\n')
-  assert.deepEqual(guessColumns(rows), { mapping: { name: 1, whatsapp: 0, group: -1, max_pax: -1 }, hasHeader: false })
+  assert.deepEqual(guessColumns(rows), { mapping: { name: 1, whatsapp: 0, group: -1, table: -1, max_pax: -1 }, hasHeader: false })
 })
 
 test('preview flags the same rows the server skips', () => {
@@ -39,6 +39,13 @@ test('preview flags the same rows the server skips', () => {
   ].join('\n'))
   const out = previewRows(rows, guessColumns(rows), [{ name: 'Sudah Ada', whatsapp: '6281200000001' }])
   assert.deepEqual(out.map(r => r.skip), [null, SKIP.badNumber, SKIP.dupNumber, SKIP.dupName, SKIP.dupNumber, SKIP.blank, null])
-  assert.deepEqual(out[0], { row: 1, name: 'Budi Santoso', whatsapp: '+62 812-3456-7890', number: '6281234567890', group: '', max_pax: 2, skip: null })
+  assert.deepEqual(out[0], { row: 1, name: 'Budi Santoso', whatsapp: '+62 812-3456-7890', number: '6281234567890', group: '', table: '', max_pax: 2, skip: null })
   assert.equal(out[6].max_pax, null)
+})
+
+test('a Meja column is picked up as the table', () => {
+  const rows = parseTable('Nama\tNo. WA\tMeja\nBudi\t0812 3456 7890\t 12 \n')
+  const guess = guessColumns(rows)
+  assert.equal(guess.mapping.table, 2)
+  assert.equal(previewRows(rows, guess)[0].table, '12')
 })
