@@ -6,6 +6,7 @@ import api from '../api/client.js'
 import { logout } from '../api/session.js'
 import GuestManager from '../components/GuestManager.jsx'
 import WishModeration from '../components/WishModeration.jsx'
+import GiftLog from '../components/GiftLog.jsx'
 import '../brand/brand.css'
 import './Dashboard.css'
 import './DashboardRSVP.css'
@@ -85,10 +86,15 @@ export default function DashboardRSVP() {
           <button className={`dash-tab ${tab === 'guests' ? 'active' : ''}`} onClick={() => setTab('guests')}>
             Daftar Tamu &amp; QR
           </button>
+          <button className={`dash-tab ${tab === 'gifts' ? 'active' : ''}`} onClick={() => setTab('gifts')}>
+            Kado
+          </button>
         </div>
 
         {tab === 'guests' ? (
           <GuestManager slug={slug} />
+        ) : tab === 'gifts' ? (
+          <GiftLog slug={slug} />
         ) : tab === 'wishes' ? (
           <WishModeration slug={slug} onChange={loadRsvps} />
         ) : (

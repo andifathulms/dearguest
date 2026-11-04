@@ -1,5 +1,6 @@
 from django.urls import path
 from .funnel import FunnelVisitView
+from .gifts import GiftConfirmCreateView, MyGiftDetail, MyGiftList
 from .marketing import MarketingView
 from .views import (
     InvitationDetailView,
@@ -46,6 +47,7 @@ urlpatterns = [
     path('invitations/<slug:slug>/guest/<str:code>/', PublicGuestView.as_view()),
     path('invitations/<slug:slug>/guest/<str:code>/open/', GuestOpenView.as_view()),
     path('invitations/<slug:slug>/wishes/', WishesListView.as_view()),
+    path('invitations/<slug:slug>/gift/', GiftConfirmCreateView.as_view()),
     path('invitations/<slug:slug>/events/<int:pk>/calendar.ics', EventCalendarView.as_view()),
     path('coupons/validate/', CouponValidateView.as_view()),
     path('music-presets/', MusicPresetListView.as_view()),
@@ -63,6 +65,8 @@ urlpatterns = [
     path('my/invitations/<slug:slug>/couple/', MyCoupleView.as_view()),
     path('my/invitations/<slug:slug>/wishes/', MyWishList.as_view()),
     path('my/invitations/<slug:slug>/wishes/<int:pk>/', MyWishDetail.as_view()),
+    path('my/invitations/<slug:slug>/gifts/', MyGiftList.as_view()),
+    path('my/invitations/<slug:slug>/gifts/<int:pk>/', MyGiftDetail.as_view()),
     path('my/invitations/<slug:slug>/events/', EventListCreate.as_view()),
     path('my/invitations/<slug:slug>/events/<int:pk>/', EventDetail.as_view()),
     path('my/invitations/<slug:slug>/stories/', StoryListCreate.as_view()),

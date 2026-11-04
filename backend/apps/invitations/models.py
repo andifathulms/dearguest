@@ -89,6 +89,8 @@ class Invitation(models.Model):
     music_preset = models.ForeignKey('MusicPreset', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     livestream_url = models.URLField(blank=True)  # YouTube/Instagram/Zoom link for remote guests
     wishlist_url = models.URLField(blank=True)  # gift registry / wishlist link
+    # "Saya sudah kirim hadiah" form under the gift cards (gifts.py).
+    gift_confirm = models.BooleanField(default=True)
     # Manual activation (no payment gateway): admin issues activation_code after
     # confirming payment; the couple enters it in the editor to go live.
     activation_code = models.CharField(max_length=20, blank=True)
@@ -433,6 +435,27 @@ class Testimonial(models.Model):
 
     def __str__(self):
         return self.names
+
+
+class GiftConfirmation(models.Model):
+    """A guest's note that they sent a gift, so the couple can match transfers
+    to names and say thank you. `channel` is a snapshot of what the guest
+    picked ("BCA", "GoPay", "Kado fisik"), kept even if the account is removed.
+    The amount is optional and never shown to other guests."""
+    invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='gift_confirmations')
+    guest = models.ForeignKey('Guest', on_delete=models.SET_NULL, null=True, blank=True, related_name='gift_confirmations')
+    sender_name = models.CharField(max_length=200)
+    channel = models.CharField(max_length=100, blank=True)
+    amount = models.PositiveBigIntegerField(null=True, blank=True)
+    note = models.TextField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    thanked_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+
+    def __str__(self):
+        return f"{self.sender_name} — {self.invitation.slug}"
 
 
 MAX_PAX = 10  # per RSVP when the guest has no own limit

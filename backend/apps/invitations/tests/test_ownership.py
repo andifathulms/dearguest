@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from django.contrib.auth.models import User
 from django.urls import URLResolver, get_resolver
 
-from apps.invitations.models import RSVP, BankAccount, Event, Guest, MusicPreset, Photo, Story
+from apps.invitations.models import RSVP, BankAccount, Event, GiftConfirmation, Guest, MusicPreset, Photo, Story
 
 from .base import APITestBase, mp3_upload, png_upload
 
@@ -29,6 +29,7 @@ OWNERSHIP = {
     'api/invitations/<slug:slug>/guest/<str:code>/': 'public',
     'api/invitations/<slug:slug>/guest/<str:code>/open/': 'public',
     'api/invitations/<slug:slug>/wishes/': 'public',
+    'api/invitations/<slug:slug>/gift/': 'public',
     'api/invitations/<slug:slug>/events/<int:pk>/calendar.ics': 'public',
     'share/<slug:slug>/': 'public',
     r'^og/(?P<slug>[-\w]+)/(?P<digest>[0-9a-f]{16})\.jpg$': 'public',
@@ -83,6 +84,11 @@ OWNERSHIP = {
         ('patch', '/api/my/invitations/{slug}/couple/'),
     ]),
     'api/my/invitations/<slug:slug>/wishes/': ('owner', [('get', '/api/my/invitations/{slug}/wishes/')]),
+    'api/my/invitations/<slug:slug>/gifts/': ('owner', [('get', '/api/my/invitations/{slug}/gifts/')]),
+    'api/my/invitations/<slug:slug>/gifts/<int:pk>/': ('owner', [
+        ('patch', '/api/my/invitations/{slug}/gifts/{gift}/'),
+        ('delete', '/api/my/invitations/{slug}/gifts/{gift}/'),
+    ]),
     'api/my/invitations/<slug:slug>/wishes/<int:pk>/': ('owner', [
         ('patch', '/api/my/invitations/{slug}/wishes/{rsvp}/'),
         ('delete', '/api/my/invitations/{slug}/wishes/{rsvp}/'),
@@ -140,6 +146,7 @@ class OwnershipSweep(APITestBase):
             'photo': Photo.objects.create(invitation=self.inv, image=png_upload()).pk,
             'bank': BankAccount.objects.create(invitation=self.inv, bank_name='BCA', account_number='1234567890',
                                                account_name='Andini').pk,
+            'gift': GiftConfirmation.objects.create(invitation=self.inv, sender_name='Tamu Rahasia', amount=100000).pk,
         }
         self.preset = MusicPreset.objects.create(title='Lagu', audio=mp3_upload())
 
@@ -148,7 +155,9 @@ class OwnershipSweep(APITestBase):
         return {
             'inv': (self.inv.is_active, self.inv.dress_code, self.inv.theme, self.inv.music_preset_id, self.inv.activation_requested),
             'couple': (self.inv.couple.bride_name, self.inv.couple.groom_name),
-            'counts': [m.objects.filter(invitation=self.inv).count() for m in (Guest, RSVP, Event, Story, Photo, BankAccount)],
+            'counts': [m.objects.filter(invitation=self.inv).count()
+                       for m in (Guest, RSVP, Event, Story, Photo, BankAccount, GiftConfirmation)],
+            'gift': GiftConfirmation.objects.get(pk=self.ids['gift']).thanked_at,
             'rsvp': RSVP.objects.get(pk=self.ids['rsvp']).wish_status,
             'photo_file': Photo.objects.get(pk=self.ids['photo']).image.storage.exists(Photo.objects.get(pk=self.ids['photo']).image.name),
         }
@@ -164,7 +173,7 @@ class OwnershipSweep(APITestBase):
                    'account_name': 'x', 'event_type': 'akad', 'venue_name': 'x', 'address': 'x',
                    'start': '2026-12-12T01:00:00Z', 'dress_code': 'Diretas', 'theme': 'floral', 'code': 'ABC123',
                    'preset': self.preset.pk, 'bride_name': 'Diretas', 'wish_status': 'hidden', 'rows': [{'name': 'x'}],
-                   'sent_at': '2026-10-28T10:00:00Z'}
+                   'sent_at': '2026-10-28T10:00:00Z', 'thanked': True, 'sender_name': 'x'}
         before = self.snapshot()
         for who in ('stranger', 'anonymous'):
             if who == 'stranger':
@@ -190,6 +199,8 @@ class OwnershipSweep(APITestBase):
                 res = self.client.get(url)
                 self.assertNotIn(b'Rahasia', res.content)
         res = self.client.post(f'/api/invitations/{A}/rsvp/', {'guest_name': 'x', 'attending': True}, format='json')
+        self.assertIn(res.status_code, DENIED)
+        res = self.client.post(f'/api/invitations/{A}/gift/', {'sender_name': 'x'}, format='json')
         self.assertIn(res.status_code, DENIED)
 
     def test_self_endpoints_list_only_the_callers_own(self):

@@ -82,3 +82,11 @@
 .wm-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .wm-delete { margin-left: auto; color: #c0504d; }
 @media (max-width: 640px) { .wm-settings { grid-template-columns: 1fr; } }
+
+/* Kado tab (GiftLog): reuses the wish list's cards. */
+.gl .dr-stats { margin-bottom: 1rem; }
+.gl .dr-stat strong { font-size: clamp(1.5rem, 7vw, 2.4rem); overflow-wrap: anywhere; }
+.gl-switch { margin-bottom: 1.25rem; }
+.gl-line { margin: 0.4rem 0 0; font-size: 0.88rem; }
+.dr-body > .dash-tabs { overflow-x: auto; }
+.dr-body > .dash-tabs .dash-tab { white-space: nowrap; flex: none; }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import PaymentLogo from '../ui/PaymentLogo.jsx'
 import SectionTitle from './SectionTitle.jsx'
+import GiftConfirm from './GiftConfirm.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 
 function typeLabel(account, t) {
@@ -110,6 +111,12 @@ export default function AmplodDigital({ bankAccounts, wishlistUrl }) {
         <div className="bank-cards">
           <GiftAddressCard recipient={invitation.gift_recipient} address={address} phone={invitation.gift_phone} />
         </div>
+      )}
+      {invitation?.gift_confirm && (hasBanks || address) && (
+        <GiftConfirm
+          slug={invitation.slug}
+          channels={[...new Set([...(bankAccounts || []).map(a => a.bank_name).filter(Boolean), ...(address ? [t('gift.confirm.physical')] : [])])]}
+        />
       )}
       {wishlistUrl && (
         <div className="amplod-wishlist-wrap">

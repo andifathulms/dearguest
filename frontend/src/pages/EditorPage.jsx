@@ -38,6 +38,7 @@ function SettingsSection({ inv, reload, notify }) {
     copy_variant: inv.copy_variant || 'umum', scripture_mode: inv.scripture_mode || 'default',
     scripture_ref: inv.scripture_ref || '', scripture_text: inv.scripture_text || '',
     gift_recipient: inv.gift_recipient || '', gift_address: inv.gift_address || '', gift_phone: inv.gift_phone || '',
+    gift_confirm: inv.gift_confirm ?? true,
   })
   // Placeholders show what guests see when a field is left empty: the variant's defaults.
   const tv = makeT(f.copy_variant)
@@ -152,6 +153,13 @@ function SettingsSection({ inv, reload, notify }) {
         <input id="set-gift-recipient" className="ed-input" aria-label="Nama penerima" value={f.gift_recipient} onChange={e => set('gift_recipient', e.target.value)} placeholder="Nama penerima" />
         <textarea id="set-gift-address" className="ed-textarea" value={f.gift_address} onChange={e => set('gift_address', e.target.value)} placeholder="Jalan, nomor, RT/RW, kelurahan, kota, kode pos" />
         <input id="set-gift-phone" className="ed-input" aria-label="Nomor HP penerima" value={f.gift_phone} onChange={e => set('gift_phone', e.target.value)} placeholder="Nomor HP penerima (opsional)" />
+      </div>
+      <div className="ed-field">
+        <label className="ed-check" htmlFor="set-gift-confirm">
+          <input id="set-gift-confirm" type="checkbox" checked={f.gift_confirm} onChange={e => set('gift_confirm', e.target.checked)} />
+          Tamu bisa mengonfirmasi hadiah yang sudah dikirim
+        </label>
+        <p className="ed-hint">Muncul di bawah amplop digital. Daftarnya ada di tab "Kado" pada halaman Tamu &amp; RSVP.</p>
       </div>
       {presets.length > 0 && (
         <div className="ed-field">

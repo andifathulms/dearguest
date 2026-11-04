@@ -229,7 +229,7 @@ class InvitationPublicSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'theme', 'wedding_date', 'expires_at',
             'opening_text', 'closing_text', 'dress_code', 'photo_filter', 'watermark', 'music_file',
-            'hero_photo', 'hero_photo_meta', 'livestream_url', 'wishlist_url',
+            'hero_photo', 'hero_photo_meta', 'livestream_url', 'wishlist_url', 'gift_confirm',
             'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
             'gift_recipient', 'gift_address', 'gift_phone',
             'couple', 'events', 'stories', 'photos', 'bank_accounts',
@@ -356,7 +356,7 @@ class InvitationSettingsSerializer(serializers.ModelSerializer):
             'slug', 'theme', 'wedding_date', 'opening_text', 'closing_text', 'dress_code', 'photo_filter',
             'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
             'gift_recipient', 'gift_address', 'gift_phone', 'wishes_require_approval', 'wish_blocklist',
-            'music_file', 'hero_photo', 'livestream_url', 'wishlist_url', 'is_active', 'watermark', 'expires_at',
+            'music_file', 'hero_photo', 'livestream_url', 'wishlist_url', 'gift_confirm', 'is_active', 'watermark', 'expires_at',
             'wa_templates',
         ]
         read_only_fields = ['slug', 'is_active', 'watermark', 'expires_at']
@@ -468,7 +468,7 @@ class EditorInvitationSerializer(serializers.ModelSerializer):
             'copy_variant', 'scripture_mode', 'scripture_ref', 'scripture_text',
             'gift_recipient', 'gift_address', 'gift_phone', 'wishes_require_approval', 'wish_blocklist',
             'activation_requested', 'has_activation_code',
-            'music_file', 'music_preset', 'hero_photo', 'livestream_url', 'wishlist_url',
+            'music_file', 'music_preset', 'hero_photo', 'livestream_url', 'wishlist_url', 'gift_confirm',
             'couple', 'events', 'stories', 'photos', 'bank_accounts', 'wa_templates', 'features',
         ]
 
