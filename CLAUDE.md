@@ -72,6 +72,23 @@ That folder is a git-ignored inbox. Then:
 - no people, no text, no religious symbols;
 - a note for a cultural reviewer.
 
+**"Section art for <theme>"**: the user painted that theme's four extra pieces from
+`prompts/sections/PROMPT-<ID>-SECTIONS.md`, against the theme's own reference painting. They are keyed
+cut-outs on the theme's key colour:
+- `section-edge`: a tall spray from the left edge, shown at the sides of sections behind the cards, mirrored
+  and alternating, with its own scroll speed;
+- `section-garland`: a horizontal garland, the painted divider between sections;
+- `monogram-wreath`: a round wreath around the initials at the closing and between the profiles;
+- `card-corner`: an L-shaped corner for event and gift cards and the RSVP form.
+
+Seven packs also get optional `parallax-back` / `parallax-front`. Build: move the images to the pack's
+`masters/` under those names, add `keyed` entries to its recipe (`clear` and the crop box remove leftovers
+Gemini repeats from the previous image, such as a half wreath under a card corner), add the slots to
+`theme.json`, then rewrite that pack's section baselines. The shared layout places them
+(docs/theme-packs.md §4, §9). Live: Jepun Prada, Gorga Ulos, Lamming Zamrud (plus depth), Gebyok Sogan (plus depth), Merah Anggur (plus depth;
+no card corner yet). A pack with new depth layers also needs hero CSS: the far strip stands ~0.25 W above
+the opaque bottom band, with the text raised to clear it (see floral/javanese/bugis overrides.css).
+
 ### Standing rules
 - Don't commit `docker-compose.yml` (the user's local port remap: web 5190, api 8020, db 5440), or
   `RECON.md`, `PHASE0-REPORT.md`, `PROMPT-ASSET-MOTION.md`.

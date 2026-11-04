@@ -1,0 +1,63 @@
+/* Tropis — Anggrek Bulan: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page white is sampled from the paintings so art and page meet without a seam;
+   the ink is the deep monstera green, the accent the heliconia coral, deepened to
+   read as text on the white (5.4:1). */
+.pk-root[data-pack='tropis'] {
+  /* colour */
+  --dg-bg: #fcfbf6;
+  --dg-bg-alt: rgba(224, 103, 79, 0.03);   /* a breath of heliconia blush */
+  --dg-surface: rgba(255, 255, 252, 0.78);
+  --dg-surface-raised: #fffffc;
+  --dg-ink: #1f3a2c;
+  --dg-ink-muted: #3f5a4b;
+  --dg-ink-faint: #7c8f82;
+  --dg-accent: #b2452f;   /* heliconia coral */
+  --dg-on-accent: #fcfbf6;
+  --dg-line: rgba(31, 58, 44, 0.16);
+  --dg-line-strong: rgba(31, 58, 44, 0.36);
+  --dg-scrim: linear-gradient(180deg, rgba(31, 58, 44, 0.2) 0%, rgba(31, 58, 44, 0) 25%, rgba(31, 58, 44, 0.45) 60%, rgba(31, 58, 44, 0.8) 100%);
+  --dg-focus: #b2452f;
+
+  /* type */
+  --dg-font-display: 'DG Tropis Display', 'DM Serif Display', Georgia, serif;
+  --dg-font-body: 'DG Tropis Body', 'Newsreader', Georgia, serif;
+  --dg-font-label: 'DG Tropis Label', 'Newsreader', Georgia, serif;
+  --dg-font-script: 'DG Tropis Script', 'Ephesis', cursive;
+  --dg-fs-names: clamp(2.8rem, 13vw, 5rem);
+  --dg-fs-title: clamp(1.7rem, 6.8vw, 2.4rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1.05rem;
+  --dg-fs-small: 0.96rem;
+  --dg-fs-label: 0.7rem;
+  --dg-lh-tight: 1.02;
+  --dg-lh-body: 1.7;
+  --dg-tracking-label: 0.2em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 14px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 14px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 12px 32px rgba(31, 58, 44, 0.08);
+  --dg-shadow-float: 0 6px 20px rgba(31, 58, 44, 0.2);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

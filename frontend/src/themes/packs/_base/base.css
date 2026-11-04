@@ -450,3 +450,53 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
   font-size: var(--dg-fs-small);
   color: var(--dg-ink-faint);
 }
+
+/* ---------- section art (prompts/sections; docs/theme-packs.md §9) ---------- */
+/* Side sprays sit behind the section's content, inset from its top and bottom so
+   their scroll drift (±4vh, SectionEdge.jsx) never crosses into the next section.
+   The painting is contained in the box: tall sections show it whole, short ones
+   shrink it. The right-hand one is the left-hand painting mirrored. Phones have no
+   empty margin, so there the spray only peeks in ~9vw, past the page gutter. */
+.pk-section-wrap { position: relative; }
+.pk-section-wrap > :not(.pk-section-edge) { position: relative; z-index: 1; }
+.pk-section-edge {
+  position: absolute;
+  inset-block: 5vh;
+  width: var(--pk-edge-w, 28vw);
+  z-index: 0;
+  pointer-events: none;
+}
+.pk-section-edge[data-side='left'] { left: var(--pk-edge-x, -17vw); }
+.pk-section-edge[data-side='right'] { right: var(--pk-edge-x, -17vw); }
+.pk-section-edge .pk-slot { display: block; width: 100%; height: 100%; }
+.pk-section-edge img { width: 100%; height: 100%; object-fit: contain; object-position: 0 50%; }
+.pk-section-edge[data-side='right'] .pk-slot { transform: scaleX(-1); }
+@media (min-aspect-ratio: 1/1) {
+  .pk-section-edge { --pk-edge-x: 0px; width: var(--pk-edge-w, min(26vw, 380px)); }
+}
+
+/* The painted garland between sections. */
+.pk-divider.pk-slot-section-garland { display: block; width: min(72vw, 440px); margin-inline: auto; padding-block: var(--dg-space-2); }
+.pk-divider.pk-slot-section-garland img { width: 100%; height: auto; }
+
+/* The painted wreath around the initials (its opening is ~half its width). */
+.pk-monogram--wreath { width: 172px; }
+.pk-closing .pk-monogram--wreath { width: 216px; }
+.pk-closing .pk-monogram--wreath .pk-monogram-initials { font-size: 1.9rem; }
+.pk-monogram-wreath { position: absolute; inset: 0; }
+.pk-monogram-wreath img { width: 100%; height: 100%; }
+.pk-monogram--wreath .pk-monogram-initials { transform: translateY(var(--pk-wreath-dy, 0)); }
+
+/* Card corners: top-left, and the same painting turned 180° at the bottom-right. */
+.pk-root[data-card-corner] :is(.event-card, .bank-card) { position: relative; }
+.pk-root[data-card-corner] :is(.event-card, .bank-card)::before,
+.pk-root[data-card-corner] :is(.event-card, .bank-card)::after {
+  content: '';
+  position: absolute;
+  width: var(--pk-card-corner-size, 76px);
+  aspect-ratio: 1;
+  background: var(--pk-card-corner) 0 0 / contain no-repeat;
+  pointer-events: none;
+}
+.pk-root[data-card-corner] :is(.event-card, .bank-card)::before { top: -6px; left: -6px; }
+.pk-root[data-card-corner] :is(.event-card, .bank-card)::after { bottom: -6px; right: -6px; transform: rotate(180deg); }

@@ -27,7 +27,12 @@
     },
     "monogram-frame": { "component": "slots/MonogramFrame.jsx" },
     "heading-ornament": { "svg": "assets/heading.svg", "width": 96, "height": 16 },
-    "divider": { "svg": "assets/divider.svg", "width": 140, "height": 16 }
+    "divider": { "svg": "assets/divider.svg", "width": 140, "height": 16 },
+    "section-edge": { "src": "assets/section-edge.webp", "avif": "assets/section-edge.avif", "width": 720, "height": 2116 },
+    "section-garland": { "src": "assets/section-garland.webp", "avif": "assets/section-garland.avif", "width": 1200, "height": 361 },
+    "monogram-wreath": { "src": "assets/monogram-wreath.webp", "avif": "assets/monogram-wreath.avif", "width": 640, "height": 640 },
+    "parallax-back": { "src": "assets/parallax-back.webp", "avif": "assets/parallax-back.avif", "width": 1080, "height": 832, "depth": -0.1 },
+    "parallax-front": { "src": "assets/parallax-front.webp", "avif": "assets/parallax-front.avif", "width": 1080, "height": 1354 }
   },
   "copyVariants": ["islam", "kristen", "katolik", "umum"],
   "eventTypes": ["akad", "pemberkatan", "sakramen", "resepsi", "adat", "ngunduh_mantu", "lainnya"],

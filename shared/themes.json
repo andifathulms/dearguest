@@ -236,6 +236,41 @@
       }
     },
     {
+      "id": "tropis",
+      "name": "Anggrek Bulan",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/tropis.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/tropis.webm",
+        "mp4": "/theme-previews/tropis.mp4"
+      },
+      "demoSlug": "demo-anggrek-bulan",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Anggrek bulan putih, daun monstera, pisang dan palem, heliconia koral, dan nyiur di kejauhan, dilukis di atas kertas putih hangat.",
+        "category": "Taman & Bunga",
+        "colors": [
+          "#fcfbf6",
+          "#1f3a2c",
+          "#b2452f"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fcfbf6,#4e8a5b 55%,#1f3a2c)",
+        "card": {
+          "bg": "#fcfbf6",
+          "fg": "#1f3a2c",
+          "accent": "#b2452f"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "tropis"
+      }
+    },
+    {
       "id": "floral",
       "name": "Merah Anggur",
       "collection": "signature",

@@ -168,6 +168,10 @@ z-order (bottom → top): `cover-bg` / `hero-bg` (0) · `hero-top` / `hero-botto
 | `photo-mask` | shape for profile (and arch-layout hero) photos | SVG, one closed path, black fill | viewBox 0 0 400 500 (4:5) | vector | — | applied with CSS `mask-image`; photo is cropped `object-fit: cover` |
 | `photo-ring` | ornament around profile photos | WebP alpha or SVG | 220×275 (4:5, matches mask + 10 % margin) | 440×550 | full colour or `currentColor` | sits above the photo; transparent centre |
 | `hero-overlay` | painted elements over the hero photo's edges (garland, foliage, frame) | WebP alpha | 390×844 | 780×1688 | full colour | anchored bottom; keep the centre clear for names |
+| `section-edge` | a tall spray growing in from a section's side, behind its content; alternates left/right (the right one mirrored) | WebP alpha (painted, keyed) | 28vw phone (peeks ~9vw), min(26vw, 380px) wide | 720 wide, ~9:23 | full colour | art in the left ~60 % of the canvas, contained in the section box (inset 5vh top and bottom) |
+| `section-garland` | the painted divider between sections; replaces `divider` when present | WebP alpha | min(72vw, 440px) | 1200 wide | full colour | slender, roughly symmetrical, tapering at both ends |
+| `monogram-wreath` | painted wreath around the initials (between the profiles, closing); replaces `monogram-frame` when present | WebP alpha | 172px (216px at the closing) | 640×640 | full colour | a clean round opening ~half the width, centred, for the initials |
+| `card-corner` | an L-shaped corner on event and gift cards, top-left and turned 180° at the bottom-right | WebP alpha | 76px (`--pk-card-corner-size`) | 360 wide | full colour | art in the top-left corner only; reaches the cards as the CSS variable `--pk-card-corner` |
 | `hero-bg` | `framed` hero: the painting behind it (wide screens when bands exist) | AVIF + WebP + JPEG, opaque | 390×844 | 1080×2340, or landscape 1920×1080 | full colour | `object-fit: cover`; centre clear |
 | `hero-top` / `hero-bottom` | `framed` hero on portrait screens: painted bands pinned to the top / bottom | WebP / AVIF with alpha (inner edge fades out) | 390 wide | 1080 wide | full colour | cut from one painting by `scripts/build_pack_art.py` |
 | `parallax-back` / `-mid` / `-front` | depth layers in the hero (static on a `framed-card` cover) | WebP alpha | 390×844 each | 1080×2340 each | full colour | `depth`: how far the layer trails the scroll, default 0.4 / 0.2 / −0.15 (0 moves with the page, 1 stands still, negative moves ahead; the offset is a fraction of a screen height, so a thin strip the pack's CSS places moves as much as a full-frame layer); each must read on its own; still under reduced motion (§9) |
@@ -244,6 +248,7 @@ Every pack moves. Most of it is shared and automatic; each pack only picks its c
 | Section titles | the title rises out of a mask, then the `heading-ornament` draws from its centre | `components/sections/SectionTitle.jsx` |
 | Gallery | each photo's frame unveils from its centre while the photo settles from a slight zoom, staggered | `GallerySection.jsx`, `_system/motion.js` |
 | Sprite wind | the `particles` layer lifts and leans against the scroll's velocity, then settles | `_system/Particles.jsx` |
+| Section sprays | a filled `section-edge` slot trails the scroll by ±4vh around each section (0 when the section is centred), so it reads as farther than the cards; per-section screenshots pin it at 0 (`tests/visual/packs/sections.css`) | `_system/SectionEdge.jsx` |
 
 **Per pack, `theme.json → motion`** (required; `make check` validates it):
 
@@ -278,6 +283,7 @@ Current packs: Gebyok Sogan `doors` + sway, shimmer; Gonjong Songket `doors` + s
 - **Reveals animate opacity too.** `tests/visual/packs/stub.js` `waitRevealed` waits for inline opacity 1, so a reveal that moves opacity with its other properties is waited for automatically.
 - **No second reveal layer on items a section already animates** (an IntersectionObserver class or a CSS scroll timeline on the same elements fights Framer and leaves items stuck hidden). Wrap, or animate an element nothing else animates.
 - **Cheap properties only** (transform, opacity, clip-path; the sheen's moving background is one small pseudo-element), no scroll listeners outside Framer's, no WebGL: guests open these links in WhatsApp's in-app browser on mid-range phones.
+- **Section art (optional):** `prompts/sections/PROMPT-<ID>-SECTIONS.md` asks for `section-edge`, `section-garland`, `monogram-wreath` and `card-corner` on the key colour; build them as `keyed` entries, add the slots to `theme.json`, and the shared layout places them (`PackTheme.jsx`, `Monogram.jsx`, `_base/base.css` "section art"). A pack without them keeps the drawn divider and frame.
 - **Depth art (optional):** a prompt's Prompt 8 asks for `parallax-back` / `parallax-front` cut-outs on the key colour; build them as `keyed` entries in the recipe and add the slots to `theme.json`. They start moving with no code.
 - **Reduced motion:** Framer's `MotionConfig reducedMotion="user"` plus `useReducedMotion()` switch reveals to plain fades, freeze the hero, make the exit a fade; the loops only exist under `prefers-reduced-motion: no-preference`.
 - **Behaviour is tested** in `tests/visual/packs/motion.spec.js` (exit, curtain at rest and on scroll, reveals ending at rest, reduced motion).

@@ -26,6 +26,7 @@ import { PackContext } from './ThemeContext.jsx'
 import ThemeAsset from './ThemeAsset.jsx'
 import Particles from './Particles.jsx'
 import Monogram from './Monogram.jsx'
+import SectionEdge from './SectionEdge.jsx'
 import Opening from './openings/Opening.jsx'
 import Cover from './layout/Cover.jsx'
 import { primaryEvent } from '../../../utils/events.js'
@@ -34,7 +35,7 @@ import { primaryEvent } from '../../../utils/events.js'
 // components (same content for every theme); the pack supplies tokens, art,
 // fonts, a layout variant and an opening (docs/theme-packs.md).
 
-function PackSection({ children, tone }) {
+function PackSection({ children, tone, edge }) {
   return (
     <motion.div
       className="pk-section-wrap"
@@ -44,6 +45,7 @@ function PackSection({ children, tone }) {
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
+      {edge && <SectionEdge side={edge} />}
       {children}
     </motion.div>
   )
@@ -54,6 +56,11 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
   const m = pack.manifest
   const couple = invitation.couple || {}
   const primary = primaryEvent(invitation.events)
+  // Section art (prompts/sections): a painted garland replaces the drawn
+  // divider, and the card corner reaches the shared cards through a CSS variable.
+  const divider = m.slots?.['section-garland'] ? 'section-garland' : 'divider'
+  const corner = m.slots?.['card-corner']
+  const cornerStyle = corner ? { '--pk-card-corner': `url(${pack.urls[corner.src]})` } : undefined
 
   const events = invitation.events || []
   const has = list => (list || []).length > 0
@@ -85,6 +92,8 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
           data-gallery={m.gallery || 'grid'}
           data-photo-filter={invitation.photo_filter || 'none'}
           data-signature={(m.motion?.signature || []).join(' ') || undefined}
+          data-card-corner={corner ? '' : undefined}
+          style={cornerStyle}
         >
           <ThemeAsset slot="texture" className="pk-texture" />
           <Particles />
@@ -99,8 +108,8 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
 
           {sections.map((section, i) => (
             <Fragment key={i}>
-              {i > 0 && <ThemeAsset slot="divider" className="pk-divider" />}
-              <PackSection tone={i % 2 ? 'alt' : 'base'}>{section}</PackSection>
+              {i > 0 && <ThemeAsset slot={divider} className="pk-divider" />}
+              <PackSection tone={i % 2 ? 'alt' : 'base'} edge={i % 2 ? 'right' : 'left'}>{section}</PackSection>
             </Fragment>
           ))}
 

@@ -66,7 +66,18 @@
    top; the bosara at the sides rise to ~0.48 W above the bottom). */
 .pk-root[data-pack='bugis'] .pk-hero--framed { padding-block: 8rem 7rem; }
 @media (max-aspect-ratio: 1/1) {
-  .pk-root[data-pack='bugis'] .pk-hero--framed[data-bands] { padding-block: 50vw 40vw; }
+  .pk-root[data-pack='bugis'] .pk-hero--framed[data-bands] { padding-block: 50vw 86vw; }
+}
+/* Depth (section prompts S5, S6), phones only: the stilt houses among palms (parallax-back) stand
+   behind the bottom band, their top ~0.25 W above it, below the date (the band hides
+   their base, so no fade), rising as the band sinks (depth -0.1); the near sabbe drapes (parallax-front) are
+   fitted to the width and pushed past the edges. Wide screens show the desktop painting. */
+.pk-root[data-pack='bugis'] .pk-hero .pk-parallax-back { inset: auto 0 7vw; opacity: 0.85; }
+.pk-root[data-pack='bugis'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='bugis'] .pk-hero .pk-parallax-front { inset: 0 -16vw; }
+.pk-root[data-pack='bugis'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='bugis'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
 }
 .pk-root[data-pack='bugis'] .pk-hero--framed .hero-content { gap: 0.5rem; }
 .pk-root[data-pack='bugis'] .pk-hero-portrait { --w: min(38vw, 180px); }

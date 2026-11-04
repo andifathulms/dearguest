@@ -85,12 +85,14 @@ export async function stubEditor(page) {
 
 // Wait until fonts and every rendered image currently in the DOM have loaded.
 // (Images that aren't rendered -- e.g. a pack's desktop painting on a phone,
-// display:none and lazy -- never load, so they are skipped.)
+// display:none and lazy -- never load, so they are skipped; so are lazy ones
+// far above the viewport, which WebKit never loads once an instant scroll has
+// jumped past them.)
 export async function settle(page, scope = 'body') {
   await page.evaluate(() => document.fonts.ready)
   await page.waitForFunction(sel => [...document.querySelector(sel).querySelectorAll('img')]
     .filter(i => i.getClientRects().length > 0)
-    .filter(i => i.loading !== 'lazy' || i.getBoundingClientRect().top < innerHeight * 2)
+    .filter(i => i.loading !== 'lazy' || Math.abs(i.getBoundingClientRect().top) < innerHeight * 2)
     .every(i => i.complete), scope)
 }
 

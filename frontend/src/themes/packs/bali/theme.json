@@ -104,7 +104,11 @@
       "svg": "assets/divider.svg",
       "width": 140,
       "height": 16
-    }
+    },
+    "section-edge": { "src": "assets/section-edge.webp", "avif": "assets/section-edge.avif", "width": 720, "height": 1841 },
+    "section-garland": { "src": "assets/section-garland.webp", "avif": "assets/section-garland.avif", "width": 1200, "height": 335 },
+    "monogram-wreath": { "src": "assets/monogram-wreath.webp", "avif": "assets/monogram-wreath.avif", "width": 640, "height": 640 },
+    "card-corner": { "src": "assets/card-corner.webp", "avif": "assets/card-corner.avif", "width": 360, "height": 348 }
   },
   "copyVariants": [
     "islam",

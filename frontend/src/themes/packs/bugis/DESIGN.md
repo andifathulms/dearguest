@@ -19,6 +19,12 @@ wouldn't paint it):
 | `photo-ring` | carved gold oval with a sabbe band, around the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | carved bracket with walasuji and a sabbe swag, framing the closing |
 | `particles` | melati, cempaka petal, daun pacar, daun sirih, beras kuning, gold sulapa eppa sequin |
+| `section-edge` | section art: a gold bunga parenreng panel with a draped sabbe silk, melati and cempaka, at the sides of the sections |
+| `section-garland` | section art: a gold bunga parenreng vine with melati and cempaka, the divider between sections (delivered twice on one sheet; the faded copy is cropped off) |
+| `monogram-wreath` | section art: a gold bunga parenreng ring with melati, cempaka and a walasuji lattice at the bottom, around the initials |
+| `card-corner` | section art: a gold bunga parenreng bracket with melati, on the event and gift cards (the delivered sheet also had a half wreath below it, cleared in the recipe) |
+| `parallax-back` | depth (section prompt S5): Bugis stilt houses among palms behind the hero's bottom band; trails the scroll (`depth` -0.1). Phones only |
+| `parallax-front` | depth (section prompt S6): red-and-gold sabbe drapes with gold fringe at the top corners, ahead of the scroll. Phones only |
 | page background | `texture.webp`, generated seamless emerald silk (in overrides.css) |
 
 **Type.** Italianno for the couple's names and section titles; Playfair Display

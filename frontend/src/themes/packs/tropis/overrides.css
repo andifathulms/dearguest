@@ -1,0 +1,149 @@
+/* Tropis — Anggrek Bulan: what tokens can't express (cap: 150 lines). See DESIGN.md. */
+
+/* The page is the same warm white paper the paintings are on (texture generated in code). */
+.pk-root[data-pack='tropis'] {
+  background: var(--dg-bg) url('./assets/texture.webp') repeat;
+  background-size: 256px 256px;
+  font-feature-settings: 'kern', 'liga';
+}
+
+/* Names in Ephesis; titles in DM Serif Display, labels in spaced Newsreader capitals. */
+.pk-root[data-pack='tropis'] :is(.cover-names, .hero-names) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='tropis'] :is(.cover-amp, .hero-ampersand) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='tropis'] :is(.cover-label, .hero-label, .cover-guest-to, .countdown-label, .event-date, .story-date) {
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='tropis'] .section-title {
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-fs-title);
+  letter-spacing: 0.02em;
+}
+
+/* Cover: under the canopy, left of the bottom-right bed. The calm zone is ~31–78 % of
+   the height in the middle 76 % of the width (the canopy is a V, deepest at the edges). */
+.pk-root[data-pack='tropis'] .pk-cover--painted { place-items: center; }
+.pk-root[data-pack='tropis'] .pk-cover--painted .pk-cover-content {
+  width: min(76vw, 25rem);
+  padding-inline: 0;
+  gap: 0.45rem;
+  padding-block: 9vh 0;
+}
+@media (min-aspect-ratio: 1/1) {
+  /* wide: the desktop painting's palms rise from ~76 %, so the block sits higher */
+  .pk-root[data-pack='tropis'] .pk-cover--painted .pk-cover-content { padding-block: 0 12vh; }
+}
+.pk-root[data-pack='tropis'] .pk-cover--painted .cover-names { font-size: clamp(3.1rem, 14.5vw, 5.4rem); margin: 0.1rem 0 0.3rem; }
+.pk-root[data-pack='tropis'] .pk-cover .pk-monogram { display: none; }
+.pk-root[data-pack='tropis'] .cover-guest { margin-top: 0.3rem; }
+.pk-root[data-pack='tropis'] .cover-guest-to { letter-spacing: 0.16em; }
+.pk-root[data-pack='tropis'] .cover-guest-name { font-family: var(--dg-font-body); font-style: italic; font-size: clamp(1.35rem, 5.6vw, 1.7rem); }
+.pk-root[data-pack='tropis'] .pk-cover .pk-open-btn { margin-top: 0.6rem; }
+
+/* Leaf-green pill buttons with white text. */
+.pk-root[data-pack='tropis'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn) {
+  border: 1px solid rgba(31, 58, 44, 0.5);
+  background: linear-gradient(180deg, #3b6b4f, #29503b);
+  color: var(--dg-on-accent);
+  font-family: var(--dg-font-label);
+  letter-spacing: 0.14em;
+  box-shadow: var(--dg-shadow-float);
+}
+.pk-root[data-pack='tropis'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn):hover { background: #1f3a2c; color: var(--dg-on-accent); }
+.pk-root[data-pack='tropis'] :is(.bank-copy-btn, .map-load, .rsvp-toggle-btn) { border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='tropis'] .rsvp-toggle-btn.active { background: #29503b; border-color: #29503b; color: var(--dg-on-accent); }
+
+/* Photo frames are ovals inside the leaf-and-orchid wreath (photo-ring.webp). Its gold
+   ring's opening is ~x 21–86 %, y 15–87 % of the art (the orchids crowd the left); the
+   photo sits just inside it (x 21–85.5 %, y 15.5–86.5 %), so the wreath extends past the
+   photo by 32.6 % (left), 22.5 % (right), 21.8 % (top) and 19 % (bottom); --w is the
+   photo width. */
+.pk-root[data-pack='tropis'] .pk-photo-frame {
+  --w: min(40vw, 180px);
+  width: var(--w);
+  aspect-ratio: 0.732;
+  margin: calc(var(--w) * 0.32) auto calc(var(--w) * 0.29);
+}
+.pk-root[data-pack='tropis'] .pk-photo-frame .profile-photo {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+}
+.pk-root[data-pack='tropis'] .pk-photo-ring { inset: -21.8% -22.5% -19% -32.6%; }
+.pk-root[data-pack='tropis'] .pk-photo-ring img { width: 100%; height: 100%; }
+
+/* Hero. Phones: content between the bands (the canopy is a V, ~0.45–0.52 W deep where
+   the portrait sits; the bed rises ~0.3 W there, 0.54 W at the edges). The far palms
+   (parallax-back, Prompt 8) stand behind the bed and rise as it sinks (depth -0.1).
+   The near canopy (parallax-front) is fitted to the width and pushed past the edges.
+   Wide screens show the desktop painting, so the depth layers stay hidden. */
+.pk-root[data-pack='tropis'] .pk-hero--framed { padding-block: 6rem 14rem; }   /* wide: lift the text clear of the palms */
+@media (max-aspect-ratio: 1/1) {
+  .pk-root[data-pack='tropis'] .pk-hero--framed[data-bands] { padding-block: 56vw 78vw; }
+}
+.pk-root[data-pack='tropis'] .pk-hero--framed .hero-content { gap: 0.5rem; }
+.pk-root[data-pack='tropis'] .pk-hero-portrait { --w: min(38vw, 170px); }
+/* The bed's band is opaque paper ~0.61 W tall and paints over the palms, so they stand
+   high enough for their crowns to show above it. Their trunks fade out, so no hard
+   edge shows as they rise out from behind the bed. */
+.pk-root[data-pack='tropis'] .pk-hero .pk-parallax-back {
+  inset: auto 0 41vw;
+  opacity: 0.8;
+  -webkit-mask-image: linear-gradient(#000 45%, transparent 80%);
+  mask-image: linear-gradient(#000 45%, transparent 80%);
+}
+.pk-root[data-pack='tropis'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='tropis'] .pk-hero .pk-parallax-front { inset: 0 -16vw; }
+.pk-root[data-pack='tropis'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='tropis'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
+}
+.pk-root[data-pack='tropis'] :is(.hero-ornament, .pk-hero--framed .hero-scroll-cue) { display: none; }
+.pk-root[data-pack='tropis'] .hero-bismillah { font-size: 1.2rem; color: var(--dg-accent); }
+
+/* Greeting, verse and closing in Newsreader italic. */
+.pk-root[data-pack='tropis'] :is(.greeting-text, .pk-closing p, .scripture-text) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  font-size: clamp(1.15rem, 4.6vw, 1.4rem);
+  line-height: 1.6;
+  color: var(--dg-ink);
+}
+
+/* Cards: soft white with rounded corners and a green hairline. */
+.pk-root[data-pack='tropis'] :is(.event-card, .bank-card, .wish-card, .rsvp-success) {
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-card);
+  box-shadow: var(--dg-shadow-card);
+}
+.pk-root[data-pack='tropis'] :is(.event-type, .profile-name, .map-event-label) {
+  font-family: var(--dg-font-script);
+  font-weight: 400;
+  font-size: clamp(2.7rem, 11.5vw, 3.4rem);
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='tropis'] .countdown-unit {
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-card);
+  background: var(--dg-surface);
+}
+.pk-root[data-pack='tropis'] .countdown-value { font-family: var(--dg-font-display); color: var(--dg-ink); }
+.pk-root[data-pack='tropis'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(255, 255, 252, 0.85); border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='tropis'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
+
+/* Closing: the monstera-and-orchid corners lean over the last words as a lintel (the
+   orchid spray must hang down, so the second corner is mirrored, not rotated). */
+.pk-root[data-pack='tropis'] .pk-closing { padding-block: clamp(14rem, 60vw, 18rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
+.pk-root[data-pack='tropis'] .pk-closing .pk-corner { width: min(52vw, 240px); }
+.pk-root[data-pack='tropis'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }

@@ -1,0 +1,12 @@
+{
+  "box": [
+    330,
+    70,
+    870,
+    460
+  ],
+  "ink": "#1f3a2c",
+  "accent": "#b2452f",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/tropis/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}
