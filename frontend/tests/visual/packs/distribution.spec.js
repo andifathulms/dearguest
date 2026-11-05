@@ -74,10 +74,11 @@ test('import: paste, mapped columns, preview flags, save', async ({ page }) => {
     'Nama\tNo HP\tGrup\tJumlah\nRina Wati\t0812 9999 0001\tAlumni\t2\nSiti Aminah\t0812 3456 7891\t\t\nTono\t12\t\t\n')
   await expect(page.locator('.gi-summary')).toContainText('1 tamu siap disimpan')
   await expect(page.locator('.gi-table tbody td:last-child')).toHaveText(['OK', 'Nomor sudah ada', 'Nomor WhatsApp tidak valid'])
+  await page.evaluate(() => document.fonts.ready)   // the preview table can render before the brand font
   await expect(page.locator('.gi')).toHaveScreenshot('import-preview.png')
   await page.getByRole('button', { name: 'Simpan 1 tamu' }).click()
   await expect(page.locator('.gi-result')).toContainText('1 tamu ditambahkan')
-  expect(state.imported).toEqual([{ name: 'Rina Wati', whatsapp: '6281299990001', group: 'Alumni', max_pax: 2 }])
+  expect(state.imported).toEqual([{ name: 'Rina Wati', whatsapp: '6281299990001', group: 'Alumni', table: '', max_pax: 2 }])
 })
 
 test('guest list: sent and opened, filter "Terkirim tapi belum dibuka"', async ({ page }) => {
