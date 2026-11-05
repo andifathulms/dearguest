@@ -1,4 +1,5 @@
 from django.urls import path
+from .csp import CSPReportView
 from .funnel import FunnelVisitView
 from .gifts import GiftConfirmCreateView, MyGiftDetail, MyGiftList
 from .headcount import HeadcountView
@@ -23,6 +24,7 @@ from .views import (
     MusicPresetListView,
 )
 from .editor_views import (
+    ExportView,
     MyInvitationsView,
     MyInvitationDetailView,
     MusicPresetSelectView,
@@ -43,6 +45,7 @@ from .editor_views import (
 )
 
 urlpatterns = [
+    path('csp-report/', CSPReportView.as_view()),
     path('funnel/visit/', FunnelVisitView.as_view()),
     path('site/marketing/', MarketingView.as_view()),
     path('invitations/<slug:slug>/', InvitationDetailView.as_view()),
@@ -73,6 +76,7 @@ urlpatterns = [
     path('my/slug-check/', SlugCheckView.as_view()),
     path('my/invitations/', MyInvitationsView.as_view()),
     path('my/invitations/<slug:slug>/', MyInvitationDetailView.as_view()),
+    path('my/invitations/<slug:slug>/export.zip', ExportView.as_view()),
     path('my/invitations/<slug:slug>/request-activation/', RequestActivationView.as_view()),
     path('my/invitations/<slug:slug>/activate/', ActivateView.as_view()),
     path('my/invitations/<slug:slug>/music-preset/', MusicPresetSelectView.as_view()),

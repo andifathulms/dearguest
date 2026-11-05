@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
-from . import audience, copy, csv_export, guest_import, ics, maps, moderation, themes
+from . import audience, copy, csv_export, guest_import, ics, maps, moderation, payload_cache, themes
 from .crawlers import is_crawler
 from .entitlements import has_feature
 from .throttling import client_ip
@@ -83,14 +83,22 @@ class InvitationDetailView(generics.RetrieveAPIView):
         invitation, error = _get_invitation_or_error(slug)
         if error:
             return error
-        serializer = self.get_serializer(invitation, context={'request': request})
-        data = serializer.data
         variant = request.query_params.get('variant')
-        if variant and variant in copy.variants() and themes.is_demo_slug(slug):
-            data = demo_in_variant(data, variant)
-        # A personal link (?g=<code>) sees its group's events; others see the shared ones.
+        if not (variant and variant in copy.variants() and themes.is_demo_slug(slug)):
+            variant = None
+        key = payload_cache.payload_key(invitation.pk, request.get_host(), variant)
+        data = cache.get(key)
+        if data is None:
+            data = self.get_serializer(invitation, context={'request': request}).data
+            if variant:
+                data = demo_in_variant(data, variant)
+            cache.set(key, data, payload_cache.PAYLOAD_TTL)
+        # Per guest, after the cache: a personal link (?g=<code>) sees its
+        # group's events; others see the shared ones.
         guest = find_guest(invitation, request.query_params.get('g'))
         data = audience.for_guest(data, guest)
+        if guest and guest.table:
+            data['seat'] = guest.table
         if guest and invitation.usher_enabled:
             from .usher import window_open
             # Around the wedding days a personal link shows its QR for the ushers.
@@ -288,7 +296,12 @@ class WishesListView(generics.ListAPIView):
         self.invitation, error = _public_or_404(self.kwargs['slug'], request.user)
         if error:
             return error
-        return super().list(request, *args, **kwargs)
+        key = payload_cache.wishes_key(self.invitation.pk, request.query_params.get('page'))
+        data = cache.get(key)
+        if data is None:
+            data = super().list(request, *args, **kwargs).data
+            cache.set(key, data, payload_cache.WISHES_TTL)
+        return Response(data)
 
     def get_queryset(self):
         return self.invitation.rsvps.exclude(wishes='').filter(wish_status='visible').order_by('-submitted_at', '-id')

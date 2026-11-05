@@ -19,23 +19,31 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
     'corsheaders',
     'apps.invitations',
     'apps.auth_api',
 ]
 
 MIDDLEWARE = [
+    'config.logging.RequestIdMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
+
+# Django admin (config/admin_site.py): its own path and a TOTP second factor.
+ADMIN_URL = config('ADMIN_URL', default='admin/').strip('/') + '/'
+ADMIN_REQUIRE_OTP = config('ADMIN_REQUIRE_OTP', default=not DEBUG, cast=bool)
 
 TEMPLATES = [
     {
@@ -98,6 +106,7 @@ REST_FRAMEWORK = {
         'guest_open': '120/hour',
         'funnel': '30/hour',
         'coupon': '30/hour',
+        'csp': '120/hour',
     },
 }
 
@@ -136,6 +145,30 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Undangan Digital <noreply@undangan.local>')
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='admin@undangan.local')
 
+# Personal data retention (UU PDP): guest lists, RSVPs, wishes, photos, music
+# and bank details are deleted this many days after an invitation expires
+# (manage.py purge_expired, run daily by the scheduler).
+RETENTION_DAYS = config('RETENTION_DAYS', default=90, cast=int)
+RETENTION_NOTICE_DAYS = 7
+
+# Ops (Phase 5): the git SHA of this build, and the token for the deep health
+# check (/api/health/?deep=1) that uptime monitoring calls.
+RELEASE = config('RELEASE', default='dev')
+HEALTH_TOKEN = config('HEALTH_TOKEN', default='')
+# Alerts from scheduled jobs (ops_report): a Telegram bot and chat.
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
+TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+
 # Public URLs used in emails, share pages, and redirects.
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173').rstrip('/')
 ADMIN_WHATSAPP_NUMBER = config('ADMIN_WHATSAPP_NUMBER', default='628123456789')
+
+# Structured JSON logs with request ids (config/logging.py); plain in development.
+from config.logging import config as _logging_config  # noqa: E402
+LOGGING = _logging_config(DEBUG)
+
+# Error tracking (config/sentry.py): off unless SENTRY_DSN is set.
+SENTRY_DSN = config('SENTRY_DSN', default='')
+if SENTRY_DSN:
+    from config import sentry as _sentry  # noqa: E402
+    _sentry.init(SENTRY_DSN, RELEASE, config('SENTRY_ENVIRONMENT', default='production'))

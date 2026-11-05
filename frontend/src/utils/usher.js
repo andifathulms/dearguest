@@ -1,4 +1,5 @@
 // Mode Penerima Tamu helpers. Pure, so they run under `node --test`.
+import { seatLabel } from './seat.js'
 
 // What an usher's camera read -> a guest code. Guests show the QR of their
 // personal link (https://…/<slug>/<CODE>, older links …?g=<code>); a code
@@ -21,7 +22,7 @@ export function codeFromScan(text) {
 const fold = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 export function matchesGuest(guest, query) {
   const words = fold(query).split(/\s+/).filter(Boolean)
-  const hay = fold(`${guest.name} ${guest.group || ''} ${guest.envelope_no || ''}`)
+  const hay = fold(`${guest.name} ${guest.group || ''} ${seatLabel(guest.table)} ${guest.envelope_no || ''}`)
   return words.every(w => hay.includes(w))
 }
 

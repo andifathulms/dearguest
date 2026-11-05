@@ -17,6 +17,8 @@
 .ws-name, .ws-couple { margin: 2.5vh 0; font-family: var(--dg-font-display, Georgia, serif); font-size: clamp(36px, 9vh, 140px); line-height: 1.05; text-wrap: balance; overflow-wrap: anywhere; }
 .ws-amp { font-family: var(--dg-font-script, inherit); color: var(--dg-accent, inherit); }
 .ws-thanks { margin: 0; font-size: clamp(16px, 2.8vh, 40px); color: var(--dg-ink-muted, #5f5a52); }
+.ws-seat { margin: 2.2vh 0 0; font-size: clamp(18px, 3.4vh, 48px); }
+.ws-seat strong { color: var(--dg-accent, inherit); font-weight: 600; }
 .ws-problem { position: absolute; bottom: 2vh; left: 0; right: 0; text-align: center; font-size: 14px; opacity: .6; margin: 0; }
 @media (prefers-reduced-motion: no-preference) {
   .ws-greet, .ws-idle { animation: ws-in .8s cubic-bezier(.2, .7, .2, 1); }

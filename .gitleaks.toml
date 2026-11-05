@@ -1,0 +1,14 @@
+# gitleaks (CI audit job): the default rules, minus files whose "secrets" are
+# public by design.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Local-only values, documented as public"
+paths = [
+  '''deploy/local-prod\.env''',
+  '''\.env\.example''',
+  '''frontend/package-lock\.json''',
+  # Throwaway passwords in test fixtures (e.g. "x-Strong-pass-91").
+  '''backend/apps/[a-z_]+/tests/''',
+]

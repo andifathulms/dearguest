@@ -10,6 +10,7 @@ export const FIELDS = [
   { key: 'name', label: 'Nama' },
   { key: 'whatsapp', label: 'No. WhatsApp' },
   { key: 'group', label: 'Grup' },
+  { key: 'table', label: 'Meja' },
   { key: 'max_pax', label: 'Jumlah orang' },
 ]
 export const SKIP = {
@@ -24,6 +25,7 @@ const HEADER_WORDS = {
   whatsapp: /^(wa|whatsapp|no\.? ?wa|no\.? ?hp|hp|nomor|nomor wa|nomor hp|no\.? ?telp|telepon|phone|no)$/,
   group: /^(grup|group|kelompok|kategori|keterangan)$/,
   max_pax: /^(jumlah|pax|jumlah orang|orang|jml)$/,
+  table: /^(meja|table|no\.? ?meja|nomor meja|tempat duduk)$/,
 }
 
 function delimiter(text) {
@@ -61,7 +63,7 @@ const looksLikeNumber = v => /^[+\d][\d\s().-]{6,}$/.test(v) && normaliseWhatsap
 // { mapping: {name: col, whatsapp: col|-1, ...}, hasHeader }
 export function guessColumns(rows) {
   const first = rows[0] || []
-  const mapping = { name: -1, whatsapp: -1, group: -1, max_pax: -1 }
+  const mapping = { name: -1, whatsapp: -1, group: -1, table: -1, max_pax: -1 }
   first.forEach((cell, col) => {
     const word = cell.toLowerCase().replace(/[:*]/g, '').trim()
     for (const [key, re] of Object.entries(HEADER_WORDS)) if (mapping[key] === -1 && re.test(word)) { mapping[key] = col; break }
@@ -87,7 +89,7 @@ function pax(v) {
   return Number.isInteger(n) && n >= 1 && n <= MAX_PAX ? n : null
 }
 
-// Each row with what will happen to it: { row, name, whatsapp, number, group, max_pax, skip }.
+// Each row with what will happen to it: { row, name, whatsapp, number, group, table, max_pax, skip }.
 export function previewRows(rows, { mapping, hasHeader }, existing = []) {
   const numbers = new Set(existing.map(g => normaliseWhatsapp(g.whatsapp)).filter(Boolean))
   const names = new Set(existing.map(g => g.name.toLocaleLowerCase('id')))
@@ -105,6 +107,6 @@ export function previewRows(rows, { mapping, hasHeader }, existing = []) {
       names.add(name.toLocaleLowerCase('id'))
       if (number) numbers.add(number)
     }
-    return { row: i + 1, name, whatsapp, number, group: clean(pick(r, 'group'), 100), max_pax: pax(pick(r, 'max_pax')), skip }
+    return { row: i + 1, name, whatsapp, number, group: clean(pick(r, 'group'), 100), table: clean(pick(r, 'table'), 40), max_pax: pax(pick(r, 'max_pax')), skip }
   })
 }

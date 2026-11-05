@@ -100,7 +100,8 @@ def _sessions(guest, events, variant):
 def guest_row(guest, answers, events, variant):
     rsvp = answers.get(guest.id)
     return {
-        'id': guest.id, 'name': guest.name, 'group': guest.group, 'code': guest.code, 'max_pax': guest.max_pax,
+        'id': guest.id, 'name': guest.name, 'group': guest.group, 'table': guest.table, 'code': guest.code,
+        'max_pax': guest.max_pax,
         'is_walk_in': guest.is_walk_in, 'checked_in': guest.checked_in, 'checked_in_at': guest.checked_in_at,
         'arrived_pax': guest.arrived_pax, 'envelope_no': guest.envelope_no, 'souvenir_given': guest.souvenir_given,
         'rsvp': {'attending': rsvp.attending, 'pax': rsvp.pax} if rsvp else None,
@@ -139,13 +140,19 @@ def _clean_pax(value, default=1):
     return min(max(n, 1), MAX_ARRIVED)
 
 
+def _clean_table(value):
+    return ' '.join(str(value or '').split())[:40]
+
+
 def _check_in(guest, data):
     guest.checked_in = True
     guest.checked_in_at = timezone.now()
     guest.arrived_pax = _clean_pax(data.get('arrived_pax'), default=guest.max_pax or 1)
     guest.envelope_no = str(data.get('envelope_no') or '').strip()[:20]
     guest.souvenir_given = bool(data.get('souvenir'))
-    guest.save(update_fields=['checked_in', 'checked_in_at', 'arrived_pax', 'envelope_no', 'souvenir_given'])
+    if 'table' in data:
+        guest.table = _clean_table(data['table'])
+    guest.save(update_fields=['checked_in', 'checked_in_at', 'arrived_pax', 'envelope_no', 'souvenir_given', 'table'])
 
 
 class UsherHomeView(_UsherView):
@@ -166,7 +173,7 @@ class UsherHomeView(_UsherView):
 
 
 class UsherCheckInView(_UsherView):
-    """POST {guest_id | code, arrived_pax, envelope_no, souvenir}. A guest who is
+    """POST {guest_id | code, arrived_pax, envelope_no, souvenir, table?}. A guest who is
     already in answers 200 with `already: true` and is left unchanged."""
 
     def post(self, request, token):
@@ -189,14 +196,15 @@ class UsherCheckInView(_UsherView):
 
 
 class UsherWalkInView(_UsherView):
-    """POST {name, group?, arrived_pax, envelope_no, souvenir}: a guest who isn't on the list."""
+    """POST {name, group?, table?, arrived_pax, envelope_no, souvenir}: a guest who isn't on the list."""
 
     def post(self, request, token):
         def body(inv):
             name = ' '.join(str(request.data.get('name') or '').split())[:200]
             if not name:
                 return Response({'name': ['Nama wajib diisi.']}, status=status.HTTP_400_BAD_REQUEST)
-            guest = Guest(invitation=inv, name=name, group=str(request.data.get('group') or '').strip()[:100], is_walk_in=True)
+            guest = Guest(invitation=inv, name=name, group=str(request.data.get('group') or '').strip()[:100],
+                          table=_clean_table(request.data.get('table')), is_walk_in=True)
             guest.save()
             _check_in(guest, request.data)
             answers, _ = _latest_answers(inv)
@@ -206,7 +214,7 @@ class UsherWalkInView(_UsherView):
 
 
 class UsherGuestView(_UsherView):
-    """PATCH {arrived_pax?, envelope_no?, souvenir_given?} after check-in;
+    """PATCH {arrived_pax?, envelope_no?, souvenir_given?, table?} after check-in;
     POST .../undo/ takes a check-in back (a walk-in added by mistake is removed)."""
 
     def patch(self, request, token, pk):
@@ -221,7 +229,9 @@ class UsherGuestView(_UsherView):
                 guest.envelope_no = str(data['envelope_no'] or '').strip()[:20]
             if 'souvenir_given' in data:
                 guest.souvenir_given = bool(data['souvenir_given'])
-            guest.save(update_fields=['arrived_pax', 'envelope_no', 'souvenir_given'])
+            if 'table' in data:   # the ushers may move someone to another table
+                guest.table = _clean_table(data['table'])
+            guest.save(update_fields=['arrived_pax', 'envelope_no', 'souvenir_given', 'table'])
             answers, _ = _latest_answers(inv)
             return Response({'guest': guest_row(guest, answers, list(inv.events.all()), inv.copy_variant), 'stats': stats(inv)})
         return self.handle(request, body)
@@ -252,7 +262,8 @@ class UsherArrivalsView(_UsherView):
             latest = inv.guests.filter(checked_in=True).order_by('-checked_in_at', '-id')[:8]
             return Response({
                 'slug': inv.slug, 'theme': inv.theme, 'couple': _couple(inv),
-                'arrivals': [{'id': g.id, 'name': g.name, 'group': g.group, 'checked_in_at': g.checked_in_at} for g in latest],
+                'arrivals': [{'id': g.id, 'name': g.name, 'group': g.group, 'table': g.table, 'checked_in_at': g.checked_in_at}
+                             for g in latest],
             })
         return self.handle(request, body)
 
@@ -298,7 +309,7 @@ class MyUsherView(APIView):
         return Response(self._body(inv))
 
 
-GUESTBOOK_HEADER = ['Nama', 'Grup', 'Tanpa undangan', 'Check-in', 'Jumlah orang', 'No. amplop', 'Suvenir', 'Ucapan']
+GUESTBOOK_HEADER = ['Nama', 'Grup', 'Meja', 'Tanpa undangan', 'Check-in', 'Jumlah orang', 'No. amplop', 'Suvenir', 'Ucapan']
 
 
 def guestbook_csv(inv):
@@ -315,7 +326,8 @@ def guestbook_csv(inv):
     for g in inv.guests.filter(checked_in=True).order_by('checked_in_at', 'id'):
         rsvp = answers.get(g.id)
         writer.writerow([
-            csv_export.safe_cell(g.name), csv_export.safe_cell(g.group), 'Ya' if g.is_walk_in else '',
+            csv_export.safe_cell(g.name), csv_export.safe_cell(g.group), csv_export.safe_cell(g.table),
+            'Ya' if g.is_walk_in else '',
             csv_export._stamp(g.checked_in_at, tz_name) if g.checked_in_at else '', g.arrived_pax or '',
             csv_export.safe_cell(g.envelope_no), 'Ya' if g.souvenir_given else '',
             csv_export.safe_cell(rsvp.wishes if rsvp else ''),

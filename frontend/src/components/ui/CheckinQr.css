@@ -12,5 +12,6 @@
 }
 .ciq-label { margin: 0; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #6b645a; }
 .ciq-name { margin: 0; font-size: 20px; font-weight: 600; overflow-wrap: anywhere; }
+.ciq-seat { margin: -4px 0 0; padding: 4px 14px; border-radius: 999px; background: #f1ece3; font-size: 15px; font-weight: 600; }
 .ciq-hint { margin: 0; font-size: 13.5px; color: #5f5a52; line-height: 1.5; }
 .ciq-close { min-height: 44px; padding: 0 28px; border: 1px solid #d8d2c8; border-radius: 999px; background: none; font: inherit; font-size: 14px; cursor: pointer; }

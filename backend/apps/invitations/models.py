@@ -101,6 +101,10 @@ class Invitation(models.Model):
     activation_code = models.CharField(max_length=20, blank=True)
     activation_requested = models.BooleanField(default=False)
     activation_requested_at = models.DateTimeField(null=True, blank=True)
+    # Retention (retention.py): guest data is deleted RETENTION_DAYS after
+    # expires_at; the couple is emailed a week before.
+    purge_notice_sent_at = models.DateTimeField(null=True, blank=True)
+    purged_at = models.DateTimeField(null=True, blank=True)
     couple_user = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='invitations'
@@ -474,6 +478,9 @@ class Guest(models.Model):
     name = models.CharField(max_length=200)
     whatsapp = models.CharField(max_length=20, blank=True)
     group = models.CharField(max_length=100, blank=True)  # e.g. Keluarga, Teman Kantor
+    # Where they sit at the reception, free text: "12", "Meja 12", "VIP A".
+    # Shown on their invitation and QR pass, to the ushers and on the welcome screen.
+    table = models.CharField(max_length=40, blank=True)
     # How many people this invitation is for; null means the invitation-wide limit.
     max_pax = models.PositiveSmallIntegerField(null=True, blank=True)
     # Unique per invitation (the link carries the slug). Pre-Oct-2026 codes are

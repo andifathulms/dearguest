@@ -48,3 +48,18 @@
   .mi-card-text h2 { font-size: 25px; }
   .mi-toplink { display: none; }
 }
+
+/* Data & privasi (AccountData.jsx) */
+.mi-privacy { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--dg-line); display: grid; gap: 12px; justify-items: start; }
+.mi-privacy h2 { margin: 0; font: 400 26px/1.1 var(--dg-f-display); }
+.mi-privacy p { margin: 0; max-width: 60ch; font-size: 14px; line-height: 1.6; color: var(--dg-muted); }
+.mi-privacy-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.dg-btn.mi-danger { color: var(--dg-bad); border-color: color-mix(in srgb, var(--dg-bad) 40%, transparent); }
+.dg-btn.mi-danger:hover { color: #fff; background: var(--dg-bad); border-color: var(--dg-bad); }
+.mi-modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(23, 17, 26, .55); display: grid; place-items: center; padding: 16px; }
+.mi-modal { width: min(100%, 420px); display: grid; gap: 10px; padding: 24px; border-radius: var(--dg-r-m); background: var(--dg-white); box-shadow: 0 24px 60px rgba(0, 0, 0, .25); }
+.mi-modal h3 { margin: 0; font: 400 26px/1.1 var(--dg-f-display); }
+.mi-modal p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--dg-ink-soft); }
+.mi-modal-label { font: 600 13px/1.3 var(--dg-f-ui); color: var(--dg-ink-soft); }
+.mi-modal-error { color: var(--dg-bad) !important; }
+.mi-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }

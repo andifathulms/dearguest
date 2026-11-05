@@ -7,6 +7,7 @@ import { waLink } from '../utils/whatsapp.js'
 import GuestImport from './GuestImport.jsx'
 import useWaMessages from './useWaMessages.js'
 import '../pages/SendQueue.css'
+import { copyText } from '../utils/clipboard.js'
 
 const ic = {
   link: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></svg>,
@@ -99,6 +100,18 @@ export default function GuestManager({ slug }) {
     }
   }
 
+  // Their table at the reception, free text ("12", "VIP A"); saved on leaving the field.
+  async function setTable(g, value) {
+    const table = value.replace(/\s+/g, ' ').trim()
+    if (table === g.table) return
+    try {
+      await api.patch(`/invitations/${slug}/guests/${g.id}/`, { table })
+      await load()
+    } catch {
+      showToast('Gagal menyimpan meja')
+    }
+  }
+
   async function remove(g) {
     if (!window.confirm(`Hapus ${g.name} dari daftar tamu?`)) return
     try {
@@ -110,7 +123,7 @@ export default function GuestManager({ slug }) {
   }
 
   function copyLink(g) {
-    navigator.clipboard.writeText(guestLink(g)).then(() => showToast('Link disalin'))
+    copyText(guestLink(g)).then(() => showToast('Link disalin'))
   }
 
   // The couple's chosen template (formal or santai), as in the send queue.
@@ -223,6 +236,11 @@ export default function GuestManager({ slug }) {
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
                 orang
+              </label>
+              <label className="gm-pax gm-table" title="Meja tamu ini di resepsi (opsional)">
+                meja
+                <input key={g.table} defaultValue={g.table} maxLength={40} placeholder="—" aria-label={`Meja untuk ${g.name}`}
+                  onBlur={e => setTable(g, e.target.value)} onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }} />
               </label>
               <div className="gm-row-actions">
                 <button className="gm-btn" onClick={() => copyLink(g)}>{ic.link} Link</button>

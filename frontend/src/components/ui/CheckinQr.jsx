@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { guestUrl } from '../../utils/publicUrl.js'
+import { seatLabel } from '../../utils/seat.js'
 import './CheckinQr.css'
 
 // On a personal link, around the wedding days when the couple uses Mode
 // Penerima Tamu (payload `checkin_qr`): a button that shows the guest's QR
 // for the ushers to scan at the door. Sits outside the theme, so it looks the
 // same on every pack.
-export default function CheckinQr({ slug, guest }) {
+export default function CheckinQr({ slug, guest, seat }) {
   const [open, setOpen] = useState(false)
   return (
     <>
@@ -20,6 +21,7 @@ export default function CheckinQr({ slug, guest }) {
           <div className="ciq-card" onClick={e => e.stopPropagation()}>
             <p className="ciq-label" id="ciq-title">QR Check-in</p>
             <p className="ciq-name">{guest.name}</p>
+            {seat && <p className="ciq-seat">{seatLabel(seat)}</p>}
             <QRCodeCanvas value={guestUrl(slug, guest.code)} size={232} level="M" includeMargin />
             <p className="ciq-hint">Tunjukkan QR ini ke penerima tamu saat tiba. Naikkan kecerahan layar bila perlu.</p>
             <button type="button" className="ciq-close" onClick={() => setOpen(false)}>Tutup</button>

@@ -64,10 +64,13 @@ class GuestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Guest
-        fields = ['id', 'name', 'whatsapp', 'group', 'max_pax', 'code', 'checked_in', 'checked_in_at',
+        fields = ['id', 'name', 'whatsapp', 'group', 'table', 'max_pax', 'code', 'checked_in', 'checked_in_at',
                   'arrived_pax', 'envelope_no', 'souvenir_given', 'is_walk_in',
                   'sent_at', 'reminded_at', 'first_opened_at', 'last_opened_at', 'open_count', 'responded', 'attending', 'created_at']
         read_only_fields = ['code', 'checked_in_at', 'first_opened_at', 'last_opened_at', 'open_count', 'created_at']
+
+    def validate_table(self, value):
+        return ' '.join(value.split())
 
     def validate_max_pax(self, value):
         if value is not None and not 1 <= value <= MAX_PAX:

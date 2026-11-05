@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '../api/client.js'
 import { getTheme } from '../themes/registry.js'
+import { seatLabel } from '../utils/seat.js'
 import './WelcomeScreen.css'
 
 const POLL_MS = 4000
@@ -96,6 +97,7 @@ export default function WelcomeScreen() {
             <p className="ws-label">Selamat datang</p>
             <p className="ws-name">{current.name}</p>
             <p className="ws-thanks">Terima kasih telah hadir</p>
+            {current.table && <p className="ws-seat">Silakan menuju <strong>{seatLabel(current.table)}</strong></p>}
           </div>
         ) : (
           <div className="ws-idle">
