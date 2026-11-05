@@ -161,6 +161,14 @@ PACKS = {
         'keyed': [
             ('photo-ring', 'photo-ring.jpg', (34, 66, 184), 880, (26, 64), 2, False),
             ('corner-tl', 'corner-tl.jpg', (34, 66, 185), 720, (26, 64), 2, False),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px).
+            # Prompt S5's far strip sits from ~58 % to the bottom; S6's drapes hang in the top ~53 %.
+            ('section-edge', 'section-edge.jpg', (31, 68, 189), 720, (26, 64), 2, False, (0, 0, 0.6, 1)),
+            ('section-garland', 'section-garland.jpg', (30, 68, 184), 1200, (26, 64), 2, False, (0, 0.28, 1, 0.76)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (27, 69, 182), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (32, 68, 187), 360, (26, 64), 2, False, (0, 0, 0.56, 0.56)),
+            ('parallax-back', 'parallax-back.jpg', (30, 70, 184), 1080, (26, 64), 2, False, (0, 0.55, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (30, 70, 181), 1080, (26, 64), 2, False, (0, 0, 1, 0.56)),
         ],
         'sprites': ('petals-sheet.jpg', (39, 71, 187), 'petal', 96, (26, 64), (2, 3, 3, 3, 2, 2), False),
         # The painted lacquer (texture.jpg) has strong vertical grain that tiles
@@ -282,6 +290,13 @@ PACKS = {
             # and overrides.css fades its straight lower edge.
             ('parallax-back', 'parallax-back.jpg', (234, 126, 0), 1080, (26, 64), 2, False, (0, 0.58, 1, 0.795)),
             ('parallax-front', 'parallax-front.jpg', (236, 129, 0), 1080, (26, 64), 2, False),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px).
+            ('section-edge', 'section-edge.jpg', (234, 130, 1), 720, (26, 64), 2, False, (0, 0, 0.62, 1)),
+            ('section-garland', 'section-garland.jpg', (230, 128, 0), 1200, (26, 64), 2, False, (0, 0.18, 1, 0.85)),
+            # The wreath is painted on a paper band (~#F6F1F8): kept, it matches both
+            # section tones (#FDF8FD and its 4 % violet wash).
+            ('monogram-wreath', 'monogram-wreath.jpg', (229, 127, 0), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (230, 129, 0), 360, (26, 64), 2, False, (0, 0, 0.62, 0.62)),
         ],
         'sprites': ('petals-sheet.jpg', (230, 124, 1), 'petal', 96, (26, 64), (2, 2, 3, 2, 2, 2), False),
         'texture': ('texture.jpg', 512, 70),

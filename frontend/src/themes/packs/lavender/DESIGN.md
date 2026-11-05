@@ -29,6 +29,10 @@ petal edges with the key). The painted paper is tinted to the paintings' white
 | `photo-ring` | an open silver wreath wound with wisteria and sage, with a lilac rose and sweet peas at the lower left, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | a branch with three hanging racemes, used as a lintel over the closing |
 | `particles` | a wisteria floret, lilac and sweet-pea petals, a lavender sprig, a sage leaf, a rose petal |
+| `section-edge` | section art: a hanging spray of wisteria with lilac roses, sweet pea and lavender sprigs, at the sides of the sections |
+| `section-garland` | section art: a wisteria swag with lilac roses, white sweet pea and lavender, the divider between sections |
+| `monogram-wreath` | section art: a twig ring with wisteria, lavender, lilac roses and sweet pea around the initials (painted on a pale paper band, kept: it disappears into both section tones) |
+| `card-corner` | section art: an L-shaped wisteria and sage-leaf sprig, on the event and gift cards |
 | page background | `texture.webp`, seamless white watercolour paper (set in overrides.css) |
 
 **The far field.** Prompt 8a asked for the field on the bottom edge. As with Batak, it

@@ -17,6 +17,12 @@ cut-outs keyed from cobalt with blue despill):
 | `photo-ring` | carved gold oval with a songket band and a gonjong crest, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | carved gonjong bracket with a songket swag, as a lintel over the closing |
 | `particles` | melati, sirih, pinang, mawar petal, pucuak rabuang and songket-diamond sequins |
+| `section-edge` | section art: a hanging red-and-gold songket cloth with melati, sirih leaves and padi, at the sides of the sections |
+| `section-garland` | section art: a carved gold-and-red ukiran bar with a melati and sirih posy and a strand of pearls, the divider between sections |
+| `monogram-wreath` | section art: a carved gold ukiran ring crowned with gonjong horns, melati, sirih and hanging pearls at the bottom, around the initials |
+| `card-corner` | section art: a carved gold ukiran bracket with a melati sprig, on the event and gift cards |
+| `parallax-back` | depth (section prompt S5): rumah gadang among palms and terraced paddies behind the hero's bottom band; trails the scroll (`depth` -0.1). Phones only |
+| `parallax-front` | depth (section prompt S6): red songket drapes with gold fringe at the top corners, ahead of the scroll. Phones only |
 | page background | `texture.webp`, seamless black lacquer (in overrides.css) |
 
 **Type.** Great Vibes for the couple's names and section titles; Gilda Display

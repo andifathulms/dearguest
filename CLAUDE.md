@@ -86,8 +86,8 @@ Seven packs also get optional `parallax-back` / `parallax-front`. Build: move th
 Gemini repeats from the previous image, such as a half wreath under a card corner), add the slots to
 `theme.json`, then rewrite that pack's section baselines. The shared layout places them
 (docs/theme-packs.md §4, §9). Live: Jepun Prada, Gorga Ulos, Lamming Zamrud (plus depth), Gebyok Sogan (plus depth), Merah Anggur (plus depth;
-no card corner yet). A pack with new depth layers also needs hero CSS: the far strip stands ~0.25 W above
-the opaque bottom band, with the text raised to clear it (see floral/javanese/bugis overrides.css).
+no card corner yet), Wisteria Lila, Gonjong Songket (plus depth). A pack with new depth layers also needs hero CSS: the far strip stands ~0.25 W above
+the opaque bottom band, with the text raised to clear it (see floral/javanese/bugis/minang overrides.css).
 
 ### Standing rules
 - Don't commit `docker-compose.yml` (the user's local port remap: web 5190, api 8020, db 5440), or

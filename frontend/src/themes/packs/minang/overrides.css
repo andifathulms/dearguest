@@ -66,7 +66,18 @@
    top; the songket runner starts ~0.34 W above the bottom). */
 .pk-root[data-pack='minang'] .pk-hero--framed { padding-block: 8rem 7rem; }
 @media (max-aspect-ratio: 1/1) {
-  .pk-root[data-pack='minang'] .pk-hero--framed[data-bands] { padding-block: 50vw 38vw; }
+  .pk-root[data-pack='minang'] .pk-hero--framed[data-bands] { padding-block: 50vw 88vw; }
+}
+/* Depth (section prompts S5, S6), phones only: the far rumah gadang among palms and
+   paddies (parallax-back) stand above the songket runner, their lower half faded,
+   rising as the band sinks (depth -0.1); the near songket drapes (parallax-front)
+   hang at the sides, over the band's own. The text is raised to clear the far strip. */
+.pk-root[data-pack='minang'] .pk-hero .pk-parallax-back { inset: auto 0 22vw; opacity: 0.85; -webkit-mask-image: linear-gradient(#000 45%, transparent 85%); mask-image: linear-gradient(#000 45%, transparent 85%); }
+.pk-root[data-pack='minang'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='minang'] .pk-hero .pk-parallax-front { inset: 0 -14vw; }
+.pk-root[data-pack='minang'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='minang'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
 }
 .pk-root[data-pack='minang'] .pk-hero--framed .hero-content { gap: 0.5rem; }
 .pk-root[data-pack='minang'] .pk-hero-portrait { --w: min(34vw, 160px); }
