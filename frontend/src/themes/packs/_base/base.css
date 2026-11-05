@@ -456,23 +456,29 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
    their scroll drift (±4vh, SectionEdge.jsx) never crosses into the next section.
    The painting is contained in the box: tall sections show it whole, short ones
    shrink it. The right-hand one is the left-hand painting mirrored. Phones have no
-   empty margin, so there the spray only peeks in ~9vw, past the page gutter. */
+   empty margin, so there a small whole spray sits in the section's top corner,
+   beside the heading (none in a section without one), instead of a sliver cut
+   off down the full height. */
 .pk-section-wrap { position: relative; }
 .pk-section-wrap > :not(.pk-section-edge) { position: relative; z-index: 1; }
 .pk-section-edge {
   position: absolute;
-  inset-block: 5vh;
-  width: var(--pk-edge-w, 28vw);
+  top: 4vh;
+  height: 52vw;
+  width: var(--pk-edge-w, 22vw);
   z-index: 0;
   pointer-events: none;
 }
-.pk-section-edge[data-side='left'] { left: var(--pk-edge-x, -17vw); }
-.pk-section-edge[data-side='right'] { right: var(--pk-edge-x, -17vw); }
+.pk-section-edge[data-side='left'] { left: var(--pk-edge-x, 0px); }
+.pk-section-edge[data-side='right'] { right: var(--pk-edge-x, 0px); }
 .pk-section-edge .pk-slot { display: block; width: 100%; height: 100%; }
-.pk-section-edge img { width: 100%; height: 100%; object-fit: contain; object-position: 0 50%; }
+.pk-section-edge img { width: 100%; height: 100%; object-fit: contain; object-position: 0 0; }
 .pk-section-edge[data-side='right'] .pk-slot { transform: scaleX(-1); }
+.pk-section-wrap:not(:has(.pk-title)) > .pk-section-edge { display: none; }   /* phones: no heading to sit beside */
 @media (min-aspect-ratio: 1/1) {
-  .pk-section-edge { --pk-edge-x: 0px; width: var(--pk-edge-w, min(26vw, 380px)); }
+  .pk-section-wrap:not(:has(.pk-title)) > .pk-section-edge { display: block; }
+  .pk-section-edge { --pk-edge-x: 0px; top: 5vh; bottom: 5vh; height: auto; width: var(--pk-edge-w, min(26vw, 380px)); }
+  .pk-section-edge img { object-position: 0 50%; }
 }
 
 /* The painted garland between sections. */

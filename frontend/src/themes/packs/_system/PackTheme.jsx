@@ -45,8 +45,8 @@ function PackSection({ children, tone, edge }) {
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
-      {edge && <SectionEdge side={edge} />}
       {children}
+      {edge && <SectionEdge side={edge} />}{/* after the section, so it stays the wrap's first child */}
     </motion.div>
   )
 }
