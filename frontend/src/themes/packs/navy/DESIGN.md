@@ -28,6 +28,10 @@ third is cropped off, and the painted paper is tinted to the paintings' navy.
 | `photo-ring` | an open wreath on a fine gold ring, with white roses at the lower left and a ranunculus at the upper right, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | a white rose spray, used as a lintel over the closing |
 | `particles` | rose and peony petals, a eucalyptus leaf, baby's breath, a gold-veined leaf, a ranunculus |
+| `section-edge` | section art: a column of white roses and peonies with eucalyptus and baby's breath, at the sides of the sections (smaller on phones, beside the wide titles) |
+| `section-garland` | section art: a swag of white roses and peonies with eucalyptus and baby's breath, the divider between sections |
+| `monogram-wreath` | section art: a eucalyptus ring with a crescent of white roses at the bottom, around the initials |
+| `card-corner` | section art: an L-shaped sprig of one white rose with eucalyptus, on the event and gift cards |
 | page background | `texture.webp`, seamless navy paper (set in overrides.css) |
 
 **Motion.**

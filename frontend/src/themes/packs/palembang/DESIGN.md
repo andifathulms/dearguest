@@ -27,6 +27,10 @@ crop.
 | `photo-ring` | a carved gilded oval with lak florals, a cempaka crest and a folded songket at its foot, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | a carved gilded corner with songket and cempaka, used as a lintel over the closing |
 | `particles` | cempaka flower and petal, jasmine, a gold lak motif, a songket tassel, a leaf |
+| `section-edge` | section art: a carved gold panel hung with red songket, cempaka and melati, at the sides of the sections (smaller on phones, beside the wide titles) |
+| `section-garland` | section art: a carved gold-on-maroon bar with a cempaka and melati posy, the divider between sections |
+| `monogram-wreath` | section art: a carved gold ring with cempaka and a swag of red songket at the bottom, around the initials |
+| `card-corner` | section art: a carved gold-on-maroon bracket with a cempaka bud, on the event and gift cards |
 | page background | `texture.webp`, seamless maroon lacquer (set in overrides.css) |
 
 **Motion.**

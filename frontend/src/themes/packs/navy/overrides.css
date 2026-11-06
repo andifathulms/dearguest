@@ -137,3 +137,7 @@
 .pk-root[data-pack='navy'] .pk-closing { padding-block: clamp(13rem, 56vw, 17rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
 .pk-root[data-pack='navy'] .pk-closing .pk-corner { width: min(50vw, 230px); }
 .pk-root[data-pack='navy'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
+
+/* Section sprays, phones: smaller than the default, as the white roses would swallow the
+   cream letters of the wide spaced titles they sit beside. */
+@media (max-aspect-ratio: 1/1) { .pk-root[data-pack='navy'] .pk-section-edge { height: 32vw; --pk-edge-x: -1vw; } }

@@ -365,6 +365,11 @@ PACKS = {
             # the near layer also has a rose cluster at the bottom left (not asked), which
             # floats over the text as it moves: keep the hanging roses (top 55 %) only
             ('parallax-front', 'parallax-front.jpg', (197, 25, 132), 1080, (26, 64), 2, False, (0, 0, 1, 0.55)),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px).
+            ('section-edge', 'section-edge.jpg', (191, 29, 128), 720, (26, 64), 2, False, (0, 0, 0.64, 1)),
+            ('section-garland', 'section-garland.jpg', (193, 25, 125), 1200, (26, 64), 2, False, (0, 0.22, 1, 0.77)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (190, 22, 122), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (189, 18, 119), 360, (26, 64), 2, False, (0, 0, 0.63, 0.63)),
         ],
         # the sheet's lower third is a painted haze, a sixth time: the sprites end ~63 %
         'sprites': ('petals-sheet.jpg', (200, 31, 134), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
@@ -396,6 +401,12 @@ PACKS = {
             # and the near songket drapes at the top only (the top-only wording worked)
             ('parallax-back', 'parallax-back.jpg', (35, 69, 191), 1080, (26, 64), 2, False, (0, 0.7, 1, 1)),
             ('parallax-front', 'parallax-front.jpg', (36, 66, 188), 1080, (26, 64), 2, False, (0, 0, 1, 0.42)),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px).
+            # The edge's songket panel stands ~11 % in from the left: cropped to meet the edge.
+            ('section-edge', 'section-edge.jpg', (31, 66, 189), 720, (26, 64), 2, False, (0.09, 0, 0.58, 1)),
+            ('section-garland', 'section-garland.jpg', (31, 66, 188), 1200, (26, 64), 2, False, (0, 0.3, 1, 0.7)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (29, 65, 188), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (33, 71, 183), 360, (26, 64), 2, False, (0, 0, 0.65, 0.65)),
         ],
         # the first sheet with no haze band: the bottom third really is flat key
         'sprites': ('petals-sheet.jpg', (37, 73, 193), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
