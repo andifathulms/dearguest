@@ -109,6 +109,14 @@ PACKS = {
         'keyed': [
             ('photo-ring', 'photo-ring.jpg', (34, 69, 184), 880, (26, 64), 2, False),
             ('corner-tl', 'corner-tl.jpg', (37, 73, 187), 720, (26, 64), 2, False),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px).
+            # Prompt S5's far grove sits from ~69 % to the bottom; S6's eucalyptus in the top ~47 %.
+            ('section-edge', 'section-edge.jpg', (34, 71, 186), 720, (26, 64), 2, False, (0, 0, 0.66, 1)),
+            ('section-garland', 'section-garland.jpg', (33, 70, 184), 1200, (26, 64), 2, False, (0, 0.2, 1, 0.77)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (32, 70, 181), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (32, 70, 178), 360, (26, 64), 2, False, (0, 0, 0.75, 0.75)),
+            ('parallax-back', 'parallax-back.jpg', (32, 69, 177), 1080, (26, 64), 2, False, (0, 0.66, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (31, 71, 183), 1080, (26, 64), 2, False, (0, 0, 1, 0.5)),
         ],
         'sprites': ('petals-sheet.jpg', (39, 72, 188), 'petal', 96, (26, 64), (3, 3, 2, 2, 1, 2), False),
         'texture': ('texture.jpg', 512, 70),
@@ -218,6 +226,14 @@ PACKS = {
         'keyed': [
             ('photo-ring', 'photo-ring.jpg', (35, 68, 191), 880, (26, 64), 2, False),
             ('corner-tl', 'corner-tl.jpg', (36, 67, 185), 720, (26, 64), 2, False),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px).
+            # Prompt S5's far meadow sits from ~63 % to the bottom; S6's pampas in the top ~46 %.
+            ('section-edge', 'section-edge.jpg', (33, 71, 179), 720, (26, 64), 2, False, (0, 0, 0.58, 1)),
+            ('section-garland', 'section-garland.jpg', (33, 70, 177), 1200, (26, 64), 2, False, (0, 0.23, 1, 0.75)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (33, 70, 176), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (33, 70, 173), 360, (26, 64), 2, False, (0, 0, 0.67, 0.67)),
+            ('parallax-back', 'parallax-back.jpg', (32, 67, 190), 1080, (26, 64), 2, False, (0, 0.6, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (35, 69, 184), 1080, (26, 64), 2, False, (0, 0, 1, 0.5)),
         ],
         # Patches of the key that Gemini smudged (x0, y0, x1, y1 fractions), painted
         # back to flat key before cutting: the corner's lower right is a faint blur.

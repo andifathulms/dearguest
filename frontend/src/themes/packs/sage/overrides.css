@@ -66,7 +66,17 @@
    ~0.5 W below the top to ~0.5 W above the bottom). */
 .pk-root[data-pack='sage'] .pk-hero--framed { padding-block: 8rem 7rem; }
 @media (max-aspect-ratio: 1/1) {
-  .pk-root[data-pack='sage'] .pk-hero--framed[data-bands] { padding-block: 48vw 64vw; }
+  .pk-root[data-pack='sage'] .pk-hero--framed[data-bands] { padding-block: 48vw 92vw; }
+}
+/* Depth (section prompts S5, S6), phones only: the far olive grove (parallax-back) stands above the rose and fern bed,
+   its lower half faded, rising as the band sinks (depth -0.1); the near eucalyptus (parallax-front) hang at the
+   top corners, over the band's own. The text is raised to clear the far strip. */
+.pk-root[data-pack='sage'] .pk-hero .pk-parallax-back { inset: auto 0 28vw; opacity: 0.85; -webkit-mask-image: linear-gradient(#000 45%, transparent 85%); mask-image: linear-gradient(#000 45%, transparent 85%); }
+.pk-root[data-pack='sage'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='sage'] .pk-hero .pk-parallax-front { inset: 0 -14vw; }
+.pk-root[data-pack='sage'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='sage'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
 }
 .pk-root[data-pack='sage'] .pk-hero--framed .hero-content { gap: 0.5rem; }
 .pk-root[data-pack='sage'] .pk-hero-portrait { --w: min(46vw, 210px); }
@@ -102,3 +112,7 @@
 /* Closing: the corner sprays frame the last words. */
 .pk-root[data-pack='sage'] .pk-closing { padding-block: clamp(9rem, 40vw, 13rem); overflow: hidden; }
 .pk-root[data-pack='sage'] .pk-closing .pk-corner { width: min(52vw, 240px); }
+
+/* Section sprays, phones: smaller than the default, beside the wide script titles
+   ("Konfirmasi Kehadiran" on one line). */
+@media (max-aspect-ratio: 1/1) { .pk-root[data-pack='sage'] .pk-section-edge { height: 28vw; --pk-edge-x: -3vw; } }

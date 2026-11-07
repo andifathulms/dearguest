@@ -25,6 +25,12 @@ sheet's hazy lower third is cropped off (`sprites_crop`).
 | `photo-ring` | an open twine wreath with pampas and roses at the lower left and a strawflower at the upper right, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | a pampas spray with a dusty rose, used as a lintel over the closing |
 | `particles` | terracotta and dusty-rose petals, a eucalyptus leaf, a pampas tuft, a wheat head, a strawflower |
+| `section-edge` | section art: a column of pampas plumes with terracotta and dusty-rose blooms and eucalyptus, at the sides of the sections (smaller on phones, beside the wide script titles) |
+| `section-garland` | section art: two pampas sheaves tied with twine around a posy of dried roses and daisies, the divider between sections |
+| `monogram-wreath` | section art: a twig and pampas ring with dried roses and a twine bow at the bottom, around the initials |
+| `card-corner` | section art: an L-shaped sprig of pampas, wheat and one terracotta bloom, on the event and gift cards |
+| `parallax-back` | depth (section prompt S5): a far pampas meadow with a misty tree line, standing above the hero's dried-flower bed; trails the scroll (`depth` -0.1). Phones only |
+| `parallax-front` | depth (section prompt S6): large pampas plumes leaning in at the top corners, ahead of the scroll. Phones only |
 | page background | `texture.webp`, seamless kraft paper (set in overrides.css) |
 
 **Motion.** Exit `bloom`: a loose spray has no natural split. Signature `sway` and

@@ -27,7 +27,13 @@
     },
     "monogram-frame": { "component": "slots/MonogramFrame.jsx" },
     "heading-ornament": { "svg": "assets/heading.svg", "width": 96, "height": 16 },
-    "divider": { "svg": "assets/divider.svg", "width": 140, "height": 16 }
+    "divider": { "svg": "assets/divider.svg", "width": 140, "height": 16 },
+    "section-edge": { "src": "assets/section-edge.webp", "avif": "assets/section-edge.avif", "width": 378, "height": 1024 },
+    "section-garland": { "src": "assets/section-garland.webp", "avif": "assets/section-garland.avif", "width": 1024, "height": 326 },
+    "monogram-wreath": { "src": "assets/monogram-wreath.webp", "avif": "assets/monogram-wreath.avif", "width": 640, "height": 640 },
+    "card-corner": { "src": "assets/card-corner.webp", "avif": "assets/card-corner.avif", "width": 360, "height": 360 },
+    "parallax-back": { "src": "assets/parallax-back.webp", "avif": "assets/parallax-back.avif", "width": 572, "height": 348, "depth": -0.1 },
+    "parallax-front": { "src": "assets/parallax-front.webp", "avif": "assets/parallax-front.avif", "width": 572, "height": 512 }
   },
   "copyVariants": ["islam", "kristen", "katolik", "umum"],
   "eventTypes": ["akad", "pemberkatan", "sakramen", "resepsi", "adat", "ngunduh_mantu", "lainnya"],
