@@ -147,3 +147,4 @@
 .pk-root[data-pack='tropis'] .pk-closing { padding-block: clamp(14rem, 60vw, 18rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
 .pk-root[data-pack='tropis'] .pk-closing .pk-corner { width: min(52vw, 240px); }
 .pk-root[data-pack='tropis'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
+@media (max-aspect-ratio: 1/1) { .pk-root[data-pack='tropis'] .pk-section-edge { height: 30vw; --pk-edge-x: -2vw; } } /* phone sprays clear wide titles */

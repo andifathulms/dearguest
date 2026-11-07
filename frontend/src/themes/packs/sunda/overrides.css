@@ -80,7 +80,17 @@
    below the top; the clouds at the foot start ~0.36 W above the bottom). */
 .pk-root[data-pack='sunda'] .pk-hero--framed { padding-block: 8rem 7rem; }
 @media (max-aspect-ratio: 1/1) {
-  .pk-root[data-pack='sunda'] .pk-hero--framed[data-bands] { padding-block: 68vw 38vw; }
+  .pk-root[data-pack='sunda'] .pk-hero--framed[data-bands] { padding-block: 68vw 122vw; }
+}
+/* Depth (section prompts S5, S6), phones only: the far hills and rice terraces (parallax-back) stand above the
+   bamboo and melati bed, their lower part faded, rising as the band sinks (depth -0.1); the near melati strings
+   and bamboo (parallax-front) hang at the top corners. The text is raised to clear the far strip. */
+.pk-root[data-pack='sunda'] .pk-hero .pk-parallax-back { inset: auto 0 58vw; -webkit-mask-image: linear-gradient(#000 60%, transparent 95%); mask-image: linear-gradient(#000 60%, transparent 95%); }
+.pk-root[data-pack='sunda'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='sunda'] .pk-hero .pk-parallax-front { inset: 0 -14vw; }
+.pk-root[data-pack='sunda'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 0; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='sunda'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
 }
 .pk-root[data-pack='sunda'] .pk-hero--framed .hero-content { gap: 0.5rem; }
 .pk-root[data-pack='sunda'] .pk-hero-portrait { --w: min(34vw, 160px); }
@@ -122,3 +132,5 @@
 .pk-root[data-pack='sunda'] .pk-closing { padding-block: clamp(13rem, 56vw, 17rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
 .pk-root[data-pack='sunda'] .pk-closing .pk-corner { width: min(50vw, 230px); }
 .pk-root[data-pack='sunda'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
+/* Section sprays: smaller on phones, beside the wide titles. */
+@media (max-aspect-ratio: 1/1) { .pk-root[data-pack='sunda'] .pk-section-edge { height: 30vw; --pk-edge-x: -2vw; } }

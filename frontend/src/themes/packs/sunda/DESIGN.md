@@ -22,6 +22,12 @@ rule out a blue key, and are edge-despilled.
 | `photo-ring` | gold filigree oval wrapped in mega mendung, with a siger crest and a melati loop, on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | mega mendung curling from the corner with gold filigree, bamboo and melati strings, used as a lintel over the closing |
 | `particles` | melati flower and bud, bamboo leaf, rose petal, a small mega mendung cloud, a siger filigree flower |
+| `section-edge` | section art: a column of mega mendung clouds with bamboo leaves, melati strings and pink buds, at the sides of the sections (smaller on phones, beside the wide titles) |
+| `section-garland` | section art: a band of mega mendung clouds with melati, pink buds and swags of melati strings, the divider between sections |
+| `monogram-wreath` | section art: a ring of gold filigree, bamboo and melati, resting on a mega mendung cloud, around the initials |
+| `card-corner` | section art: an L-shaped mega mendung corner with melati and bamboo, on the event and gift cards |
+| `parallax-back` | depth (section prompt S5): far hills in mist over rice terraces, standing above the hero's bamboo and cloud bed; trails the scroll (`depth` -0.1). Phones only |
+| `parallax-front` | depth (section prompt S6): bamboo leaves and hanging melati strings at the top corners, ahead of the scroll. Phones only |
 | page background | `texture.webp`, seamless ivory paper (set in overrides.css) |
 
 **Type.**

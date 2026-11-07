@@ -29,6 +29,10 @@ grain.
 | `photo-ring` | a fine gold ring wound with small leaves, white orchids and a heliconia at the lower left, blush orchids at the upper right; on the hero portrait and both profiles |
 | `corner-tl` (mirrored to `corner-br`) | monstera, palm and banana leaves with an arching orchid spray, used as a lintel over the closing |
 | `particles` | a white orchid, a blush petal, a monstera leaf, a palm leaflet, a heliconia bract, a green leaf with a gold vein |
+| `section-edge` | section art: a column of monstera and palm with white and blush moth orchids and heliconia, at the sides of the sections (smaller on phones, beside the wide titles) |
+| `section-garland` | section art: a swag of monstera, palm and heliconia with moth orchids, the divider between sections |
+| `monogram-wreath` | section art: a ring of palm fronds and monstera with a crescent of moth orchids and heliconia at the bottom, around the initials |
+| `card-corner` | section art: an L-shaped palm frond with one white moth orchid, on the event and gift cards |
 | page background | `texture.webp`, generated warm white paper (set in overrides.css) |
 
 **Delivered differently from the prompt.**

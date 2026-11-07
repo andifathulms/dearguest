@@ -201,6 +201,16 @@ PACKS = {
         'keyed': [
             ('photo-ring', 'photo-ring.jpg', (200, 24, 134), 880, (26, 64), 2, False),
             ('corner-tl', 'corner-tl.jpg', (205, 23, 133), 720, (26, 64), 2, False),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px). The
+            # spray and the card corner stand ~5-7 % in from their edges: cropped to meet them.
+            ('section-edge', 'section-edge.jpg', (189, 24, 123), 720, (26, 64), 2, False, (0.04, 0, 0.64, 1)),
+            ('section-garland', 'section-garland.jpg', (187, 18, 118), 1200, (26, 64), 2, False, (0, 0.28, 1, 0.72)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (186, 14, 116), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (186, 11, 114), 360, (26, 64), 2, False, (0.06, 0.06, 0.72, 0.72)),
+            # Depth: far hills over rice terraces (from ~71 %), hanging melati and bamboo (to ~63 %).
+            # The hills' outline is a pale key-and-mist blend: a wide ramp makes it soft edge, so it despills.
+            ('parallax-back', 'parallax-back.jpg', (185, 11, 115), 1080, (60, 150), 2, False, (0, 0.68, 1, 1)),
+            ('parallax-front', 'parallax-front.jpg', (183, 11, 114), 1080, (26, 64), 2, False, (0, 0, 1, 0.66)),
         ],
         # the sheet's lower 45 % is a painted mist, not flat magenta: the sprites end ~55 %
         'sprites': ('petals-sheet.jpg', (203, 31, 133), 'petal', 96, (26, 64), (2, 3, 2, 3, 2, 2), False),
@@ -446,6 +456,11 @@ PACKS = {
         'keyed': [
             ('photo-ring', 'photo-ring.jpg', (36, 68, 185), 880, (26, 64), 2, False),
             ('corner-tl', 'corner-tl.jpg', (36, 70, 188), 720, (26, 64), 2, False),
+            # Section art (prompts/sections), saved from Gemini's preview (572-1024 px).
+            ('section-edge', 'section-edge.jpg', (34, 69, 191), 720, (26, 64), 2, False, (0.04, 0, 0.74, 1)),
+            ('section-garland', 'section-garland.jpg', (34, 70, 189), 1200, (26, 64), 2, False, (0, 0.24, 1, 0.8)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (31, 70, 189), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (33, 70, 187), 360, (26, 64), 2, False, (0.02, 0.02, 0.69, 0.69)),
             # Prompt 8. The palms end in a torn-paper edge above more key, not at the image
             # edge: cut the strip out whole (~81-97 %) and tuck that edge under the bed.
             # The near layer is a canopy across the top, ending ~40 %.
