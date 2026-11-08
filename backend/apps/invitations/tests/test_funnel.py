@@ -1,6 +1,8 @@
 """Marketing funnel: anonymous weekly counts per step and UTM source."""
 from datetime import date
 
+from django.test import override_settings
+
 from apps.invitations.models import FunnelEvent
 
 from .base import APITestBase
@@ -38,6 +40,7 @@ class FunnelTests(APITestBase):
         self.client.post('/api/funnel/visit/', {}, format='json', HTTP_USER_AGENT='Googlebot/2.1')
         self.assertFalse(FunnelEvent.objects.exists())
 
+    @override_settings(ADMIN_REQUIRE_OTP=False)   # the TOTP step has its own tests (test_admin_security)
     def test_admin_weekly_table(self):
         FunnelEvent.objects.create(step='visit', week=date(2026, 10, 26))
         self.client.force_login(self.make_user('staff', is_staff=True, is_superuser=True))
