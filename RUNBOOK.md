@@ -26,12 +26,13 @@ sh scripts/deploy.sh v2026.11.02    # a tag or SHA
 ```
 
 What it does:
-1. Builds images tagged with the SHA.
+1. Gets the images for the SHA: **pulls** the ones CI pushed to GHCR when `IMAGE_PREFIX` is set in `.env` (below), otherwise builds them on the server. It exits with code 3 if CI hasn't pushed that commit yet.
 2. **Refuses destructive migrations** (dropping or renaming columns or tables, raw SQL), because the previous release must still run on the new schema.
 3. Dumps the database to `.deploy/pre-<sha>.dump`.
 4. Migrates and switches over.
 5. Smoke-checks: health reports the new SHA; landing, demo invitation, its API and its share page answer.
 6. **Rolls back automatically** if the smoke checks fail.
+7. Removes the images of releases older than the previous one, so the disk doesn't fill up.
 
 A destructive change ships in two deploys:
 1. Deploy code that no longer uses the column.
@@ -39,13 +40,27 @@ A destructive change ships in two deploys:
 
 Expect a few seconds of 502s while the backend container restarts (single host).
 
+### Prebuilt images (GHCR)
+
+On every push to `main`, the `images` job in `.github/workflows/ci.yml` builds `dearguest-backend`, `dearguest-scheduler` and `dearguest-nginx`. It runs once the backend, frontend and audit checks pass, tags each image with the commit SHA (and `main`), pushes them to `ghcr.io/<owner>/`, and keeps the last 10 versions of each. The server then only pulls; it never runs the SPA build.
+
+One-time setup:
+1. **GitHub → Settings → Secrets and variables → Actions:**
+   - Variables: `VITE_PUBLIC_ORIGIN` (required: the job is skipped without it), and optionally `ADMIN_WHATSAPP_NUMBER`, `SENTRY_DSN_FRONTEND`, `SENTRY_ORG`, `SENTRY_PROJECT_FRONTEND`. These are baked into the nginx image, so they must match the server's `.env`.
+   - Secret (optional): `SENTRY_AUTH_TOKEN`, to upload source maps.
+2. **On the server:**
+   - Log in once with a classic token that has only `read:packages`: `echo <token> | docker login ghcr.io -u <github-user> --password-stdin`.
+   - Add `IMAGE_PREFIX=ghcr.io/<owner>/dearguest` to `.env`.
+
+After a push, wait for the `images` job to go green, then run `sh scripts/deploy.sh`. Changing one of the baked-in variables needs a new image: re-run the job, or push a commit.
+
 ## 2. Roll back
 
 ```sh
 sh scripts/rollback.sh
 ```
 
-- Starts the previous release's images (still on the server) and smoke-checks them.
+- Starts the previous release's images (still on the server; pulled again from GHCR if they're gone) and smoke-checks them.
 - The database stays on the new schema, which the old code supports, because deploys only allow additive migrations.
 - To undo a migration as well, restore the pre-deploy dump:
 

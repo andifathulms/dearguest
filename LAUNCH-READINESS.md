@@ -152,6 +152,7 @@ Things only you can do.
 
 **Accounts and keys** (each value goes in the server's `.env`, documented in `.env.example`):
 - [ ] **VPS** (2 vCPU / 4 GB, Singapore/Jakarta): Docker; `unattended-upgrades`; SSH keys only; firewall 22/80/443.
+- [ ] **Prebuilt images:** the GitHub variables for the `images` job, `docker login ghcr.io` on the VPS, and `IMAGE_PREFIX` in `.env` (RUNBOOK.md §1).
 - [ ] **Domain** in Cloudflare.
   - DNS A record to the VPS (proxied).
   - SSL mode **Full (strict)**.

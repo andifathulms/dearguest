@@ -40,8 +40,9 @@ services:
 
   backend:
     # Tagged with the git SHA (scripts/deploy.sh sets RELEASE): rolling back
-    # is starting the previous tag again.
-    image: dearguest-backend:${RELEASE:-dev}
+    # is starting the previous tag again. IMAGE_PREFIX=ghcr.io/<owner>/dearguest
+    # pulls the images CI built instead of building here (RUNBOOK.md §1).
+    image: ${IMAGE_PREFIX:-dearguest}-backend:${RELEASE:-dev}
     build:
       context: ./backend
       target: app
@@ -66,7 +67,7 @@ services:
   # the retention purge, the certificate check. Reports to Telegram and the
   # deep health check.
   scheduler:
-    image: dearguest-scheduler:${RELEASE:-dev}
+    image: ${IMAGE_PREFIX:-dearguest}-scheduler:${RELEASE:-dev}
     build:
       context: ./backend
       target: scheduler
@@ -88,7 +89,7 @@ services:
 
   # The one public entry point: SPA + reverse proxy + /static/ + /media/ + TLS.
   nginx:
-    image: dearguest-nginx:${RELEASE:-dev}
+    image: ${IMAGE_PREFIX:-dearguest}-nginx:${RELEASE:-dev}
     build:
       context: .
       dockerfile: nginx/Dockerfile

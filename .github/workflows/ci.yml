@@ -112,3 +112,52 @@ jobs:
         run: npm ci --ignore-scripts && npm audit --omit=dev --audit-level=high
       - name: Secrets in the history (gitleaks)
         run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 git /repo --config /repo/.gitleaks.toml --redact --no-banner
+
+  # main only, once the checks pass: the release images, tagged with the commit,
+  # for deploy.sh's pull mode (IMAGE_PREFIX, RUNBOOK.md §1). Not gated on visual or
+  # lighthouse, which can flake on a busy runner; they still mark the run red.
+  # Skipped until the VITE_PUBLIC_ORIGIN repository variable is set: the SPA bakes
+  # the site's origin (and the optional variables below) in at build time.
+  images:
+    if: github.event_name == 'push' && vars.VITE_PUBLIC_ORIGIN != ''
+    needs: [backend, frontend, audit]
+    runs-on: ubuntu-24.04
+    permissions: { contents: read, packages: write }
+    strategy:
+      matrix:
+        include:
+          - { name: backend, context: backend, file: backend/Dockerfile, target: app }
+          - { name: scheduler, context: backend, file: backend/Dockerfile, target: scheduler }
+          - { name: nginx, context: ., file: nginx/Dockerfile, target: "" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          target: ${{ matrix.target }}
+          platforms: linux/amd64
+          push: true
+          # one manifest per tag, so pruning old versions never orphans an attestation
+          provenance: false
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/dearguest-${{ matrix.name }}:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/dearguest-${{ matrix.name }}:main
+          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,scope=${{ matrix.name }},mode=max
+          build-args: |
+            VITE_PUBLIC_ORIGIN=${{ vars.VITE_PUBLIC_ORIGIN }}
+            VITE_ADMIN_WHATSAPP_NUMBER=${{ vars.ADMIN_WHATSAPP_NUMBER }}
+            VITE_SENTRY_DSN=${{ vars.SENTRY_DSN_FRONTEND }}
+            VITE_RELEASE=${{ github.sha }}
+            SENTRY_ORG=${{ vars.SENTRY_ORG }}
+            SENTRY_PROJECT=${{ vars.SENTRY_PROJECT_FRONTEND }}
+          secrets: |
+            sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+      - name: Keep the last 10 versions (GHCR storage)
+        uses: actions/delete-package-versions@v5
+        with: { package-name: "dearguest-${{ matrix.name }}", package-type: container, min-versions-to-keep: 10 }
