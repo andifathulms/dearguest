@@ -71,10 +71,10 @@ for (const theme of themes) {
   await still.close()
   ffmpeg(['-i', join(work, 'still.png'), '-vf', 'scale=720:1560:flags=lanczos', '-c:v', 'libwebp', '-quality', '80', join(OUT, `${theme.id}.webp`)])
 
-  // Loop: recorded at 2x for sharpness, trimmed to start once the page is ready.
-  const ctx = await browser.newContext({
-    viewport: VIEW, deviceScaleFactor: 2, recordVideo: { dir: work, size: { width: VIEW.width * 2, height: VIEW.height * 2 } },
-  })
+  // Loop: trimmed to start once the page is ready. Recorded at the viewport's
+  // size: Playwright's frames are CSS pixels whatever the deviceScaleFactor, and
+  // a larger `size` only pads them with grey (the page sat in the top-left quarter).
+  const ctx = await browser.newContext({ viewport: VIEW, recordVideo: { dir: work, size: VIEW } })
   await useBackend(ctx)
   const t0 = Date.now()
   const page = await ctx.newPage()
