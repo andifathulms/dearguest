@@ -102,9 +102,14 @@
 }
 
 /* ---- features grouped by who they help ---- */
-.hm-groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--dg-line); }
-.hm-group { padding: 30px 30px 6px 0; display: grid; gap: 14px; align-content: start; }
-.hm-group + .hm-group { padding-left: 30px; border-left: 1px solid var(--dg-line); }
+.hm-groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--dg-line); }
+.hm-group { padding: 30px 24px 6px 0; display: grid; gap: 14px; align-content: start; }
+.hm-group + .hm-group { padding-left: 24px; border-left: 1px solid var(--dg-line); }
+@media (max-width: 1100px) and (min-width: 861px) {
+  .hm-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hm-group:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .hm-group:nth-child(n + 3) { border-top: 1px solid var(--dg-line); }
+}
 .hm-who { font: 600 12px/1 var(--dg-f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--dg-prada-deep); margin: 0; }
 .hm-group ul, .hm-plan ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .hm-group li, .hm-plan li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; font-size: 15px; line-height: 1.5; color: var(--dg-ink-soft); }

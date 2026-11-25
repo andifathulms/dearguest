@@ -33,7 +33,7 @@ const joinId = list => list.length > 1 ? `${list.slice(0, -1).join(', ')} dan ${
 const GROUPS = [
   {
     who: 'Untuk tamu', title: 'Dibuka, lalu dikenang',
-    items: ['Nama tamu tampil di sampul undangan', 'Musik, galeri foto, dan kisah kalian', 'Peta lokasi dan "Simpan ke Kalender"'],
+    items: ['Nama tamu tampil di sampul undangan', 'Tautan web biasa, bukan file APK', 'Peta lokasi dan "Simpan ke Kalender"'],
   },
   {
     who: 'Untuk kalian', title: 'Tahu siapa yang datang',
@@ -42,6 +42,10 @@ const GROUPS = [
   {
     who: 'Untuk keluarga', title: 'Doa dan hadiah, tersimpan rapi',
     items: ['Amplop digital, salin rekening sekali tap', 'Dinding ucapan yang bisa kalian saring', `Teks ${joinId(VARIANTS.map(v => v.label))}`],
+  },
+  {
+    who: 'Untuk hari-H', title: 'Penerima tamu tanpa buku tamu',
+    items: ['Pindai QR tamu di meja penerima, cukup dari ponsel', 'Catat jumlah yang datang, meja, dan nomor amplop', 'Stok suvenir terhitung otomatis'],
   },
 ]
 
@@ -54,6 +58,8 @@ const STEPS = [
 const FAQS = [
   { q: 'Berapa lama membuat undangannya?', a: 'Isi data mempelai, acara, dan foto, lalu lihat pratinjaunya langsung. Semua tersimpan, jadi bisa dilanjutkan kapan saja. Kalau ingin disiapkan oleh admin, paket Bisnis dikerjakan dalam 24 jam.' },
   { q: 'Apakah nama tamu bisa muncul otomatis?', a: 'Bisa. Masukkan daftar tamu (bisa ditempel dari Excel atau Google Sheets), dan setiap tamu mendapat tautan pribadi dengan namanya di sampul undangan.' },
+  { q: 'Apakah tautannya aman dibuka tamu?', a: 'Aman. Undangan ini tautan web biasa yang dibuka di browser, bukan file APK yang harus diunduh atau dipasang. Di WhatsApp, pratinjau tautan pribadi menampilkan sampul undangan dan nama tamu itu sendiri, jadi tamu tahu pesannya memang dari kalian.' },
+  { q: 'Bisakah dipakai untuk menyambut tamu di hari-H?', a: 'Bisa. Penerima tamu membuka tautan khusus di ponselnya, memindai QR di undangan tamu, lalu mencatat jumlah yang datang, meja, nomor amplop, dan suvenir. Daftar tamu yang hadir bisa diunduh setelah acara.' },
   { q: 'Bagaimana cara membayar?', a: 'Coba gratis dulu. Saat siap, minta aktivasi dari editor, transfer sesuai paket, lalu kirim bukti ke admin lewat WhatsApp. Admin mengirim kode aktivasi, dan undangan langsung aktif tanpa watermark.' },
   { q: 'Apakah ada pilihan untuk agama selain Islam?', a: `Ada. Pilih gaya teks ${joinId(VARIANTS.map(v => v.label))}. Salam pembuka, nama acara, dan ayat mengikuti pilihan itu, dan bisa diubah kapan saja.` },
   { q: 'Bisakah ganti tema setelah undangan dibuat?', a: 'Bisa, kapan saja dari editor. Data, foto, dan daftar tamu tetap utuh.' },
