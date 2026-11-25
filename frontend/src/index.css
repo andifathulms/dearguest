@@ -197,19 +197,6 @@ body.cover-open {
 .lightbox-nav.prev { left: calc(1rem + env(safe-area-inset-left)); }
 .lightbox-nav.next { right: calc(1rem + env(safe-area-inset-right)); }
 
-/* Floating RSVP shortcut — colors inherited from the active theme */
-.floating-rsvp {
-  position: fixed; bottom: calc(2rem + env(safe-area-inset-bottom)); left: calc(1.5rem + env(safe-area-inset-left)); z-index: 100;
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  padding: 0.6rem 1.1rem; border-radius: 999px; cursor: pointer; border: none;
-  background: var(--text-primary); color: var(--bg-primary);
-  font-family: inherit; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.03em;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25); transition: transform 0.2s;
-}
-.floating-rsvp:hover { transform: translateY(-2px); }
-.floating-rsvp svg { width: 16px; height: 16px; }
-@media (max-width: 640px) { .floating-rsvp span { display: none; } .floating-rsvp { padding: 0.7rem; } }
-
 /* Invitation loading / error screen */
 .inv-status {
   min-height: 100vh;

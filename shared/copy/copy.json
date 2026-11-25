@@ -128,7 +128,7 @@
 
         "music.on": "Nyalakan musik",
         "music.off": "Matikan musik",
-        "floatingRsvp.aria": "Konfirmasi kehadiran (RSVP)",
+        "floatingRsvp.label": "Konfirmasi Hadir",
         "watermark.madeWith": "Dibuat dengan"
       },
       "variants": {

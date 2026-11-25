@@ -119,7 +119,7 @@
         "invite.text": "{greeting}\n\nKepada Yth. {guest},\nDengan penuh kebahagiaan, kami mengundang Anda ke pernikahan {bride} & {groom}.\n\nBuka undangan digital kami di:\n{url}\n\nMerupakan suatu kehormatan apabila Anda berkenan hadir. Terima kasih.",
         "music.on": "Nyalakan musik",
         "music.off": "Matikan musik",
-        "floatingRsvp.aria": "Konfirmasi kehadiran (RSVP)",
+        "floatingRsvp.label": "Konfirmasi Hadir",
         "watermark.madeWith": "Dibuat dengan"
       },
       "variants": {
