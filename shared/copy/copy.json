@@ -28,7 +28,7 @@
         "events.title": "Rangkaian Acara",
         "events.until": "s.d. selesai",
         "events.localTime": "{time} waktu Anda",
-        "events.dressCode": "Dress code",
+        "events.dressCode": "Busana",
         "events.openMap": "Buka Peta",
         "events.calendar": "Simpan ke Kalender",
         "events.calendarGoogle": "Google Calendar",
@@ -106,9 +106,9 @@
         "wishes.more": "Lihat ucapan lainnya",
         "wishes.pending": "Ucapan Anda akan tampil setelah disetujui kedua mempelai.",
 
-        "livestream.title": "Live Streaming",
+        "livestream.title": "Siaran Langsung",
         "livestream.intro": "Tidak dapat hadir secara langsung? Saksikan momen bahagia kami melalui siaran langsung.",
-        "livestream.watch": "Tonton Live Streaming",
+        "livestream.watch": "Tonton Siaran Langsung",
 
         "share.button": "Bagikan via WhatsApp",
         "share.text": "{greeting}, kami mengundang Anda ke pernikahan {bride} & {groom}. Lihat undangan kami di: {url}",
