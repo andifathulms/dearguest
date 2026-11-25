@@ -3,6 +3,8 @@ souvenirs, the welcome screen feed and the guestbook export."""
 from datetime import date, datetime, timedelta, timezone as dt_tz
 from unittest import mock
 
+from django.conf import settings
+
 from apps.invitations import usher
 from apps.invitations.models import RSVP, Event, Guest
 
@@ -111,9 +113,13 @@ class UsherTests(APITestBase):
 
     def test_site_paths_cannot_be_invitation_slugs(self):
         self.login(self.make_user('baru'))
-        self.assertFalse(self.client.get('/api/my/slug-check/?slug=penerima').data['available'])
-        self.assertEqual(self.client.post('/api/my/invitations/', {'slug': 'penerima', 'wedding_date': '2027-01-01'},
-                                          format='json').status_code, 400)
+        admin = settings.ADMIN_URL.split('/')[0]
+        for slug in ('penerima', 'tema', 'dashboard', 'register', 'theme-previews', 'privasi', admin):
+            with self.subTest(slug=slug):
+                self.assertFalse(self.client.get(f'/api/my/slug-check/?slug={slug}').data['available'])
+                self.assertEqual(self.client.post('/api/my/invitations/', {'slug': slug, 'wedding_date': '2027-01-01'},
+                                                  format='json').status_code, 400)
+        self.assertTrue(self.client.get('/api/my/slug-check/?slug=demo-andini').data['available'])
 
     def test_guestbook_export(self):
         self.client.post(f'{self.base}checkin/', {'guest_id': self.budi.id, 'envelope_no': '=1+1'}, format='json')

@@ -426,8 +426,8 @@ class InvitationCreateSerializer(serializers.ModelSerializer):
         value = value.strip().lower()
         if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', value):
             raise serializers.ValidationError('Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.')
-        from .share_views import SITE_PATHS   # /dashboard, /penerima/… belong to the site
-        if value in SITE_PATHS or Invitation.objects.filter(slug=value).exists():
+        from .share_views import is_reserved_slug   # /dashboard, /penerima/… belong to the site
+        if is_reserved_slug(value) or Invitation.objects.filter(slug=value).exists():
             raise serializers.ValidationError('Slug ini sudah digunakan. Pilih yang lain.')
         return value
 

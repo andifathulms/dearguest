@@ -35,7 +35,19 @@ SHARE_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; base
 SITE_PATHS = {
     'tema', 'register', 'dashboard', 'forgot-password', 'reset-password', 'my',
     'onboarding', 'admin', 'api', 'media', 'share', 'og', 'static', 'assets', 'penerima',
+    'social', 'theme-previews',   # frontend/public folders
 }
+# Names kept free for pages the site is likely to add (legal, pricing, search pages).
+RESERVED_SLUGS = {
+    'privasi', 'kebijakan-privasi', 'privacy', 'syarat', 'ketentuan', 'syarat-ketentuan', 'terms',
+    'harga', 'pricing', 'bantuan', 'help', 'faq', 'tentang', 'about', 'kontak', 'contact',
+    'blog', 'adat', 'undangan', 'demo', 'login', 'masuk', 'daftar', 'logout', 'keluar',
+}
+
+
+def is_reserved_slug(slug):
+    """True when `slug` can't be an invitation: the site owns that first path segment."""
+    return slug in SITE_PATHS or slug in RESERVED_SLUGS or slug == settings.ADMIN_URL.split('/')[0]
 
 
 def _couple(inv):
