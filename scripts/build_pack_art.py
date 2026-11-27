@@ -86,7 +86,18 @@ PACKS = {
             ('card-corner', 'card-corner.jpg', (38, 133, 137), 360, (24, 60), 3, False, (0, 0, 0.68, 0.66)),
             ('parallax-back', 'parallax-back.jpg', (38, 133, 138), 1080, (24, 60), 3, False, (0, 0.62, 1, 1)),
             ('parallax-front', 'parallax-front.jpg', (39, 132, 137), 1080, (24, 60), 3, False, (0, 0, 1, 0.55)),
+            # Scene art (prompts/scenes): the headpieces as objects, on the same teal.
+            ('attire-bride', 'attire-bride.webp', (31, 140, 138), 640, (24, 60), 3, False),
+            ('attire-groom', 'attire-groom.webp', (34, 138, 136), 640, (24, 60), 3, False),
         ],
+        # Scene art: full paintings whose edges fade into the page. The pendopo's open
+        # centre is ~26-74 % wide, 44-70 % high; the night gebyok's opening ~30-70 %, 38-75 %.
+        'scenes': [
+            ('scene-interlude', 'scene-interlude.webp', 1080, (0.05, 0.03, 0.05, 0.03)),
+            ('closing-scene', 'closing-scene.webp', 1080, (0.07, 0.04, 0.05, 0.04)),
+        ],
+        # lamp, kembar mayang / kendi, gong
+        'props': ('props-sheet.webp', (38, 137, 135), 360, (24, 60), 3, ('prop-1', 'prop-2', 'prop-3', 'prop-4')),
         'sprites': ('petals-sheet.jpg', (39, 135, 137), 'petal', 96, (24, 60), (2, 3, 4, 4, 3, 2), False),
         'texture': ('texture.jpg', 512, 70),
     },
@@ -177,7 +188,19 @@ PACKS = {
             ('card-corner', 'card-corner.jpg', (32, 68, 187), 360, (26, 64), 2, False, (0, 0, 0.56, 0.56)),
             ('parallax-back', 'parallax-back.jpg', (30, 70, 184), 1080, (26, 64), 2, False, (0, 0.55, 1, 1)),
             ('parallax-front', 'parallax-front.jpg', (30, 70, 181), 1080, (26, 64), 2, False, (0, 0, 1, 0.56)),
+            # Scene art (prompts/scenes): the suntiang and the saluak on their stands.
+            ('attire-bride', 'attire-bride.webp', (33, 70, 184), 640, (26, 64), 2, False),
+            ('attire-groom', 'attire-groom.webp', (31, 68, 181), 640, (26, 64), 2, False),
         ],
+        # Scene art: full paintings on the lacquer. The panel is calm ~21-43 % high (full
+        # width); the lamp-lit closing between the drapes, ~28-73 % wide, 44-73 % high.
+        'scenes': [
+            ('scene-interlude', 'scene-interlude.webp', 1080, (0.04, 0.03, 0.05, 0.03)),
+            ('closing-scene', 'closing-scene.webp', 1080, (0.05, 0.04, 0.06, 0.04)),
+        ],
+        # carano, parasol / marawa, talempong. The marawa is left out: on its own, three
+        # bands of black, red and yellow read as a national flag.
+        'props': ('props-sheet.webp', (34, 70, 188), 360, (26, 64), 2, ('prop-3', 'prop-1', None, 'prop-2')),
         'sprites': ('petals-sheet.jpg', (39, 71, 187), 'petal', 96, (26, 64), (2, 3, 3, 3, 2, 2), False),
         # The painted lacquer (texture.jpg) has strong vertical grain that tiles
         # visibly at 256 px; a generated lacquer (no weave) matches the paintings.
@@ -646,6 +669,31 @@ def build(pack):
         img = resize_w(key(raw, bg, ramp, close, fill, False if plain else (True if cobalt else cfg.get('despill', False)),
                            False if plain else (True if cobalt else cfg.get('edge_fill', False)), cfg.get('spill', (14, 40))), width)
         written += save_all(img, out, name, ('avif', 'webp'))
+
+    # Scene art (prompts/scenes): an opaque painting whose four edges fade out
+    # (top, right, bottom, left, as fractions), so it sits on the page with no visible edge.
+    for name, master, width, fades in cfg.get('scenes', []):
+        img = resize_w(Image.open(src / master).convert('RGB'), width)
+        w, h = img.size
+        top, right, bottom, left = fades
+        edge = lambda n, a, b: np.minimum(np.clip(np.arange(n) / max(a * n, 1), 0, 1), np.clip((n - 1 - np.arange(n)) / max(b * n, 1), 0, 1))
+        ramp = np.outer(edge(h, top, bottom), edge(w, left, right))
+        ramp = ramp * ramp * (3 - 2 * ramp)
+        img.putalpha(Image.fromarray((ramp * 255).astype(np.uint8)))
+        written += save_all(img, out, name, ('avif', 'webp'))
+
+    # Props: a 2x2 sheet of separate objects, one per quarter, in reading order.
+    # A None name skips that quarter.
+    if 'props' in cfg:
+        master, bg, width, ramp, close, names = cfg['props']
+        raw = Image.open(src / master).convert('RGB')
+        hw, hh = raw.width // 2, raw.height // 2
+        for i, name in enumerate(names):
+            if not name:
+                continue
+            x, y = (i % 2) * hw, (i // 2) * hh
+            prop = trim(key(raw.crop((x, y, x + hw, y + hh)), bg, ramp, close, False, cfg.get('despill', False)))
+            written += save_all(resize_w(prop, width), out, name, ('avif', 'webp'))
 
     if 'sprites' in cfg:
         master, bg, prefix, size, ramp, closes, *rest = cfg['sprites']
