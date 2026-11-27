@@ -529,6 +529,8 @@ span.pk-slot > svg { width: var(--slot-w); max-width: 100%; height: auto; margin
   position: relative;
   width: var(--scene-w);
   aspect-ratio: var(--scene-ratio);
+  /* a whole number of pixels where round() exists, so the sections below don't sit on a fraction */
+  height: round(down, calc(var(--scene-w) / var(--scene-ratio)), 1px);
   margin-left: calc(50% - var(--scene-w) / 2);
 }
 .pk-scene-art, .pk-scene-art .pk-slot { position: absolute; inset: 0; display: block; }
