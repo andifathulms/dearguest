@@ -142,7 +142,7 @@ cover, not a measured gap against them. Four new kinds of asset close it, now sp
 | Four props | `prop-1` … `prop-4` | separate objects that enter from the sides on scroll |
 | Evening closing | `closing-scene` | the cover's scene at night |
 
-Pilot prompt files exist for Gonjong Songket and Gebyok Sogan. Suggested scenes and objects for the
+The pilot is built and live in the layout on Gonjong Songket and Gebyok Sogan (28 November 2026; `docs/theme-packs.md` §4, §9). Their reviewer questions are still unanswered. Suggested scenes and objects for the
 other eleven packs follow, as a starting point only. They come from general knowledge, and every
 regional object needs that culture's reviewer:
 
@@ -182,7 +182,7 @@ baselines when a pack's look changes, never write religious text from memory.
 | A11 | Draft the privacy policy and terms for the owner to review | Input: `docs/privacy-notes.md`. Mark it clearly as a draft that needs the owner's and ideally a lawyer's review | Draft pages exist; not published as final |
 | A12 | Search pages per adat | Same prerender approach as `/tema/<id>` (DISTRIBUTION-REPORT.md §F). Any text about a tradition needs a cultural reviewer note | One page per live Nusantara theme in the sitemap |
 | A13 | Prompt for the next packs | "Give me another prompt" in CLAUDE.md. Order after this review: Modern & Minimalis first, then Betawi, then Peranakan (new, needs adding to CATALOG-DIRECTION.md if the owner agrees), then Melayu. The next floral must not use the corner-bouquet composition | A `PROMPT-<THEME>-ASSETS.md` with the full set: Prompts 1–8, section pieces S1–S4 and scene pieces C1–C4 |
-| A14 | Build the scene-art pilot when the owner drops the images in | "Scene art for <theme>" in CLAUDE.md; prompts in `prompts/scenes/`. The first arrival builds the shared rendering for `scene-interlude`, `attire-*`, `prop-*` and `closing-scene`; packs without the slots must not change | Pilot pack shown to the owner on screen; other packs' baselines untouched |
+| A14 | **Done 28 Nov 2026.** Build the scene-art pilot when the owner drops the images in | "Scene art for <theme>" in CLAUDE.md; prompts in `prompts/scenes/`. The first arrival builds the shared rendering for `scene-interlude`, `attire-*`, `prop-*` and `closing-scene`; packs without the slots must not change | Pilot pack shown to the owner on screen; other packs' baselines untouched |
 | A15 | Scene prompts for the other eleven live packs | Only after the owner approves the pilot. Copy the structure of the two pilot files; starting ideas are in the table at the end of §5 | One `PROMPT-<ID>-SCENES.md` per live pack, each with reviewer questions |
 
 ### B. The owner decides or supplies
