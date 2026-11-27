@@ -70,7 +70,11 @@ That folder is a git-ignored inbox. Then:
   Gemini keeps adding a haze or ground band there;
 - the texture prompt marked optional;
 - no people, no text, no religious symbols;
-- a note for a cultural reviewer.
+- a note for a cultural reviewer;
+- **the full set, so a new pack ships to the same standard as the live ones.** After Prompts 1–8, the
+  same file carries the section pieces (S1–S4, structure in `prompts/sections/`) and the scene pieces
+  (C1–C4, structure in `prompts/scenes/`), all against the theme's own style brief. A new theme is
+  not finished with only its cover and hero.
 
 **"Section art for <theme>"**: the user painted that theme's four extra pieces from
 `prompts/sections/PROMPT-<ID>-SECTIONS.md`, against the theme's own reference painting. They are keyed
@@ -89,6 +93,23 @@ Gemini repeats from the previous image, such as a half wreath under a card corne
 no card corner yet), Wisteria Lila, Gonjong Songket (plus depth),
 Mawar Malam, Limas Emas, Pampas Kraft (plus depth), Taman Sage (plus depth), Siger Mega Mendung (plus depth), Anggrek Bulan. A pack with new depth layers also needs hero CSS: the far strip stands ~0.25 W above
 the opaque bottom band, with the text raised to clear it (see floral/javanese/bugis/minang/rustic/sage/sunda overrides.css).
+
+**"Scene art for <theme>"**: the user painted that theme's pieces from
+`prompts/scenes/PROMPT-<ID>-SCENES.md` (why they exist: `STRATEGY-REVIEW.md` §5). They give the page a
+second painting and moving objects after the hero:
+- `scene-interlude`: a 3:4 full painting (not keyed) with a calm centre, behind the countdown;
+- `attire-bride` / `attire-groom`: keyed cut-outs of the headpieces as objects, with no people. They
+  replace the portraits when the couple shows no photos;
+- `prop-1` … `prop-4`: cut from one keyed 2 × 2 sheet; they drift in at the sides of the events,
+  story, gift and RSVP sections on scroll;
+- `closing-scene`: a 9:16 full painting of the cover's scene at night, behind the closing. On a light
+  pack the closing then needs light ink.
+
+Pilot packs: Gonjong Songket and Gebyok Sogan. **The shared rendering for these slots is not built
+yet**: the first theme to arrive builds it (and documents it in `docs/theme-packs.md` §4, §9). The
+slots are optional, so a pack without them must render exactly as before. Show the owner the pilot
+on screen before writing scene prompts for the other live packs. The ceremonial objects need the
+reviewer's answers listed at the end of each prompt file before the pack ships. Live: none yet.
 
 ### Standing rules
 - Don't commit `docker-compose.yml` (the user's local port remap: web 5190, api 8020, db 5440), or

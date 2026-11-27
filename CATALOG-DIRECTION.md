@@ -38,7 +38,11 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
    - cut-outs on one flat key colour that appears nowhere in the palette (cobalt by default, magenta if the palette has blue);
    - the texture is optional, because Gemini often refuses plain surfaces and the build can generate one;
    - an optional Prompt 8 for depth layers (`parallax-back` / `parallax-front` cut-outs), which move with the hero's scroll at no code cost;
-   - a suggested `motion` for the pack (exit + signature), chosen from the composition.
+   - a suggested `motion` for the pack (exit + signature), chosen from the composition;
+   - **the full set in the same file:** the section pieces (S1–S4, as in `prompts/sections/`) and the
+     scene pieces (C1–C4, as in `prompts/scenes/`: a mid-page scene, the attire pair with no people,
+     four props, an evening closing). Every new pack ships with all of them. The next floral must
+     also break from the corner-bouquet cover that the four live florals share.
 2. **Assets** go into `assets/` (git-ignored). File names don't matter.
 3. **Build:**
    - move the images to `design/packs/<id>/masters/` and rename them by content;
