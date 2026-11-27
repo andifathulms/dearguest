@@ -93,7 +93,8 @@ PACKS = {
         # Scene art: full paintings whose edges fade into the page. The pendopo's open
         # centre is ~26-74 % wide, 44-70 % high; the night gebyok's opening ~30-70 %, 38-75 %.
         'scenes': [
-            ('scene-interlude', 'scene-interlude.webp', 1080, (0.05, 0.03, 0.05, 0.03)),
+            # the pendopo is a wash on parchment: its paper is lifted out, so the page shows through
+            ('scene-interlude', 'scene-interlude.webp', 1080, (0.05, 0.03, 0.05, 0.03), (251, 245, 227)),
             ('closing-scene', 'closing-scene.webp', 1080, (0.07, 0.04, 0.05, 0.04)),
         ],
         # lamp, kembar mayang / kendi, gong
@@ -195,8 +196,9 @@ PACKS = {
         # Scene art: full paintings on the lacquer. The panel is calm ~21-43 % high (full
         # width); the lamp-lit closing between the drapes, ~28-73 % wide, 44-73 % high.
         'scenes': [
-            ('scene-interlude', 'scene-interlude.webp', 1080, (0.04, 0.03, 0.05, 0.03)),
-            ('closing-scene', 'closing-scene.webp', 1080, (0.05, 0.04, 0.06, 0.04)),
+            # the painted black is lifted out, so the page's own lacquer (and its tone) shows through
+            ('scene-interlude', 'scene-interlude.webp', 1080, (0.04, 0.03, 0.05, 0.03), (18, 12, 9)),
+            ('closing-scene', 'closing-scene.webp', 1080, (0.05, 0.04, 0.06, 0.04), (17, 13, 9)),
         ],
         # carano, parasol / marawa, talempong. The marawa is left out: on its own, three
         # bands of black, red and yellow read as a national flag.
@@ -672,13 +674,19 @@ def build(pack):
 
     # Scene art (prompts/scenes): an opaque painting whose four edges fade out
     # (top, right, bottom, left, as fractions), so it sits on the page with no visible edge.
-    for name, master, width, fades in cfg.get('scenes', []):
+    # An optional ground colour (paper, lacquer) is lifted out as well, with a soft key,
+    # when the painting's ground doesn't match the page's.
+    for name, master, width, fades, *paper in cfg.get('scenes', []):
         img = resize_w(Image.open(src / master).convert('RGB'), width)
+        if paper:
+            img = key(img, paper[0], (8, 48), 0)
         w, h = img.size
         top, right, bottom, left = fades
         edge = lambda n, a, b: np.minimum(np.clip(np.arange(n) / max(a * n, 1), 0, 1), np.clip((n - 1 - np.arange(n)) / max(b * n, 1), 0, 1))
         ramp = np.outer(edge(h, top, bottom), edge(w, left, right))
         ramp = ramp * ramp * (3 - 2 * ramp)
+        if paper:
+            ramp = ramp * np.asarray(img.getchannel('A')) / 255
         img.putalpha(Image.fromarray((ramp * 255).astype(np.uint8)))
         written += save_all(img, out, name, ('avif', 'webp'))
 

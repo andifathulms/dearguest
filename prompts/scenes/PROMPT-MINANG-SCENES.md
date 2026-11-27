@@ -6,9 +6,9 @@ the hero, the page is black lacquer with text and cards until the closing; these
 | Piece | File | Where it goes |
 |---|---|---|
 | C1 scene | `scene-interlude` | behind the countdown: a rumah gadang in the highlands, painted like a lacquer panel, with the numbers in its calm centre |
-| C2a bride's attire | `attire-bride` | the suntiang on a stand. Stands in for the bride's portrait when the couple shows no photos; small beside her name when they do |
+| C2a bride's attire | `attire-bride` | the suntiang on a stand. Stands in for the bride's portrait when the couple shows no photos |
 | C2b groom's attire | `attire-groom` | the saluak on a stand, used the same way for the groom |
-| C3 props | `prop-1` … `prop-4` | four separate objects that drift in from the sides of the events, story, gift and RSVP sections on scroll |
+| C3 props | `prop-1` … `prop-4` | four separate objects, one beside the heading of each of the events, story, gift and RSVP sections, moving with the scroll |
 | C4 evening closing | `closing-scene` | the cover's scene again, lit by lamps, behind the closing |
 
 **How to use**

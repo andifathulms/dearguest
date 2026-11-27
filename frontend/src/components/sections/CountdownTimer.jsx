@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import SectionTitle from './SectionTitle.jsx'
+import SceneFrame from '../../themes/packs/_system/SceneFrame.jsx'
 import { useCopy } from '../../copy/CopyContext.jsx'
 
 function getTimeLeft(targetDate) {
@@ -33,7 +34,7 @@ export default function CountdownTimer({ targetDate }) {
   if (!timeLeft) {
     return (
       <section className="countdown-section">
-        <p className="countdown-done">{t('countdown.passed')}</p>
+        <SceneFrame slot="scene-interlude"><p className="countdown-done">{t('countdown.passed')}</p></SceneFrame>
       </section>
     )
   }
@@ -54,14 +55,17 @@ export default function CountdownTimer({ targetDate }) {
       transition={{ duration: 0.7 }}
     >
       <SectionTitle>{t('countdown.title')}</SectionTitle>
-      <div className="countdown-grid">
-        {units.map(({ label, value }) => (
-          <div key={label} className="countdown-unit">
-            <span className="countdown-value">{String(value).padStart(2, '0')}</span>
-            <span className="countdown-label">{label}</span>
-          </div>
-        ))}
-      </div>
+      {/* Packs with a scene painting set the numbers in its calm centre. */}
+      <SceneFrame slot="scene-interlude">
+        <div className="countdown-grid">
+          {units.map(({ label, value }) => (
+            <div key={label} className="countdown-unit">
+              <span className="countdown-value">{String(value).padStart(2, '0')}</span>
+              <span className="countdown-label">{label}</span>
+            </div>
+          ))}
+        </div>
+      </SceneFrame>
     </motion.section>
   )
 }

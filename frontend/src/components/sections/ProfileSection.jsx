@@ -28,6 +28,7 @@ function PersonCard({ couple, person, delay }) {
   const instagram = couple[`${person}_instagram`]
   const order = couple[`${person}_child_order`]
   const parents = parentsLine(couple, person, t)
+  const attire = pack?.pack.manifest.slots?.[`attire-${person}`]
   // Wording follows who the person is, not a "Putri/Putra" compromise.
   const childOf = person === 'bride'
     ? (order ? t('profile.daughterOf', { order }) : t('profile.daughterOfNoOrder'))
@@ -51,6 +52,8 @@ function PersonCard({ couple, person, delay }) {
       ) : (
         <ResponsiveImg src={photo} meta={meta} sizes="(min-width: 640px) 280px, 60vw" alt={name} className="profile-photo" />
       ))}
+      {/* Without a photo, a pack's painted attire (prompts/scenes) stands in for the portrait. */}
+      {!photo && attire && <ThemeAsset slot={`attire-${person}`} className="pk-attire" />}
       <h3 className="profile-name">{name}</h3>
       {parents && parents !== '-' && <p className="profile-parents">{childOf}<br />{parents}</p>}
       {instagram && (

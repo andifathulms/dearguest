@@ -127,10 +127,9 @@
 .pk-root[data-pack='javanese'] .countdown-value { font-family: var(--dg-font-display); color: var(--dg-ink); }
 .pk-root[data-pack='javanese'] :is(.rsvp-input, .rsvp-textarea) { background: #fffaf1; border-color: var(--dg-line-strong); color: var(--dg-ink); }
 
-/* Closing: the carved corner brackets frame the last words. */
-.pk-root[data-pack='javanese'] .pk-closing { padding-block: clamp(9rem, 40vw, 13rem); overflow: hidden; }
-.pk-root[data-pack='javanese'] .pk-closing .pk-corner { width: min(52vw, 240px); }
-/* The bracket's melati strings must hang down, so the second corner is the
-   bracket mirrored to the top-right (a lintel), not rotated to the bottom. */
-.pk-root[data-pack='javanese'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
-.pk-root[data-pack='javanese'] .pk-closing { padding-block: clamp(13rem, 56vw, 17rem) clamp(5rem, 16vw, 8rem); }
+/* Closing: the gebyok at night (closing-scene). The page deepens into the
+   painting's dark sogan, and the last words turn to lamplit ivory. */
+.pk-root[data-pack='javanese'] { --pk-closing-bg: #1b120b; }
+.pk-root[data-pack='javanese'] .pk-closing[data-scene] { --dg-ink: #f6ead2; --dg-ink-muted: #e3d2b3; --dg-accent: #d2ad62; color: var(--dg-ink); }
+.pk-root[data-pack='javanese']:has(.pk-closing[data-scene]) .watermark-footer,
+.pk-root[data-pack='javanese']:has(.pk-closing[data-scene]) .watermark-footer a { color: #b9a384; }

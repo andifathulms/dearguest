@@ -56,6 +56,8 @@ SLOTS = {
     'parallax-front', 'particles', 'opening', 'gift-card', 'og-template', 'texture', 'hero-bg', 'hero-top', 'hero-bottom',
     # section art (prompts/sections)
     'section-edge', 'section-garland', 'monogram-wreath', 'card-corner',
+    # scene art (prompts/scenes)
+    'scene-interlude', 'closing-scene', 'attire-bride', 'attire-groom', 'prop-1', 'prop-2', 'prop-3', 'prop-4',
 }
 LAYOUTS = {'framed-card', 'full-bleed', 'arch', 'painted'}
 HEROES = {'photo', 'framed'}

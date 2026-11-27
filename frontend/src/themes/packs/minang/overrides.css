@@ -111,8 +111,4 @@
 .pk-root[data-pack='minang'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(0, 0, 0, 0.3); border-color: var(--dg-line-strong); color: var(--dg-ink); }
 .pk-root[data-pack='minang'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
 
-/* Closing: the carved gonjong brackets frame the last words, as a lintel (the
-   songket swags must hang down, so the second corner is mirrored, not rotated). */
-.pk-root[data-pack='minang'] .pk-closing { padding-block: clamp(12rem, 52vw, 16rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
-.pk-root[data-pack='minang'] .pk-closing .pk-corner { width: min(50vw, 230px); }
-.pk-root[data-pack='minang'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
+/* Closing: the lamp-lit pelaminan (closing-scene) on the same lacquer; the shared layout places it. */

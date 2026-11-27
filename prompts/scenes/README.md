@@ -7,17 +7,24 @@ two or three screens of flat colour with text and cards; these pieces fill that 
 | Piece | Slot | On the page |
 |---|---|---|
 | C1 scene (3:4, full painting) | `scene-interlude` | behind the countdown: a painted view with a calm centre for the numbers |
-| C2a, C2b attire (1:1, cut-outs) | `attire-bride`, `attire-groom` | the bride's and groom's headpieces as objects, no people. They stand in for the portraits when a couple shows no photos, and sit small beside the names when they do |
-| C3 props (1:1, sheet of four cut-outs) | `prop-1` … `prop-4` | separate objects that drift in from the sides of the events, story, gift and RSVP sections on scroll, each at its own speed |
+| C2a, C2b attire (1:1, cut-outs) | `attire-bride`, `attire-groom` | the bride's and groom's headpieces as objects, no people. They stand in for the portraits when a couple shows no photos |
+| C3 props (1:1, sheet of four cut-outs) | `prop-1` … `prop-4` | one object beside the heading of the events, story, gift and RSVP sections, moving with the scroll |
 | C4 evening closing (9:16, full painting) | `closing-scene` | the cover's scene again at night with the lamps lit, behind the closing: the page ends in the evening |
 
 Every file repeats its theme's style brief (Prompt 0) word for word and asks you to attach the theme's
 own cover painting.
 
-**Status.** Pilot on two packs, one dark and one light: Gonjong Songket (`minang`) and Gebyok Sogan
-(`javanese`). The shared rendering for these slots does not exist yet. The first theme whose art
-arrives builds it (`docs/theme-packs.md` §4, §9), and a pack without these slots must render exactly
-as it does today. Write the other themes' files only after the owner has approved the pilot on screen.
+**Status.** Live on two pilot packs, one dark and one light: Gonjong Songket (`minang`) and Gebyok
+Sogan (`javanese`). The shared rendering exists (`docs/theme-packs.md` §4, §9), and a pack without
+these slots renders exactly as before. Write the other themes' files only after the owner has
+approved the pilot on screen.
+
+**What the pilot taught**
+- Ask for the calm centre, but measure what arrives: Gemini kept it smaller than asked (22 % of the
+  height on the Minang panel, half the width in the pendopo). The layout reads the measured area
+  from `theme.json`, so a small one still works: the countdown goes two by two.
+- A single object can carry a meaning its set doesn't: the marawa alone, three bands of black, red
+  and yellow, read as a national flag and was left out. Avoid flags and pennants as props.
 
 **New themes** get these prompts inside their own `PROMPT-<THEME>-ASSETS.md` from the start (see
 CLAUDE.md, "Give me another prompt"), so every new pack ships with the full set.

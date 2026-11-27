@@ -23,6 +23,10 @@ paper. The light counterpart of Floral's dark wine.
 | `card-corner` | section art: a carved teak corner with sogan-gold relief and melati, on the event and gift cards |
 | `parallax-back` | depth (section prompt S5): a joglo roof among palms in haze, standing behind the hero's bottom band; trails the scroll (`depth` -0.1). Phones only |
 | `parallax-front` | depth (section prompt S6): carved teak brackets with melati strings at the top corners, ahead of the scroll. Phones only |
+| `scene-interlude` | scene art (prompt C1): a pendopo with hanging lamps, ronce melati and kembar mayang; the countdown sits between its pillars, two by two |
+| `attire-bride` / `attire-groom` | scene art (C2): cunduk mentul, a comb and ronce melati on a batik cushion; a blangkon and a sheathed keris wound with melati. Shown when the couple uploads no portraits |
+| `prop-1` … `prop-4` | scene art (C3): a hanging brass lamp (events), a kembar mayang (story), a kendi with flowers (gifts), a gong in a carved frame (RSVP) |
+| `closing-scene` | scene art (C4): the gebyok at night with two lamps lit; the page deepens into dark sogan and the closing's words turn ivory (`--pk-closing-bg`) |
 | page background | `texture.webp`, seamless ivory paper (in overrides.css) |
 
 **Type.** Cinzel (Roman capitals) for titles and labels, like engraved
@@ -39,3 +43,5 @@ text and italic lines (Cinzel has no italic).
   rusak) were reserved for the keraton; kawung and the generic ornaments used
   here are in common wedding use today.
 - No wayang figures, no aksara Jawa (all text is Latin, rendered by the app).
+
+**Scene art, still to be reviewed.** The questions for a reviewer from Solo or Yogyakarta are at the end of `prompts/scenes/PROMPT-JAVANESE-SCENES.md` (the blangkon against a kuluk, whether a sheathed keris may appear, the kendi's link to siraman, a dark closing); none has been answered yet.

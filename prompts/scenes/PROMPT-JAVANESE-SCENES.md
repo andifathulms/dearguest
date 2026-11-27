@@ -6,9 +6,9 @@ the hero, the page is ivory paper with text and cards until the closing; these f
 | Piece | File | Where it goes |
 |---|---|---|
 | C1 scene | `scene-interlude` | behind the countdown: a view into a pendopo with hanging lamps, with the numbers in its calm centre |
-| C2a bride's attire | `attire-bride` | the bride's hair ornaments and jasmine on a cushion. Stands in for the bride's portrait when the couple shows no photos; small beside her name when they do |
+| C2a bride's attire | `attire-bride` | the bride's hair ornaments and jasmine on a cushion. Stands in for the bride's portrait when the couple shows no photos |
 | C2b groom's attire | `attire-groom` | the blangkon and keris on a cushion, used the same way for the groom |
-| C3 props | `prop-1` … `prop-4` | four separate objects that drift in from the sides of the events, story, gift and RSVP sections on scroll |
+| C3 props | `prop-1` … `prop-4` | four separate objects, one beside the heading of each of the events, story, gift and RSVP sections, moving with the scroll |
 | C4 evening closing | `closing-scene` | the cover's gebyok again at night with the lamps lit, behind the closing |
 
 **How to use**

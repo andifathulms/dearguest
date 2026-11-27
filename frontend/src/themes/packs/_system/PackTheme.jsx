@@ -27,6 +27,8 @@ import ThemeAsset from './ThemeAsset.jsx'
 import Particles from './Particles.jsx'
 import Monogram from './Monogram.jsx'
 import SectionEdge from './SectionEdge.jsx'
+import SectionProp from './SectionProp.jsx'
+import SceneFrame from './SceneFrame.jsx'
 import Opening from './openings/Opening.jsx'
 import Cover from './layout/Cover.jsx'
 import { primaryEvent } from '../../../utils/events.js'
@@ -35,7 +37,7 @@ import { primaryEvent } from '../../../utils/events.js'
 // components (same content for every theme); the pack supplies tokens, art,
 // fonts, a layout variant and an opening (docs/theme-packs.md).
 
-function PackSection({ children, tone, edge }) {
+function PackSection({ children, tone, edge, prop }) {
   return (
     <motion.div
       className="pk-section-wrap"
@@ -47,6 +49,7 @@ function PackSection({ children, tone, edge }) {
     >
       {children}
       {edge && <SectionEdge side={edge} />}{/* after the section, so it stays the wrap's first child */}
+      {prop && <SectionProp slot={prop} side={edge === 'left' ? 'right' : 'left'} />}
     </motion.div>
   )
 }
@@ -60,27 +63,29 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
   // divider, and the card corner reaches the shared cards through a CSS variable.
   const divider = m.slots?.['section-garland'] ? 'section-garland' : 'divider'
   const corner = m.slots?.['card-corner']
+  const closingScene = Boolean(m.slots?.['closing-scene'])
   const cornerStyle = corner ? { '--pk-card-corner': `url(${pack.urls[corner.src]})` } : undefined
 
   const events = invitation.events || []
   const has = list => (list || []).length > 0
   // Sections in order, each with whether it has anything to show. Empty ones
   // are skipped (not rendered as blank wrappers) so alternating tones and
-  // dividers fall between real sections only.
+  // dividers fall between real sections only. The third entry names the prop
+  // slot (prompts/scenes) that section shows, when the pack has one.
   const sections = [
     [true, <GuestGreeting guestName={guestName} openingText={invitation.opening_text} seat={invitation.seat} />],
     [Boolean(scriptureFor(invitation)), <ScriptureSection />],
     [Boolean(primary?.start), <CountdownTimer targetDate={primary?.start} />],
-    [has(events), <EventsSection events={events} dressCode={invitation.dress_code} />],
-    [has(invitation.stories), <StorySection stories={invitation.stories} />],
+    [has(events), <EventsSection events={events} dressCode={invitation.dress_code} />, 'prop-1'],
+    [has(invitation.stories), <StorySection stories={invitation.stories} />, 'prop-2'],
     [Boolean(invitation.couple), <ProfileSection couple={couple} />],
     [has(invitation.photos), <GallerySection photos={invitation.photos} />],
-    [has(invitation.bank_accounts) || Boolean(invitation.wishlist_url || invitation.gift_address?.trim()), <AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} />],
-    [true, <RSVPForm slug={invitation.slug} />],
+    [has(invitation.bank_accounts) || Boolean(invitation.wishlist_url || invitation.gift_address?.trim()), <AmplodDigital bankAccounts={invitation.bank_accounts} wishlistUrl={invitation.wishlist_url} />, 'prop-3'],
+    [true, <RSVPForm slug={invitation.slug} />, 'prop-4'],
     [true, <WishesWall slug={invitation.slug} />],
     [events.some(e => e.maps_url || e.embed_url), <MapsSection events={events} />],
     [Boolean(invitation.livestream_url), <LiveStreamSection url={invitation.livestream_url} />],
-  ].filter(([show]) => show).map(([, el]) => el)
+  ].filter(([show]) => show)
 
   return (
     <MotionConfig reducedMotion="user">
@@ -106,10 +111,10 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
             heroPhoto={invitation.hero_photo}
           />
 
-          {sections.map((section, i) => (
+          {sections.map(([, section, prop], i) => (
             <Fragment key={i}>
               {i > 0 && <ThemeAsset slot={divider} className="pk-divider" />}
-              <PackSection tone={i % 2 ? 'alt' : 'base'} edge={i % 2 ? 'right' : 'left'}>{section}</PackSection>
+              <PackSection tone={i % 2 ? 'alt' : 'base'} edge={i % 2 ? 'right' : 'left'} prop={prop}>{section}</PackSection>
             </Fragment>
           ))}
 
@@ -117,10 +122,11 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
 
           {invitation.closing_text && (
             <PackSection>
-              <section className="pk-closing">
-                <ThemeAsset slot="corner-tl" className="pk-corner pk-corner-tl" />
-                <ThemeAsset slot="corner-br" className="pk-corner pk-corner-br" />
-                <Monogram couple={couple} />
+              {/* A painted closing scene (prompts/scenes) takes the corners' place, with the monogram in its calm centre. */}
+              <section className="pk-closing" data-scene={closingScene ? '' : undefined}>
+                {!closingScene && <ThemeAsset slot="corner-tl" className="pk-corner pk-corner-tl" />}
+                {!closingScene && <ThemeAsset slot="corner-br" className="pk-corner pk-corner-br" />}
+                <SceneFrame slot="closing-scene"><Monogram couple={couple} /></SceneFrame>
                 <p>{invitation.closing_text}</p>
               </section>
             </PackSection>

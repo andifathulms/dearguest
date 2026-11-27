@@ -23,6 +23,10 @@ cut-outs keyed from cobalt with blue despill):
 | `card-corner` | section art: a carved gold ukiran bracket with a melati sprig, on the event and gift cards |
 | `parallax-back` | depth (section prompt S5): rumah gadang among palms and terraced paddies behind the hero's bottom band; trails the scroll (`depth` -0.1). Phones only |
 | `parallax-front` | depth (section prompt S6): red songket drapes with gold fringe at the top corners, ahead of the scroll. Phones only |
+| `scene-interlude` | scene art (prompt C1): a rumah gadang with rangkiang in the highlands under a carved lintel, like a lacquer panel; the countdown sits in its calm band |
+| `attire-bride` / `attire-groom` | scene art (C2): a suntiang and a saluak, each on a songket-wrapped stand, shown when the couple uploads no portraits |
+| `prop-1` … `prop-3` | scene art (C3): a yellow fringed parasol (events), a talempong on a cushion (story), a carano with sirih (gifts). The sheet's marawa is unused: alone it reads as a national flag |
+| `closing-scene` | scene art (C4): the cover's gonjong and langik-langik by lamplight, the carano between two oil lamps; the monogram sits between the drapes |
 | page background | `texture.webp`, seamless black lacquer (in overrides.css) |
 
 **Type.** Great Vibes for the couple's names and section titles; Gilda Display
@@ -34,3 +38,5 @@ diamond-chain divider, and an oval monogram frame with a gonjong crest.
 **Cultural notes for a reviewer.** Gonjong, ukiran, songket, langik-langik and
 carano belong to Minang wedding custom; none is a religious symbol. No people,
 no suntiang worn by a figure.
+
+**Scene art, still to be reviewed.** The suntiang and saluak are shown as objects on stands, never worn. The questions for a Minang reviewer are at the end of `prompts/scenes/PROMPT-MINANG-SCENES.md` (the pair, the yellow parasol, the talempong, the rumah gadang with rangkiang); none has been answered yet.

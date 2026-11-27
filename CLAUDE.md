@@ -100,16 +100,20 @@ second painting and moving objects after the hero:
 - `scene-interlude`: a 3:4 full painting (not keyed) with a calm centre, behind the countdown;
 - `attire-bride` / `attire-groom`: keyed cut-outs of the headpieces as objects, with no people. They
   replace the portraits when the couple shows no photos;
-- `prop-1` … `prop-4`: cut from one keyed 2 × 2 sheet; they drift in at the sides of the events,
-  story, gift and RSVP sections on scroll;
+- `prop-1` … `prop-4`: cut from one keyed 2 × 2 sheet; one sits beside the heading of the events,
+  story, gift and RSVP sections and moves with the scroll;
 - `closing-scene`: a 9:16 full painting of the cover's scene at night, behind the closing. On a light
-  pack the closing then needs light ink.
+  pack the closing then needs light ink and `--pk-closing-bg` (see javanese `overrides.css`).
 
-Pilot packs: Gonjong Songket and Gebyok Sogan. **The shared rendering for these slots is not built
-yet**: the first theme to arrive builds it (and documents it in `docs/theme-packs.md` §4, §9). The
-slots are optional, so a pack without them must render exactly as before. Show the owner the pilot
-on screen before writing scene prompts for the other live packs. The ceremonial objects need the
-reviewer's answers listed at the end of each prompt file before the pack ships. Live: none yet.
+Build: move the images to the pack's `masters/` under those names (`props-sheet` for the sheet). In
+the recipe, the two paintings are `scenes` entries (measure the calm area; give the ground colour
+when the painting's ground doesn't match the page), the attire `keyed` entries, the sheet `props`
+(a `None` name drops a quarter). Add the slots to `theme.json` with `"calm": [x0, y0, x1, y1]` on the
+two paintings, drop the pack's dead closing-corner CSS, rewrite that pack's section baselines, and
+add the pack to `PILOTS` in `tests/visual/packs/scenes.spec.js`. The shared layout places everything
+(docs/theme-packs.md §4, §9); a pack without the slots renders exactly as before. The ceremonial
+objects need the reviewer's answers listed at the end of each prompt file. Live: Gonjong Songket
+(three props: the marawa read as a national flag and was left out), Gebyok Sogan.
 
 ### Standing rules
 - Don't commit `docker-compose.yml` (the user's local port remap: web 5190, api 8020, db 5440), or

@@ -33,7 +33,57 @@
     "monogram-wreath": { "src": "assets/monogram-wreath.webp", "avif": "assets/monogram-wreath.avif", "width": 640, "height": 640 },
     "card-corner": { "src": "assets/card-corner.webp", "avif": "assets/card-corner.avif", "width": 360, "height": 349 },
     "parallax-back": { "src": "assets/parallax-back.webp", "avif": "assets/parallax-back.avif", "width": 1080, "height": 735, "depth": -0.1 },
-    "parallax-front": { "src": "assets/parallax-front.webp", "avif": "assets/parallax-front.avif", "width": 1080, "height": 1065 }
+    "parallax-front": { "src": "assets/parallax-front.webp", "avif": "assets/parallax-front.avif", "width": 1080, "height": 1065 },
+    "scene-interlude": {
+      "src": "assets/scene-interlude.webp",
+      "avif": "assets/scene-interlude.avif",
+      "width": 896,
+      "height": 1200,
+      "calm": [0.26, 0.44, 0.74, 0.7]
+    },
+    "attire-bride": {
+      "src": "assets/attire-bride.webp",
+      "avif": "assets/attire-bride.avif",
+      "width": 640,
+      "height": 640
+    },
+    "attire-groom": {
+      "src": "assets/attire-groom.webp",
+      "avif": "assets/attire-groom.avif",
+      "width": 640,
+      "height": 640
+    },
+    "prop-1": {
+      "src": "assets/prop-1.webp",
+      "avif": "assets/prop-1.avif",
+      "width": 176,
+      "height": 485
+    },
+    "prop-2": {
+      "src": "assets/prop-2.webp",
+      "avif": "assets/prop-2.avif",
+      "width": 220,
+      "height": 473
+    },
+    "prop-3": {
+      "src": "assets/prop-3.webp",
+      "avif": "assets/prop-3.avif",
+      "width": 289,
+      "height": 400
+    },
+    "prop-4": {
+      "src": "assets/prop-4.webp",
+      "avif": "assets/prop-4.avif",
+      "width": 360,
+      "height": 364
+    },
+    "closing-scene": {
+      "src": "assets/closing-scene.webp",
+      "avif": "assets/closing-scene.avif",
+      "width": 768,
+      "height": 1376,
+      "calm": [0.3, 0.38, 0.7, 0.75]
+    }
   },
   "copyVariants": ["islam", "kristen", "katolik", "umum"],
   "eventTypes": ["akad", "pemberkatan", "sakramen", "resepsi", "adat", "ngunduh_mantu", "lainnya"],
