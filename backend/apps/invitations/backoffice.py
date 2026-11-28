@@ -17,9 +17,10 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.paginator import Paginator
-from django.db.models import Count, Sum
+from django.db.models import Count, Q, Sum
 from django.template.response import TemplateResponse
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.timesince import timesince
 
 from . import activity, health, ops, retention, themes
@@ -50,6 +51,48 @@ def _demo_slugs():
 
 def real_invitations():
     return Invitation.objects.exclude(slug__in=_demo_slugs())
+
+
+# An invitation's place in its life: (key, label, pill tone). The first match wins.
+STATUSES = [
+    ('purged', 'Data dihapus', 'info'),
+    ('expired', 'Berakhir', 'info'),
+    ('live', 'Aktif', 'ok'),
+    ('requested', 'Minta aktivasi', 'warn'),
+    ('draft', 'Draf', 'brand'),
+]
+
+
+def status_filter(key, today=None):
+    """The Q for one of STATUSES, for the admin list filter."""
+    today = today or timezone.localdate()
+    not_over = Q(purged_at__isnull=True) & (Q(expires_at__isnull=True) | Q(expires_at__gte=today))
+    return {
+        'purged': Q(purged_at__isnull=False),
+        'expired': Q(purged_at__isnull=True, expires_at__lt=today),
+        'live': not_over & Q(is_active=True),
+        'requested': not_over & Q(is_active=False, activation_requested=True),
+        'draft': not_over & Q(is_active=False, activation_requested=False),
+    }[key]
+
+
+def invitation_status(inv, today=None):
+    today = today or timezone.localdate()
+    if inv.purged_at:
+        key = 'purged'
+    elif inv.expires_at and inv.expires_at < today:
+        key = 'expired'
+    elif inv.is_active:
+        key = 'live'
+    elif inv.activation_requested:
+        key = 'requested'
+    else:
+        key = 'draft'
+    return next(s for s in STATUSES if s[0] == key)
+
+
+def pill(tone, text):
+    return format_html('<span class="ops-pill {}">{}</span>', tone, text)
 
 
 def _theme_name(theme_id):

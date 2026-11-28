@@ -235,3 +235,51 @@ class ActivatedAtBackfillTests(MigrationTestCase):
         Invitation = self.apps.get_model('invitations', 'Invitation')
         self.assertIsNotNone(Invitation.objects.get(slug='sudah-aktif').activated_at)
         self.assertIsNone(Invitation.objects.get(slug='masih-draf').activated_at)
+
+
+@override_settings(ADMIN_REQUIRE_OTP=False)
+class InvitationListTests(APITestBase):
+    def setUp(self):
+        super().setUp()
+        self.web = Client()
+        helper = User.objects.create_user('bantu', password=PASSWORD, is_staff=True)
+        helper.groups.add(Group.objects.get(name='Staf'))
+        self.web.force_login(helper)
+        self.url = reverse('admin:invitations_invitation_changelist')
+
+    def slugs(self, **query):
+        res = self.web.get(self.url, query)
+        self.assertEqual(res.status_code, 200)
+        return sorted(inv.slug for inv in res.context['cl'].result_list)
+
+    def test_status_filter(self):
+        today = timezone.localdate()
+        self.make_invitation(slug='aktif')
+        self.make_invitation(slug='draf', active=False)
+        self.make_invitation(slug='minta', active=False, activation_requested=True)
+        old = self.make_invitation(slug='lewat', wedding_date=today - timedelta(days=200))
+        self.assertLess(old.expires_at, today)
+        self.assertEqual(self.slugs(status='live'), ['aktif'])
+        self.assertEqual(self.slugs(status='draft'), ['draf'])
+        self.assertEqual(self.slugs(status='requested'), ['minta'])
+        self.assertEqual(self.slugs(status='expired'), ['lewat'])
+
+    def test_counts_do_not_multiply(self):
+        inv = self.make_invitation(slug='hitung')
+        for i in range(3):
+            Guest.objects.create(invitation=inv, name=f'T{i}', open_count=2)
+        Event.objects.create(invitation=inv, event_type='akad', start=timezone.now(), venue_name='M', address='-')
+        res = self.web.get(self.url)
+        row = res.context['cl'].result_list[0]
+        self.assertEqual((row.n_guests, row.n_opens, row.n_events, row.n_photos), (3, 6, 1, 0))
+        self.assertContains(res, 'kurang: foto')
+
+    def test_extend_expiry_and_watermark_actions(self):
+        inv = self.make_invitation(slug='perpanjang')
+        before = inv.expires_at
+        self.web.post(self.url, {'action': 'extend_expiry', '_selected_action': [inv.pk]})
+        self.web.post(self.url, {'action': 'remove_watermark', '_selected_action': [inv.pk]})
+        inv.refresh_from_db()
+        self.assertEqual(inv.expires_at, before + timedelta(days=30))
+        self.assertFalse(inv.watermark)
+        self.assertEqual(ActivityEvent.objects.filter(kind='staff_action', invitation=inv).count(), 2)

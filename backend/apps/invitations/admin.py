@@ -1,16 +1,20 @@
 import logging
 import secrets
+from datetime import timedelta
 from urllib.parse import quote
 
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.db.models import Count, OuterRef, Subquery, Sum
+from django.db.models.functions import Coalesce
 from django.template.response import TemplateResponse
+from django.utils import timezone
 from django.utils.timesince import timesince
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 
-from . import activity, themes
+from . import activity, backoffice, themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
@@ -87,6 +91,16 @@ def audit(model_admin, request, obj, action):
     }})
 
 
+class OpsNav:
+    """Lists that belong to the backoffice: its nav on top and its styles."""
+    change_list_template = 'admin/vowvella/change_list.html'
+    ops_tab = ''
+
+    def changelist_view(self, request, extra_context=None):
+        context = {'ops_tab': self.ops_tab, 'ops_revenue': backoffice.can_see_revenue(request.user)}
+        return super().changelist_view(request, {**context, **(extra_context or {})})
+
+
 class AuditedDeletes:
     """Deletions are already in Django's history; this also logs them."""
 
@@ -102,16 +116,111 @@ class AuditedDeletes:
         super().delete_queryset(request, queryset)
 
 
+class StatusFilter(admin.SimpleListFilter):
+    title = 'status'
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return [(key, label) for key, label, _ in backoffice.STATUSES]
+
+    def queryset(self, request, queryset):
+        return queryset.filter(backoffice.status_filter(self.value())) if self.value() else queryset
+
+
+def _per_invitation(model, value=Count('pk'), **filters):
+    """A count (or sum) of an invitation's child rows, as a subquery so several
+    of them don't multiply each other's joins."""
+    rows = (model.objects.filter(invitation=OuterRef('pk'), **filters).order_by()
+            .values('invitation').annotate(n=value).values('n'))
+    return Coalesce(Subquery(rows), 0)
+
+
 @admin.register(Invitation)
-class InvitationAdmin(AuditedDeletes, admin.ModelAdmin):
+class InvitationAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
+    """Every invitation with its status and how far along it is. Support works
+    from here and the public page; staff never open the couple's editor."""
     form = InvitationAdminForm
-    list_display = ['slug', 'theme', 'tier', 'is_active', 'activation_requested', 'activation_code', 'wedding_date']
-    list_filter = ['is_active', 'activation_requested', 'tier', 'theme']
-    list_editable = ['tier', 'is_active', 'activation_code']
-    search_fields = ['slug']
-    readonly_fields = ['activation_requested', 'activation_requested_at', 'created_at']
+    ops_tab = 'invitations'
+    list_display = ['slug', 'couple_names', 'status', 'theme_name', 'tier', 'wedding_date', 'n_guests', 'n_rsvps',
+                    'n_opens', 'completeness', 'updated_at', 'public_link']
+    list_filter = [StatusFilter, 'tier', 'theme', 'watermark']
+    search_fields = ['slug', 'couple__bride_name', 'couple__groom_name', 'couple_user__username', 'couple_user__email']
+    list_select_related = ['couple']
+    ordering = ['-created_at']
+    readonly_fields = ['activation_requested', 'activation_requested_at', 'activated_at', 'created_at', 'updated_at']
     inlines = [CoupleInline, EventInline, StoryInline, PhotoInline, BankAccountInline]
-    actions = ['issue_activation_code', 'activate_invitations', 'deactivate_invitations']
+    actions = ['issue_activation_code', 'activate_invitations', 'deactivate_invitations', 'extend_expiry',
+               'remove_watermark', 'restore_watermark']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            n_guests=_per_invitation(Guest), n_rsvps=_per_invitation(RSVP),
+            n_opens=_per_invitation(Guest, Sum('open_count')),
+            n_events=_per_invitation(Event), n_photos=_per_invitation(Photo),
+        )
+
+    @admin.display(description='Mempelai')
+    def couple_names(self, obj):
+        return backoffice._names(obj) or '—'
+
+    @admin.display(description='Status')
+    def status(self, obj):
+        _, label, tone = backoffice.invitation_status(obj)
+        return backoffice.pill(tone, label)
+
+    @admin.display(description='Tema', ordering='theme')
+    def theme_name(self, obj):
+        return backoffice._theme_name(obj.theme)
+
+    @admin.display(description='Tamu', ordering='n_guests')
+    def n_guests(self, obj):
+        return obj.n_guests
+
+    @admin.display(description='RSVP', ordering='n_rsvps')
+    def n_rsvps(self, obj):
+        return obj.n_rsvps
+
+    @admin.display(description='Dibuka', ordering='n_opens')
+    def n_opens(self, obj):
+        return obj.n_opens
+
+    @admin.display(description='Kelengkapan')
+    def completeness(self, obj):
+        """Names, at least one event, a photo, a guest list: what a couple
+        usually still has to do before sending."""
+        missing = [label for ok, label in (
+            (bool(backoffice._names(obj).strip(' &')), 'nama'), (obj.n_events > 0, 'acara'),
+            (obj.n_photos > 0 or bool(obj.hero_photo), 'foto'), (obj.n_guests > 0, 'tamu'),
+        ) if not ok]
+        text = f'{4 - len(missing)}/4'
+        return format_html('{}<br><small>kurang: {}</small>', text, ', '.join(missing)) if missing else text
+
+    @admin.display(description='Halaman')
+    def public_link(self, obj):
+        return format_html('<a href="/{}/" target="_blank" rel="noopener">buka ↗</a>', obj.slug)
+
+    @admin.action(description='Perpanjang masa aktif 30 hari')
+    def extend_expiry(self, request, queryset):
+        for inv in queryset:
+            inv.expires_at = max(inv.expires_at or inv.wedding_date, timezone.localdate()) + timedelta(days=30)
+            inv.save(update_fields=['expires_at'])
+            audit(self, request, inv, f'Masa aktif diperpanjang sampai {inv.expires_at:%d-%m-%Y}')
+        self.message_user(request, f'{queryset.count()} undangan diperpanjang 30 hari.')
+
+    @admin.action(description='Hapus watermark')
+    def remove_watermark(self, request, queryset):
+        self._watermark(request, queryset, False, 'Watermark dihapus')
+
+    @admin.action(description='Pasang watermark lagi')
+    def restore_watermark(self, request, queryset):
+        self._watermark(request, queryset, True, 'Watermark dipasang')
+
+    def _watermark(self, request, queryset, on, text):
+        for inv in queryset:
+            inv.watermark = on
+            inv.save(update_fields=['watermark'])
+            audit(self, request, inv, text)
+        self.message_user(request, f'{text}: {queryset.count()} undangan.')
 
     @admin.action(description='Terbitkan kode aktivasi (kirim ke pasangan)')
     def issue_activation_code(self, request, queryset):
@@ -146,9 +255,10 @@ class RSVPAdmin(AuditedDeletes, admin.ModelAdmin):
 
 
 @admin.register(ActivationRequest)
-class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
+class ActivationRequestAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
     """Inbox of couples who requested activation but aren't live yet."""
     form = InvitationAdminForm
+    ops_tab = 'activations'
     list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at', 'waiting']
     list_editable = ['tier', 'activation_code', 'is_active']
     readonly_fields = ['activation_requested_at']
@@ -238,9 +348,10 @@ class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(AuditedDeletes, admin.ModelAdmin):
+class PaymentAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
     """Payments recorded when confirming activations. Amounts are owner-only:
     the Staf group can record a payment (add) but not list or open them."""
+    ops_tab = 'payments'
     list_display = ['created_at', 'invitation', 'tier', 'amount', 'channel', 'coupon', 'recorded_by']
     list_filter = ['tier', 'channel']
     date_hierarchy = 'created_at'
