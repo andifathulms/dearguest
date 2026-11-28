@@ -132,7 +132,7 @@ OWNERSHIP = {
 # Phase 3 (payments) adds orders and invoices: classify them here as `owner`
 # with their cases when they exist.
 
-STAFF_PREFIXES = ('admin/',)
+STAFF_PREFIXES = ('admin/', 'api/staff/')   # staff-only: test_backoffice.StaffAccessTests
 
 
 def all_patterns(resolver=None, prefix=''):

@@ -1,25 +1,15 @@
 import logging
 import secrets
-from datetime import timedelta
 from urllib.parse import quote
 
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.db.models import Count, OuterRef, Subquery, Sum
-from django.db.models.functions import Coalesce
-from django.template.response import TemplateResponse
-from django.utils import timezone
-from django.utils.timesince import timesince
 from django.core.exceptions import ValidationError
-from django.utils.html import format_html, format_html_join
-from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
-from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.template.response import TemplateResponse
+from django.utils.html import format_html
 
-from . import activity, backoffice, themes
+from . import staff_actions, themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
@@ -74,36 +64,22 @@ class InvitationAdminForm(forms.ModelForm):
             raise forms.ValidationError(exc.messages)
 
 
+audit_log = logging.getLogger('vowvella.audit')
+
+
+def audit(model_admin, request, obj, action):
+    """Record a staff action on an object: Django's admin history (LogEntry),
+    a structured log line that ships off the server, and the backoffice's
+    activity feed (staff_actions.record)."""
+    staff_actions.record(request.user, obj, action)
+
+
 class PaymentForm(forms.Form):
     """What the couple paid, asked when confirming an activation."""
     amount = forms.IntegerField(min_value=0, label='Jumlah diterima (Rp)', help_text='Per undangan, mis. 99000.')
     channel = forms.ChoiceField(choices=Payment.CHANNELS, label='Lewat')
     coupon = forms.ModelChoiceField(Coupon.objects.all(), required=False, label='Kupon')
     note = forms.CharField(max_length=200, required=False, label='Catatan')
-
-
-audit_log = logging.getLogger('vowvella.audit')
-
-
-def audit(model_admin, request, obj, action):
-    """Record a staff action on an object: Django's admin history (LogEntry)
-    plus a structured log line that ships off the server."""
-    model_admin.log_change(request, obj, action)
-    activity.record('staff_action', obj if isinstance(obj, Invitation) else None, request.user, actor='staff',
-                    action=action)
-    audit_log.info('admin action', extra={'audit': {
-        'action': action, 'model': obj._meta.label, 'object_id': obj.pk, 'staff_id': request.user.pk,
-    }})
-
-
-class OpsNav:
-    """Lists that belong to the backoffice: its nav on top and its styles."""
-    change_list_template = 'admin/vowvella/change_list.html'
-    ops_tab = ''
-
-    def changelist_view(self, request, extra_context=None):
-        context = {'ops_tab': self.ops_tab, 'ops_revenue': backoffice.can_see_revenue(request.user)}
-        return super().changelist_view(request, {**context, **(extra_context or {})})
 
 
 class AuditedDeletes:
@@ -121,111 +97,16 @@ class AuditedDeletes:
         super().delete_queryset(request, queryset)
 
 
-class StatusFilter(admin.SimpleListFilter):
-    title = 'status'
-    parameter_name = 'status'
-
-    def lookups(self, request, model_admin):
-        return [(key, label) for key, label, _ in backoffice.STATUSES]
-
-    def queryset(self, request, queryset):
-        return queryset.filter(backoffice.status_filter(self.value())) if self.value() else queryset
-
-
-def _per_invitation(model, value=Count('pk'), **filters):
-    """A count (or sum) of an invitation's child rows, as a subquery so several
-    of them don't multiply each other's joins."""
-    rows = (model.objects.filter(invitation=OuterRef('pk'), **filters).order_by()
-            .values('invitation').annotate(n=value).values('n'))
-    return Coalesce(Subquery(rows), 0)
-
-
 @admin.register(Invitation)
-class InvitationAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
-    """Every invitation with its status and how far along it is. Support works
-    from here and the public page; staff never open the couple's editor."""
+class InvitationAdmin(AuditedDeletes, admin.ModelAdmin):
     form = InvitationAdminForm
-    ops_tab = 'invitations'
-    list_display = ['slug', 'couple_names', 'status', 'theme_name', 'tier', 'wedding_date', 'n_guests', 'n_rsvps',
-                    'n_opens', 'completeness', 'updated_at', 'public_link']
-    list_filter = [StatusFilter, 'tier', 'theme', 'watermark']
-    search_fields = ['slug', 'couple__bride_name', 'couple__groom_name', 'couple_user__username', 'couple_user__email']
-    list_select_related = ['couple']
-    ordering = ['-created_at']
-    readonly_fields = ['activation_requested', 'activation_requested_at', 'activated_at', 'created_at', 'updated_at']
+    list_display = ['slug', 'theme', 'tier', 'is_active', 'activation_requested', 'activation_code', 'wedding_date']
+    list_filter = ['is_active', 'activation_requested', 'tier', 'theme']
+    list_editable = ['tier', 'is_active', 'activation_code']
+    search_fields = ['slug']
+    readonly_fields = ['activation_requested', 'activation_requested_at', 'created_at']
     inlines = [CoupleInline, EventInline, StoryInline, PhotoInline, BankAccountInline]
-    actions = ['issue_activation_code', 'activate_invitations', 'deactivate_invitations', 'extend_expiry',
-               'remove_watermark', 'restore_watermark']
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).annotate(
-            n_guests=_per_invitation(Guest), n_rsvps=_per_invitation(RSVP),
-            n_opens=_per_invitation(Guest, Sum('open_count')),
-            n_events=_per_invitation(Event), n_photos=_per_invitation(Photo),
-        )
-
-    @admin.display(description='Mempelai')
-    def couple_names(self, obj):
-        return backoffice._names(obj) or '—'
-
-    @admin.display(description='Status')
-    def status(self, obj):
-        _, label, tone = backoffice.invitation_status(obj)
-        return backoffice.pill(tone, label)
-
-    @admin.display(description='Tema', ordering='theme')
-    def theme_name(self, obj):
-        return backoffice._theme_name(obj.theme)
-
-    @admin.display(description='Tamu', ordering='n_guests')
-    def n_guests(self, obj):
-        return obj.n_guests
-
-    @admin.display(description='RSVP', ordering='n_rsvps')
-    def n_rsvps(self, obj):
-        return obj.n_rsvps
-
-    @admin.display(description='Dibuka', ordering='n_opens')
-    def n_opens(self, obj):
-        return obj.n_opens
-
-    @admin.display(description='Kelengkapan')
-    def completeness(self, obj):
-        """Names, at least one event, a photo, a guest list: what a couple
-        usually still has to do before sending."""
-        missing = [label for ok, label in (
-            (bool(backoffice._names(obj).strip(' &')), 'nama'), (obj.n_events > 0, 'acara'),
-            (obj.n_photos > 0 or bool(obj.hero_photo), 'foto'), (obj.n_guests > 0, 'tamu'),
-        ) if not ok]
-        text = f'{4 - len(missing)}/4'
-        return format_html('{}<br><small>kurang: {}</small>', text, ', '.join(missing)) if missing else text
-
-    @admin.display(description='Halaman')
-    def public_link(self, obj):
-        return format_html('<a href="/{}/" target="_blank" rel="noopener">buka ↗</a>', obj.slug)
-
-    @admin.action(description='Perpanjang masa aktif 30 hari')
-    def extend_expiry(self, request, queryset):
-        for inv in queryset:
-            inv.expires_at = max(inv.expires_at or inv.wedding_date, timezone.localdate()) + timedelta(days=30)
-            inv.save(update_fields=['expires_at'])
-            audit(self, request, inv, f'Masa aktif diperpanjang sampai {inv.expires_at:%d-%m-%Y}')
-        self.message_user(request, f'{queryset.count()} undangan diperpanjang 30 hari.')
-
-    @admin.action(description='Hapus watermark')
-    def remove_watermark(self, request, queryset):
-        self._watermark(request, queryset, False, 'Watermark dihapus')
-
-    @admin.action(description='Pasang watermark lagi')
-    def restore_watermark(self, request, queryset):
-        self._watermark(request, queryset, True, 'Watermark dipasang')
-
-    def _watermark(self, request, queryset, on, text):
-        for inv in queryset:
-            inv.watermark = on
-            inv.save(update_fields=['watermark'])
-            audit(self, request, inv, text)
-        self.message_user(request, f'{text}: {queryset.count()} undangan.')
+    actions = ['issue_activation_code', 'activate_invitations', 'deactivate_invitations']
 
     @admin.action(description='Terbitkan kode aktivasi (kirim ke pasangan)')
     def issue_activation_code(self, request, queryset):
@@ -253,91 +134,23 @@ class InvitationAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
 
 
 @admin.register(RSVP)
-class RSVPAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
-    """Answers and wishes across all invitations: the Ucapan moderation list.
-    Couples moderate their own wall; staff step in on abuse."""
-    ops_tab = 'wishes'
-    list_display = ['guest_name', 'invitation', 'wish_excerpt', 'wish_status', 'attending', 'pax', 'submitted_at']
-    list_filter = ['wish_status', 'attending']
-    search_fields = ['invitation__slug', 'guest_name', 'wishes']
-    list_select_related = ['invitation']
+class RSVPAdmin(AuditedDeletes, admin.ModelAdmin):
+    list_display = ['guest_name', 'invitation', 'attending', 'pax', 'submitted_at']
+    list_filter = ['invitation', 'attending']
     readonly_fields = ['guest_name', 'whatsapp', 'attending', 'pax', 'wishes', 'submitted_at']
-    actions = ['hide_wishes', 'show_wishes']
-
-    @admin.display(description='Ucapan')
-    def wish_excerpt(self, obj):
-        return (obj.wishes[:120] + '…') if len(obj.wishes) > 120 else (obj.wishes or '—')
-
-    @admin.action(description='Sembunyikan ucapan')
-    def hide_wishes(self, request, queryset):
-        self._wish_status(request, queryset, 'hidden', 'Ucapan disembunyikan')
-
-    @admin.action(description='Tampilkan ucapan')
-    def show_wishes(self, request, queryset):
-        self._wish_status(request, queryset, 'visible', 'Ucapan ditampilkan')
-
-    def _wish_status(self, request, queryset, status, text):
-        for rsvp in queryset.exclude(wishes=''):
-            rsvp.wish_status = status
-            rsvp.save(update_fields=['wish_status'])
-            audit(self, request, rsvp.invitation, f'{text} (RSVP {rsvp.pk})')
-        self.message_user(request, f'{text}: {queryset.exclude(wishes="").count()} ucapan.')
-
-
-@admin.register(AbuseReport)
-class AbuseReportAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
-    """Takedown and abuse reports (RUNBOOK.md §7). Log what came in, then act:
-    deactivate the invitation, decide nothing is wrong, or reactivate it once
-    the couple fixed it. Each step is audited."""
-    ops_tab = 'reports'
-    list_display = ['created_at', 'invitation', 'reason', 'status', 'url', 'reporter', 'decided_by']
-    list_filter = ['status', 'reason']
-    search_fields = ['url', 'invitation__slug', 'reporter']
-    raw_id_fields = ['invitation']
-    readonly_fields = ['decided_by', 'decided_at', 'created_at']
-    actions = ['take_down', 'no_action', 'restore']
-
-    def _decide(self, request, queryset, status, active, text):
-        for report in queryset:
-            report.status, report.decided_by, report.decided_at = status, request.user, timezone.now()
-            report.save(update_fields=['status', 'decided_by', 'decided_at'])
-            inv = report.invitation
-            if inv and active is not None and inv.is_active != active:
-                inv.is_active = active
-                inv.save(update_fields=['is_active'])
-            audit(self, request, inv or report, text)
-        self.message_user(request, f'{text}: {queryset.count()} laporan. Kabari pasangan lewat email dan WhatsApp.')
-
-    @admin.action(description='Takedown: nonaktifkan undangannya')
-    def take_down(self, request, queryset):
-        self._decide(request, queryset, 'takedown', False, 'Laporan: undangan dinonaktifkan')
-
-    @admin.action(description='Tidak ada tindakan')
-    def no_action(self, request, queryset):
-        self._decide(request, queryset, 'no_action', None, 'Laporan: tidak ada tindakan')
-
-    @admin.action(description='Selesai: aktifkan lagi')
-    def restore(self, request, queryset):
-        self._decide(request, queryset, 'resolved', True, 'Laporan selesai: undangan aktif lagi')
 
 
 @admin.register(ActivationRequest)
-class ActivationRequestAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
+class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
     """Inbox of couples who requested activation but aren't live yet."""
     form = InvitationAdminForm
-    ops_tab = 'activations'
-    list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at', 'waiting']
+    list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
     list_editable = ['tier', 'activation_code', 'is_active']
     readonly_fields = ['activation_requested_at']
-    ordering = ['activation_requested_at']   # oldest first
     actions = ['fulfill_premium', 'fulfill_bisnis', 'issue_activation_code']
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(activation_requested=True, is_active=False)
-
-    @admin.display(description='Menunggu')
-    def waiting(self, obj):
-        return timesince(obj.activation_requested_at) if obj.activation_requested_at else '—'
 
     @admin.display(description='WhatsApp')
     def whatsapp_link(self, obj):
@@ -364,10 +177,6 @@ class ActivationRequestAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
             return '—'
         return f"{c.bride_name} & {c.groom_name}"
 
-    def _issue(self, inv):
-        inv.activation_code = secrets.token_hex(3).upper()
-        inv.save(update_fields=['tier', 'activation_code'])
-
     def has_record_payment_permission(self, request):
         return request.user.has_perm('invitations.add_payment')
 
@@ -381,7 +190,8 @@ class ActivationRequestAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
 
     def _fulfill(self, request, queryset, tier):
         """First a page asking what was paid; on submit, record the payment, set
-        the tier and issue the code (sent to the couple by hand)."""
+        the tier and issue the code (staff_actions.fulfill). The backoffice
+        does the same from its Aktivasi page."""
         label = dict(Invitation.TIER_CHOICES)[tier]
         form = PaymentForm(request.POST if 'apply' in request.POST else None)
         if not form.is_valid():
@@ -392,15 +202,7 @@ class ActivationRequestAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
                 'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
             })
         for inv in queryset:
-            inv.tier = tier
-            self._issue(inv)
-            Payment.objects.create(invitation=inv, tier=tier, recorded_by=request.user, **form.cleaned_data)
-            audit(self, request, inv, f'Lunas: {label}, kode diterbitkan')
-            if tier == 'bisnis' and inv.couple_user:
-                profile, _ = CoupleProfile.objects.get_or_create(user=inv.couple_user)
-                if profile.max_invitations < 2:
-                    profile.max_invitations = 2
-                    profile.save(update_fields=['max_invitations'])
+            staff_actions.fulfill(inv, request.user, tier, **form.cleaned_data)
         self.message_user(request, f'{queryset.count()} undangan disetel {label}, pembayaran dicatat, kode diterbitkan. '
                                    'Kirim kode ke pasangan via WhatsApp.')
         return None
@@ -415,10 +217,9 @@ class ActivationRequestAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
+class PaymentAdmin(AuditedDeletes, admin.ModelAdmin):
     """Payments recorded when confirming activations. Amounts are owner-only:
     the Staf group can record a payment (add) but not list or open them."""
-    ops_tab = 'payments'
     list_display = ['created_at', 'invitation', 'tier', 'amount', 'channel', 'coupon', 'recorded_by']
     list_filter = ['tier', 'channel']
     date_hierarchy = 'created_at'
@@ -435,80 +236,22 @@ class PaymentAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+@admin.register(AbuseReport)
+class AbuseReportAdmin(AuditedDeletes, admin.ModelAdmin):
+    """Takedown and abuse reports (RUNBOOK.md §7). Day to day they're handled
+    in the backoffice (/backoffice/laporan); this is the raw table."""
+    list_display = ['created_at', 'invitation', 'reason', 'status', 'url', 'reporter', 'decided_by']
+    list_filter = ['status', 'reason']
+    search_fields = ['url', 'invitation__slug', 'reporter']
+    raw_id_fields = ['invitation']
+    readonly_fields = ['decided_by', 'decided_at', 'created_at']
+
+
 @admin.register(CoupleProfile)
-class CoupleProfileAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
-    """The Pasangan page: the account behind each invitation, for answering
-    support chats. Payment totals show to the owner only."""
-    ops_tab = 'couples'
-    list_display = ['user', 'email', 'whatsapp', 'max_invitations', 'joined', 'last_login', 'invitation_links']
+class CoupleProfileAdmin(AuditedDeletes, admin.ModelAdmin):
+    list_display = ['user', 'whatsapp', 'max_invitations']
     list_editable = ['whatsapp', 'max_invitations']
-    list_filter = ['max_invitations']
-    search_fields = ['user__username', 'user__email', 'whatsapp', 'user__invitations__slug']
-    list_select_related = ['user']
-    ordering = ['-user__date_joined']
-    actions = ['allow_two_invitations', 'make_reset_link']
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(user__is_staff=False).prefetch_related('user__invitations')
-
-    def get_list_display(self, request):
-        columns = list(super().get_list_display(request))
-        return columns + ['paid'] if backoffice.can_see_revenue(request.user) else columns
-
-    @admin.display(description='Email', ordering='user__email')
-    def email(self, obj):
-        return obj.user.email or '—'
-
-    @admin.display(description='Daftar', ordering='user__date_joined')
-    def joined(self, obj):
-        return obj.user.date_joined
-
-    @admin.display(description='Terakhir masuk', ordering='user__last_login')
-    def last_login(self, obj):
-        return obj.user.last_login or '—'
-
-    @admin.display(description='Undangan')
-    def invitation_links(self, obj):
-        invitations = list(obj.user.invitations.all())
-        if not invitations:
-            return '—'
-        return format_html_join(', ', '<a href="{}">{}</a>', (
-            (reverse('admin:invitations_invitation_change', args=[inv.pk]), inv.slug) for inv in invitations))
-
-    @admin.display(description='Dibayar')
-    def paid(self, obj):
-        total = Payment.objects.filter(invitation__couple_user=obj.user).aggregate(n=Sum('amount'))['n']
-        return backoffice.rupiah(total) if total else '—'
-
-    @admin.action(description='Izinkan 2 undangan (Bisnis)')
-    def allow_two_invitations(self, request, queryset):
-        for profile in queryset:
-            profile.max_invitations = max(profile.max_invitations, 2)
-            profile.save(update_fields=['max_invitations'])
-            audit(self, request, profile, 'Batas undangan dinaikkan ke 2')
-        self.message_user(request, f'{queryset.count()} akun boleh membuat 2 undangan.')
-
-    def has_reset_link_permission(self, request):
-        return request.user.is_superuser
-
-    @admin.action(description='Buat tautan reset sandi (kirim lewat WhatsApp)', permissions=['reset_link'])
-    def make_reset_link(self, request, queryset):
-        """Owner only: a reset link opens the account, so it's shown once, here,
-        for sending to the couple's own WhatsApp. It stops working once used
-        or once they log in."""
-        rows = []
-        for profile in queryset:
-            user = profile.user
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            link = f'{settings.FRONTEND_URL}/reset-password?uid={uid}&token={default_token_generator.make_token(user)}'
-            text = f'Halo, ini tautan untuk mengatur ulang kata sandi akun Vowvella kamu: {link}'
-            wa = f'https://wa.me/{profile.whatsapp_intl}?text={quote(text)}' if profile.whatsapp else ''
-            rows.append({'user': user, 'link': link, 'wa': wa})
-            audit(self, request, profile, 'Tautan reset sandi dibuat')
-        return TemplateResponse(request, 'admin/invitations/coupleprofile/reset_links.html', {
-            **self.admin_site.each_context(request), 'title': 'Tautan reset sandi', 'opts': self.model._meta,
-            'rows': rows,
-        })
+    search_fields = ['user__username', 'whatsapp']
 
 
 @admin.register(MusicPreset)

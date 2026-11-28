@@ -20,6 +20,7 @@ INVITATION = rf'(?!(?:admin|{re.escape(ADMIN_SEGMENT)}|api|media|share|og|static
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path('api/health/', health_view),
+    path('api/staff/', include('apps.invitations.staff_urls')),   # the backoffice (staff_views.py)
     path('api/', include('apps.invitations.urls')),
     path('api/auth/', include('apps.auth_api.urls')),
     path('share/<slug:slug>/', share_view),

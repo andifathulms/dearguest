@@ -1,16 +1,27 @@
-"""The backoffice (backoffice.py): activity recorded at the right moments and
-without personal data, the overview and its pages for staff only, revenue for
-the owner only, payments recorded when confirming an activation, and the
-Staf group and activated_at backfill (migration 0054)."""
+"""The backoffice (/backoffice, API at /api/staff/): activity recorded at the
+right moments without personal data; a staff login that needs the
+authenticator code and a session the couples' login can't stand in for;
+revenue and reset links for the owner only; each staff action; and the Staf
+group and activated_at backfill (migrations 0054/0055)."""
 from datetime import timedelta
+from urllib.parse import parse_qs, urlsplit
 
+from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import Group, User
+from django.core.management import call_command
 from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from django_otp.oath import totp
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from rest_framework.test import APIClient
 
-from apps.invitations import activity, themes
-from apps.invitations.models import ActivityEvent, Coupon, CoupleProfile, Event, Guest, Invitation, Payment
+from apps.invitations import activity, funnel, themes
+from apps.invitations.models import (
+    AbuseReport, ActivityEvent, Coupon, CoupleProfile, Event, Guest, Invitation, Payment, RSVP,
+)
+from apps.invitations.retention import delete_invitation
+from apps.invitations.staff_urls import urlpatterns as STAFF_PATTERNS
 
 from .base import APITestBase
 from .migration_base import MigrationTestCase
@@ -51,27 +62,29 @@ class ActivityRecordingTests(APITestBase):
         self.client.post('/api/my/invitations/rani-dimas/activate/', {'code': 'a7k2qx'}, format='json')
 
         self.assertEqual(self.kinds(), ['invitation_created', 'theme_changed', 'activation_requested', 'activated'])
-        changed = ActivityEvent.objects.get(kind='theme_changed')
-        self.assertEqual(changed.meta['new'], other)
+        self.assertEqual(ActivityEvent.objects.get(kind='theme_changed').meta['new'], other)
         inv.refresh_from_db()
         self.assertIsNotNone(inv.activated_at)
 
     def test_events_survive_account_deletion_without_the_link(self):
         inv = self.make_invitation(owner=self.owner)
         activity.record('activation_requested', inv, self.owner)
-        from apps.invitations.retention import delete_invitation
         delete_invitation(inv)
         self.owner.delete()
         ev = ActivityEvent.objects.get(kind='activation_requested')
         self.assertIsNone(ev.invitation)
         self.assertIsNone(ev.user)
 
-    def test_prune_keeps_recent_rows(self):
+    def test_old_activity_and_reports_are_pruned(self):
         old = activity.record('register')
         ActivityEvent.objects.filter(pk=old.pk).update(created_at=timezone.now() - timedelta(days=activity.KEEP_DAYS + 1))
         activity.record('register')
-        self.assertEqual(activity.prune(), 1)
+        report = AbuseReport.objects.create(url='a', reason='spam')
+        AbuseReport.objects.filter(pk=report.pk).update(created_at=timezone.now() - timedelta(days=366))
+        AbuseReport.objects.create(url='b', reason='spam')
+        call_command('purge_expired', stdout=open('/dev/null', 'w'))
         self.assertEqual(ActivityEvent.objects.count(), 1)
+        self.assertEqual(list(AbuseReport.objects.values_list('url', flat=True)), ['b'])
 
 
 class ActivatedAtTests(APITestBase):
@@ -91,49 +104,129 @@ class ActivatedAtTests(APITestBase):
         self.assertEqual(inv.activated_at, first)
 
 
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class BackofficePageTests(APITestBase):
+class StaffBase(APITestBase):
+    """Helpers that log in through the staff login, with the OTP check off."""
+
+    def staff(self, name='bantu', owner=False):
+        user = User.objects.create_user(name, password=PASSWORD, is_staff=True, is_superuser=owner)
+        if not owner:
+            user.groups.add(Group.objects.get(name='Staf'))
+        return user
+
+    def login(self, user):
+        self.client = APIClient()
+        with override_settings(ADMIN_REQUIRE_OTP=False):
+            res = self.client.post('/api/staff/login/', {'username': user.username, 'password': PASSWORD}, format='json')
+        self.assertEqual(res.status_code, 200, res.content)
+
+    def as_owner(self):
+        self.login(User.objects.filter(username='pemilik').first() or self.staff('pemilik', owner=True))
+
+    def as_helper(self):
+        self.login(User.objects.filter(username='bantu').first() or self.staff())
+
+
+@override_settings(ADMIN_REQUIRE_OTP=True)
+class StaffLoginTests(StaffBase):
     def setUp(self):
         super().setUp()
-        self.owner = User.objects.create_user('pemilik', password=PASSWORD, is_staff=True, is_superuser=True)
-        self.helper = User.objects.create_user('bantu', password=PASSWORD, is_staff=True)
-        self.helper.groups.add(Group.objects.get(name='Staf'))
-        self.web = Client()
+        self.user = self.staff('pemilik', owner=True)
+        self.device = TOTPDevice.objects.create(user=self.user, name='hp', confirmed=True)
 
-    def get(self, user, name, **query):
-        self.web.force_login(user)
-        return self.web.get(reverse(name), query)
+    def code(self):
+        d = self.device
+        return str(totp(d.bin_key, d.step, d.t0, d.digits, d.drift)).zfill(6)
 
-    def test_pages_need_staff(self):
+    def post(self, **data):
+        return self.client.post('/api/staff/login/', {'username': 'pemilik', 'password': PASSWORD, **data}, format='json')
+
+    def test_password_alone_is_not_enough(self):
+        self.assertEqual(self.post().status_code, 400)
+        self.assertEqual(self.client.get('/api/staff/me/').status_code, 401)
+
+    def test_password_and_code_get_in(self):
+        res = self.post(otp=self.code())
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data, {'username': 'pemilik', 'role': 'owner', 'can_see_revenue': True})
+        self.client.post('/api/auth/refresh/')   # the staff claim survives a refresh
+        self.assertEqual(self.client.get('/api/staff/overview/').status_code, 200)
+
+    def test_couples_cannot_log_in_here(self):
+        self.make_user('pasangan')
+        res = self.client.post('/api/staff/login/', {'username': 'pasangan', 'password': PASSWORD, 'otp': '000000'},
+                               format='json')
+        self.assertEqual(res.status_code, 400)
+
+    def test_five_failures_lock_the_login_out(self):
+        for _ in range(5):
+            self.assertEqual(self.post(otp='000000').status_code, 400)
+        self.assertEqual(self.post(otp=self.code()).status_code, 429)
+
+    def test_the_couples_login_does_not_open_the_backoffice(self):
+        res = self.client.post('/api/auth/login/', {'username': 'pemilik', 'password': PASSWORD}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(self.client.get('/api/staff/overview/').status_code, 403)
+
+
+class StaffAccessTests(StaffBase):
+    """Every /api/staff/ endpoint but the login refuses the anonymous, couples
+    and staff whose session didn't come from the staff login. The ownership
+    sweep (test_ownership) leaves api/staff/ to this class."""
+
+    def check_denied(self, client):
+        for p in STAFF_PATTERNS:
+            route = str(p.pattern)
+            if route == 'login/':
+                continue
+            url = '/api/staff/' + route.replace('<int:pk>', '1')
+            for method in ('get', 'post'):
+                with self.subTest(url=url, method=method):
+                    self.assertIn(getattr(client, method)(url, {}, format='json').status_code, (401, 403, 405))
+
+    def test_anonymous(self):
+        self.check_denied(APIClient())
+
+    def test_a_couple(self):
+        client = APIClient()
+        client.force_authenticate(self.make_user('pasangan'))
+        self.check_denied(client)
+
+    def test_staff_without_the_staff_login(self):
+        client = APIClient()
+        client.force_authenticate(self.staff())
+        self.check_denied(client)
+
+    def test_owner_only_endpoints(self):
+        self.as_helper()
         couple = self.make_user('pasangan')
-        for name in ('admin:index', 'admin:ops_activity', 'admin:ops_watch', 'admin:ops_system'):
-            self.assertEqual(self.web.get(reverse(name)).status_code, 302, name)   # to the admin login
-            self.web.force_login(couple)
-            self.assertEqual(self.web.get(reverse(name)).status_code, 302, name)
-            self.web.logout()
+        self.assertEqual(self.client.get('/api/staff/revenue/').status_code, 403)
+        self.assertEqual(self.client.post(f'/api/staff/couples/{couple.pk}/reset-link/').status_code, 403)
+        self.assertEqual(self.client.get('/api/staff/me/').data,
+                         {'username': 'bantu', 'role': 'staff', 'can_see_revenue': False})
 
-    def test_overview_counts_and_revenue_for_the_owner_only(self):
+    def test_staf_group(self):
+        perms = set(Group.objects.get(name='Staf').permissions.values_list('codename', flat=True))
+        self.assertIn('add_payment', perms)
+        self.assertIn('change_abusereport', perms)
+        self.assertNotIn('view_payment', perms)
+        self.assertFalse(any(p.startswith('delete_') for p in perms))
+
+
+class OverviewTests(StaffBase):
+    def test_numbers_and_revenue_for_the_owner_only(self):
         inv = self.make_invitation(active=False, activation_requested=True,
                                    activation_requested_at=timezone.now() - timedelta(hours=26))
         Payment.objects.create(invitation=inv, tier='premium', amount=99000)
-        res = self.get(self.owner, 'admin:index')
-        self.assertEqual(res.status_code, 200)
-        kpis = {k['label']: k['value'] for k in res.context['kpis']}
-        self.assertEqual(kpis['Menunggu aktivasi'], 1)
-        self.assertEqual(kpis['Pendapatan · bulan ini'], 'Rp 99.000')
-        self.assertContains(res, 'Rp 99.000')
-
-        res = self.get(self.helper, 'admin:index')
-        self.assertEqual(res.status_code, 200)
-        self.assertNotIn('Pendapatan · bulan ini', [k['label'] for k in res.context['kpis']])
-        self.assertNotContains(res, '99.000')
-        self.assertEqual(self.get(self.helper, 'admin:invitations_payment_changelist').status_code, 403)
-
-    def test_demo_invitations_are_not_counted(self):
         demo = next(t['demoSlug'] for t in themes.entries().values() if t.get('demoSlug'))
         self.make_invitation(slug=demo, active=True)
-        res = self.get(self.owner, 'admin:index')
-        self.assertEqual({k['label']: k['value'] for k in res.context['kpis']}['Undangan aktif'], 0)
+        self.as_owner()
+        numbers = self.client.get('/api/staff/overview/').data['numbers']
+        self.assertEqual((numbers['pending_activations'], numbers['live'], numbers['revenue_month']), (1, 0, 99000))
+
+        self.as_helper()
+        res = self.client.get('/api/staff/overview/')
+        self.assertNotIn('revenue_month', res.data['numbers'])
+        self.assertNotIn(b'99000', res.content)
 
     def test_wedding_watch_flags_what_is_not_ready(self):
         soon = timezone.localdate() + timedelta(days=3)
@@ -143,84 +236,200 @@ class BackofficePageTests(APITestBase):
         Guest.objects.create(invitation=ready, name='Tamu', sent_at=timezone.now())
         self.make_invitation(slug='belum-siap', wedding_date=soon, active=False)
         self.make_invitation(slug='masih-lama', wedding_date=soon + timedelta(days=30))
-        res = self.get(self.helper, 'admin:ops_watch')
-        rows = {w['inv'].slug: w for w in res.context['watch']}
+        self.as_helper()
+        rows = {w['slug']: w for w in self.client.get('/api/staff/watch/').data['results']}
         self.assertEqual(set(rows), {'siap-nikah', 'belum-siap'})
         self.assertEqual(rows['siap-nikah']['flags'], [])
-        self.assertIn(('crit', 'belum aktif'), rows['belum-siap']['flags'])
+        self.assertIn({'tone': 'bad', 'text': 'belum aktif'}, rows['belum-siap']['flags'])
 
-    def test_activity_feed_filters_by_kind_and_slug(self):
+    def test_activity_feed_filters(self):
         a = self.make_invitation(slug='andini-bagus')
         b = self.make_invitation(slug='sari-joko')
         activity.record('activation_requested', a)
         activity.record('guests_imported', b, count=12)
         activity.record('register')
-        res = self.get(self.helper, 'admin:ops_activity', kind='guests_imported')
-        self.assertEqual([r['text'] for r in res.context['rows']], ['12 tamu diimpor'])
-        res = self.get(self.helper, 'admin:ops_activity', slug='andini')
-        self.assertEqual([r['slug'] for r in res.context['rows']], ['andini-bagus'])
+        self.as_helper()
+        res = self.client.get('/api/staff/activity/', {'kind': 'guests_imported'})
+        self.assertEqual([r['text'] for r in res.data['results']], ['12 tamu diimpor'])
+        res = self.client.get('/api/staff/activity/', {'slug': 'andini'})
+        self.assertEqual([r['slug'] for r in res.data['results']], ['andini-bagus'])
 
-    def test_system_page_renders(self):
-        res = self.get(self.helper, 'admin:ops_system')
-        self.assertEqual(res.status_code, 200)
-        self.assertIn('Database', res.context['checks'])
+    def test_system(self):
+        self.as_helper()
+        res = self.client.get('/api/staff/system/')
+        self.assertIn('database', [c['key'] for c in res.data['checks']])
 
 
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class FulfillWithPaymentTests(APITestBase):
+class InvitationTests(StaffBase):
+    def test_status_filter_and_counts(self):
+        today = timezone.localdate()
+        live = self.make_invitation(slug='aktif')
+        for i in range(3):
+            Guest.objects.create(invitation=live, name=f'T{i}', open_count=2)
+        self.make_invitation(slug='draf', active=False)
+        self.make_invitation(slug='minta', active=False, activation_requested=True)
+        self.make_invitation(slug='lewat', wedding_date=today - timedelta(days=200))
+        self.as_helper()
+        res = self.client.get('/api/staff/invitations/', {'status': 'live'})
+        self.assertEqual([r['slug'] for r in res.data['results']], ['aktif'])
+        row = res.data['results'][0]
+        self.assertEqual((row['guests'], row['opens'], row['missing']), (3, 6, ['acara', 'foto']))
+        self.assertEqual(res.data['status_counts'], {'purged': 0, 'expired': 1, 'live': 1, 'requested': 1, 'draft': 1})
+        self.assertEqual(self.client.get('/api/staff/invitations/', {'q': 'Andini'}).data['count'], 4)
+
+    def test_actions_are_audited(self):
+        inv = self.make_invitation(slug='perpanjang')
+        before = inv.expires_at
+        self.as_helper()
+        for action in ('extend', 'watermark_off', 'deactivate'):
+            res = self.client.post(f'/api/staff/invitations/{inv.pk}/action/', {'action': action}, format='json')
+            self.assertEqual(res.status_code, 200)
+        res = self.client.post(f'/api/staff/invitations/{inv.pk}/action/', {'action': 'delete'}, format='json')
+        self.assertEqual(res.status_code, 400)
+        inv.refresh_from_db()
+        self.assertEqual((inv.expires_at, inv.watermark, inv.is_active), (before + timedelta(days=30), False, False))
+        self.assertEqual(ActivityEvent.objects.filter(kind='staff_action', invitation=inv).count(), 3)
+        self.assertEqual(LogEntry.objects.filter(object_id=str(inv.pk)).count(), 3)
+
+    def test_detail_shows_payments_to_the_owner_only(self):
+        inv = self.make_invitation()
+        Payment.objects.create(invitation=inv, tier='premium', amount=99000)
+        self.as_helper()
+        self.assertNotIn('payments', self.client.get(f'/api/staff/invitations/{inv.pk}/').data)
+        self.as_owner()
+        self.assertEqual(self.client.get(f'/api/staff/invitations/{inv.pk}/').data['payments'][0]['amount'], 99000)
+
+
+class FulfillTests(StaffBase):
     def setUp(self):
         super().setUp()
         self.couple = self.make_user('pasangan')
         self.inv = self.make_invitation(owner=self.couple, active=False, activation_requested=True,
                                         activation_requested_at=timezone.now())
-        self.url = reverse('admin:invitations_activationrequest_changelist')
-        self.web = Client()
 
-    def staff(self, name, superuser=False):
-        user = User.objects.create_user(name, password=PASSWORD, is_staff=True, is_superuser=superuser)
-        if not superuser:
-            user.groups.add(Group.objects.get(name='Staf'))
-        self.web.force_login(user)
-        return user
-
-    def test_action_asks_for_the_amount_first(self):
-        self.staff('pemilik', superuser=True)
-        res = self.web.post(self.url, {'action': 'fulfill_premium', '_selected_action': [self.inv.pk]})
-        self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'Jumlah diterima')
-        self.assertFalse(Payment.objects.exists())
-        self.inv.refresh_from_db()
-        self.assertEqual(self.inv.activation_code, '')
-
-    def test_staff_records_a_payment_but_cannot_see_it(self):
-        helper = self.staff('bantu')
+    def test_staff_record_a_payment_and_get_the_code(self):
+        self.as_helper()
+        self.assertEqual([r['slug'] for r in self.client.get('/api/staff/activations/').data['results']], [self.inv.slug])
         coupon = Coupon.objects.create(code='MUA10', discount_percent=10)
-        res = self.web.post(self.url, {'action': 'fulfill_bisnis', '_selected_action': [self.inv.pk], 'apply': '1',
-                                       'amount': '179000', 'channel': 'qris', 'coupon': coupon.pk, 'note': ''})
-        self.assertEqual(res.status_code, 302)
-        payment = Payment.objects.get()
-        self.assertEqual((payment.amount, payment.tier, payment.channel, payment.coupon, payment.recorded_by),
-                         (179000, 'bisnis', 'qris', coupon, helper))
+        res = self.client.post(f'/api/staff/activations/{self.inv.pk}/fulfill/', {
+            'tier': 'bisnis', 'amount': 179000, 'channel': 'qris', 'coupon': coupon.pk}, format='json')
+        self.assertEqual(res.status_code, 200, res.content)
         self.inv.refresh_from_db()
-        self.assertEqual(self.inv.tier, 'bisnis')
-        self.assertTrue(self.inv.activation_code)
+        self.assertEqual(res.data['activation_code'], self.inv.activation_code)
+        payment = Payment.objects.get()
+        self.assertEqual((payment.amount, payment.tier, payment.channel, payment.coupon, payment.recorded_by.username),
+                         (179000, 'bisnis', 'qris', coupon, 'bantu'))
         self.assertEqual(CoupleProfile.objects.get(user=self.couple).max_invitations, 2)
-        self.assertEqual(ActivityEvent.objects.get(kind='staff_action').meta['action'], 'Lunas: Bisnis, kode diterbitkan')
-        self.assertEqual(self.web.get(reverse('admin:invitations_payment_changelist')).status_code, 403)
-        self.assertEqual(self.web.get(reverse('admin:invitations_payment_add')).status_code, 403)
 
-    def test_invalid_amount_shows_the_form_again(self):
-        self.staff('pemilik', superuser=True)
-        res = self.web.post(self.url, {'action': 'fulfill_premium', '_selected_action': [self.inv.pk], 'apply': '1',
-                                       'amount': '-5', 'channel': 'transfer'})
-        self.assertEqual(res.status_code, 200)
+    def test_bad_input_changes_nothing(self):
+        self.as_helper()
+        res = self.client.post(f'/api/staff/activations/{self.inv.pk}/fulfill/', {'tier': 'gold', 'amount': '-5'},
+                               format='json')
+        self.assertEqual((res.status_code, set(res.data)), (400, {'tier', 'amount'}))
         self.assertFalse(Payment.objects.exists())
 
-    def test_staff_cannot_delete_or_see_payments_in_the_group(self):
-        perms = set(Group.objects.get(name='Staf').permissions.values_list('codename', flat=True))
-        self.assertIn('add_payment', perms)
-        self.assertNotIn('view_payment', perms)
-        self.assertFalse(any(p.startswith('delete_') for p in perms))
+    @override_settings(ADMIN_REQUIRE_OTP=False)
+    def test_the_admin_action_records_the_payment_too(self):
+        web = Client()
+        web.force_login(self.staff('pemilik', owner=True))
+        url = reverse('admin:invitations_activationrequest_changelist')
+        self.assertContains(web.post(url, {'action': 'fulfill_premium', '_selected_action': [self.inv.pk]}),
+                            'Jumlah diterima')
+        web.post(url, {'action': 'fulfill_premium', '_selected_action': [self.inv.pk], 'apply': '1',
+                       'amount': '99000', 'channel': 'transfer'})
+        self.assertEqual(Payment.objects.get().amount, 99000)
+
+
+class CoupleTests(StaffBase):
+    def setUp(self):
+        super().setUp()
+        self.couple = self.make_user('rani', email='rani@example.com')
+        CoupleProfile.objects.create(user=self.couple, whatsapp='081234567890')
+        inv = self.make_invitation(owner=self.couple, slug='rani-dimas')
+        Payment.objects.create(invitation=inv, tier='premium', amount=99000)
+
+    def test_list_with_paid_for_the_owner(self):
+        self.as_owner()
+        rows = self.client.get('/api/staff/couples/').data['results']
+        self.assertEqual([(r['username'], r['paid'], r['invitations'][0]['slug']) for r in rows],
+                         [('rani', 99000, 'rani-dimas')])
+        self.as_helper()
+        self.assertNotIn('paid', self.client.get('/api/staff/couples/').data['results'][0])
+
+    def test_allow_two_and_a_reset_link_that_works_once(self):
+        self.as_owner()
+        self.client.post(f'/api/staff/couples/{self.couple.pk}/allow-two/')
+        self.assertEqual(CoupleProfile.objects.get(user=self.couple).max_invitations, 2)
+        res = self.client.post(f'/api/staff/couples/{self.couple.pk}/reset-link/')
+        self.assertIn('wa.me/6281234567890', res.data['whatsapp'])
+        q = parse_qs(urlsplit(res.data['link']).query)
+        body = {'uid': q['uid'][0], 'token': q['token'][0], 'password': 'An0ther-Strong-pass'}
+        anon = APIClient()
+        self.assertEqual(anon.post('/api/auth/password-reset-confirm/', body, format='json').status_code, 200)
+        self.assertEqual(anon.post('/api/auth/password-reset-confirm/', body, format='json').status_code, 400)
+
+
+class ModerationTests(StaffBase):
+    def setUp(self):
+        super().setUp()
+        self.inv = self.make_invitation(slug='dilapor')
+        self.as_helper()
+
+    def test_hide_a_wish(self):
+        rsvp = RSVP.objects.create(invitation=self.inv, guest_name='X', attending=True, wishes='kasar')
+        self.assertEqual(self.client.get('/api/staff/wishes/').data['results'][0]['wishes'], 'kasar')
+        self.client.post(f'/api/staff/wishes/{rsvp.pk}/', {'wish_status': 'hidden'}, format='json')
+        rsvp.refresh_from_db()
+        self.assertEqual(rsvp.wish_status, 'hidden')
+
+    def test_log_a_report_take_it_down_and_restore(self):
+        res = self.client.post('/api/staff/reports/', {'url': 'https://x/dilapor/', 'reason': 'impersonation',
+                                                       'reporter': 'WA 0813'}, format='json')
+        self.assertEqual((res.status_code, res.data['slug']), (201, 'dilapor'))
+        self.assertEqual(self.client.get('/api/staff/overview/').data['numbers']['reports_new'], 1)
+        pk = res.data['id']
+        res = self.client.post(f'/api/staff/reports/{pk}/decide/', {'decision': 'takedown', 'note': 'jelas palsu'},
+                               format='json')
+        self.assertEqual((res.data['status'], res.data['invitation_active'], res.data['decided_by']),
+                         ('takedown', False, 'bantu'))
+        res = self.client.post(f'/api/staff/reports/{pk}/decide/', {'decision': 'restore'}, format='json')
+        self.assertEqual((res.data['status'], res.data['invitation_active']), ('resolved', True))
+
+
+class ThemesGrowthRevenueTests(StaffBase):
+    def test_themes(self):
+        a, b = [t for t in themes.entries() if themes.is_selectable(t)][:2]
+        self.make_invitation(slug='satu', theme=a, tier='premium')
+        self.make_invitation(slug='dua', theme=a, active=False)
+        moved = self.make_invitation(slug='tiga', theme=b)
+        activity.record('theme_changed', moved, old=a, new=b)
+        activity.record('invitation_created', moved, theme=a)
+        self.as_helper()
+        rows = self.client.get('/api/staff/themes/').data['results']
+        by_id = {r['id']: r for r in rows}
+        self.assertEqual([by_id[a][k] for k in ('total', 'live', 'paid', 'away', 'created')], [2, 1, 1, 1, 1])
+        self.assertEqual((by_id[b]['total'], by_id[b]['to']), (1, 1))
+        self.assertEqual(rows[0]['id'], a)
+
+    def test_growth_and_revenue(self):
+        for step, n in (('visit', 10), ('register', 4), ('onboarded', 2)):
+            for _ in range(n):
+                funnel.record(step, {'utm_source': 'ig'})
+        coupon = Coupon.objects.create(code='MUA10', discount_percent=10)
+        inv = self.make_invitation()
+        Payment.objects.create(invitation=inv, tier='premium', amount=89000, channel='qris', coupon=coupon)
+        Payment.objects.create(invitation=inv, tier='bisnis', amount=179000)
+        self.as_helper()
+        res = self.client.get('/api/staff/growth/')
+        self.assertEqual(res.data['sources'][0], {'source': 'ig', 'visit': 10, 'register': 4, 'onboarded': 2})
+        self.assertEqual(res.data['coupons'][0]['used'], 1)
+        self.assertNotIn('revenue', res.data['coupons'][0])
+
+        self.as_owner()
+        res = self.client.get('/api/staff/revenue/')
+        self.assertEqual((res.data['total'], len(res.data['months']), res.data['months'][-1]['total']),
+                         (268000, 12, 268000))
+        self.assertEqual([r['label'] for r in res.data['by_coupon']], ['(tanpa kupon)', 'MUA10'])
 
 
 class ActivatedAtBackfillTests(MigrationTestCase):
@@ -235,222 +444,3 @@ class ActivatedAtBackfillTests(MigrationTestCase):
         Invitation = self.apps.get_model('invitations', 'Invitation')
         self.assertIsNotNone(Invitation.objects.get(slug='sudah-aktif').activated_at)
         self.assertIsNone(Invitation.objects.get(slug='masih-draf').activated_at)
-
-
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class InvitationListTests(APITestBase):
-    def setUp(self):
-        super().setUp()
-        self.web = Client()
-        helper = User.objects.create_user('bantu', password=PASSWORD, is_staff=True)
-        helper.groups.add(Group.objects.get(name='Staf'))
-        self.web.force_login(helper)
-        self.url = reverse('admin:invitations_invitation_changelist')
-
-    def slugs(self, **query):
-        res = self.web.get(self.url, query)
-        self.assertEqual(res.status_code, 200)
-        return sorted(inv.slug for inv in res.context['cl'].result_list)
-
-    def test_status_filter(self):
-        today = timezone.localdate()
-        self.make_invitation(slug='aktif')
-        self.make_invitation(slug='draf', active=False)
-        self.make_invitation(slug='minta', active=False, activation_requested=True)
-        old = self.make_invitation(slug='lewat', wedding_date=today - timedelta(days=200))
-        self.assertLess(old.expires_at, today)
-        self.assertEqual(self.slugs(status='live'), ['aktif'])
-        self.assertEqual(self.slugs(status='draft'), ['draf'])
-        self.assertEqual(self.slugs(status='requested'), ['minta'])
-        self.assertEqual(self.slugs(status='expired'), ['lewat'])
-
-    def test_counts_do_not_multiply(self):
-        inv = self.make_invitation(slug='hitung')
-        for i in range(3):
-            Guest.objects.create(invitation=inv, name=f'T{i}', open_count=2)
-        Event.objects.create(invitation=inv, event_type='akad', start=timezone.now(), venue_name='M', address='-')
-        res = self.web.get(self.url)
-        row = res.context['cl'].result_list[0]
-        self.assertEqual((row.n_guests, row.n_opens, row.n_events, row.n_photos), (3, 6, 1, 0))
-        self.assertContains(res, 'kurang: foto')
-
-    def test_extend_expiry_and_watermark_actions(self):
-        inv = self.make_invitation(slug='perpanjang')
-        before = inv.expires_at
-        self.web.post(self.url, {'action': 'extend_expiry', '_selected_action': [inv.pk]})
-        self.web.post(self.url, {'action': 'remove_watermark', '_selected_action': [inv.pk]})
-        inv.refresh_from_db()
-        self.assertEqual(inv.expires_at, before + timedelta(days=30))
-        self.assertFalse(inv.watermark)
-        self.assertEqual(ActivityEvent.objects.filter(kind='staff_action', invitation=inv).count(), 2)
-
-
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class CouplesPageTests(APITestBase):
-    def setUp(self):
-        super().setUp()
-        self.web = Client()
-        self.couple = self.make_user('rani', email='rani@example.com')
-        self.profile = CoupleProfile.objects.create(user=self.couple, whatsapp='081234567890')
-        inv = self.make_invitation(owner=self.couple, slug='rani-dimas')
-        Payment.objects.create(invitation=inv, tier='premium', amount=99000)
-        User.objects.create_user('staf-lain', password=PASSWORD, is_staff=True)   # staff aren't couples
-        self.url = reverse('admin:invitations_coupleprofile_changelist')
-
-    def login(self, superuser):
-        user = User.objects.create_user('masuk', password=PASSWORD, is_staff=True, is_superuser=superuser)
-        if not superuser:
-            user.groups.add(Group.objects.get(name='Staf'))
-        self.web.force_login(user)
-
-    def test_owner_sees_payments_and_invitations(self):
-        self.login(superuser=True)
-        res = self.web.get(self.url)
-        self.assertEqual([p.user.username for p in res.context['cl'].result_list], ['rani'])
-        self.assertContains(res, 'rani-dimas')
-        self.assertContains(res, 'Rp 99.000')
-
-    def test_staff_do_not_see_payments_or_make_reset_links(self):
-        self.login(superuser=False)
-        res = self.web.get(self.url)
-        self.assertNotContains(res, '99.000')
-        self.assertNotIn('make_reset_link', dict(res.context['action_form'].fields['action'].choices))
-        res = self.web.post(self.url, {'action': 'make_reset_link', '_selected_action': [self.profile.pk]})
-        self.assertNotContains(res, 'reset-password?uid=', status_code=res.status_code)
-
-    def test_reset_link_works_once(self):
-        self.login(superuser=True)
-        res = self.web.post(self.url, {'action': 'make_reset_link', '_selected_action': [self.profile.pk]})
-        link = res.context['rows'][0]['link']
-        self.assertIn('wa.me/6281234567890', res.context['rows'][0]['wa'])
-        from urllib.parse import parse_qs, urlsplit
-        q = parse_qs(urlsplit(link).query)
-        ok = self.client.post('/api/auth/password-reset-confirm/', {
-            'uid': q['uid'][0], 'token': q['token'][0], 'password': 'An0ther-Strong-pass'}, format='json')
-        self.assertEqual(ok.status_code, 200)
-        again = self.client.post('/api/auth/password-reset-confirm/', {
-            'uid': q['uid'][0], 'token': q['token'][0], 'password': 'Yet-An0ther-pass'}, format='json')
-        self.assertEqual(again.status_code, 400)
-        self.assertTrue(ActivityEvent.objects.filter(kind='staff_action', meta__action='Tautan reset sandi dibuat').exists())
-
-
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class ModerationTests(APITestBase):
-    def setUp(self):
-        super().setUp()
-        self.web = Client()
-        helper = User.objects.create_user('bantu', password=PASSWORD, is_staff=True)
-        helper.groups.add(Group.objects.get(name='Staf'))
-        self.web.force_login(helper)
-        self.inv = self.make_invitation(slug='dilapor')
-
-    def test_report_takedown_and_restore(self):
-        from apps.invitations.models import AbuseReport
-        url = reverse('admin:invitations_abusereport_changelist')
-        report = AbuseReport.objects.create(invitation=self.inv, url='https://x/dilapor', reason='impersonation')
-        res = self.web.get(reverse('admin:index'))
-        self.assertEqual({k['label']: k['value'] for k in res.context['kpis']}['Laporan baru'], 1)
-
-        self.web.post(url, {'action': 'take_down', '_selected_action': [report.pk]})
-        report.refresh_from_db()
-        self.inv.refresh_from_db()
-        self.assertEqual(report.status, 'takedown')
-        self.assertFalse(self.inv.is_active)
-        self.assertIsNotNone(report.decided_at)
-
-        self.web.post(url, {'action': 'restore', '_selected_action': [report.pk]})
-        self.inv.refresh_from_db()
-        self.assertTrue(self.inv.is_active)
-
-    def test_reports_are_pruned_after_a_year(self):
-        from django.core.management import call_command
-        from apps.invitations.models import AbuseReport
-        old = AbuseReport.objects.create(url='a', reason='spam')
-        AbuseReport.objects.filter(pk=old.pk).update(created_at=timezone.now() - timedelta(days=366))
-        AbuseReport.objects.create(url='b', reason='spam')
-        call_command('purge_expired', stdout=open('/dev/null', 'w'))
-        self.assertEqual(list(AbuseReport.objects.values_list('url', flat=True)), ['b'])
-
-    def test_staff_hide_a_wish(self):
-        from apps.invitations.models import RSVP
-        rsvp = RSVP.objects.create(invitation=self.inv, guest_name='X', attending=True, wishes='kasar')
-        self.web.post(reverse('admin:invitations_rsvp_changelist'), {'action': 'hide_wishes', '_selected_action': [rsvp.pk]})
-        rsvp.refresh_from_db()
-        self.assertEqual(rsvp.wish_status, 'hidden')
-
-
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class ThemesPageTests(APITestBase):
-    def test_counts_per_theme(self):
-        selectable = [t for t in themes.entries() if themes.is_selectable(t)]
-        a, b = selectable[0], selectable[1]
-        self.make_invitation(slug='satu', theme=a, tier='premium')
-        self.make_invitation(slug='dua', theme=a, active=False)
-        moved = self.make_invitation(slug='tiga', theme=b)
-        activity.record('theme_changed', moved, old=a, new=b)
-        activity.record('invitation_created', moved, theme=a)
-        web = Client()
-        web.force_login(User.objects.create_user('bantu', password=PASSWORD, is_staff=True))
-        res = web.get(reverse('admin:ops_themes'))
-        rows = {r['id']: r for r in res.context['rows']}
-        self.assertEqual((rows[a]['total'], rows[a]['live'], rows[a]['paid'], rows[a]['away'], rows[a]['created']),
-                         (2, 1, 1, 1, 1))
-        self.assertEqual((rows[b]['total'], rows[b]['to']), (1, 1))
-        self.assertEqual(res.context['rows'][0]['id'], a)   # paid first
-
-
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class GrowthAndRevenueTests(APITestBase):
-    def setUp(self):
-        super().setUp()
-        from apps.invitations import funnel
-        for step, n in (('visit', 10), ('register', 4), ('onboarded', 2)):
-            for _ in range(n):
-                funnel.record(step, {'utm_source': 'ig'})
-        funnel.record('visit')
-        self.coupon = Coupon.objects.create(code='MUA10', discount_percent=10)
-        inv = self.make_invitation()
-        Payment.objects.create(invitation=inv, tier='premium', amount=89000, channel='qris', coupon=self.coupon)
-        Payment.objects.create(invitation=inv, tier='bisnis', amount=179000)
-        self.web = Client()
-
-    def login(self, superuser):
-        user = User.objects.create_user('masuk', password=PASSWORD, is_staff=True, is_superuser=superuser)
-        if not superuser:
-            user.groups.add(Group.objects.get(name='Staf'))
-        self.web.force_login(user)
-
-    def test_growth_by_source_without_amounts_for_staff(self):
-        self.login(superuser=False)
-        res = self.web.get(reverse('admin:ops_growth'))
-        ig = next(r for r in res.context['sources'] if r['name'] == 'ig')
-        self.assertEqual((ig['visit'], ig['register'], ig['to_register'], ig['to_onboarded']), (10, 4, '40%', '50%'))
-        self.assertIn('(langsung)', [r['name'] for r in res.context['sources']])
-        self.assertEqual(res.context['coupons'][0]['c'].used, 1)
-        self.assertNotContains(res, '89.000')
-        self.assertEqual(self.web.get(reverse('admin:ops_revenue')).status_code, 403)
-
-    def test_revenue_for_the_owner(self):
-        self.login(superuser=True)
-        res = self.web.get(reverse('admin:ops_revenue'))
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['total'], 'Rp 268.000')
-        self.assertEqual(len(res.context['months']), 12)
-        self.assertEqual(res.context['months'][-1]['total'], 268000)
-        self.assertEqual([r['name'] for r in res.context['by_coupon']], ['(tanpa)', 'MUA10'])
-
-
-@override_settings(ADMIN_REQUIRE_OTP=False)
-class RoleBadgeTests(APITestBase):
-    def test_nav_names_the_role(self):
-        web = Client()
-        web.force_login(User.objects.create_user('pemilik', password=PASSWORD, is_staff=True, is_superuser=True))
-        self.assertContains(web.get(reverse('admin:index')), '>Pemilik<')
-        helper = User.objects.create_user('bantu', password=PASSWORD, is_staff=True)
-        helper.groups.add(Group.objects.get(name='Staf'))
-        web.force_login(helper)
-        self.assertContains(web.get(reverse('admin:index')), '>Staf<')
-
-    def test_backoffice_is_not_an_invitation_slug(self):
-        from apps.invitations.share_views import is_reserved_slug
-        self.assertTrue(is_reserved_slug('backoffice'))
