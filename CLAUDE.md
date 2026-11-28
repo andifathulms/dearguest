@@ -115,6 +115,30 @@ add the pack to `PILOTS` in `tests/visual/packs/scenes.spec.js`. The shared layo
 objects need the reviewer's answers listed at the end of each prompt file. Live: Gonjong Songket
 (three props: the marawa read as a national flag and was left out), Gebyok Sogan.
 
+### Production: the VPS
+The generic procedure (rollback, restore, rotating secrets, incidents) is in `RUNBOOK.md`. This VPS:
+- Tencent Cloud Lighthouse 2C4G, Jakarta, Ubuntu 24.04, prepaid until 2027-11-24. No domain yet, so the
+  site is `https://149.41.196.147` with a self-signed certificate (`DOMAIN` in `.env` is the IP).
+- SSH: `ssh ubuntu@149.41.196.147`, key only (`~/.ssh/id_ed25519` on the dev Mac). The repo and the
+  `.env` (mode 600) are in `/srv/dearguest`. Never print the `.env`; the admin path is in it.
+- Two firewalls: ufw on the box and the Lighthouse console firewall (22/80/443). A port that times out
+  from outside but works on the box is the console one; only the user can change it.
+- No `IMAGE_PREFIX` yet, so the server builds the images itself (~10 min). No email, R2 backups,
+  Sentry or alerts are configured yet.
+
+**"Deploy" means:** the user has pushed (or approved pushing) `main`, then:
+1. Check what ships: `git fetch && git log --oneline <live sha>..origin/main` (the live SHA is
+   `git log -1` in `/srv/dearguest`), and look for migrations. `deploy.sh` refuses destructive ones
+   unless `--allow-destructive`; the two-step rule in `RUNBOOK.md` §1 applies.
+2. Start it detached, because it outlives a tool call's timeout:
+   `ssh ubuntu@149.41.196.147 'cd /srv/dearguest && (nohup sh scripts/deploy.sh > /tmp/deploy.log 2>&1 &)'`.
+   The script fetches and checks out `origin/main` itself (a detached HEAD there is normal); don't
+   `git pull` first.
+3. Wait with `pgrep -f "scripts/deploy.s[h]"` (the bracket keeps pgrep from matching its own command
+   line), then `tail /tmp/deploy.log`. Success ends with `OK: <sha> is live`; failed smoke checks roll
+   back on their own. Never `pkill -f` a pattern that is also in your own ssh command.
+4. Check the change itself on the live site (`curl -k`), and tell the user the live SHA.
+
 ### Standing rules
 - Don't commit `docker-compose.yml` (the user's local port remap: web 5190, api 8020, db 5440), or
   `RECON.md`, `PHASE0-REPORT.md`, `PROMPT-ASSET-MOTION.md`.
