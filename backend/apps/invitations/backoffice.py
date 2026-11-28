@@ -542,9 +542,11 @@ def voucher_list(request, user):
         rows = [r for r in rows if r['state'] == state]
     if q:
         rows = [r for r in rows if q in r['code'] or q in r['description'].upper()]
-    return {'results': rows, 'state_counts': counts,
-            'plans': [{'slug': p.slug, 'name': p.name, 'price': p.price}
-                      for p in Plan.objects.filter(slug__in=('premium', 'bisnis'))]}
+    return {'results': rows, 'state_counts': counts, 'plans': paid_plans()}
+
+
+def paid_plans():
+    return [{'slug': p.slug, 'name': p.name, 'price': p.price} for p in Plan.objects.filter(slug__in=('premium', 'bisnis'))]
 
 
 def voucher_detail(coupon, user):
@@ -553,7 +555,7 @@ def voucher_detail(coupon, user):
     c = voucher_queryset().get(pk=coupon.pk)
     uses = coupon.redemptions.select_related('invitation', 'payment')
     return {
-        **voucher_row(c, revenue), 'prices': vouchers.prices(c),
+        **voucher_row(c, revenue), 'prices': vouchers.prices(c), 'plan_options': paid_plans(),
         'uses': [{
             'id': u.pk, 'status': u.status, 'status_label': u.get_status_display(), 'tier': u.tier,
             'slug': u.invitation.slug if u.invitation else None, 'invitation_id': u.invitation_id,

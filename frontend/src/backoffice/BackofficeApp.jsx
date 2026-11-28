@@ -18,6 +18,8 @@ import ThemesPage from './pages/ThemesPage.jsx'
 import GrowthPage from './pages/GrowthPage.jsx'
 import RevenuePage from './pages/RevenuePage.jsx'
 import SystemPage from './pages/SystemPage.jsx'
+import VouchersPage from './pages/VouchersPage.jsx'
+import VoucherDetailPage from './pages/VoucherDetailPage.jsx'
 import '../brand/brand.css'
 import '../pages/Auth.css'
 import './Backoffice.css'
@@ -43,6 +45,7 @@ const NAV = [
     { to: '/backoffice/laporan', label: 'Laporan' },
   ] },
   { group: 'Bisnis', items: [
+    { to: '/backoffice/voucher', label: 'Voucher' },
     { to: '/backoffice/tema', label: 'Tema' },
     { to: '/backoffice/pertumbuhan', label: 'Pertumbuhan' },
     { to: '/backoffice/pendapatan', label: 'Pendapatan', owner: true },
@@ -186,6 +189,8 @@ function Shell() {
             <Route path="pasangan" element={<CouplesPage />} />
             <Route path="ucapan" element={<WishesPage />} />
             <Route path="laporan" element={<ReportsPage />} />
+            <Route path="voucher" element={<VouchersPage />} />
+            <Route path="voucher/:id" element={<VoucherDetailPage />} />
             <Route path="tema" element={<ThemesPage />} />
             <Route path="pertumbuhan" element={<GrowthPage />} />
             <Route path="pendapatan" element={owner ? <RevenuePage /> : <Navigate to="/backoffice" replace />} />

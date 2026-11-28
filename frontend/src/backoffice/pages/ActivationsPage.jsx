@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { priceWith, voucherLabel } from '../../utils/vouchers.js'
 import {
-  Card, CopyButton, Data, Empty, PageHead, TIER, date, errorText, since, staffPost, useStaff, useTitle, waLink,
+  Badge, Card, CopyButton, Data, Empty, PageHead, TIER, date, errorText, rupiah, since, staffPost, useStaff, useTitle,
+  waLink,
 } from '../ui.jsx'
 
 const CHANNELS = [
@@ -45,6 +47,15 @@ function Request({ r, coupons, onDone }) {
             <Link to={`/backoffice/undangan/${r.id}`} className="bo-slug">{r.slug}</Link>
             {' · '}{r.theme_name}{' · '}menikah {date(r.wedding_date)}
           </p>
+          {r.voucher && (
+            <p className="bo-request-voucher">
+              <Badge tone="warn">Voucher {r.voucher.code}</Badge>
+              <span className="bo-quiet">
+                potongan {voucherLabel(r.voucher)} · {Object.entries(r.prices).map(([slug, p]) => (
+                  p.discount ? `${p.name} ${rupiah(p.final)}` : null)).filter(Boolean).join(' · ') || 'tidak berlaku untuk paket mana pun'}
+              </span>
+            </p>
+          )}
         </div>
         <div className="bo-request-meta">
           {r.activation_requested_at && <span className="bo-wait">menunggu {since(r.activation_requested_at)}</span>}
@@ -84,12 +95,32 @@ function Request({ r, coupons, onDone }) {
   )
 }
 
-function FulfillForm({ r, coupons, onCancel, onSaved }) {
-  const [form, setForm] = useState({ tier: 'premium', amount: '', channel: 'transfer', coupon: '', note: '' })
+// The amount the couple should have paid: the plan's price after the voucher.
+function expected(r, coupons, tier, couponId) {
+  const base = r.prices[tier]?.price
+  if (base == null) return ''
+  const voucher = coupons.find(c => String(c.id) === String(couponId))
+  return String(priceWith(voucher, tier, base))
+}
+
+function FulfillForm({ r, coupons: usable, onCancel, onSaved }) {
+  // The couple's own voucher is offered even if it has since ended: the server
+  // then explains why it can't be used.
+  const coupons = r.voucher && !usable.some(c => c.id === r.voucher.id) ? [r.voucher, ...usable] : usable
+  const startCoupon = r.voucher ? String(r.voucher.id) : ''
+  const [form, setForm] = useState(() => ({
+    tier: 'premium', channel: 'transfer', coupon: startCoupon, note: '',
+    amount: expected(r, coupons, 'premium', startCoupon),
+  }))
+  const [typed, setTyped] = useState(false)   // once staff type an amount, stop suggesting
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-  const set = patch => setForm(f => ({ ...f, ...patch }))
+  const set = patch => setForm(f => {
+    const next = { ...f, ...patch }
+    return typed || 'amount' in patch ? next : { ...next, amount: expected(r, coupons, next.tier, next.coupon) }
+  })
   const id = name => `bo-${name}-${r.id}`
+  const suggestion = expected(r, coupons, form.tier, form.coupon)
 
   async function submit(e) {
     e.preventDefault()
@@ -120,7 +151,8 @@ function FulfillForm({ r, coupons, onCancel, onSaved }) {
         <div className="dg-field">
           <label className="dg-label" htmlFor={id('amount')}>Jumlah diterima (Rp)</label>
           <input id={id('amount')} className="dg-input" inputMode="numeric" required value={form.amount}
-            placeholder="mis. 99000" onChange={e => set({ amount: e.target.value.replace(/\D/g, '') })} />
+            placeholder="mis. 99000" onChange={e => { setTyped(true); set({ amount: e.target.value.replace(/\D/g, '') }) }} />
+          {suggestion && <span className="bo-quiet">Harga {TIER[form.tier]}{form.coupon ? ' setelah voucher' : ''}: {rupiah(Number(suggestion))}</span>}
         </div>
         <div className="dg-field">
           <label className="dg-label" htmlFor={id('channel')}>Lewat</label>
@@ -129,11 +161,14 @@ function FulfillForm({ r, coupons, onCancel, onSaved }) {
           </select>
         </div>
         <div className="dg-field">
-          <label className="dg-label" htmlFor={id('coupon')}>Kupon</label>
+          <label className="dg-label" htmlFor={id('coupon')}>Voucher</label>
           <select id={id('coupon')} className="dg-input" value={form.coupon} onChange={e => set({ coupon: e.target.value })}>
-            <option value="">Tanpa kupon</option>
-            {coupons.map(c => <option key={c.id} value={c.id}>{c.code} (−{c.discount_percent}%)</option>)}
+            <option value="">Tanpa voucher</option>
+            {coupons.map(c => <option key={c.id} value={c.id}>{c.code} (−{voucherLabel(c, { cap: false })})</option>)}
           </select>
+          {r.voucher && String(form.coupon) !== String(r.voucher.id) && (
+            <span className="bo-quiet">Voucher {r.voucher.code} dari pasangan akan dilepas.</span>
+          )}
         </div>
         <div className="dg-field">
           <label className="dg-label" htmlFor={id('note')}>Catatan</label>

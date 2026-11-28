@@ -145,7 +145,7 @@ class ActivationListView(StaffView):
     def get(self, request):
         usable = [c for c in Coupon.objects.filter(active=True).order_by('code') if vouchers.state(c) == 'active']
         return Response({'results': backoffice.activations(),
-                         'coupons': [{'id': c.pk, 'code': c.code, 'label': c.label(), 'plans': c.plans} for c in usable]})
+                         'coupons': [{'id': c.pk, **vouchers.public_data(c)} for c in usable]})
 
 
 class FulfillView(StaffView):

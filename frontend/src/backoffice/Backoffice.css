@@ -263,7 +263,9 @@ a.bo-stat:hover { border-color: var(--dg-ink-soft); transform: translateY(-1px);
 .bo-code.small { margin-top: 6px; }
 .bo-form { display: grid; gap: 16px; padding-top: 16px; border-top: 1px solid var(--dg-line); }
 .bo-new .bo-form { padding-top: 0; border-top: 0; }
-.bo-form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 14px; }
+.bo-form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 14px; align-items: start; }
+.bo-form .bo-chips { align-items: center; }
+.bo-form select.dg-input { height: 46px; }
 .bo-form .dg-input { padding: 11px 13px; font-size: 15px; }
 .bo-form textarea.dg-input, .bo-report textarea.dg-input { resize: vertical; font-family: inherit; }
 
@@ -310,3 +312,53 @@ a.bo-stat:hover { border-color: var(--dg-ink-soft); transform: translateY(-1px);
 .bo-month-bar i { display: block; width: 100%; background: var(--dg-prada-deep); border-radius: 6px 6px 0 0; min-height: 0; }
 .bo-month-label { font-size: 11.5px; color: var(--dg-ink-soft); }
 @media (max-width: 600px) { .bo-month-val { display: none; } .bo-months { gap: 4px; height: 170px; } }
+
+/* ---- vouchers: a ticket, the discount on the dark stub, the code to paste ---- */
+.bo-vouchers { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 16px; }
+.bo-ticket {
+  display: grid; grid-template-columns: 128px minmax(0, 1fr); border-radius: var(--dg-r-m); overflow: hidden;
+  background: var(--dg-white); border: 1px solid var(--dg-line); box-shadow: 0 24px 50px -44px rgba(23, 17, 26, .5);
+}
+.bo-ticket-stub {
+  position: relative; display: grid; align-content: center; justify-items: center; gap: 4px; padding: 18px 10px;
+  background: radial-gradient(120% 90% at 30% 0%, #2E2131 0%, var(--dg-malam) 70%); text-align: center;
+}
+/* the perforation between stub and body */
+.bo-ticket-stub::after {
+  content: ""; position: absolute; top: 8px; bottom: 8px; right: -1px; width: 0;
+  border-right: 2px dashed rgba(210, 174, 98, .45);
+}
+.bo-ticket-off { font: 400 clamp(26px, 2.6vw, 34px)/1 var(--dg-f-display); color: var(--dg-prada); overflow-wrap: anywhere; }
+.bo-ticket-kind { font: 600 10px/1 var(--dg-f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--dg-on-malam-soft); }
+.bo-ticket-body { padding: 16px 18px; display: grid; gap: 8px; min-width: 0; }
+.bo-ticket-body p { margin: 0; }
+.bo-ticket-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.bo-ticket-code {
+  font: 400 26px/1.1 var(--dg-f-display); letter-spacing: .06em; color: var(--dg-ink); text-decoration: none; overflow-wrap: anywhere;
+}
+.bo-ticket-code:hover { color: var(--dg-prada-deep); }
+.bo-ticket-desc { font-size: 14px; color: var(--dg-ink-soft); }
+.bo-ticket.inactive, .bo-ticket.ended { opacity: .72; }
+.bo-ticket.inactive .bo-ticket-off, .bo-ticket.ended .bo-ticket-off { color: var(--dg-on-malam-soft); }
+.bo-ticket.big { grid-template-columns: 1fr; }
+.bo-ticket.big .bo-ticket-stub { padding: 40px 16px; }
+.bo-ticket.big .bo-ticket-stub::after { display: none; }
+.bo-ticket.big .bo-ticket-off { font-size: 52px; }
+@media (max-width: 480px) { .bo-ticket { grid-template-columns: 96px minmax(0, 1fr); } }
+
+.bo-quota { display: grid; gap: 6px; }
+.bo-code-title { letter-spacing: .06em; }
+.bo-request-voucher { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 0; }
+
+/* the voucher form */
+.bo-voucher-form { padding-top: 0; border-top: 0; }
+.bo-inline { display: flex; gap: 8px; align-items: center; }
+.bo-inline .dg-input { flex: 1; min-width: 0; }
+.bo-code-input { text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+.bo-field-error { font-size: 13px; color: var(--dg-bad); }
+.bo-checks { display: flex; flex-wrap: wrap; gap: 20px; font-size: 14.5px; }
+.bo-checks label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.bo-checks input { width: 17px; height: 17px; accent-color: var(--dg-ink); }
+.bo-preview { display: grid; gap: 6px; padding: 12px 14px; border-radius: var(--dg-r-s); background: var(--dg-paper); }
+.bo-preview-prices { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14.5px; }
+.bo-preview-prices s { color: var(--dg-muted); }
