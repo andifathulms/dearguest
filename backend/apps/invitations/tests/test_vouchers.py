@@ -220,3 +220,90 @@ class StaffRedeemTests(APITestBase):
         self.client.post(self.url, {'tier': 'bisnis', 'amount': 179000}, format='json')
         self.assertEqual(VoucherRedemption.objects.get().status, 'released')
         self.assertEqual(vouchers.left(self.voucher), 1)
+
+
+class StaffVoucherApiTests(APITestBase):
+    def setUp(self):
+        super().setUp()
+        from django.contrib.auth.models import Group
+        self.owner = User.objects.create_user('pemilik', password='x-Strong-pass-91', is_staff=True, is_superuser=True)
+        self.helper = User.objects.create_user('bantu', password='x-Strong-pass-91', is_staff=True)
+        self.helper.groups.add(Group.objects.get(name='Staf'))
+
+    def login(self, user):
+        from django.test import override_settings
+        from rest_framework.test import APIClient
+        self.client = APIClient()
+        with override_settings(ADMIN_REQUIRE_OTP=False):
+            self.client.post('/api/staff/login/', {'username': user.username, 'password': 'x-Strong-pass-91'}, format='json')
+
+    def create(self, **data):
+        return self.client.post('/api/staff/vouchers/', data, format='json')
+
+    def test_owner_makes_percent_and_nominal_vouchers(self):
+        self.login(self.owner)
+        res = self.create(code='nikah 2027', discount_type='percent', discount_percent=15, max_discount=20000,
+                          plans=['premium', 'bisnis'], quota=50, starts_at='2026-12-01T00:00',
+                          ends_at='2027-01-31T23:59', description='Promo akhir tahun')
+        self.assertEqual(res.status_code, 201, res.data)
+        self.assertEqual((res.data['code'], res.data['label'], res.data['plans'], res.data['left']),
+                         ('NIKAH2027', '15%', [], 50))
+        start = timezone.localtime(Coupon.objects.get(code='NIKAH2027').starts_at)
+        self.assertEqual((start.hour, str(start.tzinfo)), (0, 'Asia/Jakarta'))   # the form's time is WIB
+        self.assertEqual(res.data['state'], 'scheduled')
+        res = self.create(code='', discount_type='amount', discount_amount='25.000', plans=['bisnis'])
+        self.assertEqual(res.status_code, 201, res.data)
+        self.assertRegex(res.data['code'], r'^VV-')
+        self.assertEqual((res.data['label'], res.data['prices']['bisnis']['final']), ('Rp25.000', 154000))
+        self.assertEqual(Coupon.objects.get(code=res.data['code']).created_by, self.owner)
+
+    def test_bad_input_is_explained_per_field(self):
+        self.login(self.owner)
+        Coupon.objects.create(code='ADA', discount_percent=10)
+        res = self.create(code='ada', discount_type='percent', discount_percent=150, quota=0, plans=['gratis'],
+                          starts_at='2027-01-02T00:00', ends_at='2027-01-01T00:00')
+        self.assertEqual(set(res.data), {'code', 'discount_percent', 'quota', 'plans', 'ends_at'})
+        res = self.create(code='X!', discount_type='amount', discount_amount='')
+        self.assertEqual(set(res.data), {'code', 'discount_amount'})
+
+    def test_used_vouchers_keep_code_and_discount_and_cannot_be_deleted(self):
+        self.login(self.owner)
+        c = Coupon.objects.create(code='DIPAKAI', discount_percent=10, quota=5, once_per_account=False)
+        for slug in ('a1', 'a2'):
+            vouchers.claim(self.make_invitation(slug=slug), 'DIPAKAI', None)
+        url = f'/api/staff/vouchers/{c.pk}/'
+        res = self.client.patch(url, {'code': 'BARU', 'discount_percent': 50, 'quota': 1}, format='json')
+        self.assertEqual(set(res.data), {'code', 'discount_type', 'quota'})
+        res = self.client.patch(url, {'quota': 10, 'active': False, 'description': 'Habis promo'}, format='json')
+        self.assertEqual((res.status_code, res.data['quota'], res.data['state'], res.data['used']), (200, 10, 'inactive', 2))
+        self.assertEqual([u['slug'] for u in res.data['uses']], ['a2', 'a1'])
+        self.assertEqual(self.client.delete(url).status_code, 409)
+        unused = Coupon.objects.create(code='KOSONG', discount_percent=5)
+        self.assertEqual(self.client.delete(f'/api/staff/vouchers/{unused.pk}/').status_code, 204)
+
+    def test_switching_type_needs_the_new_value(self):
+        self.login(self.owner)
+        c = Coupon.objects.create(code='GANTI', discount_percent=10)
+        res = self.client.patch(f'/api/staff/vouchers/{c.pk}/', {'discount_type': 'amount'}, format='json')
+        self.assertIn('discount_amount', res.data)
+
+    def test_staff_can_read_but_not_change(self):
+        c = Coupon.objects.create(code='LIHAT', discount_percent=10)
+        self.login(self.helper)
+        res = self.client.get('/api/staff/vouchers/')
+        self.assertEqual(res.data['results'][0]['code'], 'LIHAT')
+        self.assertNotIn('discount_total', res.data['results'][0])
+        self.assertEqual(self.create(code='BARU', discount_percent=10).status_code, 403)
+        self.assertEqual(self.client.patch(f'/api/staff/vouchers/{c.pk}/', {'active': False}, format='json').status_code, 403)
+        self.assertEqual(self.client.delete(f'/api/staff/vouchers/{c.pk}/').status_code, 403)
+
+    def test_list_filters_and_counts(self):
+        now = timezone.now()
+        Coupon.objects.create(code='JALAN', discount_percent=10)
+        Coupon.objects.create(code='NANTI', discount_percent=10, starts_at=now + timedelta(days=3))
+        Coupon.objects.create(code='LEWAT', discount_percent=10, ends_at=now - timedelta(days=1))
+        self.login(self.owner)
+        res = self.client.get('/api/staff/vouchers/', {'state': 'scheduled'})
+        self.assertEqual([r['code'] for r in res.data['results']], ['NANTI'])
+        self.assertEqual(res.data['state_counts'], {'active': 1, 'scheduled': 1, 'ended': 1, 'exhausted': 0, 'inactive': 0})
+        self.assertRegex(self.client.get('/api/staff/vouchers/new-code/').data['code'], r'^VV-')

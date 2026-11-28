@@ -8,15 +8,18 @@ the quota until staff confirm the payment (redeemed) or the code is removed
 last place."""
 import re
 import secrets
+from zoneinfo import ZoneInfo
 
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 
 from .models import GUEST_CODE_ALPHABET, Coupon, Plan, VoucherRedemption
 
 CODE_RE = re.compile(r'^[A-Z0-9][A-Z0-9-]{2,29}$')
 PAID_TIERS = ('premium', 'bisnis')
+WIB = ZoneInfo('Asia/Jakarta')
 
 
 class VoucherError(Exception):
@@ -181,3 +184,113 @@ def public_data(coupon):
         'plans': coupon.plans or list(PAID_TIERS), 'ends_at': coupon.ends_at.isoformat() if coupon.ends_at else None,
         'label': coupon.label(), 'description': coupon.description,
     }
+
+
+# ---- making and changing vouchers (backoffice) ----
+
+def _int(value):
+    if value in (None, ''):
+        return None
+    try:
+        n = int(str(value).replace('.', '').strip())
+    except ValueError:
+        raise ValueError
+    if n < 0:
+        raise ValueError
+    return n
+
+
+def _when(value):
+    """An ISO date-time; without an offset (a datetime-local input) it means WIB."""
+    if value in (None, ''):
+        return None
+    dt = parse_datetime(str(value))
+    if dt is None:
+        raise ValueError
+    return dt if timezone.is_aware(dt) else timezone.make_aware(dt, WIB)
+
+
+def clean(data, instance=None):
+    """(fields, errors) for a voucher from the backoffice form; errors by field,
+    in Indonesian. A used voucher keeps its code and discount, and its quota
+    can't go below what is already used."""
+    errors, out = {}, {}
+    in_use = bool(instance and instance.pk and instance.redemptions.exists())
+    taken = used(instance) if instance and instance.pk else 0
+
+    def given(name):
+        return name in data or instance is None
+
+    if given('code'):
+        code = normalise(data.get('code')) or (instance.code if instance else generate_code())
+        if not CODE_RE.match(code):
+            errors['code'] = 'Kode 3 sampai 30 karakter: huruf, angka, atau tanda hubung.'
+        elif Coupon.objects.filter(code=code).exclude(pk=getattr(instance, 'pk', None)).exists():
+            errors['code'] = 'Kode ini sudah dipakai voucher lain.'
+        elif in_use and code != instance.code:
+            errors['code'] = 'Voucher yang sudah dipakai tidak bisa ganti kode.'
+        out['code'] = code
+
+    kind = data.get('discount_type', instance.discount_type if instance else 'percent')
+    if kind not in dict(Coupon.TYPES):
+        errors['discount_type'] = 'Pilih persentase atau nominal.'
+    out['discount_type'] = kind
+    switched = bool(instance and instance.pk and kind != instance.discount_type)
+    try:
+        if kind == 'percent' and (given('discount_percent') or switched):
+            pct = _int(data.get('discount_percent'))
+            if pct is None or not 1 <= pct <= 100:
+                raise ValueError
+            out['discount_percent'] = pct
+        if kind == 'amount' and (given('discount_amount') or switched):
+            amount = _int(data.get('discount_amount'))
+            if not amount:
+                raise ValueError
+            out['discount_amount'] = amount
+    except ValueError:
+        field = 'discount_percent' if kind == 'percent' else 'discount_amount'
+        errors[field] = 'Isi persen 1 sampai 100.' if kind == 'percent' else 'Isi potongan dalam rupiah, mis. 25000.'
+    if in_use and any(out.get(k, getattr(instance, k)) != getattr(instance, k)
+                      for k in ('discount_type', 'discount_percent', 'discount_amount')):
+        errors['discount_type'] = 'Voucher yang sudah dipakai tidak bisa ganti potongannya. Buat voucher baru.'
+
+    if given('max_discount'):
+        try:
+            out['max_discount'] = _int(data.get('max_discount')) if kind == 'percent' else None
+        except ValueError:
+            errors['max_discount'] = 'Isi potongan maksimal dalam rupiah, atau kosongkan.'
+
+    if given('plans'):
+        plans = data.get('plans') or []
+        if not isinstance(plans, list) or any(p not in PAID_TIERS for p in plans):
+            errors['plans'] = 'Pilih paket Premium dan/atau Bisnis.'
+        out['plans'] = [] if set(plans) >= set(PAID_TIERS) else sorted(set(plans))
+
+    if given('quota'):
+        try:
+            quota = _int(data.get('quota'))
+            if quota == 0:
+                raise ValueError
+            if quota is not None and quota < taken:
+                errors['quota'] = f'Sudah dipakai {taken} kali; kuota tidak bisa kurang dari itu.'
+            out['quota'] = quota
+        except ValueError:
+            errors['quota'] = 'Isi kuota minimal 1, atau kosongkan untuk tanpa batas.'
+
+    for name in ('starts_at', 'ends_at'):
+        if given(name):
+            try:
+                out[name] = _when(data.get(name))
+            except ValueError:
+                errors[name] = 'Tanggal dan jam tidak dikenali.'
+    start = out.get('starts_at', getattr(instance, 'starts_at', None))
+    end = out.get('ends_at', getattr(instance, 'ends_at', None))
+    if start and end and end <= start and 'ends_at' not in errors:
+        errors['ends_at'] = 'Waktu berakhir harus setelah waktu mulai.'
+
+    for name in ('once_per_account', 'active'):
+        if name in data:
+            out[name] = bool(data.get(name))
+    if given('description'):
+        out['description'] = str(data.get('description') or '').strip()[:200]
+    return out, errors

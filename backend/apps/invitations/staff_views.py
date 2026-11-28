@@ -46,7 +46,8 @@ class IsOwner(IsVerifiedStaff):
 
 def me(user):
     return {'username': user.username, 'role': 'owner' if user.is_superuser else 'staff',
-            'can_see_revenue': backoffice.can_see_revenue(user)}
+            'can_see_revenue': backoffice.can_see_revenue(user),
+            'can_manage_vouchers': user.has_perm('invitations.add_coupon')}
 
 
 class StaffLoginView(APIView):
@@ -267,3 +268,55 @@ class RevenueView(APIView):
 
     def get(self, request):
         return Response(backoffice.revenue())
+
+
+class VoucherListView(StaffView):
+    """GET every voucher (?state=, ?q=); POST to make one (owner: add_coupon).
+    A blank code gets a generated one."""
+
+    def get(self, request):
+        return Response(backoffice.voucher_list(request, request.user))
+
+    def post(self, request):
+        if not request.user.has_perm('invitations.add_coupon'):
+            return Response({'detail': 'Akun ini tidak boleh membuat voucher.'}, status=status.HTTP_403_FORBIDDEN)
+        fields, errors = vouchers.clean(request.data)
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        coupon = staff_actions.save_voucher(request.user, fields)
+        return Response(backoffice.voucher_detail(coupon, request.user), status=status.HTTP_201_CREATED)
+
+
+class VoucherDetailView(StaffView):
+    """GET a voucher with its uses; PATCH to change it (change_coupon);
+    DELETE only a voucher nobody used (delete_coupon)."""
+
+    def get(self, request, pk):
+        return Response(backoffice.voucher_detail(get_object_or_404(Coupon, pk=pk), request.user))
+
+    def patch(self, request, pk):
+        if not request.user.has_perm('invitations.change_coupon'):
+            return Response({'detail': 'Akun ini tidak boleh mengubah voucher.'}, status=status.HTTP_403_FORBIDDEN)
+        coupon = get_object_or_404(Coupon, pk=pk)
+        fields, errors = vouchers.clean(request.data, coupon)
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        staff_actions.save_voucher(request.user, fields, coupon)
+        return Response(backoffice.voucher_detail(coupon, request.user))
+
+    def delete(self, request, pk):
+        if not request.user.has_perm('invitations.delete_coupon'):
+            return Response({'detail': 'Akun ini tidak boleh menghapus voucher.'}, status=status.HTTP_403_FORBIDDEN)
+        coupon = get_object_or_404(Coupon, pk=pk)
+        if coupon.redemptions.exists():
+            return Response({'detail': 'Voucher ini sudah pernah dipakai, jadi tidak bisa dihapus. Nonaktifkan saja.'},
+                            status=status.HTTP_409_CONFLICT)
+        staff_actions.delete_voucher(request.user, coupon)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VoucherCodeView(StaffView):
+    """GET a fresh unused code, for the form's "buat kode" button."""
+
+    def get(self, request):
+        return Response({'code': vouchers.generate_code()})

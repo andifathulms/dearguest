@@ -108,6 +108,25 @@ def set_wish(rsvp, user, status):
     record(user, rsvp.invitation, f'Ucapan {"disembunyikan" if status == "hidden" else "ditampilkan"} (RSVP {rsvp.pk})')
 
 
+def save_voucher(user, fields, instance=None):
+    """Create or change a voucher from fields vouchers.clean() accepted."""
+    coupon = instance or Coupon(created_by=user)
+    for name, value in fields.items():
+        setattr(coupon, name, value)
+    coupon.save()
+    if instance:
+        record(user, coupon, f'Voucher {coupon.code} diubah: {", ".join(sorted(fields))}')
+    else:
+        record(user, coupon, f'Voucher {coupon.code} dibuat ({coupon.label()})')
+    return coupon
+
+
+def delete_voucher(user, coupon):
+    """Only a voucher nobody has used; used ones are deactivated instead."""
+    record(user, coupon, f'Voucher {coupon.code} dihapus')
+    coupon.delete()
+
+
 DECISIONS = {
     # decision: (report status, invitation active afterwards or None to leave it, audit text)
     'takedown': ('takedown', False, 'Laporan: undangan dinonaktifkan'),

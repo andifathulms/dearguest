@@ -147,7 +147,8 @@ class StaffLoginTests(StaffBase):
     def test_password_and_code_get_in(self):
         res = self.post(otp=self.code())
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.data, {'username': 'pemilik', 'role': 'owner', 'can_see_revenue': True})
+        self.assertEqual(res.data, {'username': 'pemilik', 'role': 'owner', 'can_see_revenue': True,
+                                    'can_manage_vouchers': True})
         self.client.post('/api/auth/refresh/')   # the staff claim survives a refresh
         self.assertEqual(self.client.get('/api/staff/overview/').status_code, 200)
 
@@ -202,7 +203,8 @@ class StaffAccessTests(StaffBase):
         self.assertEqual(self.client.get('/api/staff/revenue/').status_code, 403)
         self.assertEqual(self.client.post(f'/api/staff/couples/{couple.pk}/reset-link/').status_code, 403)
         self.assertEqual(self.client.get('/api/staff/me/').data,
-                         {'username': 'bantu', 'role': 'staff', 'can_see_revenue': False})
+                         {'username': 'bantu', 'role': 'staff', 'can_see_revenue': False,
+                          'can_manage_vouchers': False})
 
     def test_staf_group(self):
         perms = set(Group.objects.get(name='Staf').permissions.values_list('codename', flat=True))

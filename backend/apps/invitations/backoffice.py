@@ -16,7 +16,7 @@ from django.db.models.functions import Coalesce, TruncMonth
 from django.utils import timezone
 
 from . import health, ops, retention, themes
-from .models import AbuseReport, ActivityEvent, Coupon, FunnelEvent, Guest, Invitation, Payment, Photo, RSVP, Event
+from .models import AbuseReport, ActivityEvent, Coupon, FunnelEvent, Guest, Invitation, Payment, Photo, Plan, RSVP, Event
 
 WATCH_DAYS_OVERVIEW = 7
 WATCH_DAYS = 14
@@ -494,4 +494,70 @@ def revenue():
         'by_channel': split('channel', dict(Payment.CHANNELS)),
         'by_coupon': split('coupon__code', {}),
         'recent': [payment_row(p) for p in Payment.objects.select_related('invitation', 'coupon', 'recorded_by')[:30]],
+    }
+
+
+# ---- vouchers ----
+
+VOUCHER_STATES = {'active': 'Berlaku', 'scheduled': 'Terjadwal', 'ended': 'Berakhir', 'exhausted': 'Kuota habis',
+                  'inactive': 'Nonaktif'}
+
+
+def voucher_row(c, revenue=False, now=None):
+    from . import vouchers
+    used = c.n_claimed + c.n_redeemed
+    row = {
+        'id': c.pk, 'code': c.code, 'discount_type': c.discount_type, 'discount_percent': c.discount_percent,
+        'discount_amount': c.discount_amount, 'max_discount': c.max_discount, 'label': c.label(),
+        'plans': c.plans, 'quota': c.quota, 'used': used, 'claimed': c.n_claimed, 'redeemed': c.n_redeemed,
+        'left': None if c.quota is None else max(0, c.quota - used), 'once_per_account': c.once_per_account,
+        'starts_at': iso(c.starts_at), 'ends_at': iso(c.ends_at), 'active': c.active, 'description': c.description,
+        'state': vouchers.state(c, now), 'created_by': c.created_by.username if c.created_by else None,
+        'created_at': iso(c.created_at), 'ever_used': c.n_any > 0,
+    }
+    if revenue:
+        row['discount_total'] = c.discount_total or 0
+    return row
+
+
+def voucher_queryset():
+    redeemed = Q(redemptions__status='redeemed')
+    return Coupon.objects.select_related('created_by').annotate(
+        n_claimed=Count('redemptions', filter=Q(redemptions__status='claimed', redemptions__invitation__isnull=False),
+                        distinct=True),
+        n_redeemed=Count('redemptions', filter=redeemed, distinct=True),
+        n_any=Count('redemptions', distinct=True),
+        discount_total=Sum('redemptions__discount', filter=redeemed),
+    )
+
+
+def voucher_list(request, user):
+    """Every voucher with its state and use; ?state= and ?q= filter."""
+    now = timezone.now()
+    revenue = can_see_revenue(user)
+    rows = [voucher_row(c, revenue, now) for c in voucher_queryset().order_by('-created_at', 'code')]
+    counts = {key: sum(r['state'] == key for r in rows) for key in VOUCHER_STATES}
+    q, state = request.GET.get('q', '').strip().upper(), request.GET.get('state', '')
+    if state in VOUCHER_STATES:
+        rows = [r for r in rows if r['state'] == state]
+    if q:
+        rows = [r for r in rows if q in r['code'] or q in r['description'].upper()]
+    return {'results': rows, 'state_counts': counts,
+            'plans': [{'slug': p.slug, 'name': p.name, 'price': p.price}
+                      for p in Plan.objects.filter(slug__in=('premium', 'bisnis'))]}
+
+
+def voucher_detail(coupon, user):
+    from . import vouchers
+    revenue = can_see_revenue(user)
+    c = voucher_queryset().get(pk=coupon.pk)
+    uses = coupon.redemptions.select_related('invitation', 'payment')
+    return {
+        **voucher_row(c, revenue), 'prices': vouchers.prices(c),
+        'uses': [{
+            'id': u.pk, 'status': u.status, 'status_label': u.get_status_display(), 'tier': u.tier,
+            'slug': u.invitation.slug if u.invitation else None, 'invitation_id': u.invitation_id,
+            'at': iso(u.redeemed_at or u.released_at or u.created_at), 'created_at': iso(u.created_at),
+            **({'discount': u.discount, 'paid': u.payment.amount if u.payment else None} if revenue else {}),
+        } for u in uses],
     }
