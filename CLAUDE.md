@@ -152,6 +152,22 @@ Vowvella's own operator app. It is separate from the Django admin, which stays t
 - `Coupon.expires_at` is superseded by `ends_at` (migration 0057) and unused. Drop it in a later release, as a
   two-step change (RUNBOOK §1).
 
+### Blog (`/blog`)
+- **Where things are:**
+  - `backend/apps/invitations/blog.py`: the Markdown subset, the API, the crawler pages, the sitemap and the feed;
+  - the public pages, in `frontend/src/pages/blog/`;
+  - the editor, at `/backoffice/artikel`.
+- **Who sees what:**
+  - people get the SPA;
+  - crawlers (shared/crawlers.txt, which includes Googlebot and Bingbot) get Django's server-rendered page, routed
+    by nginx `$blog_path` (Vite does the same in dev);
+  - `/sitemap-blog.xml` and `/blog/rss.xml` come from Django, and robots.txt lists the blog sitemap.
+- **Rendering:** article bodies go through `blog.render` only. It escapes everything first; widen the subset there,
+  with tests in `test_blog.py`, never by passing raw HTML through.
+- **Publishing:** an article is live when `status='published'` and `published_at` has passed, so a future time
+  schedules it. A live article keeps its slug.
+- **Rights:** Staf write and publish; only the owner deletes.
+
 ### Production: the VPS
 The generic procedure (rollback, restore, rotating secrets, incidents) is in `RUNBOOK.md`. This VPS:
 - Tencent Cloud Lighthouse 2C4G, Jakarta, Ubuntu 24.04, prepaid until 2027-11-24. No domain yet, so the
