@@ -1,5 +1,5 @@
 from django.conf import settings
-from apps.invitations import funnel
+from apps.invitations import activity, funnel
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
@@ -86,6 +86,7 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         funnel.record('register', funnel.clean_utm(request.data))
+        activity.record('register', user=user, source=funnel.clean_utm(request.data).get('utm_source', ''))
         refresh = RefreshToken.for_user(user)
         response = Response({'username': user.username}, status=status.HTTP_201_CREATED)
         return set_session(request, response, refresh.access_token, refresh)
@@ -188,4 +189,5 @@ class DeleteAccountView(APIView):
             delete_invitation(inv)
         revoke_sessions(user)
         user.delete()
+        activity.record('account_deleted')
         return clear_session(Response(status=status.HTTP_204_NO_CONTENT))

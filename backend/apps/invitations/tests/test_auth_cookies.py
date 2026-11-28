@@ -99,6 +99,7 @@ class CookieSessionTests(APITestBase):
         self.login(phone)
         self.login(laptop)
         uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.user.refresh_from_db()   # logging in set last_login, which the token is built from
         token = default_token_generator.make_token(self.user)
         res = APIClient().post('/api/auth/password-reset-confirm/',
                                {'uid': uid, 'token': token, 'password': 'An0ther-Strong-pass'}, format='json')

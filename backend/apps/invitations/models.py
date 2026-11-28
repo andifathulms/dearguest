@@ -101,6 +101,7 @@ class Invitation(models.Model):
     activation_code = models.CharField(max_length=20, blank=True)
     activation_requested = models.BooleanField(default=False)
     activation_requested_at = models.DateTimeField(null=True, blank=True)
+    activated_at = models.DateTimeField(null=True, blank=True)   # first time it went live (save())
     # Retention (retention.py): guest data is deleted RETENTION_DAYS after
     # expires_at; the couple is emailed a week before.
     purge_notice_sent_at = models.DateTimeField(null=True, blank=True)
@@ -110,6 +111,9 @@ class Invitation(models.Model):
         related_name='invitations'
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    # Last full save, i.e. the couple editing in the editor or staff in the admin;
+    # saves with update_fields (counters, activation) leave it alone.
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     @classmethod
     def from_db(cls, db, field_names, values):
@@ -124,9 +128,16 @@ class Invitation(models.Model):
         # A hand-set expiry may be extended, but never end before the wedding.
         self.expires_at = max(self.expires_at, self.wedding_date + timedelta(days=1))
 
+        stamp_activation = self.is_active and not self.activated_at
+        if stamp_activation:
+            from django.utils import timezone
+            self.activated_at = timezone.now()
+
         update_fields = kwargs.get('update_fields')
         if update_fields is not None and 'wedding_date' in update_fields:
-            kwargs['update_fields'] = {*update_fields, 'expires_at'}
+            kwargs['update_fields'] = update_fields = {*update_fields, 'expires_at'}
+        if update_fields is not None and stamp_activation:
+            kwargs['update_fields'] = {*update_fields, 'activated_at'}
         super().save(*args, **kwargs)
         self._loaded_wedding_date = self.wedding_date
 
@@ -547,3 +558,71 @@ class FunnelEvent(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Funnel'
         verbose_name_plural = 'Funnel (per minggu)'
+
+
+class ActivityEvent(models.Model):
+    """One thing that happened, for the backoffice feed (backoffice.py). Like
+    FunnelEvent it holds no personal data: ids, the kind, and small counts or
+    theme ids in `meta`; never guest names, numbers or wish text. RSVPs, gifts
+    and check-ins aren't copied here: their own tables are counted. Deleting an
+    invitation or account keeps the row with the link cleared. Rows older than
+    activity.KEEP_DAYS are deleted by purge_expired."""
+    KINDS = [
+        ('register', 'Daftar'),
+        ('invitation_created', 'Buat undangan'),
+        ('theme_changed', 'Ganti tema'),
+        ('activation_requested', 'Minta aktivasi'),
+        ('activated', 'Aktif'),
+        ('guests_imported', 'Impor tamu'),
+        ('exported', 'Ekspor data'),
+        ('account_deleted', 'Akun dihapus'),
+        ('staff_action', 'Tindakan staf'),
+    ]
+    ACTORS = [('couple', 'Pasangan'), ('staff', 'Staf'), ('system', 'Sistem')]
+
+    kind = models.CharField(max_length=24, choices=KINDS)
+    actor = models.CharField(max_length=8, choices=ACTORS, default='couple')
+    invitation = models.ForeignKey(Invitation, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    meta = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['kind', 'created_at'])]
+        verbose_name = 'Aktivitas'
+        verbose_name_plural = 'Aktivitas'
+
+    def __str__(self):
+        return f'{self.get_kind_display()} · {self.created_at:%Y-%m-%d %H:%M}'
+
+
+class Payment(models.Model):
+    """Money received for an invitation, recorded by staff when they confirm an
+    activation (no gateway yet; Phase 3 replaces this with orders). Kept when
+    the invitation or account is deleted, with the link cleared, for the books.
+    Seeing amounts needs the `view_payment` permission; the Staf group can
+    record payments but not see them."""
+    CHANNELS = [
+        ('transfer', 'Transfer bank'),
+        ('qris', 'QRIS'),
+        ('ewallet', 'E-wallet'),
+        ('cash', 'Tunai'),
+        ('other', 'Lainnya'),
+    ]
+    invitation = models.ForeignKey(Invitation, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments')
+    tier = models.CharField(max_length=10, choices=Invitation.TIER_CHOICES)
+    amount = models.PositiveIntegerField(help_text='Rupiah, mis. 99000.')
+    channel = models.CharField(max_length=10, choices=CHANNELS, default='transfer')
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments')
+    note = models.CharField(max_length=200, blank=True)
+    recorded_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Pembayaran'
+        verbose_name_plural = 'Pembayaran'
+
+    def __str__(self):
+        return f'Rp {self.amount:,} · {self.get_tier_display()}'.replace(',', '.')

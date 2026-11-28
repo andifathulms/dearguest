@@ -4,14 +4,17 @@ from urllib.parse import quote
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin import helpers
+from django.template.response import TemplateResponse
+from django.utils.timesince import timesince
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 
-from . import themes
+from . import activity, themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
-    Plan, Testimonial,
+    Plan, Testimonial, Payment,
 )
 
 
@@ -62,6 +65,14 @@ class InvitationAdminForm(forms.ModelForm):
             raise forms.ValidationError(exc.messages)
 
 
+class PaymentForm(forms.Form):
+    """What the couple paid, asked when confirming an activation."""
+    amount = forms.IntegerField(min_value=0, label='Jumlah diterima (Rp)', help_text='Per undangan, mis. 99000.')
+    channel = forms.ChoiceField(choices=Payment.CHANNELS, label='Lewat')
+    coupon = forms.ModelChoiceField(Coupon.objects.all(), required=False, label='Kupon')
+    note = forms.CharField(max_length=200, required=False, label='Catatan')
+
+
 audit_log = logging.getLogger('vowvella.audit')
 
 
@@ -69,6 +80,8 @@ def audit(model_admin, request, obj, action):
     """Record a staff action on an object: Django's admin history (LogEntry)
     plus a structured log line that ships off the server."""
     model_admin.log_change(request, obj, action)
+    activity.record('staff_action', obj if isinstance(obj, Invitation) else None, request.user, actor='staff',
+                    action=action)
     audit_log.info('admin action', extra={'audit': {
         'action': action, 'model': obj._meta.label, 'object_id': obj.pk, 'staff_id': request.user.pk,
     }})
@@ -136,13 +149,18 @@ class RSVPAdmin(AuditedDeletes, admin.ModelAdmin):
 class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
     """Inbox of couples who requested activation but aren't live yet."""
     form = InvitationAdminForm
-    list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at']
+    list_display = ['slug', 'couple_names', 'whatsapp_link', 'tier', 'activation_code', 'is_active', 'activation_requested_at', 'waiting']
     list_editable = ['tier', 'activation_code', 'is_active']
     readonly_fields = ['activation_requested_at']
+    ordering = ['activation_requested_at']   # oldest first
     actions = ['fulfill_premium', 'fulfill_bisnis', 'issue_activation_code']
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(activation_requested=True, is_active=False)
+
+    @admin.display(description='Menunggu')
+    def waiting(self, obj):
+        return timesince(obj.activation_requested_at) if obj.activation_requested_at else '—'
 
     @admin.display(description='WhatsApp')
     def whatsapp_link(self, obj):
@@ -173,26 +191,42 @@ class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
         inv.activation_code = secrets.token_hex(3).upper()
         inv.save(update_fields=['tier', 'activation_code'])
 
-    @admin.action(description='✓ Konfirmasi lunas → Premium + terbitkan kode')
-    def fulfill_premium(self, request, queryset):
-        for inv in queryset:
-            inv.tier = 'premium'
-            self._issue(inv)
-            audit(self, request, inv, 'Lunas: Premium, kode diterbitkan')
-        self.message_user(request, f'{queryset.count()} undangan disetel Premium + kode diterbitkan. Kirim kode ke pasangan via WhatsApp.')
+    def has_record_payment_permission(self, request):
+        return request.user.has_perm('invitations.add_payment')
 
-    @admin.action(description='✓ Konfirmasi lunas → Bisnis (2 undangan) + terbitkan kode')
+    @admin.action(description='✓ Konfirmasi lunas → Premium + terbitkan kode', permissions=['record_payment'])
+    def fulfill_premium(self, request, queryset):
+        return self._fulfill(request, queryset, 'premium')
+
+    @admin.action(description='✓ Konfirmasi lunas → Bisnis (2 undangan) + terbitkan kode', permissions=['record_payment'])
     def fulfill_bisnis(self, request, queryset):
+        return self._fulfill(request, queryset, 'bisnis')
+
+    def _fulfill(self, request, queryset, tier):
+        """First a page asking what was paid; on submit, record the payment, set
+        the tier and issue the code (sent to the couple by hand)."""
+        label = dict(Invitation.TIER_CHOICES)[tier]
+        form = PaymentForm(request.POST if 'apply' in request.POST else None)
+        if not form.is_valid():
+            return TemplateResponse(request, 'admin/invitations/activationrequest/fulfill.html', {
+                **self.admin_site.each_context(request),
+                'title': f'Konfirmasi lunas → {label}', 'opts': self.model._meta, 'form': form,
+                'invitations': queryset, 'action': request.POST.get('action'),
+                'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+            })
         for inv in queryset:
-            inv.tier = 'bisnis'
+            inv.tier = tier
             self._issue(inv)
-            audit(self, request, inv, 'Lunas: Bisnis, kode diterbitkan')
-            if inv.couple_user:
+            Payment.objects.create(invitation=inv, tier=tier, recorded_by=request.user, **form.cleaned_data)
+            audit(self, request, inv, f'Lunas: {label}, kode diterbitkan')
+            if tier == 'bisnis' and inv.couple_user:
                 profile, _ = CoupleProfile.objects.get_or_create(user=inv.couple_user)
                 if profile.max_invitations < 2:
                     profile.max_invitations = 2
                     profile.save(update_fields=['max_invitations'])
-        self.message_user(request, f'{queryset.count()} undangan disetel Bisnis (2 undangan) + kode diterbitkan.')
+        self.message_user(request, f'{queryset.count()} undangan disetel {label}, pembayaran dicatat, kode diterbitkan. '
+                                   'Kirim kode ke pasangan via WhatsApp.')
+        return None
 
     @admin.action(description='Terbitkan kode aktivasi saja')
     def issue_activation_code(self, request, queryset):
@@ -201,6 +235,26 @@ class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
             inv.save(update_fields=['activation_code'])
             audit(self, request, inv, 'Kode aktivasi diterbitkan')
         self.message_user(request, f'Kode aktivasi diterbitkan untuk {queryset.count()} undangan.')
+
+
+@admin.register(Payment)
+class PaymentAdmin(AuditedDeletes, admin.ModelAdmin):
+    """Payments recorded when confirming activations. Amounts are owner-only:
+    the Staf group can record a payment (add) but not list or open them."""
+    list_display = ['created_at', 'invitation', 'tier', 'amount', 'channel', 'coupon', 'recorded_by']
+    list_filter = ['tier', 'channel']
+    date_hierarchy = 'created_at'
+    search_fields = ['invitation__slug']
+    raw_id_fields = ['invitation']
+    readonly_fields = ['recorded_by', 'created_at']
+
+    def has_add_permission(self, request):
+        return super().has_add_permission(request) and self.has_view_permission(request)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.recorded_by = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(CoupleProfile)

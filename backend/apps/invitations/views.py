@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
-from . import audience, copy, csv_export, guest_import, ics, maps, moderation, payload_cache, themes
+from . import activity, audience, copy, csv_export, guest_import, ics, maps, moderation, payload_cache, themes
 from .crawlers import is_crawler
 from .entitlements import has_feature
 from .throttling import client_ip
@@ -416,6 +416,8 @@ class GuestImportView(APIView):
             return Response({'detail': f'Maksimal {guest_import.MAX_ROWS} tamu sekali impor.'},
                             status=status.HTTP_400_BAD_REQUEST)
         created, skipped = guest_import.import_guests(invitation, rows)
+        if created:
+            activity.record('guests_imported', invitation, request.user, count=len(created))
         return Response({'created': len(created), 'skipped': skipped}, status=status.HTTP_201_CREATED)
 
 

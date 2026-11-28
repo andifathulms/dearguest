@@ -1,0 +1,17 @@
+{% if rows %}
+<table>
+  {% if full %}<thead><tr><th>Waktu</th><th>Jenis</th><th>Undangan</th><th>Keterangan</th></tr></thead>{% endif %}
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td class="ops-time">{% if full %}{{ r.ev.created_at|date:"d M H:i" }}{% else %}{{ r.ev.created_at|date:"H:i" }}{% if r.ev.created_at|date:"Ymd" != today_key %} · {{ r.ev.created_at|date:"d M" }}{% endif %}{% endif %}</td>
+      <td><span class="ops-pill {{ r.tone }}">{{ r.ev.get_kind_display }}</span></td>
+      <td class="ops-slug">{% if r.slug %}<a href="{% url 'admin:invitations_invitation_change' r.ev.invitation_id %}">{{ r.slug }}</a>{% else %}—{% endif %}</td>
+      <td>{{ r.text }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="ops-empty">Belum ada aktivitas. Pendaftaran, undangan baru, permintaan aktivasi dan tindakan staf akan muncul di sini.</p>
+{% endif %}

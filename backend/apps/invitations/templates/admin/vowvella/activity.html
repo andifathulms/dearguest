@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+{% block extrastyle %}{{ block.super }}{% include "admin/vowvella/_style.html" %}{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Ringkasan</a> › Aktivitas</div>{% endblock %}
+{% block content %}
+{% with ops_tab='activity' %}{% include "admin/vowvella/_nav.html" %}{% endwith %}
+<form method="get" class="ops-filter">
+  <label for="ops-kind">Jenis</label>
+  <select name="kind" id="ops-kind">
+    <option value="">Semua</option>
+    {% for value, label in kinds %}<option value="{{ value }}"{% if value == kind %} selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <label for="ops-slug">Undangan</label>
+  <input type="search" name="slug" id="ops-slug" value="{{ slug }}" placeholder="slug">
+  <input type="submit" value="Saring">
+  {% if query %}<a href="?">Hapus saringan</a>{% endif %}
+</form>
+<div class="ops-panel">
+  {% include "admin/vowvella/_feed.html" with full=True %}
+</div>
+{% if page.has_other_pages %}
+<p class="paginator">
+  {% if page.has_previous %}<a href="?{{ query }}{% if query %}&{% endif %}p={{ page.previous_page_number }}">← Lebih baru</a>{% endif %}
+  Halaman {{ page.number }} dari {{ page.paginator.num_pages }}
+  {% if page.has_next %}<a href="?{{ query }}{% if query %}&{% endif %}p={{ page.next_page_number }}">Lebih lama →</a>{% endif %}
+</p>
+{% endif %}
+<p class="ops-help">Hanya jenis kejadian dan id yang dicatat, tanpa nama atau nomor tamu. RSVP, hadiah dan check-in dihitung langsung dari datanya. Baris lebih dari {{ keep_days }} hari dihapus otomatis.</p>
+{% endblock %}

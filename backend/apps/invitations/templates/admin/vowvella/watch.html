@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+{% block extrastyle %}{{ block.super }}{% include "admin/vowvella/_style.html" %}{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Ringkasan</a> › Hari H</div>{% endblock %}
+{% block content %}
+{% with ops_tab='watch' %}{% include "admin/vowvella/_nav.html" %}{% endwith %}
+<p class="ops-help">Pernikahan dari hari ini sampai {{ watch_days }} hari ke depan. <b>Belum aktif</b> dan <b>tanpa acara</b> berarti tamu tidak bisa membuka undangan dengan benar: hubungi pasangan.
+  <b>Belum dikirim</b>: ada daftar tamu tapi belum ada yang dikirimi tautan. Check-in tampil di hari H.</p>
+<div class="ops-panel ops-wide">{% include "admin/vowvella/_watch_table.html" %}</div>
+{% endblock %}

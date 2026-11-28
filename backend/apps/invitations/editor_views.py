@@ -2,7 +2,7 @@
 every endpoint is scoped to {slug} and verifies the requester owns it (or is staff).
 is_active/watermark/tier remain admin-controlled (the paywall)."""
 import re
-from . import export, funnel
+from . import activity, export, funnel
 from apps.auth_api.cookies import recently_authenticated
 from django.http import FileResponse
 from django.conf import settings
@@ -64,6 +64,7 @@ class MyInvitationsView(APIView):
         serializer.is_valid(raise_exception=True)
         inv = serializer.save(couple_user=request.user, is_active=False)
         funnel.record('onboarded', funnel.clean_utm(request.data))
+        activity.record('invitation_created', inv, request.user, theme=inv.theme)
         Couple.objects.get_or_create(
             invitation=inv,
             defaults={'bride_name': '', 'bride_parents': '', 'groom_name': '', 'groom_parents': ''},
@@ -87,7 +88,10 @@ class MyInvitationDetailView(APIView):
             return Response({'detail': 'Undangan tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = InvitationSettingsSerializer(inv, data=request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
+        old_theme = inv.theme
         serializer.save()
+        if inv.theme != old_theme:
+            activity.record('theme_changed', inv, request.user, old=old_theme, new=inv.theme)
         # Uploading a custom track supersedes any chosen preset.
         if 'music_file' in request.FILES:
             inv.music_preset = None
@@ -154,6 +158,7 @@ class RequestActivationView(APIView):
         inv.activation_requested = True
         inv.activation_requested_at = timezone.now()
         inv.save(update_fields=['activation_requested', 'activation_requested_at'])
+        activity.record('activation_requested', inv, request.user, tier=inv.tier)
         # Notify admin so they can confirm payment and issue an activation code.
         couple = getattr(inv, 'couple', None)
         names = f"{couple.bride_name} & {couple.groom_name}" if couple else inv.slug
@@ -189,6 +194,7 @@ class ActivateView(APIView):
             return Response({'detail': 'Kode aktivasi tidak valid.'}, status=status.HTTP_400_BAD_REQUEST)
         inv.is_active = True
         inv.save(update_fields=['is_active'])
+        activity.record('activated', inv, request.user, tier=inv.tier)
         return Response({'is_active': True})
 
 
@@ -390,5 +396,6 @@ class ExportView(APIView):
             return Response({'detail': 'Konfirmasi kata sandi dulu.', 'code': 'reauth_required'},
                             status=status.HTTP_403_FORBIDDEN)
         data = EditorInvitationSerializer(inv, context={'request': request}).data
+        activity.record('exported', inv, request.user)
         return FileResponse(export.build(inv, data), as_attachment=True, filename=f'vowvella-{inv.slug}.zip',
                             content_type='application/zip')

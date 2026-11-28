@@ -4,13 +4,16 @@
 - staff need a TOTP code as well as the password (ADMIN_REQUIRE_OTP; on
   unless DEBUG). Enrol with `manage.py enrol_totp <username>`;
 - 5 failed logins per client address and username lock that pair out for
-  15 minutes (nginx also rate-limits the login URL).
+  15 minutes (nginx also rate-limits the login URL);
+- its index is the backoffice overview, with the other backoffice pages under
+  ops/ (apps/invitations/backoffice.py).
 Installed in config/urls.py by swapping the default site's class, so every
 existing `@admin.register` keeps working."""
 from django.conf import settings
 from django.contrib.admin import AdminSite
 from django.core.cache import cache
 from django.http import HttpResponse
+from django.urls import path
 from django_otp.admin import OTPAdminAuthenticationForm, OTPAdminSite
 
 from apps.invitations.throttling import client_ip
@@ -20,6 +23,24 @@ LOCKOUT_SECONDS = 15 * 60
 
 
 class VowvellaAdminSite(AdminSite):
+    site_header = 'Vowvella · Ops'
+    site_title = 'Vowvella Ops'
+    index_title = 'Ringkasan'
+    index_template = 'admin/vowvella/index.html'
+
+    def get_urls(self):
+        from apps.invitations import backoffice
+        return [
+            path('ops/aktivitas/', self.admin_view(backoffice.activity_view), name='ops_activity'),
+            path('ops/hari-h/', self.admin_view(backoffice.watch_view), name='ops_watch'),
+            path('ops/sistem/', self.admin_view(backoffice.system_view), name='ops_system'),
+        ] + super().get_urls()
+
+    def index(self, request, extra_context=None):
+        from apps.invitations import backoffice
+        context = {**backoffice.overview(request), 'ops_revenue': backoffice.can_see_revenue(request.user)}
+        return super().index(request, {**context, **(extra_context or {})})
+
     def has_permission(self, request):
         allowed = super().has_permission(request)
         if allowed and settings.ADMIN_REQUIRE_OTP:

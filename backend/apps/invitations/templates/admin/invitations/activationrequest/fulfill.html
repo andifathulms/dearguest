@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Beranda</a> ›
+  <a href="{% url 'admin:invitations_activationrequest_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> ›
+  {{ title }}
+</div>
+{% endblock %}
+{% block content %}
+<p>Catat pembayaran untuk {{ invitations|length }} undangan:
+  {% for inv in invitations %}<strong>{{ inv.slug }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}.
+  Setelah disimpan, kode aktivasi terbit dan bisa dikirim lewat WhatsApp dari daftar.</p>
+<form method="post">{% csrf_token %}
+  {% for inv in invitations %}<input type="hidden" name="{{ action_checkbox_name }}" value="{{ inv.pk }}">{% endfor %}
+  <input type="hidden" name="action" value="{{ action }}">
+  <input type="hidden" name="apply" value="1">
+  <fieldset class="module aligned">
+    {% for field in form %}
+      <div class="form-row">
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+        {% if field.help_text %}<div class="help">{{ field.help_text }}</div>{% endif %}
+      </div>
+    {% endfor %}
+  </fieldset>
+  <div class="submit-row">
+    <input type="submit" class="default" value="Simpan dan terbitkan kode">
+    <a href="{% url 'admin:invitations_activationrequest_changelist' %}" class="button cancel-link">Batal</a>
+  </div>
+</form>
+{% endblock %}
