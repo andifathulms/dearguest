@@ -42,6 +42,7 @@ RESERVED_SLUGS = {
     'privasi', 'kebijakan-privasi', 'privacy', 'syarat', 'ketentuan', 'syarat-ketentuan', 'terms',
     'harga', 'pricing', 'bantuan', 'help', 'faq', 'tentang', 'about', 'kontak', 'contact',
     'blog', 'adat', 'undangan', 'demo', 'login', 'masuk', 'daftar', 'logout', 'keluar',
+    'backoffice', 'kelola',   # admin paths (ADMIN_URL), kept free whatever the setting is
 }
 
 

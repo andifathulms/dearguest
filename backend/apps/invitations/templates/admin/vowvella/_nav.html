@@ -12,4 +12,7 @@
   {% if ops_revenue %}<a href="{% url 'admin:ops_revenue' %}"{% if ops_tab == 'revenue' %} class="on"{% endif %}>Pendapatan</a>
   <a href="{% url 'admin:invitations_payment_changelist' %}"{% if ops_tab == 'payments' %} class="on"{% endif %}>Pembayaran</a>{% endif %}
   <a href="{% url 'admin:ops_system' %}"{% if ops_tab == 'system' %} class="on"{% endif %}>Sistem</a>
+  <span class="ops-role" title="{% if request.user.is_superuser %}Melihat semua, termasuk pendapatan{% else %}Tanpa angka pembayaran{% endif %}">
+    {{ request.user.get_username }} · <span class="ops-pill {% if request.user.is_superuser %}brand{% else %}info{% endif %}">{% if request.user.is_superuser %}Pemilik{% else %}Staf{% endif %}</span>
+  </span>
 </nav>

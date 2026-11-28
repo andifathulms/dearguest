@@ -438,3 +438,19 @@ class GrowthAndRevenueTests(APITestBase):
         self.assertEqual(len(res.context['months']), 12)
         self.assertEqual(res.context['months'][-1]['total'], 268000)
         self.assertEqual([r['name'] for r in res.context['by_coupon']], ['(tanpa)', 'MUA10'])
+
+
+@override_settings(ADMIN_REQUIRE_OTP=False)
+class RoleBadgeTests(APITestBase):
+    def test_nav_names_the_role(self):
+        web = Client()
+        web.force_login(User.objects.create_user('pemilik', password=PASSWORD, is_staff=True, is_superuser=True))
+        self.assertContains(web.get(reverse('admin:index')), '>Pemilik<')
+        helper = User.objects.create_user('bantu', password=PASSWORD, is_staff=True)
+        helper.groups.add(Group.objects.get(name='Staf'))
+        web.force_login(helper)
+        self.assertContains(web.get(reverse('admin:index')), '>Staf<')
+
+    def test_backoffice_is_not_an_invitation_slug(self):
+        from apps.invitations.share_views import is_reserved_slug
+        self.assertTrue(is_reserved_slug('backoffice'))

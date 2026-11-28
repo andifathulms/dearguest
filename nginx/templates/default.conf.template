@@ -122,6 +122,9 @@ server {
     }
 
     # Django admin, at a path of its own (ADMIN_PATH / ADMIN_URL).
+    location = /${ADMIN_PATH} {
+        return 301 /${ADMIN_PATH}/;
+    }
     location /${ADMIN_PATH}/ {
         include /etc/nginx/snippets/proxy.conf;
     }
