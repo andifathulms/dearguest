@@ -117,6 +117,23 @@ objects need the reviewer's answers listed at the end of each prompt file. Live:
 (three props: the marawa read as a national flag and was left out), Gebyok Sogan, Kembang Kelapa,
 Lengkung Pasir.
 
+### Backoffice (the admin)
+The Django admin at `ADMIN_URL` is the operator console (`backend/apps/invitations/backoffice.py`,
+templates in `templates/admin/vowvella/`). It's server-rendered with no script (CSP), in Indonesian, and
+desktop first:
+- **Ringkasan**: the admin index;
+- **Aktivitas, Hari H, Tema, Pertumbuhan, Pendapatan, Sistem**: pages under `ops/`;
+- **Undangan, Pasangan, Aktivasi, Ucapan, Laporan, Pembayaran**: the model lists, sharing one nav (`OpsNav`).
+
+Rules:
+- `ActivityEvent` holds ids and small facts only, never guest names, numbers or wish text. Record new
+  events with `activity.record()`.
+- Demo invitations are left out of every count.
+- Revenue needs `invitations.view_payment`: the owner is a superuser. Helpers get `is_staff` plus the
+  **Staf** group (migrations 0054/0055), which can record a payment but never see amounts.
+- Confirming an activation asks what was paid. Gateway orders and partner commissions wait for
+  STRATEGY-REVIEW B4/B7.
+
 ### Production: the VPS
 The generic procedure (rollback, restore, rotating secrets, incidents) is in `RUNBOOK.md`. This VPS:
 - Tencent Cloud Lighthouse 2C4G, Jakarta, Ubuntu 24.04, prepaid until 2027-11-24. No domain yet, so the

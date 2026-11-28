@@ -160,13 +160,15 @@ Work top to bottom and stop when it's fixed. Tell the couple on WhatsApp within 
 
 ## 7. Takedown or abuse report
 
-1. Record the URL, who reported it and when.
+1. Record it: admin → **Laporan** → add (URL, who reported it and how, reason). Reports are kept a year.
 2. Look at it. If it's clearly abusive (impersonation, illegal content, spam), deactivate it now:
-   - admin → Invitations → select → *Nonaktifkan undangan yang dipilih*. This is audited.
+   - in Laporan, select the report → *Takedown: nonaktifkan undangannya*. This is audited and
+     timestamped on the report.
    - The public page then says "belum aktif".
 3. Tell the account owner by email and WhatsApp why, and how to respond.
-4. Copyright (a photo or song): deactivate, ask the couple to replace the item, and reactivate when they have.
-5. Keep the record (date, URL, decision) for 1 year. Delete content only through the normal account deletion or retention.
+4. Copyright (a photo or song): deactivate, ask the couple to replace the item, then *Selesai: aktifkan lagi*.
+5. Write the decision in the report's note. `purge_expired` deletes reports after a year. Delete content only
+   through the normal account deletion or retention.
 
 ## 8. Manual refund (Phase 3)
 
