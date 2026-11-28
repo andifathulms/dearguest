@@ -523,7 +523,26 @@ PACKS = {
             # sides, ~13-81 %.
             ('parallax-back', 'parallax-back.jpg', (30, 69, 192), 1080, (26, 64), 2, False, (0, 0.43, 1, 0.78)),
             ('parallax-front', 'parallax-front.jpg', (29, 70, 192), 1080, (26, 64), 2, False, (0, 0.1, 1, 0.84)),
+            # Section art (prompts/sections): the spray fills ~58 % of the width, the
+            # garland ~39-74 % of the height, the corner the top-left ~44 %.
+            ('section-edge', 'section-edge.jpg', (35, 70, 186), 720, (26, 64), 2, False, (0, 0, 0.62, 0.95)),
+            ('section-garland', 'section-garland.jpg', (33, 68, 185), 1200, (26, 64), 2, False, (0, 0.34, 1, 0.79)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (33, 68, 184), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (32, 71, 186), 360, (26, 64), 2, False, (0, 0, 0.48, 0.48)),
+            # Scene art (prompts/scenes): the bride's crown and the groom's alpie on their stands.
+            ('attire-bride', 'attire-bride.jpg', (30, 69, 186), 640, (26, 64), 2, False),
+            ('attire-groom', 'attire-groom.jpg', (28, 69, 186), 640, (26, 64), 2, False),
         ],
+        # Scene art: full paintings. The kampung's sky is calm ~21-52 % high right of the
+        # palm (~40-94 % wide); the night veranda the same.
+        'scenes': [
+            # the cream paper is the page's own: lifted out, so the page's texture shows through
+            ('scene-interlude', 'scene-interlude.jpg', 1080, (0.05, 0.03, 0.05, 0.03), (252, 247, 228)),
+            ('closing-scene', 'closing-scene.jpg', 1080, (0.04, 0.04, 0.05, 0.04)),
+        ],
+        # kembang kelapa, tehyan, roti buaya, sirih dare (the tray's corner reaches into its quarter)
+        'clear': {'prop-4': [(0, 0, 0.05, 1)]},
+        'props': ('props-sheet.jpg', (34, 74, 195), 360, (26, 64), 2, ('prop-1', 'prop-2', 'prop-3', 'prop-4')),
         # painted 2 across x 3 down, on a flat key to the bottom edge
         'sprites': ('petals-sheet.jpg', (35, 70, 186), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
         'sprites_grid': (3, 2),
@@ -555,7 +574,24 @@ PACKS = {
             # kept down to ~80 %: below that is the colonnade's floor, hidden by the sill
             ('parallax-back', 'parallax-back.jpg', (35, 69, 186), 1080, (26, 64), 2, False, (0, 0.39, 1, 0.8)),
             ('parallax-front', 'parallax-front.jpg', (36, 68, 184), 1080, (26, 64), 2, False),
+            # Section art (prompts/sections): the spray fills ~53 % of the width, the
+            # garland ~36-65 % of the height, the corner the top-left half.
+            ('section-edge', 'section-edge.jpg', (36, 72, 192), 720, (26, 64), 2, False, (0, 0.06, 0.58, 0.95)),
+            ('section-garland', 'section-garland.jpg', (32, 70, 188), 1200, (26, 64), 2, False, (0, 0.31, 1, 0.69)),
+            ('monogram-wreath', 'monogram-wreath.jpg', (31, 69, 187), 640, (26, 64), 2, False),
+            ('card-corner', 'card-corner.jpg', (38, 72, 182), 360, (26, 64), 2, False, (0, 0, 0.54, 0.54)),
+            # Scene art (prompts/scenes): a veil on a plaster plinth, a bow tie and folded linen on another.
+            ('attire-bride', 'attire-bride.jpg', (32, 66, 189), 640, (26, 64), 2, False),
+            ('attire-groom', 'attire-groom.jpg', (36, 63, 203), 640, (26, 64), 2, False),
         ],
+        # Scene art: full paintings, both calm inside the arch: the sunlit arcade
+        # ~12-86 % wide, 30-64 % high; the candlelit arch ~18-84 %, 20-76 %.
+        'scenes': [
+            ('scene-interlude', 'scene-interlude.jpg', 1080, (0.04, 0.04, 0.05, 0.04)),
+            ('closing-scene', 'closing-scene.jpg', 1080, (0.04, 0.05, 0.05, 0.05)),
+        ],
+        # bud vase, rings, envelope, candle
+        'props': ('props-sheet.jpg', (36, 63, 202), 360, (26, 64), 2, ('prop-1', 'prop-2', 'prop-3', 'prop-4')),
         'sprites': ('petals-sheet.jpg', (36, 73, 191), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
         'sprites_grid': (3, 2),
         'texture': ('texture.jpg', 512, 70),
@@ -769,7 +805,11 @@ def build(pack):
             if not name:
                 continue
             x, y = (i % 2) * hw, (i // 2) * hh
-            prop = trim(key(raw.crop((x, y, x + hw, y + hh)), bg, ramp, close, False, cfg.get('despill', False)))
+            quarter = raw.crop((x, y, x + hw, y + hh))
+            # 'clear' boxes (fractions of the quarter): a neighbour's edge reaching across the midline
+            for x0, y0, x1, y1 in cfg.get('clear', {}).get(name, []):
+                quarter.paste(tuple(bg), (round(x0 * hw), round(y0 * hh), round(x1 * hw), round(y1 * hh)))
+            prop = trim(key(quarter, bg, ramp, close, False, cfg.get('despill', False)))
             written += save_all(resize_w(prop, width), out, name, ('avif', 'webp'))
 
     if 'sprites' in cfg:
