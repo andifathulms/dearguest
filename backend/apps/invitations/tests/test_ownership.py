@@ -41,6 +41,13 @@ OWNERSHIP = {
     'api/usher/<str:token>/arrivals/': 'public',
     'api/invitations/<slug:slug>/events/<int:pk>/calendar.ics': 'public',
     'share/<slug:slug>/': 'public',
+    # The blog: live articles only (test_blog.py checks drafts stay hidden).
+    'api/blog/': 'public',
+    'api/blog/<slug:slug>/': 'public',
+    r'^blog/?$': 'public',
+    'blog/rss.xml': 'public',
+    r'^blog/(?P<slug>[-a-z0-9]+)/?$': 'public',
+    'sitemap-blog.xml': 'public',
     r'^og/(?P<slug>[-\w]+)/(?P<digest>[0-9a-f]{16})\.jpg$': 'public',
     r'^og/(?P<slug>[-\w]+)/(?P<code>[A-Za-z0-9]{4,12})/(?P<digest>[0-9a-f]{16})\.jpg$': 'public',
     rf'^{INVITATION}/?$': 'public',

@@ -28,4 +28,9 @@ urlpatterns = [
     path('vouchers/', v.VoucherListView.as_view()),
     path('vouchers/new-code/', v.VoucherCodeView.as_view()),
     path('vouchers/<int:pk>/', v.VoucherDetailView.as_view()),
+    path('articles/', v.ArticleListView.as_view()),
+    path('articles/preview/', v.ArticlePreviewView.as_view()),
+    path('articles/images/', v.ArticleImageView.as_view()),
+    path('articles/<int:pk>/', v.ArticleDetailView.as_view()),
+    path('articles/<int:pk>/cover/', v.ArticleCoverView.as_view()),
 ]

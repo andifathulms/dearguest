@@ -13,7 +13,7 @@ from . import staff_actions, themes, vouchers
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
-    Plan, Testimonial, Payment, AbuseReport, VoucherRedemption,
+    Plan, Testimonial, Payment, AbuseReport, VoucherRedemption, Article,
 )
 
 
@@ -362,3 +362,13 @@ class FunnelEventAdmin(admin.ModelAdmin):
         context = {'funnel_steps': [label for _, label in steps], 'funnel_rows': rows,
                    'funnel_sources': sources, 'funnel_source': source}
         return super().changelist_view(request, extra_context={**context, **(extra_context or {})})
+
+
+@admin.register(Article)
+class ArticleAdmin(AuditedDeletes, admin.ModelAdmin):
+    """The raw blog table. Articles are written in the backoffice
+    (/backoffice/artikel), which previews them as they'll appear."""
+    list_display = ['title', 'category', 'status', 'published_at', 'author_name']
+    list_filter = ['status', 'category']
+    search_fields = ['title', 'slug']
+    readonly_fields = ['created_by', 'created_at', 'updated_at']

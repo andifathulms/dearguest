@@ -725,3 +725,50 @@ class AbuseReport(models.Model):
 
     def __str__(self):
         return f'{self.get_reason_display()} · {self.url}'
+
+
+class Article(models.Model):
+    """A blog post on /blog (blog.py): written in the backoffice in a small
+    Markdown subset, shown to people by the SPA and to search engines and link
+    previews as server-rendered HTML. Live once published and its published_at
+    has passed (a future time schedules it)."""
+    CATEGORIES = [
+        ('inspirasi', 'Inspirasi'),
+        ('adat', 'Adat & budaya'),
+        ('persiapan', 'Persiapan pernikahan'),
+        ('etiket', 'Etiket undangan'),
+        ('panduan', 'Panduan Vowvella'),
+    ]
+    STATUSES = [('draft', 'Draf'), ('published', 'Terbit')]
+
+    title = models.CharField(max_length=140)
+    slug = models.SlugField(max_length=120, unique=True)
+    category = models.CharField(max_length=12, choices=CATEGORIES, default='inspirasi')
+    excerpt = models.CharField(max_length=200, blank=True, help_text='Ringkasan dan deskripsi untuk mesin pencari.')
+    body = models.TextField(blank=True, help_text='Markdown sederhana (blog.py).')
+    cover = SafeImageField(upload_to='blog/', validators=[validate_image_upload], null=True, blank=True)
+    cover_alt = models.CharField(max_length=160, blank=True)
+    theme = models.CharField(max_length=30, blank=True, help_text='Tema terkait (id di registry), opsional.')
+    author_name = models.CharField(max_length=80, default='Tim Vowvella')
+    seo_title = models.CharField(max_length=70, blank=True, help_text='Judul di hasil pencarian, bila beda dari judul.')
+    status = models.CharField(max_length=10, choices=STATUSES, default='draft')
+    published_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-published_at', '-created_at']
+        verbose_name = 'Artikel'
+        verbose_name_plural = 'Artikel'
+
+    def __str__(self):
+        return self.title
+
+
+class ArticleImage(models.Model):
+    """An image placed inside an article's body (uploaded from the editor)."""
+    article = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True, blank=True, related_name='images')
+    image = SafeImageField(upload_to='blog/', validators=[validate_image_upload])
+    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True)

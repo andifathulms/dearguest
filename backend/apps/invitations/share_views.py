@@ -36,6 +36,7 @@ SITE_PATHS = {
     'tema', 'register', 'dashboard', 'forgot-password', 'reset-password', 'my',
     'onboarding', 'admin', 'api', 'media', 'share', 'og', 'static', 'assets', 'penerima',
     'social', 'theme-previews',   # frontend/public folders
+    'blog', 'backoffice', 'sitemap-blog.xml',
 }
 # Names kept free for pages the site is likely to add (legal, pricing, search pages).
 RESERVED_SLUGS = {

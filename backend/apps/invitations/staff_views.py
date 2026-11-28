@@ -10,7 +10,9 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django_otp import match_token
 from rest_framework import status
 from rest_framework.permissions import AllowAny, BasePermission
@@ -20,8 +22,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.auth_api.cookies import set_session
 
-from . import backoffice, staff_actions, vouchers
-from .models import AbuseReport, Coupon, Invitation, Payment, RSVP
+from . import backoffice, blog, staff_actions, themes, vouchers
+from .models import AbuseReport, Article, ArticleImage, Coupon, Invitation, Payment, RSVP
+from .uploads import validate_image_upload
 from .throttling import client_ip
 
 STAFF_CLAIM = 'staff_otp'
@@ -320,3 +323,131 @@ class VoucherCodeView(StaffView):
 
     def get(self, request):
         return Response({'code': vouchers.generate_code()})
+
+
+# ---- blog articles ----
+
+def _image_or_error(request, field='image'):
+    """The uploaded image, checked like every other upload, or a 400."""
+    f = request.FILES.get(field)
+    if not f:
+        return None, Response({field: 'Pilih gambar dulu.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        validate_image_upload(f)
+    except DjangoValidationError as exc:
+        return None, Response({field: ' '.join(exc.messages)}, status=status.HTTP_400_BAD_REQUEST)
+    return f, None
+
+
+class ArticleListView(StaffView):
+    """GET articles (?state=draft|scheduled|live, ?q=); POST to start one."""
+
+    def get(self, request):
+        now = timezone.now()
+        rows = [blog.staff_row(a, request) for a in Article.objects.order_by('-updated_at')]
+        counts = {k: sum(r['state'] == k for r in rows) for k in ('draft', 'scheduled', 'live')}
+        wanted, q = request.GET.get('state', ''), request.GET.get('q', '').strip().lower()
+        if wanted in counts:
+            rows = [r for r in rows if r['state'] == wanted]
+        if q:
+            rows = [r for r in rows if q in r['title'].lower() or q in r['slug']]
+        return Response({'results': rows, 'state_counts': counts, 'now': now.isoformat(),
+                         'categories': [{'key': k, 'label': v} for k, v in Article.CATEGORIES],
+                         'themes': [{'id': t, 'name': name} for t, name in themes.choices(include_hidden=False)],
+                         'can_delete': request.user.has_perm('invitations.delete_article')})
+
+    def post(self, request):
+        if not request.user.has_perm('invitations.add_article'):
+            return Response({'detail': 'Akun ini tidak boleh menulis artikel.'}, status=status.HTTP_403_FORBIDDEN)
+        fields, errors = blog.clean(request.data)
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        article = Article.objects.create(created_by=request.user, **fields)
+        staff_actions.record(request.user, article, f'Artikel dibuat: {article.title}')
+        return Response(blog.staff_detail(article, request), status=status.HTTP_201_CREATED)
+
+
+class ArticleDetailView(StaffView):
+    """GET one article to edit; PATCH to save (publishing included); DELETE
+    (owner: delete_article)."""
+
+    def get(self, request, pk):
+        return Response(blog.staff_detail(get_object_or_404(Article, pk=pk), request))
+
+    def patch(self, request, pk):
+        if not request.user.has_perm('invitations.change_article'):
+            return Response({'detail': 'Akun ini tidak boleh mengubah artikel.'}, status=status.HTTP_403_FORBIDDEN)
+        article = get_object_or_404(Article, pk=pk)
+        was = blog.state(article)
+        fields, errors = blog.clean(request.data, article)
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        for name, value in fields.items():
+            setattr(article, name, value)
+        article.save()
+        now = blog.state(article)
+        if now != was:
+            labels = {'draft': 'jadi draf', 'scheduled': 'dijadwalkan', 'live': 'diterbitkan'}
+            staff_actions.record(request.user, article, f'Artikel {labels[now]}: {article.title}')
+        return Response(blog.staff_detail(article, request))
+
+    def delete(self, request, pk):
+        if not request.user.has_perm('invitations.delete_article'):
+            return Response({'detail': 'Hanya pemilik yang bisa menghapus artikel.'}, status=status.HTTP_403_FORBIDDEN)
+        article = get_object_or_404(Article, pk=pk)
+        staff_actions.record(request.user, article, f'Artikel dihapus: {article.title}')
+        article.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ArticleCoverView(StaffView):
+    """POST image=<file> to set the cover; DELETE to remove it."""
+
+    def post(self, request, pk):
+        if not request.user.has_perm('invitations.change_article'):
+            return Response({'detail': 'Akun ini tidak boleh mengubah artikel.'}, status=status.HTTP_403_FORBIDDEN)
+        article = get_object_or_404(Article, pk=pk)
+        f, error = _image_or_error(request)
+        if error:
+            return error
+        if article.cover:
+            article.cover.delete(save=False)
+        article.cover = f
+        article.save(update_fields=['cover', 'updated_at'])
+        return Response(blog.staff_detail(article, request))
+
+    def delete(self, request, pk):
+        if not request.user.has_perm('invitations.change_article'):
+            return Response({'detail': 'Akun ini tidak boleh mengubah artikel.'}, status=status.HTTP_403_FORBIDDEN)
+        article = get_object_or_404(Article, pk=pk)
+        if article.cover:
+            article.cover.delete(save=False)
+            article.cover = None
+            article.save(update_fields=['cover', 'updated_at'])
+        return Response(blog.staff_detail(article, request))
+
+
+class ArticleImageView(StaffView):
+    """POST image=<file> (article=<id> optional): an image for an article's
+    body. Answers its URL and the line to paste into the text."""
+
+    def post(self, request):
+        if not request.user.has_perm('invitations.add_articleimage'):
+            return Response({'detail': 'Akun ini tidak boleh mengunggah gambar.'}, status=status.HTTP_403_FORBIDDEN)
+        f, error = _image_or_error(request)
+        if error:
+            return error
+        article = Article.objects.filter(pk=request.data.get('article') or 0).first()
+        image = ArticleImage.objects.create(article=article, image=f, created_by=request.user)
+        url = request.build_absolute_uri(image.image.url) if not image.image.url.startswith('http') else image.image.url
+        alt = str(request.data.get('alt') or '').replace(']', '').strip()
+        return Response({'url': url, 'markdown': f'![{alt}]({url})'}, status=status.HTTP_201_CREATED)
+
+
+class ArticlePreviewView(StaffView):
+    """POST {body}: the HTML the article will show, with its sections."""
+
+    def post(self, request):
+        body = str(request.data.get('body') or '')
+        return Response({'html': blog.render(body), 'toc': blog.headings(body),
+                         'reading_minutes': blog.reading_minutes(body), 'words': len(blog.plain_text(body).split())})

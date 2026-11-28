@@ -1,4 +1,6 @@
 from django.urls import path
+
+from . import blog
 from .csp import CSPReportView
 from .funnel import FunnelVisitView
 from .gifts import GiftConfirmCreateView, MyGiftDetail, MyGiftList
@@ -68,6 +70,8 @@ urlpatterns = [
     path('invitations/<slug:slug>/gift/', GiftConfirmCreateView.as_view()),
     path('invitations/<slug:slug>/events/<int:pk>/calendar.ics', EventCalendarView.as_view()),
     path('coupons/validate/', CouponValidateView.as_view()),
+    path('blog/', blog.ArticleListView.as_view()),
+    path('blog/<slug:slug>/', blog.ArticleDetailView.as_view()),
     path('music-presets/', MusicPresetListView.as_view()),
     path('invitations/<slug:slug>/guests/', GuestListCreateView.as_view()),
     path('invitations/<slug:slug>/guests/import/', GuestImportView.as_view()),
