@@ -12,7 +12,12 @@ from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.utils.timesince import timesince
 from django.core.exceptions import ValidationError
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from . import activity, backoffice, themes
 from .models import (
@@ -369,10 +374,79 @@ class PaymentAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
 
 
 @admin.register(CoupleProfile)
-class CoupleProfileAdmin(AuditedDeletes, admin.ModelAdmin):
-    list_display = ['user', 'whatsapp', 'max_invitations']
+class CoupleProfileAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
+    """The Pasangan page: the account behind each invitation, for answering
+    support chats. Payment totals show to the owner only."""
+    ops_tab = 'couples'
+    list_display = ['user', 'email', 'whatsapp', 'max_invitations', 'joined', 'last_login', 'invitation_links']
     list_editable = ['whatsapp', 'max_invitations']
-    search_fields = ['user__username', 'whatsapp']
+    list_filter = ['max_invitations']
+    search_fields = ['user__username', 'user__email', 'whatsapp', 'user__invitations__slug']
+    list_select_related = ['user']
+    ordering = ['-user__date_joined']
+    actions = ['allow_two_invitations', 'make_reset_link']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(user__is_staff=False).prefetch_related('user__invitations')
+
+    def get_list_display(self, request):
+        columns = list(super().get_list_display(request))
+        return columns + ['paid'] if backoffice.can_see_revenue(request.user) else columns
+
+    @admin.display(description='Email', ordering='user__email')
+    def email(self, obj):
+        return obj.user.email or '—'
+
+    @admin.display(description='Daftar', ordering='user__date_joined')
+    def joined(self, obj):
+        return obj.user.date_joined
+
+    @admin.display(description='Terakhir masuk', ordering='user__last_login')
+    def last_login(self, obj):
+        return obj.user.last_login or '—'
+
+    @admin.display(description='Undangan')
+    def invitation_links(self, obj):
+        invitations = list(obj.user.invitations.all())
+        if not invitations:
+            return '—'
+        return format_html_join(', ', '<a href="{}">{}</a>', (
+            (reverse('admin:invitations_invitation_change', args=[inv.pk]), inv.slug) for inv in invitations))
+
+    @admin.display(description='Dibayar')
+    def paid(self, obj):
+        total = Payment.objects.filter(invitation__couple_user=obj.user).aggregate(n=Sum('amount'))['n']
+        return backoffice.rupiah(total) if total else '—'
+
+    @admin.action(description='Izinkan 2 undangan (Bisnis)')
+    def allow_two_invitations(self, request, queryset):
+        for profile in queryset:
+            profile.max_invitations = max(profile.max_invitations, 2)
+            profile.save(update_fields=['max_invitations'])
+            audit(self, request, profile, 'Batas undangan dinaikkan ke 2')
+        self.message_user(request, f'{queryset.count()} akun boleh membuat 2 undangan.')
+
+    def has_reset_link_permission(self, request):
+        return request.user.is_superuser
+
+    @admin.action(description='Buat tautan reset sandi (kirim lewat WhatsApp)', permissions=['reset_link'])
+    def make_reset_link(self, request, queryset):
+        """Owner only: a reset link opens the account, so it's shown once, here,
+        for sending to the couple's own WhatsApp. It stops working once used
+        or once they log in."""
+        rows = []
+        for profile in queryset:
+            user = profile.user
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            link = f'{settings.FRONTEND_URL}/reset-password?uid={uid}&token={default_token_generator.make_token(user)}'
+            text = f'Halo, ini tautan untuk mengatur ulang kata sandi akun Vowvella kamu: {link}'
+            wa = f'https://wa.me/{profile.whatsapp_intl}?text={quote(text)}' if profile.whatsapp else ''
+            rows.append({'user': user, 'link': link, 'wa': wa})
+            audit(self, request, profile, 'Tautan reset sandi dibuat')
+        return TemplateResponse(request, 'admin/invitations/coupleprofile/reset_links.html', {
+            **self.admin_site.each_context(request), 'title': 'Tautan reset sandi', 'opts': self.model._meta,
+            'rows': rows,
+        })
 
 
 @admin.register(MusicPreset)

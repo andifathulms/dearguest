@@ -283,3 +283,52 @@ class InvitationListTests(APITestBase):
         self.assertEqual(inv.expires_at, before + timedelta(days=30))
         self.assertFalse(inv.watermark)
         self.assertEqual(ActivityEvent.objects.filter(kind='staff_action', invitation=inv).count(), 2)
+
+
+@override_settings(ADMIN_REQUIRE_OTP=False)
+class CouplesPageTests(APITestBase):
+    def setUp(self):
+        super().setUp()
+        self.web = Client()
+        self.couple = self.make_user('rani', email='rani@example.com')
+        self.profile = CoupleProfile.objects.create(user=self.couple, whatsapp='081234567890')
+        inv = self.make_invitation(owner=self.couple, slug='rani-dimas')
+        Payment.objects.create(invitation=inv, tier='premium', amount=99000)
+        User.objects.create_user('staf-lain', password=PASSWORD, is_staff=True)   # staff aren't couples
+        self.url = reverse('admin:invitations_coupleprofile_changelist')
+
+    def login(self, superuser):
+        user = User.objects.create_user('masuk', password=PASSWORD, is_staff=True, is_superuser=superuser)
+        if not superuser:
+            user.groups.add(Group.objects.get(name='Staf'))
+        self.web.force_login(user)
+
+    def test_owner_sees_payments_and_invitations(self):
+        self.login(superuser=True)
+        res = self.web.get(self.url)
+        self.assertEqual([p.user.username for p in res.context['cl'].result_list], ['rani'])
+        self.assertContains(res, 'rani-dimas')
+        self.assertContains(res, 'Rp 99.000')
+
+    def test_staff_do_not_see_payments_or_make_reset_links(self):
+        self.login(superuser=False)
+        res = self.web.get(self.url)
+        self.assertNotContains(res, '99.000')
+        self.assertNotIn('make_reset_link', dict(res.context['action_form'].fields['action'].choices))
+        res = self.web.post(self.url, {'action': 'make_reset_link', '_selected_action': [self.profile.pk]})
+        self.assertNotContains(res, 'reset-password?uid=', status_code=res.status_code)
+
+    def test_reset_link_works_once(self):
+        self.login(superuser=True)
+        res = self.web.post(self.url, {'action': 'make_reset_link', '_selected_action': [self.profile.pk]})
+        link = res.context['rows'][0]['link']
+        self.assertIn('wa.me/6281234567890', res.context['rows'][0]['wa'])
+        from urllib.parse import parse_qs, urlsplit
+        q = parse_qs(urlsplit(link).query)
+        ok = self.client.post('/api/auth/password-reset-confirm/', {
+            'uid': q['uid'][0], 'token': q['token'][0], 'password': 'An0ther-Strong-pass'}, format='json')
+        self.assertEqual(ok.status_code, 200)
+        again = self.client.post('/api/auth/password-reset-confirm/', {
+            'uid': q['uid'][0], 'token': q['token'][0], 'password': 'Yet-An0ther-pass'}, format='json')
+        self.assertEqual(again.status_code, 400)
+        self.assertTrue(ActivityEvent.objects.filter(kind='staff_action', meta__action='Tautan reset sandi dibuat').exists())

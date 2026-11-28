@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}
+<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Ringkasan</a> ›
+  <a href="{% url 'admin:invitations_coupleprofile_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> › {{ title }}</div>
+{% endblock %}
+{% block content %}
+<p>Kirim tautan ini hanya ke nomor WhatsApp atau email milik pasangan sendiri. Tautan berhenti berlaku setelah dipakai atau saat mereka masuk lagi. Halaman ini tidak bisa dibuka ulang: buat tautan baru bila perlu.</p>
+<table>
+  <thead><tr><th>Akun</th><th>Tautan</th><th>WhatsApp</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr><td>{{ r.user.username }}</td><td><input type="text" readonly value="{{ r.link }}" size="70" aria-label="Tautan reset untuk {{ r.user.username }}"></td>
+      <td>{% if r.wa %}<a href="{{ r.wa }}" target="_blank" rel="noopener">Kirim ↗</a>{% else %}nomor belum diisi{% endif %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p><a href="{% url 'admin:invitations_coupleprofile_changelist' %}">← Kembali ke daftar</a></p>
+{% endblock %}

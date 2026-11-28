@@ -4,6 +4,7 @@
   <a href="{% url 'admin:invitations_activationrequest_changelist' %}"{% if ops_tab == 'activations' %} class="on"{% endif %}>Aktivasi</a>
   <a href="{% url 'admin:ops_watch' %}"{% if ops_tab == 'watch' %} class="on"{% endif %}>Hari H</a>
   <a href="{% url 'admin:invitations_invitation_changelist' %}"{% if ops_tab == 'invitations' %} class="on"{% endif %}>Undangan</a>
+  <a href="{% url 'admin:invitations_coupleprofile_changelist' %}"{% if ops_tab == 'couples' %} class="on"{% endif %}>Pasangan</a>
   {% if ops_revenue %}<a href="{% url 'admin:invitations_payment_changelist' %}"{% if ops_tab == 'payments' %} class="on"{% endif %}>Pembayaran</a>{% endif %}
   <a href="{% url 'admin:ops_system' %}"{% if ops_tab == 'system' %} class="on"{% endif %}>Sistem</a>
 </nav>
