@@ -1,0 +1,12 @@
+{
+  "box": [
+    400,
+    90,
+    800,
+    560
+  ],
+  "ink": "#1e3b2c",
+  "accent": "#9e2f2c",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/betawi/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

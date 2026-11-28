@@ -1,0 +1,12 @@
+{
+  "box": [
+    430,
+    140,
+    770,
+    590
+  ],
+  "ink": "#2e2a25",
+  "accent": "#94573a",
+  "shadow": false,
+  "_generated": "GENERATED from frontend/src/themes/packs/arch/theme.json by scripts/sync_themes.py \u2014 do not edit by hand."
+}

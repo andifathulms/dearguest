@@ -433,6 +433,76 @@
       "pack": {
         "dir": "navy"
       }
+    },
+    {
+      "id": "betawi",
+      "name": "Kembang Kelapa",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/betawi.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/betawi.webm",
+        "mp4": "/theme-previews/betawi.mp4"
+      },
+      "demoSlug": "demo-kembang-kelapa",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Kembang kelapa warna-warni, lisplang gigi balang, pintu jalusi, dan langkan rumah kebaya hijau giok, dilukis di atas kertas krem.",
+        "category": "Pesona Nusantara",
+        "colors": [
+          "#fcf7e4",
+          "#1e3b2c",
+          "#9e2f2c"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#fcf7e4,#4a8161 55%,#9e2f2c)",
+        "card": {
+          "bg": "#fcf7e4",
+          "fg": "#1e3b2c",
+          "accent": "#9e2f2c"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "betawi"
+      }
+    },
+    {
+      "id": "arch",
+      "name": "Lengkung Pasir",
+      "collection": "signature",
+      "kind": "pack",
+      "status": "active",
+      "tier": "premium",
+      "previewImage": "/theme-previews/arch.webp",
+      "previewVideo": {
+        "webm": "/theme-previews/arch.webm",
+        "mp4": "/theme-previews/arch.mp4"
+      },
+      "demoSlug": "demo-lengkung-pasir",
+      "demoTemporary": true,
+      "catalog": {
+        "desc": "Satu lengkung plester pasir di cahaya sore, ranting zaitun bergaris tinta, dan vas terakota: bersih, tenang, tetap dilukis.",
+        "category": "Modern & Minimalis",
+        "colors": [
+          "#f2eadf",
+          "#2e2a25",
+          "#94573a"
+        ],
+        "previewClass": null,
+        "swatch": "linear-gradient(135deg,#f2eadf,#c9b49c 55%,#94573a)",
+        "card": {
+          "bg": "#f2eadf",
+          "fg": "#2e2a25",
+          "accent": "#94573a"
+        },
+        "badge": null
+      },
+      "pack": {
+        "dir": "arch"
+      }
     }
   ]
 }

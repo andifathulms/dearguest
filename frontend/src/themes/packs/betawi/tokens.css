@@ -1,0 +1,63 @@
+/* Betawi — Kembang Kelapa: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page cream is sampled from the paintings so art and page meet without a seam;
+   the ink is the rumah kebaya's jade, deepened to read as text, and the accent the
+   kembang kelapa's red, deepened to 6:1 on the cream. */
+.pk-root[data-pack='betawi'] {
+  /* colour */
+  --dg-bg: #fcf7e4;
+  --dg-bg-alt: rgba(166, 59, 55, 0.03);   /* a breath of kembang kelapa red */
+  --dg-surface: rgba(255, 252, 240, 0.8);
+  --dg-surface-raised: #fffcf0;
+  --dg-ink: #1e3b2c;
+  --dg-ink-muted: #3d5a49;
+  --dg-ink-faint: #7a8c7f;
+  --dg-accent: #9e2f2c;   /* kembang kelapa red */
+  --dg-on-accent: #fcf7e4;
+  --dg-line: rgba(30, 59, 44, 0.16);
+  --dg-line-strong: rgba(30, 59, 44, 0.36);
+  --dg-scrim: linear-gradient(180deg, rgba(30, 59, 44, 0.2) 0%, rgba(30, 59, 44, 0) 25%, rgba(30, 59, 44, 0.45) 60%, rgba(30, 59, 44, 0.8) 100%);
+  --dg-focus: #9e2f2c;
+
+  /* type */
+  --dg-font-display: 'DG Betawi Display', 'Yeseva One', Georgia, serif;
+  --dg-font-body: 'DG Betawi Body', 'Gelasio', Georgia, serif;
+  --dg-font-label: 'DG Betawi Label', 'Gelasio', Georgia, serif;
+  --dg-font-script: 'DG Betawi Script', 'Dancing Script', cursive;
+  --dg-fs-names: clamp(2.8rem, 13vw, 5rem);
+  --dg-fs-title: clamp(1.6rem, 6.4vw, 2.3rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 1.02rem;
+  --dg-fs-small: 0.94rem;
+  --dg-fs-label: 0.7rem;
+  --dg-lh-tight: 1.05;
+  --dg-lh-body: 1.7;
+  --dg-tracking-label: 0.2em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 10px;
+  --dg-radius-button: 999px;
+  --dg-radius-photo: 10px;   /* gallery; portraits are ovals in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 12px 32px rgba(31, 58, 44, 0.08);
+  --dg-shadow-float: 0 6px 20px rgba(31, 58, 44, 0.2);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

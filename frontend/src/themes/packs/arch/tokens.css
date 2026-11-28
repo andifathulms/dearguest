@@ -1,0 +1,63 @@
+/* Arch — Lengkung Pasir: tokens (see DESIGN.md). Every token in docs/theme-packs.md §2.
+   The page is the paintings' own sand plaster; the ink is the drawings' warm charcoal,
+   the accent the vase's terracotta, deepened to read as text (4.7:1). Square corners
+   and arched portraits: the pack's one shape is the arch. */
+.pk-root[data-pack='arch'] {
+  /* colour */
+  --dg-bg: #f2eadf;
+  --dg-bg-alt: rgba(162, 102, 71, 0.03);   /* a breath of terracotta */
+  --dg-surface: rgba(250, 246, 239, 0.8);
+  --dg-surface-raised: #faf6ef;
+  --dg-ink: #2e2a25;
+  --dg-ink-muted: #5b5248;
+  --dg-ink-faint: #8f8478;
+  --dg-accent: #94573a;   /* terracotta */
+  --dg-on-accent: #f7f2ea;
+  --dg-line: rgba(46, 42, 37, 0.14);
+  --dg-line-strong: rgba(46, 42, 37, 0.34);
+  --dg-scrim: linear-gradient(180deg, rgba(46, 42, 37, 0.2) 0%, rgba(46, 42, 37, 0) 25%, rgba(46, 42, 37, 0.45) 60%, rgba(46, 42, 37, 0.8) 100%);
+  --dg-focus: #94573a;
+
+  /* type */
+  --dg-font-display: 'DG Arch Display', 'Instrument Serif', Georgia, serif;
+  --dg-font-body: 'DG Arch Body', 'Manrope', system-ui, sans-serif;
+  --dg-font-label: 'DG Arch Label', 'Manrope', system-ui, sans-serif;
+  --dg-font-script: 'DG Arch Script', 'Ms Madi', cursive;
+  --dg-fs-names: clamp(2.9rem, 13.5vw, 5.4rem);
+  --dg-fs-title: clamp(1.9rem, 7.6vw, 2.7rem);
+  --dg-fs-subtitle: 1.5rem;
+  --dg-fs-body: 0.98rem;
+  --dg-fs-small: 0.9rem;
+  --dg-fs-label: 0.68rem;
+  --dg-lh-tight: 1;
+  --dg-lh-body: 1.75;
+  --dg-tracking-label: 0.24em;
+  --dg-weight-display: 400;
+
+  /* shape */
+  --dg-radius-card: 2px;
+  --dg-radius-button: 2px;
+  --dg-radius-photo: 2px;   /* gallery; portraits are arches in overrides.css */
+
+  /* space: 4 / 8 / 16 / 24 / 40 / 64 */
+  --dg-space-1: 0.25rem;
+  --dg-space-2: 0.5rem;
+  --dg-space-3: 1rem;
+  --dg-space-4: 1.5rem;
+  --dg-space-5: 2.5rem;
+  --dg-space-6: 4rem;
+  --dg-section-pad-y: clamp(4rem, 13vw, 7rem);
+  --dg-content-max: 720px;
+  --dg-gutter: 1.5rem;
+
+  /* depth */
+  --dg-shadow-card: 0 12px 32px rgba(31, 58, 44, 0.08);
+  --dg-shadow-float: 0 6px 20px rgba(31, 58, 44, 0.2);
+
+  /* motion */
+  --dg-dur-fast: 180ms;
+  --dg-dur-base: 800ms;
+  --dg-dur-slow: 2200ms;
+  --dg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dg-stagger: 90ms;
+}

@@ -12,11 +12,11 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 
 | Category | Promise | Live | Next candidates |
 |---|---|---|---|
-| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda), Gorga Ulos (Batak Toba), Jepun Prada (Bali), Limas Emas (Palembang) | Betawi (ondel-ondel motifs, *kembang kelapa*); Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
+| **Pesona Nusantara** | regional wedding heritage, shown with respect | Gebyok Sogan (Jawa), Gonjong Songket (Minang), Lamming Zamrud (Bugis), Siger Mega Mendung (Sunda), Gorga Ulos (Batak Toba), Jepun Prada (Bali), Limas Emas (Palembang), Kembang Kelapa (Betawi) | Melayu (tepak sirih, yellow and gold); Dayak; Toraja |
 | **Taman & Bunga** | botanical and painterly, suits any background | Merah Anggur (dark wine florals), Taman Sage (fresh watercolour), Pampas Kraft (kraft paper, pampas, dried flowers), Wisteria Lila (lilac wisteria, pastel), Mawar Malam (white blooms on deep navy), Anggrek Bulan (Tropis: monstera, palms and white moth orchids) | none queued |
-| *(later)* **Modern & Minimalis** | clean, editorial, photo-led | none yet | a painted-minimal pack: line-art florals or an arch, so it still has assets |
+| **Modern & Minimalis** | clean, editorial, photo-led, still painted | Lengkung Pasir (a plaster arch, an olive branch in ink line) | a second painted-minimal look (line-art florals) |
 
-**Suggested order.** First, section art for every live theme (`prompts/sections/`); then Betawi (Sunda, Rustic, Batak, Lavender, Bali, Navy Bloom, Palembang and Tropis are live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
+**Suggested order.** First, section art for every live theme (`prompts/sections/`); then Melayu (Sunda, Rustic, Batak, Lavender, Bali, Navy Bloom, Palembang, Tropis, Betawi and the first Modern & Minimalis pack are live), then one *Taman & Bunga* look per *Nusantara* look, so the catalogue stays balanced between couples who want heritage and couples who don't:
 1. Sunda (live)
 2. Rustic (live)
 3. Batak (live)
@@ -25,8 +25,8 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 6. Navy Bloom (live)
 7. Palembang (live)
 8. Tropis (live)
-9. Betawi
-10. Modern & Minimalis (the first painted-minimal pack)
+9. Betawi (live: "Kembang Kelapa"; section and scene art still to paint, in `PROMPT-BETAWI-ASSETS.md`)
+10. Modern & Minimalis (live: "Lengkung Pasir", id `arch`; section and scene art still to paint, in `PROMPT-ARCH-ASSETS.md`)
 11. Melayu
 
 ## Per-theme checklist (what worked)

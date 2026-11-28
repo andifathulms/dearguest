@@ -1,0 +1,148 @@
+/* Betawi — Kembang Kelapa: what tokens can't express (cap: 150 lines). See DESIGN.md. */
+
+/* The page is the same warm cream paper the paintings are on. */
+.pk-root[data-pack='betawi'] {
+  background: var(--dg-bg) url('./assets/texture.webp') repeat;
+  background-size: 256px 256px;
+  font-feature-settings: 'kern', 'liga';
+}
+
+/* Names in Dancing Script; titles in Yeseva One, labels in spaced Gelasio capitals. */
+.pk-root[data-pack='betawi'] :is(.cover-names, .hero-names) {
+  font-family: var(--dg-font-script);
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='betawi'] :is(.cover-amp, .hero-ampersand) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='betawi'] :is(.cover-label, .hero-label, .cover-guest-to, .countdown-label, .event-date, .story-date) {
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='betawi'] .section-title {
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-fs-title);
+  letter-spacing: 0.01em;
+}
+
+/* Cover: under the gigi balang valance, between the kembang kelapa. The calm zone is
+   ~25-73 % of the height in the middle 62 % of the width; the railing starts ~73 %. */
+.pk-root[data-pack='betawi'] .pk-cover--painted { place-items: center; }
+.pk-root[data-pack='betawi'] .pk-cover--painted .pk-cover-content {
+  width: min(62vw, 24rem);
+  padding-inline: 0;
+  gap: 0.45rem;
+  padding-block: 0 6vh;
+}
+@media (min-aspect-ratio: 1/1) {
+  /* wide: between the open doors and their kembang kelapa (calm ~33-67 % of the width) */
+  .pk-root[data-pack='betawi'] .pk-cover--painted .pk-cover-content { width: min(32vw, 26rem); padding-block: 8vh 0; }
+}
+.pk-root[data-pack='betawi'] .pk-cover--painted .cover-names { font-size: clamp(2.7rem, 12.5vw, 5rem); margin: 0.1rem 0 0.3rem; }
+.pk-root[data-pack='betawi'] .pk-cover .pk-monogram { display: none; }
+.pk-root[data-pack='betawi'] .cover-guest { margin-top: 0.3rem; }
+.pk-root[data-pack='betawi'] .cover-guest-to { letter-spacing: 0.16em; }
+.pk-root[data-pack='betawi'] .cover-guest-name { font-family: var(--dg-font-body); font-style: italic; font-size: clamp(1.3rem, 5.4vw, 1.65rem); }
+.pk-root[data-pack='betawi'] .pk-cover .pk-open-btn { margin-top: 0.6rem; }
+
+/* Jade pill buttons with cream text, like the painted woodwork. */
+.pk-root[data-pack='betawi'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn) {
+  border: 1px solid rgba(30, 59, 44, 0.5);
+  background: linear-gradient(180deg, #4a8161, #356a4d);
+  color: var(--dg-on-accent);
+  font-family: var(--dg-font-label);
+  letter-spacing: 0.14em;
+  box-shadow: var(--dg-shadow-float);
+}
+.pk-root[data-pack='betawi'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn):hover { background: #2a5640; color: var(--dg-on-accent); }
+.pk-root[data-pack='betawi'] :is(.bank-copy-btn, .map-load, .rsvp-toggle-btn) { border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='betawi'] .rsvp-toggle-btn.active { background: #356a4d; border-color: #356a4d; color: var(--dg-on-accent); }
+
+/* Photo frames are ovals inside the flower ring (photo-ring.webp). Its gold ring's
+   opening is ~x 19-82 %, y 24-69 % of the art; the photo sits just inside it, so the
+   ring extends past the photo by 30 % (sides), 53 % (top) and 69 % (bottom) of the photo
+   width; --w is the photo width. */
+.pk-root[data-pack='betawi'] .pk-photo-frame {
+  --w: min(40vw, 180px);
+  width: var(--w);
+  aspect-ratio: 0.78;
+  margin: calc(var(--w) * 0.5) auto calc(var(--w) * 0.62);
+}
+.pk-root[data-pack='betawi'] .pk-photo-frame .profile-photo {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 96%, transparent 100%);
+}
+.pk-root[data-pack='betawi'] .pk-photo-ring { inset: -52% -30% -68% -30%; }
+.pk-root[data-pack='betawi'] .pk-photo-ring img { width: 100%; height: 100%; }
+
+/* Hero. Phones: content between the bands (the valance and lamps ~0.4 W deep; the
+   railing's top rail ~0.47 W above the bottom, the small kembang kelapa ~0.7 W at the
+   edges). The railing band's paper is lifted out, so the far kampung roofs
+   (parallax-back) stand behind the railing, showing between its balusters, and rise as
+   it sinks (depth -0.1). The near kembang kelapa (parallax-front) are pushed half past
+   the edges. Wide screens show the desktop painting, so the depth layers stay hidden. */
+.pk-root[data-pack='betawi'] .pk-hero--framed { padding-block: 7rem 6rem; }
+@media (max-aspect-ratio: 1/1) {
+  .pk-root[data-pack='betawi'] .pk-hero--framed[data-bands] { padding-block: 46vw 102vw; }
+}
+.pk-root[data-pack='betawi'] .pk-hero--framed .hero-content { gap: 0.5rem; }
+.pk-root[data-pack='betawi'] .pk-hero-portrait { --w: min(36vw, 160px); }
+.pk-root[data-pack='betawi'] .pk-hero .pk-parallax-back {
+  inset: auto 0 22vw;
+  opacity: 0.7;
+  -webkit-mask-image: linear-gradient(transparent, #000 22%);
+  mask-image: linear-gradient(transparent, #000 22%);
+}
+.pk-root[data-pack='betawi'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='betawi'] .pk-hero .pk-parallax-front { inset: 0 -36vw; }
+.pk-root[data-pack='betawi'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 24%; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='betawi'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
+}
+.pk-root[data-pack='betawi'] :is(.hero-ornament, .pk-hero--framed .hero-scroll-cue) { display: none; }
+.pk-root[data-pack='betawi'] .hero-bismillah { font-size: 1.2rem; color: var(--dg-accent); }
+
+/* Greeting, verse and closing in Gelasio italic. */
+.pk-root[data-pack='betawi'] :is(.greeting-text, .pk-closing p, .scripture-text) {
+  font-family: var(--dg-font-body);
+  font-style: italic;
+  font-size: clamp(1.1rem, 4.4vw, 1.35rem);
+  line-height: 1.6;
+  color: var(--dg-ink);
+}
+
+/* Cards: cream with a jade hairline and a thin red rule along the top, like the
+   railing's tumpal band. */
+.pk-root[data-pack='betawi'] :is(.event-card, .bank-card, .wish-card, .rsvp-success) {
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-line);
+  border-top: 3px solid rgba(158, 47, 44, 0.75);
+  border-radius: var(--dg-radius-card);
+  box-shadow: var(--dg-shadow-card);
+}
+.pk-root[data-pack='betawi'] :is(.event-type, .profile-name, .map-event-label) {
+  font-family: var(--dg-font-script);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 10.5vw, 3.1rem);
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='betawi'] .countdown-unit {
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-card);
+  background: var(--dg-surface);
+}
+.pk-root[data-pack='betawi'] .countdown-value { font-family: var(--dg-font-display); color: var(--dg-ink); }
+.pk-root[data-pack='betawi'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(255, 252, 240, 0.85); border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='betawi'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
+
+/* Closing: the valance-and-flower corners hang over the last words as a lintel (the
+   melati strings must hang down, so the second corner is mirrored, not rotated). */
+.pk-root[data-pack='betawi'] .pk-closing { padding-block: clamp(14rem, 60vw, 18rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
+.pk-root[data-pack='betawi'] .pk-closing .pk-corner { width: min(52vw, 240px); }
+.pk-root[data-pack='betawi'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }

@@ -1,0 +1,147 @@
+/* Arch — Lengkung Pasir: what tokens can't express (cap: 150 lines). See DESIGN.md. */
+
+/* The page is the same sand plaster the paintings are on. */
+.pk-root[data-pack='arch'] {
+  background: var(--dg-bg) url('./assets/texture.webp') repeat;
+  background-size: 256px 256px;
+  font-feature-settings: 'kern', 'liga';
+}
+
+/* Names in Instrument Serif italic, large and light; titles in its roman; labels in
+   widely spaced Manrope capitals. Ms Madi only for the ampersand and the event names. */
+.pk-root[data-pack='arch'] :is(.cover-names, .hero-names) {
+  font-family: var(--dg-font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='arch'] :is(.cover-amp, .hero-ampersand) {
+  font-family: var(--dg-font-script);
+  font-style: normal;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='arch'] :is(.cover-label, .hero-label, .cover-guest-to, .countdown-label, .event-date, .story-date) {
+  font-family: var(--dg-font-label);
+  font-weight: 600;
+  color: var(--dg-accent);
+}
+.pk-root[data-pack='arch'] .section-title {
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-fs-title);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Cover: inside the arch. Its opening is ~22-78 % of the width; the curve tops out at
+   ~19 % and the sill starts ~84 %. The olive branch climbs the left rim, up to ~55 %,
+   with leaves reaching ~30 % in: phones crop the painting's sides, so the block sits a
+   little right of centre to clear them. */
+.pk-root[data-pack='arch'] .pk-cover--painted { place-items: center; }
+.pk-root[data-pack='arch'] .pk-cover--painted .pk-cover-content {
+  width: min(60vw, 22rem);
+  padding-inline: 0;
+  gap: 0.5rem;
+  padding-block: 8vh 0;
+  translate: 6vw 0;
+}
+@media (min-aspect-ratio: 1/1) {
+  /* wide: inside the central arch (~34-66 % of the width, from ~12 % down) */
+  .pk-root[data-pack='arch'] .pk-cover--painted .pk-cover-content { width: min(28vw, 24rem); padding-block: 14vh 0; translate: none; }
+}
+.pk-root[data-pack='arch'] .pk-cover--painted .cover-names { font-size: clamp(2.6rem, 12vw, 4.8rem); line-height: 1; margin: 0.2rem 0 0.4rem; }
+.pk-root[data-pack='arch'] .pk-cover .pk-monogram { display: none; }
+.pk-root[data-pack='arch'] .cover-guest { margin-top: 0.4rem; }
+.pk-root[data-pack='arch'] .cover-guest-to { letter-spacing: 0.24em; }
+.pk-root[data-pack='arch'] .cover-guest-name { font-family: var(--dg-font-display); font-style: italic; font-size: clamp(1.4rem, 5.8vw, 1.75rem); }
+.pk-root[data-pack='arch'] .pk-cover .pk-open-btn { margin-top: 0.8rem; white-space: nowrap; }
+
+/* Charcoal buttons with square corners and spaced capitals; outlines elsewhere. */
+.pk-root[data-pack='arch'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn) {
+  border: 1px solid var(--dg-ink);
+  background: var(--dg-ink);
+  color: var(--dg-on-accent);
+  font-family: var(--dg-font-label);
+  letter-spacing: 0.22em;
+  box-shadow: none;
+}
+.pk-root[data-pack='arch'] :is(.pk-open-btn, .rsvp-submit, .wa-share-btn):hover { background: var(--dg-accent); border-color: var(--dg-accent); color: var(--dg-on-accent); }
+.pk-root[data-pack='arch'] :is(.bank-copy-btn, .map-load, .rsvp-toggle-btn) { border-color: var(--dg-line-strong); color: var(--dg-ink); }
+.pk-root[data-pack='arch'] .rsvp-toggle-btn.active { background: var(--dg-ink); border-color: var(--dg-ink); color: var(--dg-on-accent); }
+
+/* Photo frames are arches inside the painted arch frame (photo-ring.webp). Its opening
+   is ~x 21-79 %, y 19-82 % of the art: the photo fills it (aspect 0.65), so the frame
+   extends past the photo by 36 % (sides), 30 % (top) and 30 % (bottom) of the photo
+   width; --w is the photo width. */
+.pk-root[data-pack='arch'] .pk-photo-frame {
+  --w: min(40vw, 180px);
+  width: var(--w);
+  aspect-ratio: 0.65;
+  margin: calc(var(--w) * 0.36) auto calc(var(--w) * 0.36);
+}
+.pk-root[data-pack='arch'] .pk-photo-frame .profile-photo { border-radius: 999px 999px 0 0 / calc(var(--w) * 0.5) calc(var(--w) * 0.5) 0 0; }
+.pk-root[data-pack='arch'] .pk-photo-ring { inset: -29.5% -36.5% -30% -36.5%; }
+.pk-root[data-pack='arch'] .pk-photo-ring img { width: 100%; height: 100%; }
+
+/* Hero. Phones: one arch the full height of the section. The bands carry its curved
+   top (~0.72 W deep, with the sprig) and its sill (~0.5 W); between them hero-mid, a
+   slice of plain rim and plaster, repeats down the section, so the arch stays whole at
+   any height. The far colonnade (parallax-back) stands inside the arch, between the
+   names and the sill; the near olive branches (parallax-front) hang over both rims. Wide screens
+   show the desktop painting, so the depth layers stay hidden. */
+.pk-root[data-pack='arch'] .pk-hero--framed { padding-block: 9rem 5rem; }
+@media (max-aspect-ratio: 1/1) {
+  .pk-root[data-pack='arch'] .pk-hero--framed[data-bands] {
+    padding-block: 52vw 96vw;
+    background: url('./assets/hero-mid.webp') repeat-y 50% 0 / 100% auto;
+  }
+}
+.pk-root[data-pack='arch'] .pk-hero--framed .hero-content { gap: 0.55rem; }
+.pk-root[data-pack='arch'] .pk-hero-portrait { --w: min(34vw, 150px); }
+.pk-root[data-pack='arch'] .pk-hero .pk-parallax-back {
+  inset: auto 13vw 40vw;
+  opacity: 0.6;
+  -webkit-mask-image: linear-gradient(#000 70%, transparent);
+  mask-image: linear-gradient(#000 70%, transparent);
+}
+.pk-root[data-pack='arch'] .pk-hero .pk-parallax-back img { height: auto; }
+.pk-root[data-pack='arch'] .pk-hero .pk-parallax-front { inset: 0 -34vw; }
+.pk-root[data-pack='arch'] .pk-hero .pk-parallax-front img { object-fit: contain; object-position: 50% 20%; }
+@media (min-aspect-ratio: 1/1) {
+  .pk-root[data-pack='arch'] .pk-hero :is(.pk-parallax-back, .pk-parallax-front) { display: none; }
+}
+.pk-root[data-pack='arch'] :is(.hero-ornament, .pk-hero--framed .hero-scroll-cue) { display: none; }
+.pk-root[data-pack='arch'] .hero-bismillah { font-size: 1.2rem; color: var(--dg-accent); }
+
+/* Greeting, verse and closing in Instrument Serif italic. */
+.pk-root[data-pack='arch'] :is(.greeting-text, .pk-closing p, .scripture-text) {
+  font-family: var(--dg-font-display);
+  font-style: italic;
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+  line-height: 1.5;
+  color: var(--dg-ink);
+}
+
+/* Cards: flat plaster panels with a hairline, no shadow. */
+.pk-root[data-pack='arch'] :is(.event-card, .bank-card, .wish-card, .rsvp-success) {
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-card);
+  box-shadow: none;
+}
+.pk-root[data-pack='arch'] :is(.event-type, .profile-name, .map-event-label) {
+  font-family: var(--dg-font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.2rem, 9.5vw, 2.8rem);
+  color: var(--dg-ink);
+}
+.pk-root[data-pack='arch'] .countdown-unit { border: 0; border-bottom: 1px solid var(--dg-line-strong); border-radius: 0; background: transparent; }
+.pk-root[data-pack='arch'] .countdown-value { font-family: var(--dg-font-display); font-weight: 400; color: var(--dg-ink); }
+.pk-root[data-pack='arch'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(250, 246, 239, 0.85); border-color: var(--dg-line-strong); border-radius: 2px; color: var(--dg-ink); }
+.pk-root[data-pack='arch'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
+
+/* Closing: the olive corners lean in over the last words as a lintel, mirrored. */
+.pk-root[data-pack='arch'] .pk-closing { padding-block: clamp(12rem, 52vw, 16rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
+.pk-root[data-pack='arch'] .pk-closing .pk-corner { width: min(48vw, 220px); }
+.pk-root[data-pack='arch'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
