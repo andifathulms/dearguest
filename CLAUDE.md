@@ -138,6 +138,20 @@ Vowvella's own operator app. It is separate from the Django admin, which stays t
 - Demo invitations are left out of every count.
 - Gateway orders and partner commissions wait for STRATEGY-REVIEW B4/B7.
 
+### Vouchers
+- **Model:** the `Coupon` model, shown as "Voucher". The rules are in `vouchers.py`, the browser copy of the maths in
+  `frontend/src/utils/vouchers.js`; keep the two in step (both have tests).
+- **Discount and limits:** percent (with an optional rupiah cap) or a nominal amount; limited to plans
+  (`premium`/`bisnis`, empty = both); a quota; a start and end time (WIB in the form); once per account.
+- **Lifecycle:** a couple pastes the code on the landing page (price preview only) or in the editor's publish card
+  (`/api/my/invitations/<slug>/voucher/`). The editor claims a place in the quota as a `VoucherRedemption`.
+  Confirming the payment (backoffice Aktivasi, or the admin action) re-checks the voucher for the paid plan and
+  redeems it; recording no voucher releases the claim. Claims lock the voucher row, so the quota can't be overrun.
+- **Managing:** vouchers are made and changed in `/backoffice/voucher` by the owner (the coupon permissions; Staf only
+  reads). Once used, a voucher keeps its code and discount and can only be deactivated.
+- `Coupon.expires_at` is superseded by `ends_at` (migration 0057) and unused. Drop it in a later release, as a
+  two-step change (RUNBOOK §1).
+
 ### Production: the VPS
 The generic procedure (rollback, restore, rotating secrets, incidents) is in `RUNBOOK.md`. This VPS:
 - Tencent Cloud Lighthouse 2C4G, Jakarta, Ubuntu 24.04, prepaid until 2027-11-24. No domain yet, so the

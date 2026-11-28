@@ -122,6 +122,9 @@ class CouponToVoucherMigrationTests(MigrationTestCase):
     migrate_to = '0057_vouchers_data'
 
     def setUpBeforeMigration(self, apps):
+        # Other TransactionTestCases flush the plans migration 0045 seeds.
+        apps.get_model('invitations', 'Plan').objects.update_or_create(
+            slug='premium', defaults={'name': 'Premium', 'price': 99000})
         Coupon = apps.get_model('invitations', 'Coupon')
         Payment = apps.get_model('invitations', 'Payment')
         coupon = Coupon.objects.create(code='CINTA20', discount_percent=20, expires_at=date(2026, 12, 31))
