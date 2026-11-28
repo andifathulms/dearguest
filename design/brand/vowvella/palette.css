@@ -1,0 +1,12 @@
+:root{
+  --malam:#17111A;      /* dark stage */
+  --malam-2:#251C28;    /* raised on dark */
+  --porcelain:#FBF9F6;  /* light reading */
+  --paper:#F2EDE6;      /* light secondary */
+  --ink:#221A1F;        /* text on light */
+  --on-malam:#F3ECE6;   /* text on dark */
+  --prada:#D2AE62;      /* gold: thin line only */
+  --prada-deep:#8E6A2C; /* gold on light */
+  --font-display:'Instrument Serif',serif;
+  --font-ui:'Plus Jakarta Sans',sans-serif;
+}

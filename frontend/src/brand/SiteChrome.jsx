@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useSession } from '../api/session.js'
 import { Icon } from './icons.jsx'
 import { NAV, WA_HELP } from './site.js'
+import Logo from './Logo.jsx'
 
 // Header for every marketing page. `tone="light"` sits on porcelain pages;
 // the default is the dark "malam" stage. A logged-in couple sees "Undangan
@@ -20,7 +21,7 @@ export function SiteNav({ tone = 'dark' }) {
   return (
     <header className={`dg-nav ${tone === 'light' ? 'light' : ''}`}>
       <div className="dg-container dg-nav-inner">
-        <Link to="/" className="dg-brand" aria-label="Vowvella, beranda">Vow<i>vella</i></Link>
+        <Link to="/" className="dg-brand" aria-label="Vowvella, beranda"><Logo /></Link>
         <nav className="dg-nav-links" aria-label="Menu utama">
           {NAV.map(n => (
             <Link key={n.to} to={n.to} aria-current={pathname === n.to ? 'page' : undefined}>{n.label}</Link>
@@ -73,7 +74,7 @@ export function SiteFooter() {
       <div className="dg-container">
         <div className="dg-footer-grid">
           <div>
-            <Link to="/" className="dg-brand">Vow<i>vella</i></Link>
+            <Link to="/" className="dg-brand"><Logo /></Link>
             <p>Undangan pernikahan digital berlukis untuk pasangan Indonesia. Satu tautan untuk semua tamu.</p>
           </div>
           <div>

@@ -5,6 +5,7 @@ import useWaMessages from '../components/useWaMessages.js'
 import { defaultTemplate, renderMessage, TEMPLATE_KEYS, unknownVariables, VARIABLES } from '../utils/waTemplate.js'
 import { normaliseWhatsapp, waLink } from '../utils/whatsapp.js'
 import { guestUrl } from '../utils/publicUrl.js'
+import Logo from '../brand/Logo.jsx'
 import '../brand/brand.css'
 import './Dashboard.css'
 import './DashboardRSVP.css'
@@ -145,7 +146,7 @@ export default function SendQueuePage() {
     <div className="dr">
       <header className="dr-bar dg dg-inline dg-dark">
         <div className="dr-bar-left">
-          <Link to="/my" className="dg-brand">Dear<i>Guest</i></Link>
+          <Link to="/my" className="dg-brand"><Logo /></Link>
           <h1>Kirim Undangan<small>{slug}</small></h1>
         </div>
         <div className="dr-bar-actions">

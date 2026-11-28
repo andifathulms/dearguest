@@ -245,7 +245,7 @@ export default function UsherPage() {
   if (!data) {
     return (
       <div className="dg us us-center">
-        <p className="us-brand">Dear<i>Guest</i> · Penerima Tamu</p>
+        <p className="us-brand">Vowvella · Penerima Tamu</p>
         <p>{problem || 'Memuat daftar tamu…'}</p>
         {problem && <button type="button" className="dg-btn dg-btn-line" onClick={load}>Coba lagi</button>}
       </div>

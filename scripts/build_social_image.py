@@ -15,9 +15,11 @@ PACKS = ROOT / 'frontend/src/themes/packs'
 OUT = ROOT / 'frontend/public/social/vowvella.jpg'
 SIZE = (1200, 630)
 BAND = (0, 205, 1200, 425)
-INK = (61, 71, 65)
 ACCENT = (138, 111, 62)
 FONTS = PACKS / 'sage/fonts'
+# The brand kit's lockup, rendered from logo/vowvella-lockup-on-porcelain.svg.
+LOCKUP = ROOT / 'design/brand/vowvella/exports/lockup-on-porcelain-300.png'
+LOCKUP_HEIGHT = 84
 
 
 def covers():
@@ -44,10 +46,11 @@ def main():
     image = Image.alpha_composite(base, band)
 
     draw = ImageDraw.Draw(image)
-    brand = ImageFont.truetype(str(FONTS / 'script-400.woff2'), 104)
     tag = ImageFont.truetype(str(FONTS / 'label-500.woff2'), 26)
     cx, cy = SIZE[0] / 2, (BAND[1] + BAND[3]) / 2
-    draw.text((cx, cy - 18), 'Vowvella', font=brand, fill=INK, anchor='ms')
+    lockup = Image.open(LOCKUP).convert('RGBA')
+    lockup = lockup.resize((round(lockup.width * LOCKUP_HEIGHT / lockup.height), LOCKUP_HEIGHT), Image.LANCZOS)
+    image.alpha_composite(lockup, (round(cx - lockup.width / 2), round(cy - 18 - LOCKUP_HEIGHT)))
     tagline = 'UNDANGAN PERNIKAHAN DIGITAL'
     spacing = 5
     width = sum(tag.getlength(c) for c in tagline) + spacing * (len(tagline) - 1)

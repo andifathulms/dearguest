@@ -7,6 +7,7 @@ import { getTheme, themeName } from '../themes/registry.js'
 import { Icon } from '../brand/icons.jsx'
 import { waLink } from '../brand/site.js'
 import AccountData from '../components/AccountData.jsx'
+import Logo from '../brand/Logo.jsx'
 import '../brand/brand.css'
 import './MyInvitations.css'
 
@@ -85,7 +86,7 @@ export default function MyInvitationsPage() {
     <div className="dg mi">
       <header className="mi-topbar dg-dark">
         <div className="dg-container mi-topbar-inner">
-          <Link to="/" className="dg-brand">Dear<i>Guest</i></Link>
+          <Link to="/" className="dg-brand"><Logo /></Link>
           <div className="mi-topbar-actions">
             <Link to="/tema" className="mi-toplink">Galeri tema</Link>
             <button type="button" className="dg-btn dg-btn-line dg-btn-sm" onClick={logout}>Keluar</button>

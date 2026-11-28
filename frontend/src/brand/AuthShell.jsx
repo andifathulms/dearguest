@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { selectableThemes } from '../themes/registry.js'
 import { chosenTheme } from '../utils/themeChoice.js'
+import Logo from './Logo.jsx'
 import './brand.css'
 import './AuthShell.css'
 
@@ -26,7 +27,7 @@ export default function AuthShell({ children, wide = false }) {
   return (
     <div className={`dg auth ${wide ? 'auth-is-wide' : ''}`}>
       <aside className="auth-art dg-dark" aria-hidden="true">
-        <Link to="/" className="dg-brand" tabIndex={-1}>Dear<i>Guest</i></Link>
+        <Link to="/" className="dg-brand" tabIndex={-1}><Logo /></Link>
         {cover && (
           <div className="auth-art-phone dg-phone">
             <img key={cover.id} src={cover.previewImage} alt="" className="auth-art-img" />
@@ -35,7 +36,7 @@ export default function AuthShell({ children, wide = false }) {
         {cover && <p className="auth-art-cap">Tema <b>{cover.name}</b> · {cover.category}</p>}
       </aside>
       <main className="auth-main">
-        <Link to="/" className="dg-brand auth-mobile-brand">Dear<i>Guest</i></Link>
+        <Link to="/" className="dg-brand auth-mobile-brand"><Logo /></Link>
         {children}
       </main>
     </div>

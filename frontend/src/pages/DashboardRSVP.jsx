@@ -9,6 +9,7 @@ import WishModeration from '../components/WishModeration.jsx'
 import GiftLog from '../components/GiftLog.jsx'
 import Headcount from '../components/Headcount.jsx'
 import VenueSetup from '../components/VenueSetup.jsx'
+import Logo from '../brand/Logo.jsx'
 import '../brand/brand.css'
 import './Dashboard.css'
 import './DashboardRSVP.css'
@@ -67,7 +68,7 @@ export default function DashboardRSVP() {
     <div className="dr">
       <header className="dr-bar dg dg-inline dg-dark">
         <div className="dr-bar-left">
-          <Link to="/my" className="dg-brand">Dear<i>Guest</i></Link>
+          <Link to="/my" className="dg-brand"><Logo /></Link>
           <h1>Tamu &amp; RSVP<small>{slug}</small></h1>
         </div>
         <div className="dr-bar-actions">
