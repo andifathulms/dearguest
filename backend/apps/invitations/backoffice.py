@@ -7,6 +7,8 @@ script, as the CSP wants. Any staff user sees them; revenue needs the
     <admin>/ops/aktivitas/   the activity feed (ActivityEvent), filterable
     <admin>/ops/hari-h/      weddings in the next 14 days and how ready they are
     <admin>/ops/tema/        which theme packs are chosen, go live and are paid for
+    <admin>/ops/pertumbuhan/ funnel per traffic source, coupon use
+    <admin>/ops/pendapatan/  revenue by month, tier, channel and coupon (owner)
     <admin>/ops/sistem/      the deep health check, job runs, retention queue
 
 Theme demo invitations (seed_demos) are left out of every count."""
@@ -17,15 +19,17 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Count, Q, Sum
+from django.db.models.functions import TruncMonth
 from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.timesince import timesince
 
 from . import activity, health, ops, retention, themes
-from .models import AbuseReport, ActivityEvent, FunnelEvent, Guest, Invitation, Payment, RSVP
+from .models import AbuseReport, ActivityEvent, Coupon, FunnelEvent, Guest, Invitation, Payment, RSVP
 
 WATCH_DAYS_OVERVIEW = 7
 WATCH_DAYS = 14
@@ -336,4 +340,65 @@ def themes_view(request):
     days = 90
     return _page(request, 'admin/vowvella/themes.html', 'Tema', {
         'rows': theme_rows(timezone.now() - timedelta(days=days)), 'days': days,
+    })
+
+
+def _pct(part, whole):
+    return f'{round(part / whole * 100)}%' if whole else '—'
+
+
+def growth_view(request):
+    """Funnel per traffic source over the last WEEKS weeks, and coupon use.
+    Amounts per coupon only for the owner."""
+    weeks = 12
+    today = timezone.localdate()
+    since = today - timedelta(days=today.weekday(), weeks=weeks - 1)
+    counts = {}
+    for r in FunnelEvent.objects.filter(week__gte=since).values('utm_source', 'step').annotate(n=Count('id')):
+        counts.setdefault(r['utm_source'] or '(langsung)', {})[r['step']] = r['n']
+    sources = []
+    for name, c in counts.items():
+        visit, register, onboarded = c.get('visit', 0), c.get('register', 0), c.get('onboarded', 0)
+        sources.append({'name': name, 'visit': visit, 'register': register, 'onboarded': onboarded,
+                        'to_register': _pct(register, visit), 'to_onboarded': _pct(onboarded, register)})
+    sources.sort(key=lambda r: (-r['register'], -r['visit']))
+    coupons = (Coupon.objects.annotate(used=Count('payments'), revenue=Sum('payments__amount'))
+               .order_by('-used', 'code'))
+    revenue = can_see_revenue(request.user)
+    return _page(request, 'admin/vowvella/growth.html', 'Pertumbuhan', {
+        'sources': sources, 'weeks': weeks, 'since': since,
+        'coupons': [{'c': c, 'revenue': rupiah(c.revenue) if revenue and c.revenue else ''} for c in coupons],
+    })
+
+
+def revenue_view(request):
+    """Owner only: what came in, from the payments recorded at activation."""
+    if not can_see_revenue(request.user):
+        raise PermissionDenied
+    now = timezone.localtime()
+    since = (now.replace(day=1, hour=0, minute=0, second=0, microsecond=0) - timedelta(days=335)).replace(day=1)
+    payments = Payment.objects.filter(created_at__gte=since)
+    by_month = {r['m'].date(): r for r in payments.annotate(m=TruncMonth('created_at'))
+                .values('m').annotate(total=Sum('amount'), n=Count('id'))}
+    months, cursor = [], since.date()
+    while cursor <= now.date():
+        r = by_month.get(cursor, {})
+        months.append({'month': cursor, 'total': r.get('total') or 0, 'n': r.get('n', 0)})
+        cursor = (cursor + timedelta(days=32)).replace(day=1)
+    top = max((m['total'] for m in months), default=0) or 1
+    for m in months:
+        m['pct'], m['label'] = round(m['total'] / top * 100), rupiah(m['total'])
+
+    def split(field, labels):
+        rows = payments.values(field).annotate(total=Sum('amount'), n=Count('id')).order_by('-total')
+        return [{'name': labels.get(r[field], r[field] or '(tanpa)'), 'total': rupiah(r['total']), 'n': r['n']}
+                for r in rows]
+
+    total = payments.aggregate(total=Sum('amount'), n=Count('id'))
+    return _page(request, 'admin/vowvella/revenue.html', 'Pendapatan', {
+        'months': months, 'since': since, 'total': rupiah(total['total']), 'count': total['n'],
+        'average': rupiah((total['total'] or 0) // total['n']) if total['n'] else '—',
+        'by_tier': split('tier', dict(Invitation.TIER_CHOICES)),
+        'by_channel': split('channel', dict(Payment.CHANNELS)),
+        'by_coupon': split('coupon__code', {}),
     })

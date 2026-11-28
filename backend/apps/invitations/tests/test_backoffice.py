@@ -397,3 +397,44 @@ class ThemesPageTests(APITestBase):
                          (2, 1, 1, 1, 1))
         self.assertEqual((rows[b]['total'], rows[b]['to']), (1, 1))
         self.assertEqual(res.context['rows'][0]['id'], a)   # paid first
+
+
+@override_settings(ADMIN_REQUIRE_OTP=False)
+class GrowthAndRevenueTests(APITestBase):
+    def setUp(self):
+        super().setUp()
+        from apps.invitations import funnel
+        for step, n in (('visit', 10), ('register', 4), ('onboarded', 2)):
+            for _ in range(n):
+                funnel.record(step, {'utm_source': 'ig'})
+        funnel.record('visit')
+        self.coupon = Coupon.objects.create(code='MUA10', discount_percent=10)
+        inv = self.make_invitation()
+        Payment.objects.create(invitation=inv, tier='premium', amount=89000, channel='qris', coupon=self.coupon)
+        Payment.objects.create(invitation=inv, tier='bisnis', amount=179000)
+        self.web = Client()
+
+    def login(self, superuser):
+        user = User.objects.create_user('masuk', password=PASSWORD, is_staff=True, is_superuser=superuser)
+        if not superuser:
+            user.groups.add(Group.objects.get(name='Staf'))
+        self.web.force_login(user)
+
+    def test_growth_by_source_without_amounts_for_staff(self):
+        self.login(superuser=False)
+        res = self.web.get(reverse('admin:ops_growth'))
+        ig = next(r for r in res.context['sources'] if r['name'] == 'ig')
+        self.assertEqual((ig['visit'], ig['register'], ig['to_register'], ig['to_onboarded']), (10, 4, '40%', '50%'))
+        self.assertIn('(langsung)', [r['name'] for r in res.context['sources']])
+        self.assertEqual(res.context['coupons'][0]['c'].used, 1)
+        self.assertNotContains(res, '89.000')
+        self.assertEqual(self.web.get(reverse('admin:ops_revenue')).status_code, 403)
+
+    def test_revenue_for_the_owner(self):
+        self.login(superuser=True)
+        res = self.web.get(reverse('admin:ops_revenue'))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['total'], 'Rp 268.000')
+        self.assertEqual(len(res.context['months']), 12)
+        self.assertEqual(res.context['months'][-1]['total'], 268000)
+        self.assertEqual([r['name'] for r in res.context['by_coupon']], ['(tanpa)', 'MUA10'])

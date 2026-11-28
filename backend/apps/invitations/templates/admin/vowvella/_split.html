@@ -1,0 +1,5 @@
+{% if rows %}
+<table><tbody>
+  {% for r in rows %}<tr><td>{{ r.name }}</td><td class="ops-num">{{ r.n }}×</td><td class="ops-num">{{ r.total }}</td></tr>{% endfor %}
+</tbody></table>
+{% else %}<p class="ops-empty">Belum ada pembayaran.</p>{% endif %}

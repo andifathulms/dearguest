@@ -8,6 +8,8 @@
   <a href="{% url 'admin:invitations_rsvp_changelist' %}?wish_status__exact=pending"{% if ops_tab == 'wishes' %} class="on"{% endif %}>Ucapan</a>
   <a href="{% url 'admin:invitations_abusereport_changelist' %}"{% if ops_tab == 'reports' %} class="on"{% endif %}>Laporan</a>
   <a href="{% url 'admin:ops_themes' %}"{% if ops_tab == 'themes' %} class="on"{% endif %}>Tema</a>
-  {% if ops_revenue %}<a href="{% url 'admin:invitations_payment_changelist' %}"{% if ops_tab == 'payments' %} class="on"{% endif %}>Pembayaran</a>{% endif %}
+  <a href="{% url 'admin:ops_growth' %}"{% if ops_tab == 'growth' %} class="on"{% endif %}>Pertumbuhan</a>
+  {% if ops_revenue %}<a href="{% url 'admin:ops_revenue' %}"{% if ops_tab == 'revenue' %} class="on"{% endif %}>Pendapatan</a>
+  <a href="{% url 'admin:invitations_payment_changelist' %}"{% if ops_tab == 'payments' %} class="on"{% endif %}>Pembayaran</a>{% endif %}
   <a href="{% url 'admin:ops_system' %}"{% if ops_tab == 'system' %} class="on"{% endif %}>Sistem</a>
 </nav>
