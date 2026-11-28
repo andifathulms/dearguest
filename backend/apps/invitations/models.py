@@ -379,27 +379,88 @@ class MusicPreset(models.Model):
 
 
 class Coupon(models.Model):
-    """Promo code shown on the pricing page; redeemed manually over WhatsApp."""
+    """A voucher: a code a couple pastes (landing page, editor) for money off a
+    paid plan. Created in the backoffice; the rules live in vouchers.py.
+
+    Percent vouchers take `discount_percent` off, capped at `max_discount` if
+    set; nominal ones take `discount_amount` rupiah off, never below zero.
+    `quota` is how many invitations may use it (empty: unlimited), counted
+    from VoucherRedemption. The table keeps its old name (Coupon) so codes
+    made before vouchers keep working."""
+    TYPES = [('percent', 'Persentase'), ('amount', 'Nominal')]
+
     code = models.CharField(max_length=30, unique=True)
-    discount_percent = models.PositiveIntegerField(default=0)  # 0–100
+    discount_type = models.CharField(max_length=8, choices=TYPES, default='percent')
+    discount_percent = models.PositiveIntegerField(default=0)  # 1–100, for percent vouchers
+    discount_amount = models.PositiveIntegerField(default=0, help_text='Rupiah, untuk voucher nominal.')
+    max_discount = models.PositiveIntegerField(null=True, blank=True,
+                                               help_text='Potongan maksimal (Rp) untuk voucher persentase.')
+    plans = models.JSONField(default=list, blank=True, help_text='Slug paket yang boleh; kosong = semua paket berbayar.')
+    quota = models.PositiveIntegerField(null=True, blank=True, help_text='Berapa undangan boleh memakai. Kosong = tanpa batas.')
+    once_per_account = models.BooleanField(default=True)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
     description = models.CharField(max_length=200, blank=True)
     active = models.BooleanField(default=True)
-    expires_at = models.DateField(null=True, blank=True)
+    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    # Superseded by ends_at (migration 0056 copied it). Unused; drop in a later
+    # release (RUNBOOK §1, destructive changes ship in two deploys).
+    expires_at = models.DateField(null=True, blank=True, editable=False)
+
+    class Meta:
+        verbose_name = 'Voucher'
+        verbose_name_plural = 'Voucher'
 
     def save(self, *args, **kwargs):
         self.code = self.code.strip().upper()
         super().save(*args, **kwargs)
 
     def is_valid(self):
-        from datetime import date
-        if not self.active:
-            return False
-        if self.expires_at and date.today() > self.expires_at:
-            return False
-        return 1 <= self.discount_percent <= 100
+        """Usable right now, ignoring who asks and for which plan (vouchers.check
+        has the full rules)."""
+        from . import vouchers
+        return vouchers.state(self) == 'active'
+
+    def label(self):
+        if self.discount_type == 'amount':
+            return f"Rp{self.discount_amount:,}".replace(',', '.')
+        return f"{self.discount_percent}%"
 
     def __str__(self):
-        return f"{self.code} (-{self.discount_percent}%)"
+        return f"{self.code} (-{self.label()})"
+
+
+class VoucherRedemption(models.Model):
+    """One invitation using a voucher. `claimed` when the couple pastes the code
+    (it holds a place in the quota), `redeemed` when staff confirm the payment,
+    `released` when the code is removed. Kept when the invitation or account is
+    deleted (link cleared), so paid uses still count."""
+    STATUSES = [('claimed', 'Dipakai, belum bayar'), ('redeemed', 'Lunas'), ('released', 'Dilepas')]
+
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='redemptions')
+    invitation = models.ForeignKey(Invitation, on_delete=models.SET_NULL, null=True, blank=True, related_name='voucher_uses')
+    user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    status = models.CharField(max_length=10, choices=STATUSES, default='claimed')
+    tier = models.CharField(max_length=10, blank=True)                 # the plan it was redeemed for
+    discount = models.PositiveIntegerField(default=0)                  # rupiah off, set when redeemed
+    payment = models.OneToOneField('Payment', on_delete=models.SET_NULL, null=True, blank=True, related_name='voucher_use')
+    created_at = models.DateTimeField(auto_now_add=True)
+    redeemed_at = models.DateTimeField(null=True, blank=True)
+    released_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Pemakaian voucher'
+        verbose_name_plural = 'Pemakaian voucher'
+        constraints = [
+            # One live voucher per invitation.
+            models.UniqueConstraint(fields=['invitation'], condition=models.Q(status='claimed'),
+                                    name='one_claimed_voucher_per_invitation'),
+        ]
+
+    def __str__(self):
+        return f'{self.coupon.code} · {self.get_status_display()}'
 
 
 class Plan(models.Model):

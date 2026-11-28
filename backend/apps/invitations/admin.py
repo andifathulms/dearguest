@@ -13,7 +13,7 @@ from . import staff_actions, themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
-    Plan, Testimonial, Payment, AbuseReport,
+    Plan, Testimonial, Payment, AbuseReport, VoucherRedemption,
 )
 
 
@@ -260,11 +260,27 @@ class MusicPresetAdmin(admin.ModelAdmin):
     list_editable = ['order']
 
 
+class VoucherRedemptionInline(admin.TabularInline):
+    model = VoucherRedemption
+    extra = 0
+    fields = ['invitation', 'status', 'tier', 'discount', 'created_at', 'redeemed_at']
+    readonly_fields = fields
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Coupon)
 class CouponAdmin(AuditedDeletes, admin.ModelAdmin):
-    list_display = ['code', 'discount_percent', 'active', 'expires_at', 'description']
-    list_editable = ['discount_percent', 'active', 'expires_at']
-    search_fields = ['code']
+    """The raw voucher table. Day to day vouchers are made in the backoffice
+    (/backoffice/voucher), which checks the rules in vouchers.py."""
+    list_display = ['code', 'discount_type', 'discount_percent', 'discount_amount', 'quota', 'starts_at', 'ends_at', 'active']
+    list_editable = ['active']
+    list_filter = ['active', 'discount_type']
+    search_fields = ['code', 'description']
+    readonly_fields = ['created_by', 'created_at']
+    inlines = [VoucherRedemptionInline]
 
 
 @admin.register(Plan)
