@@ -19,6 +19,8 @@ const InvitationPage = lazy(() => import('./pages/InvitationPage.jsx'))
 const UsherPage = lazy(() => import('./pages/UsherPage.jsx'))
 const WelcomeScreen = lazy(() => import('./pages/WelcomeScreen.jsx'))
 const BackofficeApp = lazy(() => import('./backoffice/BackofficeApp.jsx'))
+const BlogPage = lazy(() => import('./pages/blog/BlogPage.jsx'))
+const ArticlePage = lazy(() => import('./pages/blog/ArticlePage.jsx'))
 
 function Loading() {
   return (
@@ -36,6 +38,8 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/tema" element={<ThemesGalleryPage />} />
           <Route path="/tema/:id" element={<ThemeDetailPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<ArticlePage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<DashboardLogin />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

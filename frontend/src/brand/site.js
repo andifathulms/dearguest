@@ -11,5 +11,6 @@ export const NAV = [
   { label: 'Tema', to: '/tema' },
   { label: 'Cara Kerja', to: '/#cara-kerja' },
   { label: 'Harga', to: '/#harga' },
+  { label: 'Blog', to: '/blog' },
   { label: 'FAQ', to: '/#faq' },
 ]

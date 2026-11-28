@@ -11,6 +11,8 @@ import { SiteNav, SiteFooter, StickyBar, useHashScroll } from '../brand/SiteChro
 import { Icon } from '../brand/icons.jsx'
 import { WA_HELP, waLink } from '../brand/site.js'
 import { DEFAULT_PLANS, formatRp } from '../brand/plans.js'
+import { ArticleCard } from './blog/blogShared.jsx'
+import './blog/Blog.css'
 import '../brand/brand.css'
 import './Home.css'
 
@@ -332,6 +334,29 @@ function Testimonials({ items }) {
   )
 }
 
+// The three newest articles; the section stays away until there is one.
+function FromTheBlog() {
+  const [articles, setArticles] = useState([])
+  useEffect(() => {
+    api.get('/blog/', { params: { limit: 3 } }).then(res => setArticles(res.data.results)).catch(() => {})
+  }, [])
+  if (!articles.length) return null
+  return (
+    <section className="dg-band paper" id="blog">
+      <div className="dg-container">
+        <div className="dg-head hm-head-row">
+          <div className="hm-head-text">
+            <p className="dg-eyebrow">Dari blog</p>
+            <h2 className="dg-h2">Cerita, adat, dan <em>persiapan</em></h2>
+          </div>
+          <Link to="/blog" className="dg-link hm-all">Semua artikel</Link>
+        </div>
+        <div className="bl-grid">{articles.map(a => <ArticleCard key={a.slug} a={a} />)}</div>
+      </div>
+    </section>
+  )
+}
+
 function Faq() {
   const [open, setOpen] = useState(0)
   return (
@@ -390,6 +415,7 @@ export default function LandingPage() {
         <Steps />
         <Pricing plans={plans} />
         <Testimonials items={testimonials} />
+        <FromTheBlog />
         <Faq />
         <Closing />
       </main>

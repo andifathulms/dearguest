@@ -83,6 +83,7 @@ export function SiteFooter() {
               <li><Link to="/tema">Galeri tema</Link></li>
               <li><Link to="/#cara-kerja">Cara kerja</Link></li>
               <li><Link to="/#harga">Harga</Link></li>
+              <li><Link to="/blog">Blog</Link></li>
               <li><Link to="/#faq">FAQ</Link></li>
             </ul>
           </div>
