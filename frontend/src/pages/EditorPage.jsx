@@ -22,6 +22,7 @@ const photoFiltersFor = themeId => {
 import ImageCropper from '../components/ui/ImageCropper.jsx'
 import { compressImage } from '../utils/compressImage.js'
 import { formatRp } from '../brand/plans.js'
+import { normaliseCode, voucherLabel } from '../utils/vouchers.js'
 import '../brand/brand.css'
 import './Editor.css'
 import { copyText } from '../utils/clipboard.js'
@@ -659,19 +660,76 @@ function ChecklistCard({ inv }) {
 }
 
 /* ---------------- Publish / activation ---------------- */
+// A voucher code the couple pastes before paying: it holds their place in the
+// voucher's quota and shows the prices after it (backend vouchers.py).
+function VoucherBox({ slug, onChange }) {
+  const [state, setState] = useState(null)   // { voucher, prices }
+  const [code, setCode] = useState('')
+  const [open, setOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  useEffect(() => {
+    api.get(`/my/invitations/${slug}/voucher/`).then(({ data }) => { setState(data); onChange(data) }).catch(() => {})
+  }, [slug, onChange])
+
+  async function apply(e) {
+    e.preventDefault()
+    const clean = normaliseCode(code)
+    if (!clean) return
+    setBusy(true)
+    setErr('')
+    try {
+      const { data } = await api.post(`/my/invitations/${slug}/voucher/`, { code: clean })
+      setState(data); onChange(data); setCode(''); setOpen(false)
+    } catch (ex) {
+      setErr(ex.response?.status === 429 ? 'Terlalu banyak percobaan. Coba lagi sebentar lagi.'
+        : ex.response?.data?.detail || 'Kode tidak bisa dipakai.')
+    } finally { setBusy(false) }
+  }
+  async function remove() {
+    setBusy(true)
+    try { const { data } = await api.delete(`/my/invitations/${slug}/voucher/`); setState(data); onChange(data) }
+    finally { setBusy(false) }
+  }
+
+  const v = state?.voucher
+  if (v) {
+    return (
+      <div className="ed-voucher on">
+        <span><b>Voucher {v.code}</b> · potongan {voucherLabel(v)}</span>
+        <button type="button" className="ed-mini" onClick={remove} disabled={busy}>Lepas</button>
+      </div>
+    )
+  }
+  if (!open) return <button type="button" className="ed-voucher-toggle" onClick={() => setOpen(true)}>Punya kode voucher?</button>
+  return (
+    <form className="ed-voucher" onSubmit={apply}>
+      <input className="ed-input" aria-label="Kode voucher" value={code} autoFocus placeholder="tempel kode voucher"
+        style={{ maxWidth: '220px', textTransform: 'uppercase', letterSpacing: '0.06em' }}
+        onChange={e => setCode(e.target.value.toUpperCase())} />
+      <button className="ed-btn ed-btn-sm" type="submit" disabled={busy}>{busy ? '…' : 'Pakai'}</button>
+      {err && <p className="ed-pub-err">{err}</p>}
+    </form>
+  )
+}
+
 function PublishCard({ inv, reload, notify }) {
   const [code, setCode] = useState('')
   const [reqLoading, setReqLoading] = useState(false)
   const [activating, setActivating] = useState(false)
   const [err, setErr] = useState('')
   const [plans, setPlans] = useState([])
+  const [voucher, setVoucher] = useState(null)   // { voucher, prices } from VoucherBox
+  const onVoucher = useCallback(data => setVoucher(data), [])
   useEffect(() => {
     if (inv.is_active) return
     api.get('/site/marketing/').then(({ data }) => setPlans((data.plans || []).filter(p => p.price > 0))).catch(() => {})
   }, [inv.is_active])
 
+  const voucherCode = voucher?.voucher?.code
   const waUrl = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
-    `Halo admin, saya ingin mengaktifkan undangan "${inv.slug}". Saya sudah melakukan pembayaran (bukti terlampir). Mohon kode aktivasinya.`
+    `Halo admin, saya ingin mengaktifkan undangan "${inv.slug}"${voucherCode ? ` dengan voucher ${voucherCode}` : ''}. `
+    + 'Saya sudah melakukan pembayaran (bukti terlampir). Mohon kode aktivasinya.'
   )}`
 
   if (inv.is_active) {
@@ -717,10 +775,16 @@ function PublishCard({ inv, reload, notify }) {
           <strong>Hubungi admin & kirim bukti pembayaran.</strong>
           {plans.length > 0 && (
             <p className="ed-pub-plans">
-              {plans.map(p => <span key={p.slug}><b>{p.name}</b> {formatRp(p.price)}</span>)}
+              {plans.map(p => {
+                const after = voucher?.voucher && voucher.prices?.[p.slug]
+                return after && after.discount
+                  ? <span key={p.slug}><b>{p.name}</b> <s>{formatRp(p.price)}</s> {formatRp(after.final)}</span>
+                  : <span key={p.slug}><b>{p.name}</b> {formatRp(p.price)}</span>
+              })}
               <small>sekali bayar per undangan</small>
             </p>
           )}
+          <VoucherBox slug={inv.slug} onChange={onVoucher} />
           <div className="ed-pub-row">
             {inv.activation_requested
               ? <span className="ed-saved">✓ Permintaan aktivasi terkirim</span>

@@ -205,3 +205,10 @@
 .ed-aud-new { flex: 1 1 12rem; min-width: 0; }
 .ed-aud-groups .ed-hint { flex-basis: 100%; margin: 0.2rem 0 0; }
 .ed-aud-tag { font-weight: 400; color: #8a7a5a; }
+
+/* Voucher code on the publish card (EditorPage VoucherBox) */
+.ed-voucher-toggle { background: none; border: 0; padding: 0; margin: 2px 0 8px; font: inherit; font-size: 0.85rem; color: var(--dg-ink-soft); text-decoration: underline; text-decoration-color: var(--dg-line); text-underline-offset: 4px; cursor: pointer; }
+.ed-voucher { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: 2px 0 10px; }
+.ed-voucher .ed-pub-err { flex-basis: 100%; margin: 0; }
+.ed-voucher.on { justify-content: space-between; padding: 0.55rem 0.8rem; border-radius: 10px; background: #F6ECD8; color: var(--dg-prada-deep); font-size: 0.88rem; }
+.ed-pub-plans s { color: var(--dg-muted); margin-right: 2px; }

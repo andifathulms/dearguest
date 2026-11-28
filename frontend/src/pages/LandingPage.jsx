@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client.js'
+import { normaliseCode, priceWith, voucherLabel } from '../utils/vouchers.js'
 import { selectableThemes } from '../themes/registry.js'
 import { variantOptions } from '../copy/copy.js'
 import { trackVisit } from '../utils/funnel.js'
@@ -221,14 +222,20 @@ function Coupon({ coupon, setCoupon }) {
   const [open, setOpen] = useState(false)
   const [code, setCode] = useState('')
   const [status, setStatus] = useState('')
+  const [reason, setReason] = useState('')
   async function apply(e) {
     e.preventDefault()
-    if (!code.trim()) return
+    const clean = normaliseCode(code)
+    if (!clean) return
     setStatus('checking')
     try {
-      const res = await api.get('/coupons/validate/', { params: { code } })
-      if (res.data.valid) { setCoupon(res.data); setStatus('ok') } else { setCoupon(null); setStatus('bad') }
-    } catch { setStatus('bad') }
+      const res = await api.get('/coupons/validate/', { params: { code: clean } })
+      if (res.data.valid) { setCoupon(res.data); setStatus('ok') } else { setCoupon(null); setReason(res.data.reason || ''); setStatus('bad') }
+    } catch (err) {
+      setCoupon(null)
+      setReason(err.response?.status === 429 ? 'Terlalu banyak percobaan. Coba lagi sebentar lagi.' : '')
+      setStatus('bad')
+    }
   }
   if (!open && !coupon) {
     return <button type="button" className="hm-promo-toggle" onClick={() => setOpen(true)}>Punya kode promo?</button>
@@ -238,18 +245,22 @@ function Coupon({ coupon, setCoupon }) {
       <label htmlFor="hm-coupon" className="dg-label">Kode promo</label>
       <div className="hm-coupon-row">
         <input id="hm-coupon" className="dg-input" value={code} autoFocus={!coupon}
-          onChange={e => setCode(e.target.value.toUpperCase())} placeholder="mis. CINTA20" />
+          onChange={e => setCode(e.target.value.toUpperCase())} placeholder="tempel kode voucher" />
         <button type="submit" className="dg-btn dg-btn-line" disabled={status === 'checking'}>Pakai</button>
       </div>
-      {status === 'ok' && coupon && <p className="hm-coupon-ok">{coupon.code}: potongan {coupon.discount_percent}% diterapkan pada harga di atas.</p>}
-      {status === 'bad' && <p className="hm-coupon-bad">Kode tidak berlaku. Periksa ejaannya atau tanyakan ke admin.</p>}
+      {status === 'ok' && coupon && (
+        <p className="hm-coupon-ok">
+          {coupon.code}: potongan {voucherLabel(coupon)} diterapkan pada harga di atas.
+          {' '}Tempel kode ini lagi saat mengaktifkan undangan.
+        </p>
+      )}
+      {status === 'bad' && <p className="hm-coupon-bad">{reason || 'Kode tidak berlaku. Periksa ejaannya atau tanyakan ke admin.'}</p>}
     </form>
   )
 }
 
 function Pricing({ plans }) {
   const [coupon, setCoupon] = useState(null)
-  const pct = coupon?.discount_percent || 0
   return (
     <section className="dg-band" id="harga">
       <div className="dg-container">
@@ -260,8 +271,8 @@ function Pricing({ plans }) {
         </div>
         <div className="hm-prices" style={{ '--cols': `repeat(${Math.min(plans.length, 3)}, minmax(0, 1fr))` }}>
           {plans.map(p => {
-            const final = pct && p.price ? Math.round(p.price * (1 - pct / 100)) : p.price
-            const was = pct && p.price ? p.price : p.compare_at_price
+            const final = coupon ? priceWith(coupon, p.slug, p.price) : p.price
+            const was = final !== p.price ? p.price : p.compare_at_price
             return (
               <div key={p.slug} className={`hm-plan ${p.is_featured ? 'dg-dark featured' : ''}`}>
                 <div className="hm-plan-top">
