@@ -1,4 +1,4 @@
-// Scene art (prompts/scenes; docs/theme-packs.md §4, §9) on the two pilot packs:
+// Scene art (prompts/scenes; docs/theme-packs.md §4, §9) on the packs that have it:
 // the countdown in its painting, props beside the headings, the attire pair
 // when a couple shows no photos, and the evening closing. A pack without the
 // slots keeps the page it always had.
@@ -9,7 +9,7 @@ import { NOW, SLUG, settle, stubInvitation, waitRevealed } from './stub.js'
 const PAGE = `/${SLUG}?to=Budi+Santoso`
 const SECTION_CSS = new URL('./sections.css', import.meta.url).pathname
 const fixture = JSON.parse(fs.readFileSync(new URL('./fixtures/invitation.json', import.meta.url), 'utf8'))
-const PILOTS = [['minang', 3], ['javanese', 4]]   // pack, number of props
+const PILOTS = [['minang', 3], ['javanese', 4], ['betawi', 4], ['arch', 4]]   // pack, number of props
 
 async function open(page, overrides) {
   await page.clock.setFixedTime(NOW)
