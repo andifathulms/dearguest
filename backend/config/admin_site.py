@@ -34,6 +34,7 @@ class VowvellaAdminSite(AdminSite):
             path('ops/aktivitas/', self.admin_view(backoffice.activity_view), name='ops_activity'),
             path('ops/hari-h/', self.admin_view(backoffice.watch_view), name='ops_watch'),
             path('ops/sistem/', self.admin_view(backoffice.system_view), name='ops_system'),
+            path('ops/tema/', self.admin_view(backoffice.themes_view), name='ops_themes'),
         ] + super().get_urls()
 
     def index(self, request, extra_context=None):

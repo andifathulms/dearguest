@@ -6,6 +6,7 @@ script, as the CSP wants. Any staff user sees them; revenue needs the
     <admin>/                 Ringkasan: counts, funnel, wedding-day watch, feed
     <admin>/ops/aktivitas/   the activity feed (ActivityEvent), filterable
     <admin>/ops/hari-h/      weddings in the next 14 days and how ready they are
+    <admin>/ops/tema/        which theme packs are chosen, go live and are paid for
     <admin>/ops/sistem/      the deep health check, job runs, retention queue
 
 Theme demo invitations (seed_demos) are left out of every count."""
@@ -306,4 +307,33 @@ def system_view(request):
         'expiring': real_invitations().filter(is_active=True, expires_at__gte=today,
                                               expires_at__lte=today + timedelta(days=7)).count(),
         'activity_rows': ActivityEvent.objects.count(),
+    })
+
+
+def theme_rows(since):
+    """One row per registered theme: invitations on it now (all, live, paid),
+    and what the activity feed saw since `since` (new drafts, switches)."""
+    today = timezone.localdate()
+    invs = real_invitations()
+    now_on = {r['theme']: r for r in invs.values('theme').annotate(
+        total=Count('id'), live=Count('id', filter=status_filter('live', today)),
+        paid=Count('id', filter=~Q(tier='free')))}
+    events = ActivityEvent.objects.filter(created_at__gte=since)
+    created = dict(events.filter(kind='invitation_created').values_list('meta__theme').annotate(n=Count('id')))
+    to = dict(events.filter(kind='theme_changed').values_list('meta__new').annotate(n=Count('id')))
+    away = dict(events.filter(kind='theme_changed').values_list('meta__old').annotate(n=Count('id')))
+    rows = []
+    for tid, entry in themes.entries().items():
+        r = now_on.get(tid, {})
+        rows.append({'id': tid, 'name': entry['name'], 'status': entry['status'], 'tier': entry.get('tier', ''),
+                     'total': r.get('total', 0), 'live': r.get('live', 0), 'paid': r.get('paid', 0),
+                     'created': created.get(tid, 0), 'to': to.get(tid, 0), 'away': away.get(tid, 0)})
+    rows.sort(key=lambda r: (-r['paid'], -r['total'], r['name']))
+    return rows
+
+
+def themes_view(request):
+    days = 90
+    return _page(request, 'admin/vowvella/themes.html', 'Tema', {
+        'rows': theme_rows(timezone.now() - timedelta(days=days)), 'days': days,
     })

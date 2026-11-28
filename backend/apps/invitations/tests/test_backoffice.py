@@ -377,3 +377,23 @@ class ModerationTests(APITestBase):
         self.web.post(reverse('admin:invitations_rsvp_changelist'), {'action': 'hide_wishes', '_selected_action': [rsvp.pk]})
         rsvp.refresh_from_db()
         self.assertEqual(rsvp.wish_status, 'hidden')
+
+
+@override_settings(ADMIN_REQUIRE_OTP=False)
+class ThemesPageTests(APITestBase):
+    def test_counts_per_theme(self):
+        selectable = [t for t in themes.entries() if themes.is_selectable(t)]
+        a, b = selectable[0], selectable[1]
+        self.make_invitation(slug='satu', theme=a, tier='premium')
+        self.make_invitation(slug='dua', theme=a, active=False)
+        moved = self.make_invitation(slug='tiga', theme=b)
+        activity.record('theme_changed', moved, old=a, new=b)
+        activity.record('invitation_created', moved, theme=a)
+        web = Client()
+        web.force_login(User.objects.create_user('bantu', password=PASSWORD, is_staff=True))
+        res = web.get(reverse('admin:ops_themes'))
+        rows = {r['id']: r for r in res.context['rows']}
+        self.assertEqual((rows[a]['total'], rows[a]['live'], rows[a]['paid'], rows[a]['away'], rows[a]['created']),
+                         (2, 1, 1, 1, 1))
+        self.assertEqual((rows[b]['total'], rows[b]['to']), (1, 1))
+        self.assertEqual(res.context['rows'][0]['id'], a)   # paid first
