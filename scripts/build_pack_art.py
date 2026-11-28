@@ -497,6 +497,70 @@ PACKS = {
         # no painted texture was delivered: warm white paper, the paintings' own
         'texture_synth': {'size': 512, 'rgb': (252, 251, 246), 'grain': 1.3, 'weave': 0, 'mottle': 0.5},
     },
+    'betawi': {
+        # Cut-outs on cobalt (~#1E46BE delivered); jade, red, cerise, marigold and gold have
+        # no blues -> despill, and edge_fill for the kembang kelapa's thin streamers.
+        'despill': True,
+        'edge_fill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg (the cover again, with a small kembang kelapa at each foot): the valance
+        # and lamps end ~22 %; the tall kembang kelapa at the sides run ~24-55 % and are left
+        # out; the small ones and the railing start ~61 %, so the band shows the tall ones'
+        # poles rising behind.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.235, 'bottom', 0.08, 1080),
+            # the paper is lifted out, so the far roofs show behind the railing
+            ('hero-bottom', 'hero.jpg', 0.585, 1.0, 'top', 0.08, 1080, (252, 247, 228)),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (29, 70, 190), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (33, 72, 194), 720, (26, 64), 2, False),
+            # Prompt 8: the kampung roofs from ~45 % to the bottom edge, kept down to ~78 %
+            # (the rest stands behind the railing); the near kembang kelapa at both
+            # sides, ~13-81 %.
+            ('parallax-back', 'parallax-back.jpg', (30, 69, 192), 1080, (26, 64), 2, False, (0, 0.43, 1, 0.78)),
+            ('parallax-front', 'parallax-front.jpg', (29, 70, 192), 1080, (26, 64), 2, False, (0, 0.1, 1, 0.84)),
+        ],
+        # painted 2 across x 3 down, on a flat key to the bottom edge
+        'sprites': ('petals-sheet.jpg', (35, 70, 186), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
+        'sprites_grid': (3, 2),
+        'texture': ('texture.jpg', 512, 70),
+        'texture_tint': (252, 246, 228),
+    },
+    'arch': {
+        # Cut-outs on cobalt (~#2346BA delivered); sand, olive, terracotta and charcoal have
+        # no blues -> despill, and edge_fill for the fine olive line work.
+        'despill': True,
+        'edge_fill': True,
+        'opaque': [
+            ('cover-bg', 'cover-bg-portrait.jpg', 1080, ('avif', 'webp', 'jpg')),
+            ('cover-bg-desktop', 'cover-bg-desktop.jpg', 1920, ('avif', 'webp', 'jpg')),
+        ],
+        # hero.jpg: one arch whose rim runs the full height. The arch top and its sprig end
+        # ~36 %, the sill and vase start ~76 %. Between them the pack's CSS repeats hero-mid,
+        # a slice of plain rim and plaster (~50-56 %), so the arch stays whole at any height.
+        'bands': [
+            ('hero-top', 'hero.jpg', 0.0, 0.4, 'bottom', 0.04, 1080),
+            ('hero-mid', 'hero.jpg', 0.5, 0.56, 'none', 0, 1080),
+            ('hero-bottom', 'hero.jpg', 0.72, 1.0, 'top', 0.04, 1080),
+        ],
+        'keyed': [
+            ('photo-ring', 'photo-ring.jpg', (31, 70, 186), 880, (26, 64), 2, False),
+            ('corner-tl', 'corner-tl.jpg', (36, 74, 190), 720, (26, 64), 2, False),
+            # Prompt 8: the colonnade from ~55 % (cypresses from ~41 %) to the bottom edge,
+            # the near olive branches run down both sides, ~5-90 %.
+            # kept down to ~80 %: below that is the colonnade's floor, hidden by the sill
+            ('parallax-back', 'parallax-back.jpg', (35, 69, 186), 1080, (26, 64), 2, False, (0, 0.39, 1, 0.8)),
+            ('parallax-front', 'parallax-front.jpg', (36, 68, 184), 1080, (26, 64), 2, False),
+        ],
+        'sprites': ('petals-sheet.jpg', (36, 73, 191), 'petal', 96, (26, 64), (2, 2, 2, 2, 2, 2), False),
+        'sprites_grid': (3, 2),
+        'texture': ('texture.jpg', 512, 70),
+        'texture_tint': (243, 237, 225),
+    },
 }
 
 QUALITY = {'avif': 52, 'webp': 78, 'jpg': 82}
@@ -645,16 +709,21 @@ def build(pack):
         img = resize_w(Image.open(src / master).convert('RGB'), width)
         written += save_all(img, out, name, formats)
 
-    for name, master, y0, y1, edge, fade, width in cfg.get('bands', []):
+    for name, master, y0, y1, edge, fade, width, *paper in cfg.get('bands', []):
         img = Image.open(src / master).convert('RGB')
         band = resize_w(img.crop((0, round(y0 * img.height), img.width, round(y1 * img.height))), width)
+        # optional paper colour: lifted out with a soft key, so a depth layer can stand
+        # behind the band's art (between a railing's balusters) instead of above it
+        cut = np.asarray(key(band, paper[0], (8, 48), 0).getchannel('A')) / 255 if paper else 1
         h = band.height
-        from_top = np.clip(np.arange(h) / (fade * h), 0, 1)
-        from_bottom = np.clip((h - 1 - np.arange(h)) / (fade * h), 0, 1)
+        from_top = np.clip(np.arange(h) / max(fade * h, 1), 0, 1)
+        from_bottom = np.clip((h - 1 - np.arange(h)) / max(fade * h, 1), 0, 1)
         # 'both': a free-floating strip (a depth layer) fades at both edges
-        ramp = {'top': from_top, 'bottom': from_bottom, 'both': np.minimum(from_top, from_bottom)}[edge]
+        # 'none': an opaque slice the pack's CSS repeats between the bands (a wall that runs on)
+        ramp = {'top': from_top, 'bottom': from_bottom, 'both': np.minimum(from_top, from_bottom),
+                'none': np.ones(h)}[edge]
         ramp = ramp * ramp * (3 - 2 * ramp)   # smoothstep: no visible edge where the fade starts
-        alpha = np.repeat((ramp * 255).astype(np.uint8)[:, None], band.width, 1)
+        alpha = (np.repeat(ramp[:, None], band.width, 1) * cut * 255).astype(np.uint8)
         band.putalpha(Image.fromarray(alpha))
         written += save_all(band, out, name, ('avif', 'webp'))
 
@@ -711,7 +780,7 @@ def build(pack):
             x0, y0, x1, y1 = cfg['sprites_crop']
             raw = raw.crop((round(x0 * raw.width), round(y0 * raw.height), round(x1 * raw.width), round(y1 * raw.height)))
         sheet = key(raw, bg, ramp, 6, fill=True)   # only to find the sprites' boxes
-        # The sheet is painted as a 3x2 grid: one sprite per cell, even when a
+        # The sheet is painted as a 3x2 grid (or 'sprites_grid'): one sprite per cell, even when a
         # sprite is several separate pieces (rice grains). Rows and columns are
         # split at the widest empty gaps between pieces (not at fixed thirds:
         # a sprite can sit across the sheet's midline), then pieces are grouped
@@ -729,8 +798,10 @@ def build(pack):
                 reach = max(reach, b)
             return sorted(pos for _, pos in sorted(gaps, reverse=True)[:k - 1])
 
-        rows = splits([(b[0].start, b[0].stop) for b in parts], 2)
-        cols = splits([(b[1].start, b[1].stop) for b in parts], 3)
+        # 'sprites_grid': (rows, columns) when the sheet came another way round (2 x 3)
+        nrows, ncols = cfg.get('sprites_grid', (2, 3))
+        rows = splits([(b[0].start, b[0].stop) for b in parts], nrows)
+        cols = splits([(b[1].start, b[1].stop) for b in parts], ncols)
         cells = {}
         for b in parts:
             cy, cx = (b[0].start + b[0].stop) / 2, (b[1].start + b[1].stop) / 2
