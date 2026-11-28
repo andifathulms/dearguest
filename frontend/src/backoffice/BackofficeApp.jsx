@@ -20,8 +20,11 @@ import RevenuePage from './pages/RevenuePage.jsx'
 import SystemPage from './pages/SystemPage.jsx'
 import VouchersPage from './pages/VouchersPage.jsx'
 import VoucherDetailPage from './pages/VoucherDetailPage.jsx'
+import ArticlesPage from './pages/ArticlesPage.jsx'
+import ArticleEditorPage from './pages/ArticleEditorPage.jsx'
 import '../brand/brand.css'
 import '../pages/Auth.css'
+import '../pages/blog/Blog.css'
 import './Backoffice.css'
 
 // The backoffice: Vowvella's own operator app at /backoffice, for the owner
@@ -46,6 +49,7 @@ const NAV = [
   ] },
   { group: 'Bisnis', items: [
     { to: '/backoffice/voucher', label: 'Voucher' },
+    { to: '/backoffice/artikel', label: 'Artikel' },
     { to: '/backoffice/tema', label: 'Tema' },
     { to: '/backoffice/pertumbuhan', label: 'Pertumbuhan' },
     { to: '/backoffice/pendapatan', label: 'Pendapatan', owner: true },
@@ -191,6 +195,8 @@ function Shell() {
             <Route path="laporan" element={<ReportsPage />} />
             <Route path="voucher" element={<VouchersPage />} />
             <Route path="voucher/:id" element={<VoucherDetailPage />} />
+            <Route path="artikel" element={<ArticlesPage />} />
+            <Route path="artikel/:id" element={<ArticleEditorPage />} />
             <Route path="tema" element={<ThemesPage />} />
             <Route path="pertumbuhan" element={<GrowthPage />} />
             <Route path="pendapatan" element={owner ? <RevenuePage /> : <Navigate to="/backoffice" replace />} />

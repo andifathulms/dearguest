@@ -327,6 +327,15 @@ class VoucherCodeView(StaffView):
 
 # ---- blog articles ----
 
+def _article(article, request):
+    """An article for the editor, with the choices its form needs."""
+    return {**blog.staff_detail(article, request), 'options': {
+        'categories': [{'key': k, 'label': v} for k, v in Article.CATEGORIES],
+        'themes': [{'id': t, 'name': name} for t, name in themes.choices(include_hidden=False)],
+        'can_delete': request.user.has_perm('invitations.delete_article'),
+    }}
+
+
 def _image_or_error(request, field='image'):
     """The uploaded image, checked like every other upload, or a 400."""
     f = request.FILES.get(field)
@@ -351,10 +360,7 @@ class ArticleListView(StaffView):
             rows = [r for r in rows if r['state'] == wanted]
         if q:
             rows = [r for r in rows if q in r['title'].lower() or q in r['slug']]
-        return Response({'results': rows, 'state_counts': counts, 'now': now.isoformat(),
-                         'categories': [{'key': k, 'label': v} for k, v in Article.CATEGORIES],
-                         'themes': [{'id': t, 'name': name} for t, name in themes.choices(include_hidden=False)],
-                         'can_delete': request.user.has_perm('invitations.delete_article')})
+        return Response({'results': rows, 'state_counts': counts, 'now': now.isoformat()})
 
     def post(self, request):
         if not request.user.has_perm('invitations.add_article'):
@@ -364,7 +370,7 @@ class ArticleListView(StaffView):
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         article = Article.objects.create(created_by=request.user, **fields)
         staff_actions.record(request.user, article, f'Artikel dibuat: {article.title}')
-        return Response(blog.staff_detail(article, request), status=status.HTTP_201_CREATED)
+        return Response(_article(article, request), status=status.HTTP_201_CREATED)
 
 
 class ArticleDetailView(StaffView):
@@ -372,7 +378,7 @@ class ArticleDetailView(StaffView):
     (owner: delete_article)."""
 
     def get(self, request, pk):
-        return Response(blog.staff_detail(get_object_or_404(Article, pk=pk), request))
+        return Response(_article(get_object_or_404(Article, pk=pk), request))
 
     def patch(self, request, pk):
         if not request.user.has_perm('invitations.change_article'):
@@ -389,7 +395,7 @@ class ArticleDetailView(StaffView):
         if now != was:
             labels = {'draft': 'jadi draf', 'scheduled': 'dijadwalkan', 'live': 'diterbitkan'}
             staff_actions.record(request.user, article, f'Artikel {labels[now]}: {article.title}')
-        return Response(blog.staff_detail(article, request))
+        return Response(_article(article, request))
 
     def delete(self, request, pk):
         if not request.user.has_perm('invitations.delete_article'):
@@ -414,7 +420,7 @@ class ArticleCoverView(StaffView):
             article.cover.delete(save=False)
         article.cover = f
         article.save(update_fields=['cover', 'updated_at'])
-        return Response(blog.staff_detail(article, request))
+        return Response(_article(article, request))
 
     def delete(self, request, pk):
         if not request.user.has_perm('invitations.change_article'):
@@ -424,7 +430,7 @@ class ArticleCoverView(StaffView):
             article.cover.delete(save=False)
             article.cover = None
             article.save(update_fields=['cover', 'updated_at'])
-        return Response(blog.staff_detail(article, request))
+        return Response(_article(article, request))
 
 
 class ArticleImageView(StaffView):
