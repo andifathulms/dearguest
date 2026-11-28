@@ -25,6 +25,7 @@ const DEV_PROXY_TARGET = process.env.DEV_PROXY_TARGET || 'http://localhost:8000'
 // shared/crawlers.txt (make sync).
 const CRAWLER_UA = new RegExp(crawlers.patterns.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i')
 const INVITATION_PATH = '^/[-\\w]+(/[A-Za-z0-9]{4,12})?/?(\\?.*)?$'
+const BLOG_PATH = '^/blog(/[-a-z0-9]+)?/?(\\?.*)?$'
 
 export default defineConfig(({ command, mode }) => {
   if (command === 'build') requirePublicOrigin(mode)
@@ -54,6 +55,17 @@ export default defineConfig(({ command, mode }) => {
         '/og/': {
           target: DEV_PROXY_TARGET,
           changeOrigin: false,
+        },
+        // The blog's sitemap and feed come from Django, for everyone.
+        '^/(sitemap-blog\\.xml|blog/rss\\.xml)$': {
+          target: DEV_PROXY_TARGET,
+          changeOrigin: false,
+        },
+        // Crawlers get Django's server-rendered blog pages, as nginx does.
+        [BLOG_PATH]: {
+          target: DEV_PROXY_TARGET,
+          changeOrigin: false,
+          bypass: req => (CRAWLER_UA.test(req.headers['user-agent'] || '') ? undefined : req.url),
         },
         [INVITATION_PATH]: {
           target: DEV_PROXY_TARGET,

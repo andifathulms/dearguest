@@ -4,7 +4,8 @@
 //   each page's own <title>, description, canonical and Open Graph tags (the
 //   site's JPEG preview image: WhatsApp doesn't reliably show WebP), plus a
 //   <noscript> summary. nginx serves them via `try_files $uri/index.html`.
-// - dist/sitemap.xml: marketing pages only (invitations are private).
+// - dist/sitemap.xml: marketing pages only (invitations are private). Blog
+//   articles are dynamic: Django serves them in /sitemap-blog.xml.
 // - dist/robots.txt.
 // Invitations themselves get noindex from nginx (X-Robots-Tag) and the app.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -58,7 +59,7 @@ export default function marketingPages() {
       }
 
       const today = new Date().toISOString().slice(0, 10)
-      const urls = ['/', '/tema', ...themes.map(t => `/tema/${t.id}`)]
+      const urls = ['/', '/tema', '/blog', ...themes.map(t => `/tema/${t.id}`)]
       writeFileSync(join(outDir, 'sitemap.xml'),
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
         urls.map(u => `  <url><loc>${esc(origin + u)}</loc><lastmod>${today}</lastmod></url>`).join('\n') +
@@ -74,6 +75,7 @@ export default function marketingPages() {
         'Allow: /',
         '',
         `Sitemap: ${origin}/sitemap.xml`,
+        `Sitemap: ${origin}/sitemap-blog.xml`,
         '',
       ].join('\n'))
     },

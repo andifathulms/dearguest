@@ -25,9 +25,17 @@ map $uri $invitation_path {
     default                                   0;
     "~^/[-\w]+(/[A-Za-z0-9]{4,12})?/?$"       1;
 }
-map "$og_crawler$invitation_path" $og_proxy {
+# The blog: crawlers (search engines included) get Django's server-rendered
+# article page (apps/invitations/blog.py); people get the SPA.
+map $uri $blog_path {
+    default                                   0;
+    "~^/blog(/[-a-z0-9]+)?/?$"                1;
+}
+map "$og_crawler$invitation_path$blog_path" $og_proxy {
     default 0;
-    "11"    1;
+    "110"   1;
+    "101"   1;
+    "111"   1;
 }
 
 # Search engines may index the marketing site only. Everything else served
@@ -36,6 +44,7 @@ map $request_uri $robots_tag {
     default                                                     "noindex, nofollow";
     "~^/(\?.*)?$"                                                "";
     "~^/tema(/[a-z0-9-]+)?/?(\?.*)?$"                            "";
+    "~^/blog(/[a-z0-9-]+)?/?(\?.*)?$"                            "";
     "~^/(register|robots\.txt|sitemap\.xml)"                    "";
     "~^/(assets|social|theme-previews)/"                         "";
 }
@@ -131,6 +140,14 @@ server {
     location = /${ADMIN_PATH}/login/ {
         limit_req zone=admin_login burst=5 nodelay;
         limit_req_status 429;
+        include /etc/nginx/snippets/proxy.conf;
+    }
+
+    # The blog's sitemap and RSS feed, built by Django from the live articles.
+    location = /sitemap-blog.xml {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+    location = /blog/rss.xml {
         include /etc/nginx/snippets/proxy.conf;
     }
 
