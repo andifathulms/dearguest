@@ -626,3 +626,41 @@ class Payment(models.Model):
 
     def __str__(self):
         return f'Rp {self.amount:,} · {self.get_tier_display()}'.replace(',', '.')
+
+
+class AbuseReport(models.Model):
+    """A takedown or abuse report (RUNBOOK.md §7), logged by staff from the
+    email or WhatsApp it came in on. Kept KEEP_DAYS, then deleted by
+    purge_expired; the invitation link is cleared if it is deleted first."""
+    KEEP_DAYS = 365
+    REASONS = [
+        ('impersonation', 'Mengaku orang lain'),
+        ('illegal', 'Konten melanggar hukum'),
+        ('spam', 'Spam atau penipuan'),
+        ('copyright', 'Hak cipta (foto/lagu)'),
+        ('other', 'Lainnya'),
+    ]
+    STATUSES = [
+        ('new', 'Baru'),
+        ('takedown', 'Dinonaktifkan'),
+        ('no_action', 'Tidak ada tindakan'),
+        ('resolved', 'Selesai'),
+    ]
+    invitation = models.ForeignKey(Invitation, on_delete=models.SET_NULL, null=True, blank=True, related_name='reports')
+    url = models.CharField(max_length=300, help_text='Tautan yang dilaporkan, apa adanya.')
+    reporter = models.CharField(max_length=200, blank=True, help_text='Siapa yang melapor dan lewat apa.')
+    reason = models.CharField(max_length=16, choices=REASONS)
+    details = models.TextField(blank=True)
+    status = models.CharField(max_length=10, choices=STATUSES, default='new')
+    decision_note = models.TextField(blank=True, help_text='Keputusan dan apa yang dikatakan ke pasangan.')
+    decided_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    decided_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Laporan'
+        verbose_name_plural = 'Laporan'
+
+    def __str__(self):
+        return f'{self.get_reason_display()} · {self.url}'

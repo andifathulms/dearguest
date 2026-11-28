@@ -332,3 +332,48 @@ class CouplesPageTests(APITestBase):
             'uid': q['uid'][0], 'token': q['token'][0], 'password': 'Yet-An0ther-pass'}, format='json')
         self.assertEqual(again.status_code, 400)
         self.assertTrue(ActivityEvent.objects.filter(kind='staff_action', meta__action='Tautan reset sandi dibuat').exists())
+
+
+@override_settings(ADMIN_REQUIRE_OTP=False)
+class ModerationTests(APITestBase):
+    def setUp(self):
+        super().setUp()
+        self.web = Client()
+        helper = User.objects.create_user('bantu', password=PASSWORD, is_staff=True)
+        helper.groups.add(Group.objects.get(name='Staf'))
+        self.web.force_login(helper)
+        self.inv = self.make_invitation(slug='dilapor')
+
+    def test_report_takedown_and_restore(self):
+        from apps.invitations.models import AbuseReport
+        url = reverse('admin:invitations_abusereport_changelist')
+        report = AbuseReport.objects.create(invitation=self.inv, url='https://x/dilapor', reason='impersonation')
+        res = self.web.get(reverse('admin:index'))
+        self.assertEqual({k['label']: k['value'] for k in res.context['kpis']}['Laporan baru'], 1)
+
+        self.web.post(url, {'action': 'take_down', '_selected_action': [report.pk]})
+        report.refresh_from_db()
+        self.inv.refresh_from_db()
+        self.assertEqual(report.status, 'takedown')
+        self.assertFalse(self.inv.is_active)
+        self.assertIsNotNone(report.decided_at)
+
+        self.web.post(url, {'action': 'restore', '_selected_action': [report.pk]})
+        self.inv.refresh_from_db()
+        self.assertTrue(self.inv.is_active)
+
+    def test_reports_are_pruned_after_a_year(self):
+        from django.core.management import call_command
+        from apps.invitations.models import AbuseReport
+        old = AbuseReport.objects.create(url='a', reason='spam')
+        AbuseReport.objects.filter(pk=old.pk).update(created_at=timezone.now() - timedelta(days=366))
+        AbuseReport.objects.create(url='b', reason='spam')
+        call_command('purge_expired', stdout=open('/dev/null', 'w'))
+        self.assertEqual(list(AbuseReport.objects.values_list('url', flat=True)), ['b'])
+
+    def test_staff_hide_a_wish(self):
+        from apps.invitations.models import RSVP
+        rsvp = RSVP.objects.create(invitation=self.inv, guest_name='X', attending=True, wishes='kasar')
+        self.web.post(reverse('admin:invitations_rsvp_changelist'), {'action': 'hide_wishes', '_selected_action': [rsvp.pk]})
+        rsvp.refresh_from_db()
+        self.assertEqual(rsvp.wish_status, 'hidden')

@@ -23,7 +23,7 @@ from . import activity, backoffice, themes
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
-    Plan, Testimonial, Payment,
+    Plan, Testimonial, Payment, AbuseReport,
 )
 
 
@@ -253,10 +253,72 @@ class InvitationAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
 
 
 @admin.register(RSVP)
-class RSVPAdmin(AuditedDeletes, admin.ModelAdmin):
-    list_display = ['guest_name', 'invitation', 'attending', 'pax', 'submitted_at']
-    list_filter = ['invitation', 'attending']
+class RSVPAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
+    """Answers and wishes across all invitations: the Ucapan moderation list.
+    Couples moderate their own wall; staff step in on abuse."""
+    ops_tab = 'wishes'
+    list_display = ['guest_name', 'invitation', 'wish_excerpt', 'wish_status', 'attending', 'pax', 'submitted_at']
+    list_filter = ['wish_status', 'attending']
+    search_fields = ['invitation__slug', 'guest_name', 'wishes']
+    list_select_related = ['invitation']
     readonly_fields = ['guest_name', 'whatsapp', 'attending', 'pax', 'wishes', 'submitted_at']
+    actions = ['hide_wishes', 'show_wishes']
+
+    @admin.display(description='Ucapan')
+    def wish_excerpt(self, obj):
+        return (obj.wishes[:120] + '…') if len(obj.wishes) > 120 else (obj.wishes or '—')
+
+    @admin.action(description='Sembunyikan ucapan')
+    def hide_wishes(self, request, queryset):
+        self._wish_status(request, queryset, 'hidden', 'Ucapan disembunyikan')
+
+    @admin.action(description='Tampilkan ucapan')
+    def show_wishes(self, request, queryset):
+        self._wish_status(request, queryset, 'visible', 'Ucapan ditampilkan')
+
+    def _wish_status(self, request, queryset, status, text):
+        for rsvp in queryset.exclude(wishes=''):
+            rsvp.wish_status = status
+            rsvp.save(update_fields=['wish_status'])
+            audit(self, request, rsvp.invitation, f'{text} (RSVP {rsvp.pk})')
+        self.message_user(request, f'{text}: {queryset.exclude(wishes="").count()} ucapan.')
+
+
+@admin.register(AbuseReport)
+class AbuseReportAdmin(OpsNav, AuditedDeletes, admin.ModelAdmin):
+    """Takedown and abuse reports (RUNBOOK.md §7). Log what came in, then act:
+    deactivate the invitation, decide nothing is wrong, or reactivate it once
+    the couple fixed it. Each step is audited."""
+    ops_tab = 'reports'
+    list_display = ['created_at', 'invitation', 'reason', 'status', 'url', 'reporter', 'decided_by']
+    list_filter = ['status', 'reason']
+    search_fields = ['url', 'invitation__slug', 'reporter']
+    raw_id_fields = ['invitation']
+    readonly_fields = ['decided_by', 'decided_at', 'created_at']
+    actions = ['take_down', 'no_action', 'restore']
+
+    def _decide(self, request, queryset, status, active, text):
+        for report in queryset:
+            report.status, report.decided_by, report.decided_at = status, request.user, timezone.now()
+            report.save(update_fields=['status', 'decided_by', 'decided_at'])
+            inv = report.invitation
+            if inv and active is not None and inv.is_active != active:
+                inv.is_active = active
+                inv.save(update_fields=['is_active'])
+            audit(self, request, inv or report, text)
+        self.message_user(request, f'{text}: {queryset.count()} laporan. Kabari pasangan lewat email dan WhatsApp.')
+
+    @admin.action(description='Takedown: nonaktifkan undangannya')
+    def take_down(self, request, queryset):
+        self._decide(request, queryset, 'takedown', False, 'Laporan: undangan dinonaktifkan')
+
+    @admin.action(description='Tidak ada tindakan')
+    def no_action(self, request, queryset):
+        self._decide(request, queryset, 'no_action', None, 'Laporan: tidak ada tindakan')
+
+    @admin.action(description='Selesai: aktifkan lagi')
+    def restore(self, request, queryset):
+        self._decide(request, queryset, 'resolved', True, 'Laporan selesai: undangan aktif lagi')
 
 
 @admin.register(ActivationRequest)

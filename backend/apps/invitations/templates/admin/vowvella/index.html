@@ -5,7 +5,7 @@
 {% with ops_tab='home' %}{% include "admin/vowvella/_nav.html" %}{% endwith %}
 <div class="ops-kpis">
   {% for k in kpis %}
-    {% if k.url %}<a class="ops-kpi{% if k.action %} act{% endif %}" href="{% url k.url %}">{% else %}<div class="ops-kpi{% if k.action %} act{% endif %}">{% endif %}
+    {% if k.url %}<a class="ops-kpi{% if k.action %} act{% endif %}" href="{% url k.url %}{{ k.query }}">{% else %}<div class="ops-kpi{% if k.action %} act{% endif %}">{% endif %}
       <span class="k">{{ k.label }}</span><span class="v">{{ k.value }}</span><span class="d">{{ k.note }}</span>
     {% if k.url %}</a>{% else %}</div>{% endif %}
   {% endfor %}

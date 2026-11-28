@@ -5,6 +5,8 @@
   <a href="{% url 'admin:ops_watch' %}"{% if ops_tab == 'watch' %} class="on"{% endif %}>Hari H</a>
   <a href="{% url 'admin:invitations_invitation_changelist' %}"{% if ops_tab == 'invitations' %} class="on"{% endif %}>Undangan</a>
   <a href="{% url 'admin:invitations_coupleprofile_changelist' %}"{% if ops_tab == 'couples' %} class="on"{% endif %}>Pasangan</a>
+  <a href="{% url 'admin:invitations_rsvp_changelist' %}?wish_status__exact=pending"{% if ops_tab == 'wishes' %} class="on"{% endif %}>Ucapan</a>
+  <a href="{% url 'admin:invitations_abusereport_changelist' %}"{% if ops_tab == 'reports' %} class="on"{% endif %}>Laporan</a>
   {% if ops_revenue %}<a href="{% url 'admin:invitations_payment_changelist' %}"{% if ops_tab == 'payments' %} class="on"{% endif %}>Pembayaran</a>{% endif %}
   <a href="{% url 'admin:ops_system' %}"{% if ops_tab == 'system' %} class="on"{% endif %}>Sistem</a>
 </nav>

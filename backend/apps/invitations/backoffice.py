@@ -24,7 +24,7 @@ from django.utils.html import format_html
 from django.utils.timesince import timesince
 
 from . import activity, health, ops, retention, themes
-from .models import ActivityEvent, FunnelEvent, Guest, Invitation, Payment, RSVP
+from .models import AbuseReport, ActivityEvent, FunnelEvent, Guest, Invitation, Payment, RSVP
 
 WATCH_DAYS_OVERVIEW = 7
 WATCH_DAYS = 14
@@ -193,6 +193,7 @@ def overview(request):
     rsvp_week = rsvps.filter(submitted_at__gte=week_ago).count()
     rsvp_before = rsvps.filter(submitted_at__gte=two_weeks_ago, submitted_at__lt=week_ago).count()
     held = rsvps.filter(wish_status='pending')
+    reports = AbuseReport.objects.filter(status='new').count()
 
     kpis = [
         {'label': 'Menunggu aktivasi', 'value': pending.count(), 'action': pending.exists(),
@@ -204,8 +205,12 @@ def overview(request):
         {'label': 'Undangan baru · 7 hari', 'value': invs.filter(created_at__gte=week_ago).count(),
          'note': f'{invs.filter(activated_at__gte=week_ago).count()} jadi aktif'},
         {'label': 'RSVP · 7 hari', 'value': rsvp_week, 'note': f'{_delta(rsvp_week, rsvp_before)} vs minggu lalu'},
-        {'label': 'Ucapan perlu ditinjau', 'value': held.count(), 'action': held.exists(),
-         'note': f'{held.values("invitation").distinct().count()} undangan'},
+        {'label': 'Ucapan ditahan', 'value': held.count(),
+         'note': f'menunggu pasangan · {held.values("invitation").distinct().count()} undangan',
+         'url': 'admin:invitations_rsvp_changelist', 'query': '?wish_status__exact=pending'},
+        {'label': 'Laporan baru', 'value': reports, 'action': bool(reports),
+         'note': 'takedown / penyalahgunaan', 'url': 'admin:invitations_abusereport_changelist',
+         'query': '?status__exact=new'},
     ]
     if can_see_revenue(request.user):
         month = now.astimezone(timezone.get_current_timezone()).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
