@@ -63,7 +63,7 @@ class LoggingTests(APITestBase):
         handler = logging.StreamHandler(stream)
         handler.setFormatter(JSONFormatter())
         handler.addFilter(RequestIdFilter())
-        log = logging.getLogger('dearguest.test')
+        log = logging.getLogger('vowvella.test')
         log.addHandler(handler)
         try:
             res = self.client.get('/api/health/', HTTP_X_REQUEST_ID='req-12345678')

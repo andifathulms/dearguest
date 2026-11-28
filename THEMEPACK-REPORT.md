@@ -1,4 +1,4 @@
-# DearGuest — Phase 1 report: theme packs + Minimal reference pack
+# Vowvella — Phase 1 report: theme packs + Minimal reference pack
 
 Branch `feat/theme-packs`. **Not merged, not pushed.**
 

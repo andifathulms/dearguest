@@ -390,5 +390,5 @@ class ExportView(APIView):
             return Response({'detail': 'Konfirmasi kata sandi dulu.', 'code': 'reauth_required'},
                             status=status.HTTP_403_FORBIDDEN)
         data = EditorInvitationSerializer(inv, context={'request': request}).data
-        return FileResponse(export.build(inv, data), as_attachment=True, filename=f'dearguest-{inv.slug}.zip',
+        return FileResponse(export.build(inv, data), as_attachment=True, filename=f'vowvella-{inv.slug}.zip',
                             content_type='application/zip')

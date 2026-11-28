@@ -1,5 +1,5 @@
 {
-  "_about": "Single source of truth for DearGuest themes. Edit this file, then run `make themes` (scripts/sync_themes.py) to update the backend and frontend copies.",
+  "_about": "Single source of truth for Vowvella themes. Edit this file, then run `make themes` (scripts/sync_themes.py) to update the backend and frontend copies.",
   "version": 1,
   "themes": [
     {

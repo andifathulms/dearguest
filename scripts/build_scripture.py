@@ -45,7 +45,7 @@ BIBLE = [
 
 
 def fetch(url):
-    req = urllib.request.Request(url, headers={'User-Agent': 'DearGuest scripture build (contact: repo owner)'})
+    req = urllib.request.Request(url, headers={'User-Agent': 'Vowvella scripture build (contact: repo owner)'})
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 

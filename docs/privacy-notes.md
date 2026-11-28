@@ -17,7 +17,7 @@ These are the facts the privacy policy has to state, as built in Phase 5. **This
 
 ## Sentences the policy needs
 
-1. **Open tracking (Phase 4):** "Saat tamu membuka tautan undangan pribadinya, DearGuest mencatat waktu dan berapa kali tautan dibuka, lalu menampilkannya kepada pasangan yang mengirim undangan. Kami tidak menyimpan alamat IP, perangkat, atau lokasi tamu."
+1. **Open tracking (Phase 4):** "Saat tamu membuka tautan undangan pribadinya, Vowvella mencatat waktu dan berapa kali tautan dibuka, lalu menampilkannya kepada pasangan yang mengirim undangan. Kami tidak menyimpan alamat IP, perangkat, atau lokasi tamu."
 2. **Retention:** guest lists, RSVPs, wishes, open tracking, uploaded photos and music, bank accounts and QRIS, the gift address and phone, and link-preview images are **deleted 90 days after the invitation's end date** (`expires_at`, itself 90 days after the wedding by default). The couple is emailed 7 days before, with a link to download everything.
 3. **What stays after that:** the invitation's address (slug), the couple's names, the story and event details, until the couple deletes the account.
 4. **Couples' rights:**

@@ -11,7 +11,7 @@ function requirePublicOrigin(mode) {
   if (!origin || !/^https?:\/\/[^/]+\/?$/.test(origin)) {
     throw new Error(
       'VITE_PUBLIC_ORIGIN must be set to the public site origin for builds, e.g. ' +
-      'VITE_PUBLIC_ORIGIN=https://dearguest.id (got: ' + JSON.stringify(origin ?? null) + ')',
+      'VITE_PUBLIC_ORIGIN=https://vowvella.id (got: ' + JSON.stringify(origin ?? null) + ')',
     )
   }
 }

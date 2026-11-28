@@ -1,7 +1,7 @@
 // "Pakai tema ini" on /tema/:id: the theme survives registration (and a
 // login detour) until onboarding preselects it. sessionStorage only: it's a
 // convenience, so failures are ignored.
-const KEY = 'dearguest.theme'
+const KEY = 'vowvella.theme'
 
 export function rememberTheme(id) {
   try { if (id) sessionStorage.setItem(KEY, id) } catch { /* private mode */ }

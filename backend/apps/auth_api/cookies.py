@@ -42,7 +42,7 @@ def clear_session(response):
 # within the last few minutes, proven by a short-lived signed cookie.
 RECENT_COOKIE = 'dg_recent'
 RECENT_SECONDS = 5 * 60
-_RECENT_SALT = 'dearguest.recent-auth'
+_RECENT_SALT = 'vowvella.recent-auth'
 
 
 def mark_recent(response, user):

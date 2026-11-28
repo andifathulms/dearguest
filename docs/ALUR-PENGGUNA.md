@@ -1,4 +1,4 @@
-# Alur Pengguna — Dear Guest
+# Alur Pengguna — Vowvella
 
 Panduan lengkap: dari calon pengantin mendaftar sampai undangannya aktif dan
 tamu bisa RSVP — plus apa saja yang dikerjakan admin di sisi belakang.
@@ -81,7 +81,7 @@ masuk, mendarat di `/my` (daftar semua undangan miliknya).
 Satu layar, tiga isian:
 
 1. **Alamat undangan (slug)**
-   Jadi alamat publiknya: `dearguest.com/dinda-raka`.
+   Jadi alamat publiknya: `vowvella.com/dinda-raka`.
    Ketikan otomatis dirapikan (huruf kecil, spasi → tanda hubung).
    Ketersediaan dicek langsung saat mengetik:
    - ✓ Tersedia → boleh lanjut
@@ -164,7 +164,7 @@ Kalau salah: *"Kode aktivasi tidak valid."*
 Begitu kode benar:
 - Kartu berubah jadi hijau: **"🎉 Undangan Kamu Sudah Aktif"**
 - Label di kanan atas berubah dari **Draft** → **Aktif**
-- Link `dearguest.com/{slug}` bisa dibuka siapa saja, tanpa login
+- Link `vowvella.com/{slug}` bisa dibuka siapa saja, tanpa login
 
 **Editor tetap bisa dipakai setelah aktif.** Ganti foto, ubah jam acara,
 tambah cerita — semua langsung tayang, tidak perlu minta persetujuan lagi.
@@ -281,7 +281,7 @@ paket, atau tema. Di sini admin bisa:
 
 ### Beda paket
 
-| Paket | Watermark "Dear Guest" | Jumlah undangan |
+| Paket | Watermark "Vowvella" | Jumlah undangan |
 |---|---|---|
 | **Gratis** | Tampil | 1 |
 | **Premium** | Hilang | 1 |

@@ -19,7 +19,7 @@ MAX_FAILURES = 5
 LOCKOUT_SECONDS = 15 * 60
 
 
-class DearGuestAdminSite(AdminSite):
+class VowvellaAdminSite(AdminSite):
     def has_permission(self, request):
         allowed = super().has_permission(request)
         if allowed and settings.ADMIN_REQUIRE_OTP:

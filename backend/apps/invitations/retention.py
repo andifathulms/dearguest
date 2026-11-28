@@ -22,7 +22,7 @@ from django.utils import timezone
 
 from .models import BankAccount, Guest, Invitation, Photo, RSVP
 
-log = logging.getLogger('dearguest.retention')
+log = logging.getLogger('vowvella.retention')
 
 
 def deletion_date(invitation):
@@ -51,12 +51,12 @@ def due_for_purge(today, now):
 def send_notice(inv):
     when = deletion_date(inv)
     send_mail(
-        'Data undangan kalian akan dihapus — DearGuest',
+        'Data undangan kalian akan dihapus — Vowvella',
         f"Halo {inv.couple_user.username},\n\n"
         f"Sesuai kebijakan privasi kami, data tamu undangan /{inv.slug} (daftar tamu, konfirmasi kehadiran, "
         f"ucapan, foto, musik dan rekening) akan dihapus permanen mulai {when:%d-%m-%Y}.\n\n"
         f"Ingin menyimpannya? Unduh semua data lebih dulu di dashboard:\n"
-        f"{settings.FRONTEND_URL}/dashboard/{inv.slug}\n\nTerima kasih telah menggunakan DearGuest.",
+        f"{settings.FRONTEND_URL}/dashboard/{inv.slug}\n\nTerima kasih telah menggunakan Vowvella.",
         settings.DEFAULT_FROM_EMAIL, [inv.couple_user.email],
     )
 

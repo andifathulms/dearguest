@@ -3,7 +3,7 @@
 what their link preview would show: the tags, and the image's size and weight.
 
     python3 scripts/crawl_check.py http://localhost:5190 demo-taman-sage 63YR9R
-    python3 scripts/crawl_check.py https://dearguest.id <slug> [<guest code>]
+    python3 scripts/crawl_check.py https://vowvella.id <slug> [<guest code>]
 
 Run it against the site origin people open (Vite in dev, nginx in prod), not
 the backend directly, so the crawler routing is checked too.

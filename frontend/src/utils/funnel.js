@@ -4,8 +4,8 @@
 // failures (private mode) just mean the step goes uncounted.
 import api from '../api/client.js'
 
-const UTM_KEY = 'dearguest.utm'
-const VISIT_KEY = 'dearguest.visit'
+const UTM_KEY = 'vowvella.utm'
+const VISIT_KEY = 'vowvella.visit'
 const FIELDS = ['utm_source', 'utm_medium', 'utm_campaign']
 
 function read(key) {

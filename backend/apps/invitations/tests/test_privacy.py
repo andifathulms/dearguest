@@ -178,7 +178,7 @@ class ExportAndDeleteTests(PrivacyBase):
 class ScrubberTests(APITestBase):
     def test_text_patterns(self):
         text = ('Gagal kirim ke Budi 0812-3456-7890 / +62 812 3456 7891, andini@example.com, '
-                'link https://dearguest.id/andini-bagus/K7MPQ2?to=Budi%20Santoso '
+                'link https://vowvella.id/andini-bagus/K7MPQ2?to=Budi%20Santoso '
                 'token eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxfQ.abc123')
         out = pii.scrub_text(text)
         for secret in ('3456-7890', '812 3456 7891', 'andini@example.com', 'K7MPQ2', 'Budi%20Santoso', 'eyJhbGci'):

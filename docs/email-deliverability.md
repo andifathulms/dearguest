@@ -1,6 +1,6 @@
 # Email deliverability (Brevo, `mail.<domain>`)
 
-DearGuest sends three kinds of email:
+Vowvella sends three kinds of email:
 - password resets;
 - activation requests (to the admin);
 - deletion notices (to couples, 7 days before guest data is deleted).
@@ -20,7 +20,7 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=<Brevo SMTP login>
 EMAIL_HOST_PASSWORD=<Brevo SMTP key>
-DEFAULT_FROM_EMAIL=DearGuest <halo@mail.<domain>>
+DEFAULT_FROM_EMAIL=Vowvella <halo@mail.<domain>>
 ADMIN_EMAIL=<your inbox>
 ```
 

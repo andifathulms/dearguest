@@ -1,4 +1,4 @@
-# CLAUDE.md — DearGuest (Undangan Digital Platform)
+# CLAUDE.md — Vowvella (Undangan Digital Platform)
 
 ## Read first: how this repo works now (October 2026)
 

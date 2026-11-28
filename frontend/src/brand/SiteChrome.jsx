@@ -20,7 +20,7 @@ export function SiteNav({ tone = 'dark' }) {
   return (
     <header className={`dg-nav ${tone === 'light' ? 'light' : ''}`}>
       <div className="dg-container dg-nav-inner">
-        <Link to="/" className="dg-brand" aria-label="DearGuest, beranda">Dear<i>Guest</i></Link>
+        <Link to="/" className="dg-brand" aria-label="Vowvella, beranda">Vow<i>vella</i></Link>
         <nav className="dg-nav-links" aria-label="Menu utama">
           {NAV.map(n => (
             <Link key={n.to} to={n.to} aria-current={pathname === n.to ? 'page' : undefined}>{n.label}</Link>
@@ -73,7 +73,7 @@ export function SiteFooter() {
       <div className="dg-container">
         <div className="dg-footer-grid">
           <div>
-            <Link to="/" className="dg-brand">Dear<i>Guest</i></Link>
+            <Link to="/" className="dg-brand">Vow<i>vella</i></Link>
             <p>Undangan pernikahan digital berlukis untuk pasangan Indonesia. Satu tautan untuk semua tamu.</p>
           </div>
           <div>
@@ -95,8 +95,8 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="dg-footer-base">
-          <span>© {new Date().getFullYear()} DearGuest</span>
-          <span>Undangan pernikahan digital</span>
+          <span>© {new Date().getFullYear()} Vowvella</span>
+          <span>Untuk hari yang hanya satu</span>
         </div>
       </div>
     </footer>

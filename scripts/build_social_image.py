@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The marketing site's link preview (frontend/public/social/dearguest.jpg):
+"""The marketing site's link preview (frontend/public/social/vowvella.jpg):
 a 1200x630 strip of every active pack's phone cover, with the brand on a
 calm band across the middle. Re-run after adding or retiring a pack.
 
@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 PACKS = ROOT / 'frontend/src/themes/packs'
-OUT = ROOT / 'frontend/public/social/dearguest.jpg'
+OUT = ROOT / 'frontend/public/social/vowvella.jpg'
 SIZE = (1200, 630)
 BAND = (0, 205, 1200, 425)
 INK = (61, 71, 65)
@@ -47,7 +47,7 @@ def main():
     brand = ImageFont.truetype(str(FONTS / 'script-400.woff2'), 104)
     tag = ImageFont.truetype(str(FONTS / 'label-500.woff2'), 26)
     cx, cy = SIZE[0] / 2, (BAND[1] + BAND[3]) / 2
-    draw.text((cx, cy - 18), 'DearGuest', font=brand, fill=INK, anchor='ms')
+    draw.text((cx, cy - 18), 'Vowvella', font=brand, fill=INK, anchor='ms')
     tagline = 'UNDANGAN PERNIKAHAN DIGITAL'
     spacing = 5
     width = sum(tag.getlength(c) for c in tagline) + spacing * (len(tagline) - 1)

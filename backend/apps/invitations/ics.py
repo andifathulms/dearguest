@@ -38,7 +38,7 @@ def _utc(dt):
     return dt.astimezone(dt_timezone.utc).strftime('%Y%m%dT%H%M%SZ')
 
 
-def event_ics(event, invitation, host='dearguest', maps_url=''):
+def event_ics(event, invitation, host='vowvella', maps_url=''):
     couple = getattr(invitation, 'couple', None)
     names = f'{couple.bride_name} & {couple.groom_name}' if couple else invitation.slug
     label = copy.event_label(event.event_type, invitation.copy_variant, event.title)
@@ -47,7 +47,7 @@ def event_ics(event, invitation, host='dearguest', maps_url=''):
     lines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//DearGuest//Undangan Pernikahan//ID',
+        'PRODID:-//Vowvella//Undangan Pernikahan//ID',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
         f'X-WR-TIMEZONE:{event.timezone}',

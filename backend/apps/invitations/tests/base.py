@@ -15,7 +15,7 @@ from rest_framework.test import APIClient
 
 from apps.invitations.models import Invitation, Couple
 
-_MEDIA = tempfile.mkdtemp(prefix='dearguest-test-media-')
+_MEDIA = tempfile.mkdtemp(prefix='vowvella-test-media-')
 
 
 def png_bytes(size=(8, 8)):

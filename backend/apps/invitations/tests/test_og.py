@@ -93,14 +93,14 @@ class CrawlerPageTests(OgBase):
             with self.subTest(path=path):
                 res = self.crawl(path)
                 self.assertEqual(res.status_code, 404)
-                self.assertContains(res, 'DearGuest', status_code=404)
+                self.assertContains(res, 'Vowvella', status_code=404)
                 self.assertNotContains(res, 'Andini', status_code=404)
                 self.assertNotContains(res, 'og:image', status_code=404)
 
     def test_site_paths_get_site_tags_and_admin_keeps_its_slash_redirect(self):
         res = self.crawl('/tema')
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'DearGuest')
+        self.assertContains(res, 'Vowvella')
         self.assertEqual(self.client.get('/admin').status_code, 301)
 
     def test_legacy_share_link_sends_people_to_the_clean_link(self):

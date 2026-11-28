@@ -27,7 +27,7 @@ function withTags(shell, { title, desc, url, noscript }) {
 export default function marketingPages() {
   let outDir
   return {
-    name: 'dearguest-marketing-pages',
+    name: 'vowvella-marketing-pages',
     apply: 'build',
     configResolved(config) { outDir = config.build.outDir },
     closeBundle() {
@@ -41,15 +41,15 @@ export default function marketingPages() {
       }
 
       write('tema', withTags(shell, {
-        title: 'Galeri Tema Undangan Pernikahan Digital · DearGuest',
+        title: 'Galeri Tema Undangan Pernikahan Digital · Vowvella',
         desc: `${themes.length} tema undangan pernikahan berlukis: ${themes.map(t => t.name).join(', ')}.`,
         url: `${origin}/tema`,
-        noscript: `<h1>Galeri Tema DearGuest</h1><ul>${themes.map(t =>
+        noscript: `<h1>Galeri Tema Vowvella</h1><ul>${themes.map(t =>
           `<li><a href="/tema/${t.id}">${esc(t.name)}</a>: ${esc(t.catalog.desc)}</li>`).join('')}</ul>`,
       }))
       for (const t of themes) {
         write(`tema/${t.id}`, withTags(shell, {
-          title: `${t.name} · Tema Undangan Pernikahan DearGuest`,
+          title: `${t.name} · Tema Undangan Pernikahan Vowvella`,
           desc: t.catalog.desc,
           url: `${origin}/tema/${t.id}`,
           noscript: `<h1>${esc(t.name)}</h1><p>${esc(t.catalog.category)}</p><p>${esc(t.catalog.desc)}</p>` +

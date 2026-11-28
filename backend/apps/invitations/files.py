@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models import FileField
 from django.db.models.signals import post_delete, pre_save
 
-log = logging.getLogger('dearguest.files')
+log = logging.getLogger('vowvella.files')
 
 
 def file_fields(model):

@@ -7,7 +7,7 @@ The SPA can't provide per-invitation link previews (crawlers don't run JS), so:
   are redirected to the invitation (share_view);
 - the preview image is drawn by og.py and served from `/og/...` (og_image_view).
 
-Drafts, expired and unknown invitations all get the same generic DearGuest
+Drafts, expired and unknown invitations all get the same generic Vowvella
 page with a 404, so a shared link never leaks names before (or after) the
 invitation is public. Personal previews come only from a guest-list code;
 `?to=` is never read here.
@@ -24,9 +24,9 @@ from .entitlements import has_feature
 from .models import Couple, Invitation, find_guest
 from .views import is_public
 
-GENERIC_TITLE = 'DearGuest · Undangan Pernikahan Digital'
+GENERIC_TITLE = 'Vowvella · Undangan Pernikahan Digital'
 GENERIC_DESC = 'Undangan pernikahan digital untuk pasangan Indonesia.'
-SITE_NAME = 'DearGuest'
+SITE_NAME = 'Vowvella'
 NOINDEX = 'noindex, nofollow'
 # The tag page has no script and one inline style attribute.
 SHARE_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"

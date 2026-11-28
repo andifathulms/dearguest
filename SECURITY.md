@@ -1,6 +1,6 @@
 # Security
 
-DearGuest holds couples' accounts and their guests' names, WhatsApp numbers, attendance, wishes and photos. This page covers the threat model, what protects what, and the risks we accept. Last reviewed: Phase 5 (October 2026).
+Vowvella holds couples' accounts and their guests' names, WhatsApp numbers, attendance, wishes and photos. This page covers the threat model, what protects what, and the risks we accept. Last reviewed: Phase 5 (October 2026).
 
 **Report a vulnerability** to the admin email in the server's `.env` (`ADMIN_EMAIL`), not in a public issue.
 

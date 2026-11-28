@@ -45,8 +45,8 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: config.settings.production
           DB_PASSWORD: undangan_pass
-          ALLOWED_HOSTS: dearguest.example
-          CSRF_TRUSTED_ORIGINS: https://dearguest.example
+          ALLOWED_HOSTS: vowvella.example
+          CSRF_TRUSTED_ORIGINS: https://vowvella.example
         run: python manage.py check --deploy --fail-level WARNING
 
   frontend:
@@ -59,7 +59,7 @@ jobs:
       - run: npm ci
       - run: npm run test:unit
       - name: Production build
-        env: { VITE_PUBLIC_ORIGIN: https://dearguest.example }
+        env: { VITE_PUBLIC_ORIGIN: https://vowvella.example }
         run: npm run build
 
   visual:

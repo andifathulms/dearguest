@@ -54,7 +54,7 @@ def render_copy(canonical=CANONICAL):
 PACKS = FRONTEND / 'themes' / 'packs'
 OG_ASSETS = BACKEND / 'og_assets'
 OG_ROLES = ('names', 'label', 'text')
-# Packs without an og block fall back to this generic DearGuest look (og.py),
+# Packs without an og block fall back to this generic Vowvella look (og.py),
 # which borrows these fonts.
 OG_GENERIC_FONTS = 'sage'
 

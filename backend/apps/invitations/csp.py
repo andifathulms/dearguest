@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-log = logging.getLogger('dearguest.csp')
+log = logging.getLogger('vowvella.csp')
 MAX_BODY = 16 * 1024
 
 

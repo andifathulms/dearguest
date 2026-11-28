@@ -1,4 +1,4 @@
-# Font licences — DearGuest brand (marketing site and couple's app)
+# Font licences — Vowvella brand (marketing site and couple's app)
 
 Both families are licensed under the **SIL Open Font License 1.1**, which
 permits commercial use, embedding and redistribution with the product. The

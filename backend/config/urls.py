@@ -7,10 +7,10 @@ from django.conf.urls.static import static
 
 from apps.invitations.share_views import crawler_view, og_image_view, share_view
 from apps.invitations.health import health_view
-from config.admin_site import DearGuestAdminSite
+from config.admin_site import VowvellaAdminSite
 
 # TOTP, lockout and its own path for the default admin site (admin_site.py).
-admin.site.__class__ = DearGuestAdminSite
+admin.site.__class__ = VowvellaAdminSite
 ADMIN_SEGMENT = settings.ADMIN_URL.split('/')[0]
 
 # A slug that isn't one of the backend's own prefixes (so /admin still gets its

@@ -4,7 +4,7 @@ export const DEFAULT_PLANS = [
   {
     slug: 'gratis', name: 'Gratis', price: 0, compare_at_price: null, badge: '', is_featured: false,
     audience: 'Untuk mencoba semua fitur sebelum memutuskan.', cta_label: 'Coba Gratis',
-    features: ['1 undangan, aktif 14 hari', 'RSVP & dinding ucapan', 'Countdown & peta lokasi', 'Dengan watermark DearGuest'],
+    features: ['1 undangan, aktif 14 hari', 'RSVP & dinding ucapan', 'Countdown & peta lokasi', 'Dengan watermark Vowvella'],
   },
   {
     slug: 'premium', name: 'Premium', price: 99000, compare_at_price: 199000, badge: 'Paling dipilih', is_featured: true,

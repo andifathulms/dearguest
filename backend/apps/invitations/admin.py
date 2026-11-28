@@ -62,7 +62,7 @@ class InvitationAdminForm(forms.ModelForm):
             raise forms.ValidationError(exc.messages)
 
 
-audit_log = logging.getLogger('dearguest.audit')
+audit_log = logging.getLogger('vowvella.audit')
 
 
 def audit(model_admin, request, obj, action):

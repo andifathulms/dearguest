@@ -3,14 +3,14 @@ import assert from 'node:assert/strict'
 import { codeFromScan, expectedPax, matchesGuest } from './usher.js'
 
 test('a scanned personal link gives its code', () => {
-  assert.equal(codeFromScan('https://dearguest.id/rani-dimas/K7MPQ2'), 'K7MPQ2')
-  assert.equal(codeFromScan('https://dearguest.id/rani-dimas/K7MPQ2/'), 'K7MPQ2')
-  assert.equal(codeFromScan('https://dearguest.id/rani-dimas?to=Budi&g=a1b2c3d4'), 'a1b2c3d4')
+  assert.equal(codeFromScan('https://vowvella.id/rani-dimas/K7MPQ2'), 'K7MPQ2')
+  assert.equal(codeFromScan('https://vowvella.id/rani-dimas/K7MPQ2/'), 'K7MPQ2')
+  assert.equal(codeFromScan('https://vowvella.id/rani-dimas?to=Budi&g=a1b2c3d4'), 'a1b2c3d4')
   assert.equal(codeFromScan(' K7MPQ2 '), 'K7MPQ2')
 })
 
 test('anything else is not a code', () => {
-  assert.equal(codeFromScan('https://dearguest.id/rani-dimas'), '')
+  assert.equal(codeFromScan('https://vowvella.id/rani-dimas'), '')
   assert.equal(codeFromScan('WIFI:S:Gedung;T:WPA;P:secret;;'), '')
   assert.equal(codeFromScan(''), '')
 })

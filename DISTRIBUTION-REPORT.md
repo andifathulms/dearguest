@@ -57,7 +57,7 @@ Full size, personal link: [`docs/distribution/og-personal.jpg`](docs/distributio
 
 **`?to=` is never used.** Rude and 10 KB `?to=` values were sent through `/<slug>`, `/<slug>/<code>`, `/share/<slug>/` and `/share/…&g=`. They never appear in a title or description, and never change the image URL. `/share/` still hands `?to=` to the app in its redirect for people, because the cover reads it.
 
-**Drafts, expired and unknown invitations** get the generic DearGuest tags, a 404 status and no image.
+**Drafts, expired and unknown invitations** get the generic Vowvella tags, a 404 status and no image.
 
 **Crawler routing**
 - One list, `shared/crawlers.txt`, generated into the nginx `map`, the Vite proxy and the backend.
@@ -93,7 +93,7 @@ WhatsApp  /demo-taman-sage/WNB9BU  → 200  X-Robots-Tag: noindex, nofollow
 - `og.titleGuest`: "Untuk {guest} · Undangan Pernikahan {bride} & {groom}"
 - `og.description`: "{greeting}, dengan penuh sukacita kami mengundang Anda ke pernikahan kami pada {date}." There's no address and no phone number.
 
-**Marketing site.** `public/social/dearguest.jpg` is a strip of all six covers (`scripts/build_social_image.py`); `index.html` and the prerendered pages use it.
+**Marketing site.** `public/social/vowvella.jpg` is a strip of all six covers (`scripts/build_social_image.py`); `index.html` and the prerendered pages use it.
 
 **Checking on a real phone**
 - WhatsApp caches a preview per URL. The cleanest test is a link that has never been shared, e.g. a new guest's `/<slug>/<code>`.
@@ -190,7 +190,7 @@ Mohon maaf kami hanya dapat mengundang melalui pesan ini. Terima kasih atas doa 
 - **Guest list:** counts for Total / Terkirim / Dibuka / Sudah RSVP / Sudah hadir; "dibuka N×" per guest; filters including **"Terkirim tapi belum dibuka"**.
 - In development, React StrictMode sends the beacon twice. Production sends one, and the 30-minute dedupe absorbs it either way.
 
-> **Privacy policy: a line is needed (not written by me).** The policy should say that when a guest opens their personal invitation link, DearGuest records the time and how often it was opened, and shows this to the couple who sent it. No IP address, device or location is stored.
+> **Privacy policy: a line is needed (not written by me).** The policy should say that when a guest opens their personal invitation link, Vowvella records the time and how often it was opened, and shows this to the couple who sent it. No IP address, device or location is stored.
 
 ## E · Catalogue
 
@@ -224,7 +224,7 @@ Mohon maaf kami hanya dapat mengundang melalui pesan ini. Terima kasih atas doa 
 ## F · Search engines and funnel
 
 **What crawlers see**
-- **Prerendered marketing pages:** `dist/tema/index.html` and `dist/tema/<id>/index.html`, each with its own title, description, canonical, OG tags and a `<noscript>` summary. A crawler without JavaScript now gets "Taman Sage · Tema Undangan Pernikahan DearGuest" instead of the generic shell.
+- **Prerendered marketing pages:** `dist/tema/index.html` and `dist/tema/<id>/index.html`, each with its own title, description, canonical, OG tags and a `<noscript>` summary. A crawler without JavaScript now gets "Taman Sage · Tema Undangan Pernikahan Vowvella" instead of the generic shell.
 - **`sitemap.xml`:** `/`, `/tema` and each theme page.
 - **`robots.txt`:** disallows `/dashboard`, `/my`, `/onboarding` and `/api/`. I left `/og/` and `/share/` crawlable on purpose, because some preview bots (e.g. Twitterbot) honour robots.txt for card images. Both send `noindex` themselves.
 - **`noindex`:** nginx sends `X-Robots-Tag: noindex, nofollow` for everything except the marketing pages and public files. Invitations also add a runtime robots meta tag.
@@ -248,7 +248,7 @@ Mohon maaf kami hanya dapat mengundang melalui pesan ini. Terima kasih atas doa 
 ## Known gaps and follow-ups
 
 1. **Reserved slugs.** Nothing stops a couple choosing `tema`, `dashboard`, `register` etc. as their slug. The crawler view handles those names safely, but slug validation should reject them (add a list next to `SITE_PATHS` in `share_views.py`).
-2. **Brand spelling.** New copy uses "DearGuest"; `index.html`'s title and the footer still say "Dear Guest". Pick one.
+2. **Brand spelling.** Resolved: the brand is now Vowvella everywhere (November 2026).
 3. **`FRONTEND_URL` must be the real public origin in production.** Preview images and `og:url` are built on it.
 4. **New packs need an `og` block and a capture run.** The other session's packs (Pampas Kraft, Gorga Ulos, Wisteria Lila, Bali) were built on this branch, so they have OG assets. Their registry entries don't have `previewVideo` yet; the gallery shows their still until `capture-docker.sh <id>` is run.
 5. **Group messages aren't tracked per person**, by design (one general link).

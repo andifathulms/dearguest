@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { MASK, scrubEvent, scrubText } from './scrub.js'
 
 test('masks numbers, emails, tokens, ?to= and guest codes', () => {
-  const out = scrubText('https://dearguest.id/andini-bagus/K7MPQ2?to=Budi%20Santoso 0812-3456-7890 budi@example.com eyJa.eyJb.c')
+  const out = scrubText('https://vowvella.id/andini-bagus/K7MPQ2?to=Budi%20Santoso 0812-3456-7890 budi@example.com eyJa.eyJb.c')
   for (const secret of ['K7MPQ2', 'Budi%20Santoso', '3456-7890', 'budi@example.com', 'eyJa.eyJb.c']) assert.ok(!out.includes(secret), secret)
   assert.ok(out.includes('/andini-bagus/[kode]'))
   assert.equal(scrubText('/api/invitations/andini-bagus/rsvps/'), '/api/invitations/andini-bagus/rsvps/')

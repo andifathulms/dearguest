@@ -134,7 +134,7 @@ export default function PackTheme({ entry, pack, invitation, guestName, preview 
 
           {invitation.watermark && (
             <div className="watermark-footer">
-              Dibuat dengan <a href={watermarkHref(invitation.slug)}>Dear Guest</a>
+              Dibuat dengan <a href={watermarkHref(invitation.slug)}>Vowvella</a>
             </div>
           )}
 

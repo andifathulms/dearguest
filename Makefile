@@ -1,4 +1,4 @@
-# DearGuest developer shortcuts. Requires the dev stack (`docker compose up -d`).
+# Vowvella developer shortcuts. Requires the dev stack (`docker compose up -d`).
 
 .PHONY: sync themes check test test-unit visual visual-update scripture
 

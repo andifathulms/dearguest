@@ -16,7 +16,7 @@ from django.core.management.base import BaseCommand
 
 from apps.invitations import ops
 
-log = logging.getLogger('dearguest.ops')
+log = logging.getLogger('vowvella.ops')
 
 
 def telegram(text):
@@ -50,8 +50,8 @@ class Command(BaseCommand):
             ops.heartbeat(job)
             log.info('job ok', extra={'ops_job': job, 'ops_detail': detail})
             return
-        text = f'⚠️ DearGuest {settings.RELEASE}: job "{job}" GAGAL ({detail}). Lihat RUNBOOK.md.'
+        text = f'⚠️ Vowvella {settings.RELEASE}: job "{job}" GAGAL ({detail}). Lihat RUNBOOK.md.'
         log.error('job failed', extra={'ops_job': job, 'ops_detail': detail})
         telegram(text)
         if job == 'backup':
-            send_mail('[DearGuest] Backup gagal', text, settings.DEFAULT_FROM_EMAIL, [settings.ADMIN_EMAIL], fail_silently=True)
+            send_mail('[Vowvella] Backup gagal', text, settings.DEFAULT_FROM_EMAIL, [settings.ADMIN_EMAIL], fail_silently=True)

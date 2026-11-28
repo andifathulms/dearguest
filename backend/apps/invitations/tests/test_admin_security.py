@@ -54,14 +54,14 @@ class AdminSecurityTests(APITestBase):
         inv = self.make_invitation(slug='aktifkan', active=False)
         self.web.force_login(self.staff)
         changelist = reverse('admin:invitations_invitation_changelist')
-        with self.assertLogs('dearguest.audit', 'INFO') as logs:
+        with self.assertLogs('vowvella.audit', 'INFO') as logs:
             self.web.post(changelist, {'action': 'activate_invitations', '_selected_action': [inv.pk]})
         inv.refresh_from_db()
         self.assertTrue(inv.is_active)
         entry = LogEntry.objects.get(object_id=str(inv.pk))
         self.assertEqual((entry.user, entry.get_change_message()), (self.staff, 'Diaktifkan'))
         self.assertIn('admin action', logs.output[0])
-        with self.assertLogs('dearguest.audit', 'INFO') as logs:
+        with self.assertLogs('vowvella.audit', 'INFO') as logs:
             self.web.post(changelist, {'action': 'delete_selected', '_selected_action': [inv.pk], 'post': 'yes'})
         self.assertFalse(Invitation.objects.filter(pk=inv.pk).exists())
         self.assertIn('admin delete', logs.output[0])

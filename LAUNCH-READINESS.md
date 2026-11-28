@@ -49,7 +49,7 @@ Everything this phase could do in code is done and verified below.
 | **A1** Sessions out of localStorage | httpOnly `dg_access` (15 min) and `dg_refresh` (14 days, rotating, blacklisted after use), `SameSite=Lax`, Secure unless DEBUG. CSRF required on writes. Logout endpoint. A password reset revokes every session. 9 tests. **Browser check on the dev stack:** anonymous `/my` redirects; login sets 3 cookies with the tokens httpOnly; PATCH without CSRF → 403, with CSRF → 200; an expired access cookie refreshes silently; the editor's draft preview renders; logout clears. Existing users log in once more. |
 | **A2** Ownership sweep | `test_ownership.py` walks the URL conf: **49 patterns, every one classified**. An unlisted or stale pattern fails CI. Every owner endpoint × every method tried by another couple and anonymously: 401/403/404/405, no data in the body, nothing changed (rows, couple, moderation, files). **Found and fixed:** 5 editor list endpoints answered strangers 200 with an empty list and validated uploads before refusing. Orders/invoices: Phase 3. |
 | **A3** CSP and headers | Enforced CSP with no inline script, plus Referrer-Policy, Permissions-Policy, COOP, XFO, nosniff, HSTS. **Walkthrough on the prod-like stack** (landing, /tema, a theme page, all 6 demos opened and scrolled with maps and music, a guest link, login, /my, dashboard, guest list, send queue, editor with preview, onboarding): **0 violations report-only, then 0 enforced, 0 page errors**. The share page lost its inline script. The payment provider's allowances are a Phase 3 placeholder. |
-| **A4** Admin | Path from `ADMIN_URL` (`/admin/` is just the app now); **TOTP required** (django-otp, `enrol_totp`); 5 failures per address+username → 15-minute lockout; nginx 5/min on the login URL (verified: `403 ×5`, then `429`); bulk actions and deletes write `LogEntry` plus `dearguest.audit` log lines. 5 tests. Refunds: Phase 3. |
+| **A4** Admin | Path from `ADMIN_URL` (`/admin/` is just the app now); **TOTP required** (django-otp, `enrol_totp`); 5 failures per address+username → 15-minute lockout; nginx 5/min on the login URL (verified: `403 ×5`, then `429`); bulk actions and deletes write `LogEntry` plus `vowvella.audit` log lines. 5 tests. Refunds: Phase 3. |
 | **A5** Audits | `check --deploy`: **"System check identified no issues (1 silenced)"**; the silenced W021 (HSTS preload) is deliberate until the domain is final. `pip-audit`: the old pins had advisories in Django 5.0, Pillow 10.3, DRF, simplejwt, setuptools. **Now clean** (Django 5.2.18 LTS, Pillow 13, DRF 3.18.3, …). `npm audit --omit=dev`: **0 high** (axios fixed). React Router 6 moderate and dev-only Vite advisories accepted, see SECURITY.md. gitleaks over **170 commits: no leaks** (test-fixture passwords allowlisted). |
 | **A6** Uploads | Every `FileField` in the project is a checked field. 8 editor upload paths + 3 admin forms reject HTML, SVG and oversized files. |
 | **A7** | `SECURITY.md` |
@@ -194,7 +194,7 @@ Things only you can do.
   - terms of service;
   - a takedown contact;
   - licences for demo photos and music (RECON 2.7).
-- [ ] Brand spelling "DearGuest" vs "Dear Guest" (Phase 4 follow-up).
+- [x] Brand spelling: renamed to Vowvella (November 2026).
 - [ ] Reserved slugs (`tema`, `dashboard`, `kelola`, …) rejected at signup (Phase 4 follow-up; not done here).
 - [ ] Run the full visual suite twice on an idle machine.
 

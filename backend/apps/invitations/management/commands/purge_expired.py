@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from apps.invitations import ops, retention
 
-log = logging.getLogger('dearguest.retention')
+log = logging.getLogger('vowvella.retention')
 
 
 class Command(BaseCommand):

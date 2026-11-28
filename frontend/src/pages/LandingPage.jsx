@@ -298,7 +298,7 @@ function Testimonials({ items }) {
     <section className="dg-band dg-dark hm-quotes">
       <div className="dg-container">
         <div className="dg-head">
-          <p className="dg-eyebrow">Dari pasangan DearGuest</p>
+          <p className="dg-eyebrow">Dari pasangan Vowvella</p>
           <h2 className="dg-h2">Kata mereka yang <em>sudah mengirim</em>.</h2>
         </div>
         <div className="hm-quote-grid" style={{ '--cols': `repeat(${Math.min(items.length, 3)}, minmax(0, 1fr))` }}>

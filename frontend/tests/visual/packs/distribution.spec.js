@@ -149,5 +149,5 @@ test('/tema/:id: demo in a phone frame, variant toggle, "Pakai tema ini"', async
   // The phone-only sticky bar repeats the link; click the one in the panel.
   await page.locator('.td-info').getByRole('link', { name: 'Pakai tema ini' }).click()
   await expect(page).toHaveURL(/\/register\?theme=sage$/)
-  expect(await page.evaluate(() => sessionStorage.getItem('dearguest.theme'))).toBe('sage')
+  expect(await page.evaluate(() => sessionStorage.getItem('vowvella.theme'))).toBe('sage')
 })

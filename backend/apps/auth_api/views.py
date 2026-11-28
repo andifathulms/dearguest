@@ -124,7 +124,7 @@ class PasswordResetView(APIView):
             token = default_token_generator.make_token(user)
             link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
             send_mail(
-                'Reset Kata Sandi — Dear Guest',
+                'Reset Kata Sandi — Vowvella',
                 f"Halo {user.username},\n\nKlik tautan berikut untuk mengatur ulang kata sandi kamu:\n{link}\n\n"
                 f"Jika kamu tidak meminta ini, abaikan saja email ini.",
                 settings.DEFAULT_FROM_EMAIL,
