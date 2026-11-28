@@ -160,10 +160,10 @@ Work top to bottom and stop when it's fixed. Tell the couple on WhatsApp within 
 
 ## 7. Takedown or abuse report
 
-1. Record it: admin → **Laporan** → add (URL, who reported it and how, reason). Reports are kept a year.
+1. Record it: `/backoffice/laporan` → *Catat laporan* (URL, who reported it and how, reason). Reports are kept
+   a year.
 2. Look at it. If it's clearly abusive (impersonation, illegal content, spam), deactivate it now:
-   - in Laporan, select the report → *Takedown: nonaktifkan undangannya*. This is audited and
-     timestamped on the report.
+   - on the report, click *Takedown: nonaktifkan*. This is audited and timestamped on the report.
    - The public page then says "belum aktif".
 3. Tell the account owner by email and WhatsApp why, and how to respond.
 4. Copyright (a photo or song): deactivate, ask the couple to replace the item, then *Selesai: aktifkan lagi*.
