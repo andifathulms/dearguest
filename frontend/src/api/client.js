@@ -32,7 +32,7 @@ api.interceptors.response.use(
       !original ||
       original._retried ||
       // Login, logout and refresh failing must not loop (/auth/me/ may refresh).
-      /\/auth\/(login|logout|refresh|register)\//.test(original.url || '')
+      /\/auth\/(login|logout|refresh|register)\/|\/staff\/login\//.test(original.url || '')
     ) {
       return Promise.reject(error)
     }

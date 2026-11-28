@@ -18,6 +18,7 @@ const SendQueuePage = lazy(() => import('./pages/SendQueuePage.jsx'))
 const InvitationPage = lazy(() => import('./pages/InvitationPage.jsx'))
 const UsherPage = lazy(() => import('./pages/UsherPage.jsx'))
 const WelcomeScreen = lazy(() => import('./pages/WelcomeScreen.jsx'))
+const BackofficeApp = lazy(() => import('./backoffice/BackofficeApp.jsx'))
 
 function Loading() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/dashboard/:slug/kirim" element={<SendQueuePage />} />
           <Route path="/penerima/:token" element={<UsherPage />} />
           <Route path="/penerima/:token/layar" element={<WelcomeScreen />} />
+          <Route path="/backoffice/*" element={<BackofficeApp />} />
           <Route path="/:slug/:code" element={<InvitationPage />} />
           <Route path="/:slug" element={<InvitationPage />} />
         </Routes>
