@@ -27,6 +27,14 @@ fine line work. The painted texture is tinted to the paintings' plaster.
 | `corner-tl` (mirrored to `corner-br`) | one olive branch from the corner, used as a light lintel over the closing |
 | `particles` | two olive leaves, a white petal, an olive twig, a terracotta petal, a white flower |
 | page background | `texture.webp`, the painted plaster (set in overrides.css) |
+| `section-edge` | one olive branch from the left edge, beside section headings (mirrored on the right) |
+| `section-garland` | two olive sprigs meeting at a white flower and a terracotta ribbon, the divider between sections |
+| `monogram-wreath` | a fine gold ring with an olive wreath on its lower half and one white flower |
+| `card-corner` | a double hairline corner with an olive sprig, on event and gift cards |
+| `scene-interlude` | a sunlit arcade seen through the arch, a potted olive at its foot; the countdown sits across the plain wall (calm ~12-86 % wide, 30-64 % high) |
+| `attire-bride` / `attire-groom` | a veil with a small comb, draped over a plaster plinth; a black bow tie and folded linen with an olive sprig on another; they stand in for the portraits when the couple shows no photos |
+| `prop-1` … `prop-4` | the bud vase (events), two rings in a linen box (story), a sealed envelope (gift), an unlit candle (RSVP) |
+| `closing-scene` | the arch at dusk, lit by a row of candles on its step; the monogram sits inside the arch (calm ~18-84 %, 20-76 %). The page deepens into the dusk (`--pk-closing-bg`) and the closing turns to candlelit sand |
 
 **Delivered differently from the prompt.**
 - The hero's arch rim runs the full height, so it can't be cut into two bands alone; see
@@ -34,7 +42,6 @@ fine line work. The painted texture is tinted to the paintings' plaster.
 - The cover's branch reaches ~30 % into the opening. Phones crop the painting's sides, so
   the cover text sits a little right of centre to clear it.
 - The sprite sheet came 2 across × 3 down (`sprites_grid`).
-- No section art (S1-S4) or scene art (C1-C4) yet: the pack renders without them.
 
 **Motion.**
 - Exit `bloom`: the cover grows and fades, as if walking through the arch.
@@ -59,4 +66,5 @@ fine line work. The painted texture is tinted to the paintings' plaster.
   couples of every faith?
 - Is the page too quiet for an Indonesian wedding, or is that the point for the couples
   who choose it?
+- The wax seal on the envelope is plain, with no letters or symbols.
 - The pack's name describes the look ("Lengkung Pasir").

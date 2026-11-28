@@ -25,8 +25,8 @@ Every theme is a **painted pack**: real illustrated art (generated with Gemini f
 6. Navy Bloom (live)
 7. Palembang (live)
 8. Tropis (live)
-9. Betawi (live: "Kembang Kelapa"; section and scene art still to paint, in `PROMPT-BETAWI-ASSETS.md`)
-10. Modern & Minimalis (live: "Lengkung Pasir", id `arch`; section and scene art still to paint, in `PROMPT-ARCH-ASSETS.md`)
+9. Betawi (live: "Kembang Kelapa", with section and scene art)
+10. Modern & Minimalis (live: "Lengkung Pasir", id `arch`, with section and scene art)
 11. Melayu
 
 ## Per-theme checklist (what worked)

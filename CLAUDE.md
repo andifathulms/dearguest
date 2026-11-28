@@ -91,7 +91,8 @@ Gemini repeats from the previous image, such as a half wreath under a card corne
 `theme.json`, then rewrite that pack's section baselines. The shared layout places them
 (docs/theme-packs.md §4, §9). Live: Jepun Prada, Gorga Ulos, Lamming Zamrud (plus depth), Gebyok Sogan (plus depth), Merah Anggur (plus depth;
 no card corner yet), Wisteria Lila, Gonjong Songket (plus depth),
-Mawar Malam, Limas Emas, Pampas Kraft (plus depth), Taman Sage (plus depth), Siger Mega Mendung (plus depth), Anggrek Bulan. A pack with new depth layers also needs hero CSS: the far strip stands ~0.25 W above
+Mawar Malam, Limas Emas, Pampas Kraft (plus depth), Taman Sage (plus depth), Siger Mega Mendung (plus depth), Anggrek Bulan,
+Kembang Kelapa (plus depth), Lengkung Pasir (plus depth). A pack with new depth layers also needs hero CSS: the far strip stands ~0.25 W above
 the opaque bottom band, with the text raised to clear it (see floral/javanese/bugis/minang/rustic/sage/sunda overrides.css).
 
 **"Scene art for <theme>"**: the user painted that theme's pieces from
@@ -113,7 +114,8 @@ two paintings, drop the pack's dead closing-corner CSS, rewrite that pack's sect
 add the pack to `PILOTS` in `tests/visual/packs/scenes.spec.js`. The shared layout places everything
 (docs/theme-packs.md §4, §9); a pack without the slots renders exactly as before. The ceremonial
 objects need the reviewer's answers listed at the end of each prompt file. Live: Gonjong Songket
-(three props: the marawa read as a national flag and was left out), Gebyok Sogan.
+(three props: the marawa read as a national flag and was left out), Gebyok Sogan, Kembang Kelapa,
+Lengkung Pasir.
 
 ### Production: the VPS
 The generic procedure (rollback, restore, rotating secrets, incidents) is in `RUNBOOK.md`. This VPS:

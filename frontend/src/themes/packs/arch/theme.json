@@ -109,6 +109,80 @@
       "svg": "assets/divider.svg",
       "width": 140,
       "height": 16
+    },
+    "section-edge": {
+      "src": "assets/section-edge.webp",
+      "avif": "assets/section-edge.avif",
+      "width": 445,
+      "height": 1224
+    },
+    "section-garland": {
+      "src": "assets/section-garland.webp",
+      "avif": "assets/section-garland.avif",
+      "width": 1200,
+      "height": 255
+    },
+    "monogram-wreath": {
+      "src": "assets/monogram-wreath.webp",
+      "avif": "assets/monogram-wreath.avif",
+      "width": 640,
+      "height": 640
+    },
+    "card-corner": {
+      "src": "assets/card-corner.webp",
+      "avif": "assets/card-corner.avif",
+      "width": 360,
+      "height": 360
+    },
+    "scene-interlude": {
+      "src": "assets/scene-interlude.webp",
+      "avif": "assets/scene-interlude.avif",
+      "width": 896,
+      "height": 1200,
+      "calm": [0.12, 0.3, 0.86, 0.64]
+    },
+    "attire-bride": {
+      "src": "assets/attire-bride.webp",
+      "avif": "assets/attire-bride.avif",
+      "width": 640,
+      "height": 640
+    },
+    "attire-groom": {
+      "src": "assets/attire-groom.webp",
+      "avif": "assets/attire-groom.avif",
+      "width": 640,
+      "height": 640
+    },
+    "prop-1": {
+      "src": "assets/prop-1.webp",
+      "avif": "assets/prop-1.avif",
+      "width": 179,
+      "height": 382
+    },
+    "prop-2": {
+      "src": "assets/prop-2.webp",
+      "avif": "assets/prop-2.avif",
+      "width": 343,
+      "height": 291
+    },
+    "prop-3": {
+      "src": "assets/prop-3.webp",
+      "avif": "assets/prop-3.avif",
+      "width": 333,
+      "height": 263
+    },
+    "prop-4": {
+      "src": "assets/prop-4.webp",
+      "avif": "assets/prop-4.avif",
+      "width": 270,
+      "height": 284
+    },
+    "closing-scene": {
+      "src": "assets/closing-scene.webp",
+      "avif": "assets/closing-scene.avif",
+      "width": 756,
+      "height": 1344,
+      "calm": [0.18, 0.2, 0.84, 0.76]
     }
   },
   "copyVariants": [

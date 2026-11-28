@@ -141,8 +141,8 @@
 .pk-root[data-pack='betawi'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(255, 252, 240, 0.85); border-color: var(--dg-line-strong); color: var(--dg-ink); }
 .pk-root[data-pack='betawi'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
 
-/* Closing: the valance-and-flower corners hang over the last words as a lintel (the
-   melati strings must hang down, so the second corner is mirrored, not rotated). */
-.pk-root[data-pack='betawi'] .pk-closing { padding-block: clamp(14rem, 60vw, 18rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
-.pk-root[data-pack='betawi'] .pk-closing .pk-corner { width: min(52vw, 240px); }
-.pk-root[data-pack='betawi'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
+/* Closing: the veranda at night (closing-scene). The page deepens into the
+   painting's dark, and the last words turn to lamplit cream. */
+.pk-root[data-pack='betawi'] { --pk-closing-bg: #22120f; }
+.pk-root[data-pack='betawi'] .pk-closing[data-scene] { --dg-ink: #f8efd6; --dg-ink-muted: #e6d6b4; --dg-accent: #e0b65c; color: var(--dg-ink); }
+.pk-root[data-pack='betawi']:has(.pk-closing[data-scene]) :is(.watermark-footer, .watermark-footer a) { color: #c2a988; }

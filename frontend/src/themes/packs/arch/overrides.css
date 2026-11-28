@@ -141,7 +141,8 @@
 .pk-root[data-pack='arch'] :is(.rsvp-input, .rsvp-textarea) { background: rgba(250, 246, 239, 0.85); border-color: var(--dg-line-strong); border-radius: 2px; color: var(--dg-ink); }
 .pk-root[data-pack='arch'] :is(.rsvp-input, .rsvp-textarea)::placeholder { color: var(--dg-ink-faint); }
 
-/* Closing: the olive corners lean in over the last words as a lintel, mirrored. */
-.pk-root[data-pack='arch'] .pk-closing { padding-block: clamp(12rem, 52vw, 16rem) clamp(5rem, 16vw, 8rem); overflow: hidden; }
-.pk-root[data-pack='arch'] .pk-closing .pk-corner { width: min(48vw, 220px); }
-.pk-root[data-pack='arch'] .pk-closing .pk-corner-br.pk-slot-mirrored { top: 0; bottom: auto; transform: scaleX(-1); }
+/* Closing: the arch at dusk, lit by candles (closing-scene). The page deepens into
+   the painting's dusk, and the last words turn to candlelit sand. */
+.pk-root[data-pack='arch'] { --pk-closing-bg: #2b2420; }
+.pk-root[data-pack='arch'] .pk-closing[data-scene] { --dg-ink: #f4ece0; --dg-ink-muted: #dccfbd; --dg-accent: #d9a27c; color: var(--dg-ink); }
+.pk-root[data-pack='arch']:has(.pk-closing[data-scene]) :is(.watermark-footer, .watermark-footer a) { color: #b8a690; }

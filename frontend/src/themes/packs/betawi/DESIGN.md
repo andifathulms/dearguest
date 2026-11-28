@@ -30,6 +30,14 @@ for the thin streamers. The painted texture is tinted to the paintings' cream.
 | `corner-tl` (mirrored to `corner-br`) | a short gigi balang valance with a spray of paper flowers, streamers and hanging melati, used as a lintel over the closing |
 | `particles` | red, cerise and marigold paper flowers, a melati bud, a rose petal, a curl of gold foil |
 | page background | `texture.webp`, the painted cream paper (set in overrides.css) |
+| `section-edge` | a kembang kelapa spray from the left edge, beside section headings (mirrored on the right) |
+| `section-garland` | a melati-and-flower garland with a gold tie, the divider between sections |
+| `monogram-wreath` | a melati wreath, fuller at the bottom, with a tumpal band on its lower curve |
+| `card-corner` | a gigi balang corner with a red flower, on event and gift cards |
+| `scene-interlude` | a rumah kebaya in its garden, with a palm and a belimbing tree; the countdown sits across the calm sky under the valance (calm ~6-94 % wide, 20-35 % high). Its cream paper is lifted out, so the page's texture shows through |
+| `attire-bride` / `attire-groom` | the bride's burung hong crown with kembang goyang and siangko, and the groom's alpie, each on a jade stand with a red tumpal cloth; they stand in for the portraits when the couple shows no photos |
+| `prop-1` … `prop-4` | a small kembang kelapa (events), a tehyan (story), a pair of roti buaya on a red tray (gift), a sirih dare (RSVP) |
+| `closing-scene` | the veranda at night with the lamps lit; the monogram sits in the dark sky right of the palm (calm ~40-94 %, 21-53 %). The page deepens into it (`--pk-closing-bg`) and the closing turns to lamplit cream |
 
 **Delivered differently from the prompt.**
 - The hero painting is the cover again with a small kembang kelapa added at each foot, so
@@ -38,7 +46,10 @@ for the thin streamers. The painted texture is tinted to the paintings' cream.
 - The far roofs fill ~45 % of the painting, not 28 %. They are kept down to ~78 % and
   placed behind the railing.
 - The sprite sheet came 2 across × 3 down (`sprites_grid`).
-- No section art (S1-S4) or scene art (C1-C4) yet: the pack renders without them.
+- The scene's palm fills the left of the sky, so the countdown sits in one row across the
+  band above it, and the closing's monogram sits right of the palm, off centre.
+- The sheet's roti buaya tray reaches across the midline; its corner is cleared from the
+  sirih dare's quarter (`clear`).
 
 **Motion.**
 - Exit `gate`: the symmetrical cover splits down the middle and the halves slide apart,
@@ -66,4 +77,12 @@ for the thin streamers. The painted texture is tinted to the paintings' cream.
 - Does a gate that opens (after the *palang pintu*) suit the cover, or is that ceremony
   too specific to show?
 - Do the brass lamps and the melati swag belong on a Betawi veranda?
+- The bride's crown: are the burung hong, the kembang goyang and the siangko right for a
+  Betawi bride (*dandanan care none*), and is it respectful to show them on a stand?
+- The groom's alpie belongs to the *care haji* attire, which carries a link to the hajj. Is a
+  stand-alone alpie right for couples of every background, or would a black peci with gold
+  trim be safer? (It is a one-image swap: `attire-groom` in the masters.)
+- Do the roti buaya, the sirih dare and the tehyan belong beside invitation text? Is the
+  roti buaya pair right for the gift section?
+- Does a night version of the veranda feel right for the closing?
 - The pack's name describes the look ("Kembang Kelapa"), not the group.
