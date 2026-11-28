@@ -2,7 +2,7 @@
 every endpoint is scoped to {slug} and verifies the requester owns it (or is staff).
 is_active/watermark/tier remain admin-controlled (the paywall)."""
 import re
-from . import activity, export, funnel
+from . import activity, export, funnel, vouchers
 from apps.auth_api.cookies import recently_authenticated
 from django.http import FileResponse
 from django.conf import settings
@@ -158,7 +158,9 @@ class RequestActivationView(APIView):
         inv.activation_requested = True
         inv.activation_requested_at = timezone.now()
         inv.save(update_fields=['activation_requested', 'activation_requested_at'])
-        activity.record('activation_requested', inv, request.user, tier=inv.tier)
+        use = vouchers.current(inv)
+        activity.record('activation_requested', inv, request.user, tier=inv.tier,
+                        **({'voucher': use.coupon.code} if use else {}))
         # Notify admin so they can confirm payment and issue an activation code.
         couple = getattr(inv, 'couple', None)
         names = f"{couple.bride_name} & {couple.groom_name}" if couple else inv.slug
@@ -169,7 +171,8 @@ class RequestActivationView(APIView):
             f"Undangan '{inv.slug}' ({names}) meminta aktivasi.\n\n"
             f"Akun    : {request.user.username}\n"
             f"WhatsApp: {wa or '(belum diisi)'}\n"
-            f"Email   : {request.user.email or '(kosong)'}\n\n"
+            f"Email   : {request.user.email or '(kosong)'}\n"
+            f"Voucher : {use.coupon.code + ' (' + use.coupon.label() + ')' if use else '-'}\n\n"
             f"Konfirmasi pembayaran, lalu terbitkan kode aktivasi & set tier di admin:\n"
             f"Buka admin → Permintaan Aktivasi (nomor WhatsApp bisa diklik di sana).",
             settings.DEFAULT_FROM_EMAIL,
@@ -177,6 +180,49 @@ class RequestActivationView(APIView):
             fail_silently=True,
         )
         return Response({'activation_requested': True})
+
+
+def voucher_state(inv):
+    """The invitation's voucher and the paid plans' prices with it."""
+    use = vouchers.current(inv)
+    return {'voucher': vouchers.public_data(use.coupon) if use else None,
+            'prices': vouchers.prices(use.coupon if use else None)}
+
+
+class MyVoucherView(APIView):
+    """GET the invitation's voucher; POST {code} to use one (pasted from a
+    promo); DELETE to remove it. Only before the invitation is live."""
+    permission_classes = [IsAuthenticated]
+    throttle_scope = 'coupon'
+
+    def get_throttles(self):
+        return super().get_throttles() if self.request.method == 'POST' else []
+
+    def _inv(self, request, slug):
+        inv = _owned(request.user, slug)
+        if not inv:
+            raise NotFound('Undangan tidak ditemukan.')
+        return inv
+
+    def get(self, request, slug):
+        return Response(voucher_state(self._inv(request, slug)))
+
+    def post(self, request, slug):
+        inv = self._inv(request, slug)
+        if inv.is_active:
+            return Response({'detail': 'Undangan sudah aktif; voucher dipakai sebelum pembayaran.'},
+                            status=status.HTTP_409_CONFLICT)
+        try:
+            vouchers.claim(inv, request.data.get('code'), inv.couple_user)
+        except vouchers.VoucherError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(voucher_state(inv))
+
+    def delete(self, request, slug):
+        inv = self._inv(request, slug)
+        if not inv.is_active:
+            vouchers.release_claim(inv)
+        return Response(voucher_state(inv))
 
 
 class ActivateView(APIView):

@@ -15,8 +15,8 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from . import activity
-from .models import CoupleProfile, Invitation, Payment
+from . import activity, vouchers
+from .models import Coupon, CoupleProfile, Invitation, Payment, Plan
 
 audit_log = logging.getLogger('vowvella.audit')
 TIER_LABELS = dict(Invitation.TIER_CHOICES)
@@ -40,12 +40,22 @@ def issue_code(inv, user):
 @transaction.atomic
 def fulfill(inv, user, tier, amount, channel='transfer', coupon=None, note=''):
     """The couple paid: record it, set the tier and issue the code staff send
-    them by WhatsApp. Bisnis also allows a second invitation."""
+    them by WhatsApp. Bisnis also allows a second invitation. With a voucher,
+    it must still be usable for this plan (vouchers.VoucherError otherwise) and
+    is redeemed; without one, a code the couple pasted is released."""
+    if coupon:
+        coupon = Coupon.objects.select_for_update().get(pk=coupon.pk)   # the quota can't be overrun
+        vouchers.check(coupon, tier=tier, user=inv.couple_user, invitation=inv)
     inv.tier = tier
     inv.activation_code = secrets.token_hex(3).upper()
     inv.save(update_fields=['tier', 'activation_code'])
-    Payment.objects.create(invitation=inv, tier=tier, amount=amount, channel=channel, coupon=coupon, note=note,
-                           recorded_by=user)
+    payment = Payment.objects.create(invitation=inv, tier=tier, amount=amount, channel=channel, coupon=coupon,
+                                     note=note, recorded_by=user)
+    if coupon:
+        list_price = Plan.objects.filter(slug=tier).values_list('price', flat=True).first() or 0
+        vouchers.redeem(inv, coupon, payment, tier, list_price)
+    else:
+        vouchers.release_claim(inv)
     if tier == 'bisnis' and inv.couple_user:
         profile, _ = CoupleProfile.objects.get_or_create(user=inv.couple_user)
         if profile.max_invitations < 2:

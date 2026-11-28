@@ -345,9 +345,17 @@ def system():
 # ---- activations, couples, wishes, reports ----
 
 def activations():
+    """Pending requests, each with the voucher the couple pasted and the paid
+    plans' prices after it."""
+    from . import vouchers
     qs = (real_invitations().select_related('couple', 'couple_user__profile')
           .filter(activation_requested=True, is_active=False).order_by('activation_requested_at'))
-    return [invitation_row(inv) for inv in with_counts(qs)]
+    rows = []
+    for inv in with_counts(qs):
+        use = vouchers.current(inv)
+        rows.append({**invitation_row(inv), 'prices': vouchers.prices(use.coupon if use else None),
+                     'voucher': {'id': use.coupon_id, **vouchers.public_data(use.coupon)} if use else None})
+    return rows
 
 
 def couples(request, user):

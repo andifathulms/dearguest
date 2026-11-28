@@ -92,6 +92,11 @@ OWNERSHIP = {
     'api/my/invitations/<slug:slug>/export.zip': ('owner', [('get', '/api/my/invitations/{slug}/export.zip')]),
     'api/my/invitations/<slug:slug>/request-activation/': ('owner', [('post', '/api/my/invitations/{slug}/request-activation/')]),
     'api/my/invitations/<slug:slug>/activate/': ('owner', [('post', '/api/my/invitations/{slug}/activate/')]),
+    'api/my/invitations/<slug:slug>/voucher/': ('owner', [
+        ('get', '/api/my/invitations/{slug}/voucher/'),
+        ('post', '/api/my/invitations/{slug}/voucher/'),
+        ('delete', '/api/my/invitations/{slug}/voucher/'),
+    ]),
     'api/my/invitations/<slug:slug>/music-preset/': ('owner', [
         ('post', '/api/my/invitations/{slug}/music-preset/'),
         ('put', '/api/my/invitations/{slug}/music-preset/'),

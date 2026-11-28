@@ -3,13 +3,13 @@ import secrets
 from urllib.parse import quote
 
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.core.exceptions import ValidationError
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 
-from . import staff_actions, themes
+from . import staff_actions, themes, vouchers
 from .models import (
     Invitation, Couple, Event, Story, Photo, BankAccount, RSVP, Guest,
     CoupleProfile, ActivationRequest, Coupon, MusicPreset, FunnelEvent,
@@ -78,7 +78,7 @@ class PaymentForm(forms.Form):
     """What the couple paid, asked when confirming an activation."""
     amount = forms.IntegerField(min_value=0, label='Jumlah diterima (Rp)', help_text='Per undangan, mis. 99000.')
     channel = forms.ChoiceField(choices=Payment.CHANNELS, label='Lewat')
-    coupon = forms.ModelChoiceField(Coupon.objects.all(), required=False, label='Kupon')
+    coupon = forms.ModelChoiceField(Coupon.objects.all(), required=False, label='Voucher')
     note = forms.CharField(max_length=200, required=False, label='Catatan')
 
 
@@ -201,10 +201,16 @@ class ActivationRequestAdmin(AuditedDeletes, admin.ModelAdmin):
                 'invitations': queryset, 'action': request.POST.get('action'),
                 'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
             })
+        done = 0
         for inv in queryset:
-            staff_actions.fulfill(inv, request.user, tier, **form.cleaned_data)
-        self.message_user(request, f'{queryset.count()} undangan disetel {label}, pembayaran dicatat, kode diterbitkan. '
-                                   'Kirim kode ke pasangan via WhatsApp.')
+            try:
+                staff_actions.fulfill(inv, request.user, tier, **form.cleaned_data)
+                done += 1
+            except vouchers.VoucherError as exc:
+                self.message_user(request, f'{inv.slug}: {exc} Tidak ada yang dicatat untuk undangan ini.', messages.ERROR)
+        if done:
+            self.message_user(request, f'{done} undangan disetel {label}, pembayaran dicatat, kode diterbitkan. '
+                                       'Kirim kode ke pasangan via WhatsApp.')
         return None
 
     @admin.action(description='Terbitkan kode aktivasi saja')

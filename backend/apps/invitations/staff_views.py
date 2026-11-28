@@ -20,7 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.auth_api.cookies import set_session
 
-from . import backoffice, staff_actions
+from . import backoffice, staff_actions, vouchers
 from .models import AbuseReport, Coupon, Invitation, Payment, RSVP
 from .throttling import client_ip
 
@@ -142,8 +142,9 @@ class InvitationActionView(StaffView):
 
 class ActivationListView(StaffView):
     def get(self, request):
-        return Response({'results': backoffice.activations(), 'coupons': list(
-            Coupon.objects.filter(active=True).values('id', 'code', 'discount_percent'))})
+        usable = [c for c in Coupon.objects.filter(active=True).order_by('code') if vouchers.state(c) == 'active']
+        return Response({'results': backoffice.activations(),
+                         'coupons': [{'id': c.pk, 'code': c.code, 'label': c.label(), 'plans': c.plans} for c in usable]})
 
 
 class FulfillView(StaffView):
@@ -172,10 +173,13 @@ class FulfillView(StaffView):
         if data.get('coupon'):
             coupon = Coupon.objects.filter(pk=data.get('coupon')).first()
             if not coupon:
-                errors['coupon'] = 'Kupon tidak ditemukan.'
+                errors['coupon'] = 'Voucher tidak ditemukan.'
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
-        staff_actions.fulfill(inv, request.user, tier, amount, channel, coupon, str(data.get('note') or '')[:200])
+        try:
+            staff_actions.fulfill(inv, request.user, tier, amount, channel, coupon, str(data.get('note') or '')[:200])
+        except vouchers.VoucherError as exc:
+            return Response({'coupon': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         inv.refresh_from_db()
         return Response({'activation_code': inv.activation_code, 'tier': inv.tier})
 

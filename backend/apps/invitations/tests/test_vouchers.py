@@ -136,3 +136,87 @@ class CouponToVoucherMigrationTests(MigrationTestCase):
         self.assertEqual(coupon.discount_type, 'percent')
         use = self.apps.get_model('invitations', 'VoucherRedemption').objects.get()
         self.assertEqual((use.status, use.tier, use.discount), ('redeemed', 'premium', 19800))
+
+
+class CoupleVoucherTests(APITestBase):
+    def setUp(self):
+        super().setUp()
+        self.voucher = Coupon.objects.create(code='HEMAT20', discount_percent=20, max_discount=30000)
+        self.owner = self.make_user('rani')
+        self.inv = self.make_invitation(owner=self.owner, slug='rani-dimas', active=False)
+        self.client.force_authenticate(self.owner)
+        self.url = '/api/my/invitations/rani-dimas/voucher/'
+
+    def test_public_check_shows_the_prices(self):
+        self.client.force_authenticate(None)
+        res = self.client.get('/api/coupons/validate/', {'code': ' hemat20 '})
+        self.assertEqual((res.data['valid'], res.data['label']), (True, '20%'))
+        self.assertEqual(res.data['prices']['premium']['final'], 79200)
+        self.assertEqual(res.data['prices']['bisnis']['discount'], 30000)   # 20% of 179000 capped
+        res = self.client.get('/api/coupons/validate/', {'code': 'NOPE'})
+        self.assertEqual(res.data, {'valid': False, 'reason': 'Kode voucher tidak ditemukan. Periksa ejaannya.'})
+
+    def test_paste_remove_and_errors(self):
+        self.assertIsNone(self.client.get(self.url).data['voucher'])
+        res = self.client.post(self.url, {'code': 'hemat20'}, format='json')
+        self.assertEqual((res.status_code, res.data['voucher']['code']), (200, 'HEMAT20'))
+        self.assertEqual(res.data['prices']['premium']['final'], 79200)
+        res = self.client.post(self.url, {'code': 'SALAH'}, format='json')
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(self.client.get(self.url).data['voucher']['code'], 'HEMAT20')   # the old one stays
+        self.assertIsNone(self.client.delete(self.url).data['voucher'])
+        self.assertEqual(vouchers.used(self.voucher), 0)
+
+    def test_not_after_the_invitation_is_live(self):
+        self.inv.is_active = True
+        self.inv.save()
+        self.assertEqual(self.client.post(self.url, {'code': 'HEMAT20'}, format='json').status_code, 409)
+
+    def test_the_activation_request_carries_the_code(self):
+        from django.core import mail
+        from apps.invitations.models import ActivityEvent
+        self.client.post(self.url, {'code': 'HEMAT20'}, format='json')
+        self.client.post('/api/my/invitations/rani-dimas/request-activation/')
+        self.assertIn('Voucher : HEMAT20 (20%)', mail.outbox[-1].body)
+        self.assertEqual(ActivityEvent.objects.get(kind='activation_requested').meta['voucher'], 'HEMAT20')
+
+
+class StaffRedeemTests(APITestBase):
+    def setUp(self):
+        super().setUp()
+        from django.contrib.auth.models import Group
+        from django.test import override_settings
+        self.voucher = Coupon.objects.create(code='HEMAT20', discount_percent=20, plans=['premium'], quota=1)
+        self.owner = self.make_user('rani')
+        self.inv = self.make_invitation(owner=self.owner, active=False, activation_requested=True,
+                                        activation_requested_at=timezone.now())
+        vouchers.claim(self.inv, 'HEMAT20', self.owner)
+        staff = User.objects.create_user('bantu', password='x-Strong-pass-91', is_staff=True)
+        staff.groups.add(Group.objects.get(name='Staf'))
+        with override_settings(ADMIN_REQUIRE_OTP=False):
+            self.client.post('/api/staff/login/', {'username': 'bantu', 'password': 'x-Strong-pass-91'}, format='json')
+        self.url = f'/api/staff/activations/{self.inv.pk}/fulfill/'
+
+    def test_the_list_shows_the_voucher_and_the_price_after_it(self):
+        row = self.client.get('/api/staff/activations/').data['results'][0]
+        self.assertEqual((row['voucher']['code'], row['prices']['premium']['final']), ('HEMAT20', 79200))
+
+    def test_paying_with_the_claimed_voucher_redeems_it(self):
+        res = self.client.post(self.url, {'tier': 'premium', 'amount': 79200, 'coupon': self.voucher.pk}, format='json')
+        self.assertEqual(res.status_code, 200, res.content)
+        use = VoucherRedemption.objects.get()
+        self.assertEqual((use.status, use.discount, use.payment.amount), ('redeemed', 19800, 79200))
+        self.assertEqual(vouchers.state(self.voucher), 'exhausted')
+
+    def test_a_voucher_that_does_not_fit_the_plan_records_nothing(self):
+        res = self.client.post(self.url, {'tier': 'bisnis', 'amount': 179000, 'coupon': self.voucher.pk}, format='json')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('hanya untuk paket Premium', res.data['coupon'])
+        self.assertFalse(Payment.objects.exists())
+        self.inv.refresh_from_db()
+        self.assertEqual(self.inv.activation_code, '')
+
+    def test_paying_without_a_voucher_releases_the_claim(self):
+        self.client.post(self.url, {'tier': 'bisnis', 'amount': 179000}, format='json')
+        self.assertEqual(VoucherRedemption.objects.get().status, 'released')
+        self.assertEqual(vouchers.left(self.voucher), 1)

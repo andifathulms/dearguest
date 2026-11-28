@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import MAX_PAX, Invitation, RSVP, Guest, Coupon, MusicPreset, find_guest, normalise_whatsapp
 from .serializers import MusicPresetSerializer
-from . import activity, audience, copy, csv_export, guest_import, ics, maps, moderation, payload_cache, themes
+from . import activity, audience, copy, csv_export, guest_import, ics, maps, moderation, payload_cache, themes, vouchers
 from .crawlers import is_crawler
 from .entitlements import has_feature
 from .throttling import client_ip
@@ -336,21 +336,19 @@ class MusicPresetListView(generics.ListAPIView):
 
 
 class CouponValidateView(APIView):
-    """Public: validate a promo code and return its discount."""
+    """Public: check a voucher code for the pricing page. GET ?code=. Answers
+    what it takes off and the paid plans' prices with it, or the reason it
+    can't be used (vouchers.py). A logged-in couple is checked as themselves
+    (once per account)."""
     permission_classes = [AllowAny]
     throttle_scope = 'coupon'   # codes can't be guessed by brute force
 
     def get(self, request):
-        code = (request.query_params.get('code') or '').strip().upper()
-        coupon = Coupon.objects.filter(code=code).first()
-        if not coupon or not coupon.is_valid():
-            return Response({'valid': False})
-        return Response({
-            'valid': True,
-            'code': coupon.code,
-            'discount_percent': coupon.discount_percent,
-            'description': coupon.description,
-        })
+        try:
+            coupon = vouchers.check(request.query_params.get('code'), user=request.user)
+        except vouchers.VoucherError as exc:
+            return Response({'valid': False, 'reason': str(exc)})
+        return Response({'valid': True, **vouchers.public_data(coupon), 'prices': vouchers.prices(coupon)})
 
 
 class GuestListCreateView(generics.ListCreateAPIView):
